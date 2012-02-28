@@ -93,7 +93,7 @@ public class ProcTaxaCambio extends SvrProcess
 		rate.setC_Currency_ID(USD);
 		rate.setC_Currency_ID_To(BRL);
 		rate.setValidFrom(AdempiereLBR.addDays(dataCambio, 1));
-		rate.setValidTo(AdempiereLBR.addDays(dataCambio, 1));
+		rate.setValidTo(AdempiereLBR.addDays(dataCambio, 7)); //BF - Válido por 7 dias para garantir fds e feriados
 		rate.setMultiplyRate(taxaVenda);
 		rate.setC_ConversionType_ID(MConversionType.getDefault(Env.getAD_Client_ID(getCtx())));
 		rate.save(get_TrxName());
