@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MClient;
 import org.compiere.model.MOrgInfo;
@@ -59,7 +60,7 @@ public abstract class NFeEmail {
 			MOrgInfo orgInfo = MOrgInfo.get(ctx, nf.getAD_Org_ID(), trx);
 
 			final MUser from = new MUser(ctx,
-					orgInfo.get_ValueAsInt("lbr_ContatoNFe"), trx);
+					orgInfo.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_lbr_ContatoNFe_ID), trx);
 
 			// Check from email user
 			if (from.getEMailUser() == null && from.getEMailUserPW() == null)
