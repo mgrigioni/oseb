@@ -287,7 +287,7 @@ public class RC100 extends RegSped implements Comparable<Object>{
             .append(PIPE).append(COD_SIT)
             .append(PIPE).append(SER)
             .append(PIPE).append(NUM_DOC)
-            .append(PIPE).append((IND_EMIT.equals("1") || isCancelled) ? "" : TextUtil.checkSize(TextUtil.toNumeric(CHV_NFE), 44))
+            .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(CHV_NFE), 44))
             .append(PIPE).append(TextUtil.timeToString(DT_DOC, "ddMMyyyy", false))
             .append(PIPE).append(TextUtil.timeToString(DT_E_S, "ddMMyyyy", false))
             .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(VL_DOC), 255))

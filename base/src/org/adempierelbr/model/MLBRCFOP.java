@@ -15,6 +15,9 @@ package org.adempierelbr.model;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
+import org.adempierelbr.wrapper.I_W_C_OrderLine;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
@@ -53,6 +56,18 @@ public class MLBRCFOP extends X_LBR_CFOP {
 	public MLBRCFOP(Properties ctx, int ID, String trx){
 		super(ctx,ID,trx);
 	}
+	
+	/*
+	 * Devolução
+	 */
+	public boolean isDevol(){
+		
+		if (getDescription() != null && 
+		   (getDescription().toUpperCase()).indexOf("DEVOL") != -1)
+				return true;	
+		
+		return false;
+	} //isDevol
 
 	/**
 	 *  Load Constructor
@@ -104,7 +119,7 @@ public class MLBRCFOP extends X_LBR_CFOP {
 			isSOTrx = false;
 		}
 		
-		if (!dt.get_ValueAsBoolean("lbr_HasFiscalDocument")) //SEM NF NÃO VERIFICA CFOP
+		if (!dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasFiscalDocument)) //SEM NF NÃO VERIFICA CFOP
 			return null;
 
 		MInvoiceLine[] lines = invoice.getLines();
@@ -112,8 +127,8 @@ public class MLBRCFOP extends X_LBR_CFOP {
 			if (line.isDescription())
 				continue;
 
-			Integer LBR_CFOP_ID = (Integer)line.get_Value("LBR_CFOP_ID");
-			if (!MLBRCFOP.validateCFOP(LBR_CFOP_ID, isSOTrx, orgLocation, location, !dt.get_ValueAsBoolean("lbr_HasFiscalDocument")))
+			Integer LBR_CFOP_ID = (Integer)line.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_CFOP_ID);
+			if (!MLBRCFOP.validateCFOP(LBR_CFOP_ID, isSOTrx, orgLocation, location, !dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasFiscalDocument)))
 				return  "CFOP inválido. Fatura: " + invoice.getDocumentNo() + " Linha: " + line.getLine();
 		}
 
@@ -149,7 +164,7 @@ public class MLBRCFOP extends X_LBR_CFOP {
 
 		MOrderLine[] lines = order.getLines();
 		for(MOrderLine line : lines){
-			Integer LBR_CFOP_ID = (Integer)line.get_Value("LBR_CFOP_ID");
+			Integer LBR_CFOP_ID = (Integer)line.get_Value(I_W_C_OrderLine.COLUMNNAME_LBR_CFOP_ID);
 			if (!MLBRCFOP.validateCFOP(LBR_CFOP_ID, isSOTrx, orgLocation, location, true))
 				return  "CFOP inválido. OV: " + order.getDocumentNo() + " Linha: " + line.getLine();
 		}

@@ -22,12 +22,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempierelbr.nfe.beans.ChaveNFE;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeEmail;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
-import org.adempierelbr.nfe.beans.ChaveNFE;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
@@ -41,6 +43,7 @@ import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MPaymentTerm;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRegion;
 import org.compiere.model.MSequence;
@@ -190,7 +193,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 					&& vC_DocTypeTarget_ID.intValue() > 0)
 			{
 				MDocType dt = new MDocType (Env.getCtx(), vC_DocTypeTarget_ID, null);
-				String nfModel = dt.get_ValueAsString("lbr_NFModel");
+				String nfModel = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel);
 				//
 				if (nfModel != null && nfModel.startsWith("RPS"))
 				{
@@ -237,7 +240,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 
 		MDocType docType = new MDocType(getCtx(), invoice.getC_DocTypeTarget_ID(), get_TrxName());
 
-		LBR_DocTypeNF_ID = (Integer)docType.get_Value("LBR_DocTypeNF_ID");
+		LBR_DocTypeNF_ID = (Integer)docType.get_Value(I_W_C_DocType.COLUMNNAME_LBR_DocTypeNF_ID);
 		if (LBR_DocTypeNF_ID == null)
 			LBR_DocTypeNF_ID = 0;
 
@@ -246,26 +249,40 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 	
 	/**
 	 * Indicador do tipo de pagamento (Utilizado na NFe e SPED)
+	 * 
+	 * PADRAO = A VISTA
+	 * SE POSSUIR INVOICE E ITENS EM ABERTO VERIFICA SE E PARCELADO OU A PRAZO, OU MANTEM O A VISTA
+	 * SENAO = SEM COBRANCA
+	 * 
 	 * @return String indPag
 	 */
 	public String getIndPag(){
 		
 		String indPag = "0"; //A VISTA
-		MLBROpenItem[] openItems = MLBROpenItem.getOpenItem(getC_Invoice_ID(), get_TrxName());
-		if (openItems.length > 1)
-			indPag = "2"; //PARCELADO
-		else {
-			if (openItems.length == 1){
-				if (openItems[0].getNetDays() > 0)
-					indPag = "1"; //A PRAZO
+		
+		MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
+		if (invoice.get_ID() != 0){
+			MDocType dt = new MDocType(getCtx(),invoice.getC_DocType_ID(),get_TrxName());
+			if (dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems)){
+				if (invoice.isPayScheduleValid()){
+					indPag = "2"; //PARCELADO
+				}
+				else{
+					MPaymentTerm pt = new MPaymentTerm(getCtx(),invoice.getC_Payment_ID(),get_TrxName());
+					if (pt.getNetDays() > 0)
+						indPag = "1"; //PRAZO
+				}
 			}
 			else{
 				indPag = "9"; //SEM COBRANCA
 			}
 		}
-		
+		else{
+			indPag = "9"; //SEM COBRANCA
+		}
+
 		return indPag;
-	}
+	} //getIndPag
 
 	public boolean setSiscomexTax(){
 
@@ -429,7 +446,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),get_TrxName());
 		MCountry orgCountry = new MCountry(getCtx(),orgLoc.getC_Country_ID(),get_TrxName());
 
-		String legalEntity = orgInfo.get_ValueAsString("lbr_LegalEntity");
+		String legalEntity = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity);
 		if (legalEntity == null || legalEntity.length() < 1)
 			legalEntity = org.getName();
 
@@ -443,9 +460,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 		setlbr_OrgPostal(orgLoc.getPostal());
 		setlbr_OrgCountry(orgCountry.getCountryCode());
 		setlbr_OrgRegion(orgLoc.getRegionName(true));
-		setlbr_OrgCCM(orgInfo.get_ValueAsString("lbr_CCM"));
-		setlbr_CNPJ(orgInfo.get_ValueAsString("lbr_CNPJ"));
-		setlbr_IE(orgInfo.get_ValueAsString("lbr_IE"));
+		setlbr_OrgCCM(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM));
+		setlbr_CNPJ(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ));
+		setlbr_IE(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE));
 	} //setOrgInfo
 
 	public void setBPartner(MBPartner bpartner, MBPartnerLocation bpLocation){
@@ -1306,6 +1323,30 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 
 		return list.toArray(new X_LBR_NFDI[list.size()]);
 	}	//	getDIs
+	
+	public boolean isRevenue(){
+		
+		String cfopReference = getCFOPReference();
+		List<String> list = new ArrayList<String>();
+		
+		if (cfopReference.indexOf(",") != -1){
+			String[] cfops = cfopReference.split(",");
+			for (String cfop : cfops){
+				list.add(cfop);
+			}
+		}
+		else{
+			list.add(cfopReference);
+		}
+		
+		for (String cfop : list){
+			MLBRCFOP codigo = MLBRCFOP.getCFOP(getCtx(), cfop, get_TrxName());
+			if (!codigo.islbr_IsRevenue())
+				return false;
+		}
+		
+		return true;
+	} //isRevenue
 
 	/**
 	 * Atualiza autorização NF-e e XML de distribuicao
@@ -1533,7 +1574,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 		String serieNo = getSerieNo(getDocumentNo());
 		if (serieNo.isEmpty() && islbr_IsOwnDocument()){
 			MDocType dt = new MDocType(getCtx(),getC_DocTypeTarget_ID(),get_TrxName());
-			serieNo = dt.get_ValueAsString("lbr_NFSerie");
+			serieNo = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
 		}
 		return serieNo;
 	}

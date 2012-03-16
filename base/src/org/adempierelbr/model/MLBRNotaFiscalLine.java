@@ -480,25 +480,38 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 		return CST_IPI;
 	} //getCST_IPI
-	
+		
 	/**
 	 * Formata e retorna a Situação Tributária do PIS
 	 * @return String Situação Tributária do PIS
 	 */
 	public String getCST_PIS(){
 
-		String CST_PIS = getlbr_TaxStatusPIS();
+		String CST_PIS = getlbr_TaxStatusCOFINS();
 		
-		if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) //ENTRADA
-			CST_PIS = "50";
-		else
-			CST_PIS = "01";
+		MLBRCFOP cfop = new MLBRCFOP(getCtx(),getLBR_CFOP_ID(),get_TrxName());
+		
+		if (CST_PIS == null || CST_PIS.trim().isEmpty()){
+			if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) {//ENTRADA
+				CST_PIS = "54";
+				if (cfop.isDevol())
+					CST_PIS = "50";
+			}
+			else{
+				CST_PIS = "01";
+				if (getTaxRate("PIS").compareTo(TaxBR.PISRATE) != 0)
+					CST_PIS = "02";
+			}
+		}
 				
 		if (getTaxAmt("PIS").signum() != 1){ //ISENTO
-			if (CST_PIS.equals("50"))
+			if (CST_PIS.equals("50") || CST_PIS.equals("54"))
 				CST_PIS = "98";
-			else if (CST_PIS.equals("01"))
+			else if (CST_PIS.equals("01") || CST_PIS.equals("02")){
 				CST_PIS = "07";
+				if (!cfop.islbr_IsRevenue())
+					CST_PIS = "49";
+			}
 		}
 		
 		return CST_PIS;
@@ -512,16 +525,29 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 		String CST_COFINS = getlbr_TaxStatusCOFINS();
 		
-		if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) //ENTRADA
-			CST_COFINS = "50";
-		else
-			CST_COFINS = "01";
+		MLBRCFOP cfop = new MLBRCFOP(getCtx(),getLBR_CFOP_ID(),get_TrxName());
+		
+		if (CST_COFINS == null || CST_COFINS.trim().isEmpty()){
+			if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) {//ENTRADA
+				CST_COFINS = "54";
+				if (cfop.isDevol())
+					CST_COFINS = "50";
+			}
+			else{
+				CST_COFINS = "01";
+				if (getTaxRate("COFINS").compareTo(TaxBR.COFINSRATE) != 0)
+					CST_COFINS = "02";
+			}
+		}
 				
 		if (getTaxAmt("COFINS").signum() != 1){ //ISENTO
-			if (CST_COFINS.equals("50"))
+			if (CST_COFINS.equals("50") || CST_COFINS.equals("54"))
 				CST_COFINS = "98";
-			else if (CST_COFINS.equals("01"))
+			else if (CST_COFINS.equals("01") || CST_COFINS.equals("02")){
 				CST_COFINS = "07";
+				if (!cfop.islbr_IsRevenue())
+					CST_COFINS = "49";
+			}
 		}
 		
 		return CST_COFINS;

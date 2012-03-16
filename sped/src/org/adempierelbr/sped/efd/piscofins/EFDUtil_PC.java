@@ -54,6 +54,10 @@ import org.adempierelbr.sped.efd.piscofins.beans.RD505;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_BPartner;
+import org.adempierelbr.wrapper.I_W_C_Country;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCountry;
@@ -138,13 +142,13 @@ public class EFDUtil_PC
 		String TIP_ESCRIT  = "0"; //REMESSA ORIGINAL //FIXME
 		String IND_SIT_ESP = "0"; //ABERTURA //FIXME
 		String NUM_REC_ANTERIOR = ""; //FIXME
-		String NOME        = orgInfo.get_ValueAsString("lbr_LegalEntity");
-		String CNPJ        = orgInfo.get_ValueAsString("lbr_CNPJ");
+		String NOME        = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity);
+		String CNPJ        = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
 		String UF          = orgLoc.getC_Region().getName();
 		String COD_MUN     = BPartnerUtil.getCityCode(orgLoc);
-		String SUFRAMA     = orgInfo.get_ValueAsString("lbr_Suframa");
+		String SUFRAMA     = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_Suframa);
 		String IND_NAT_PJ  = "00"; //SOCIEDADE EMPRESARIAL //FIXME
-		String IND_ATIV    = orgInfo.get_ValueAsString("lbr_IndAtividade");
+		String IND_ATIV    = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IndAtividade);
 
 		return new R0000(COD_VER, TIP_ESCRIT, IND_SIT_ESP, NUM_REC_ANTERIOR, 
 				dateFrom, dateTo, NOME, CNPJ, UF, COD_MUN, SUFRAMA, IND_NAT_PJ, IND_ATIV);
@@ -154,7 +158,7 @@ public class EFDUtil_PC
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 		
-		int BPAccountant_ID = orgInfo.get_ValueAsInt("LBR_BP_Accountant_ID");
+		int BPAccountant_ID = orgInfo.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_BP_Accountant_ID);
 		if (BPAccountant_ID <= 0){
 			log.severe("EFD R0100 - CONTADOR NAO CADASTRADO");
 			return null;
@@ -170,10 +174,10 @@ public class EFDUtil_PC
 		MLocation contLoc = new MLocation(getCtx(),bpcontLoc.getC_Location_ID(),get_TrxName());
 
 		String NOME = bpContador.getName();
-		String CPF  = bpContador.get_ValueAsString("lbr_CPF");
-		String CRC  = bpContador.get_ValueAsString("lbr_CRC");
+		String CPF  = bpContador.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF);
+		String CRC  = bpContador.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CRC);
 		String CNPJ = "";
-		if (bpContador.get_ValueAsString("lbr_BPTypeBR").equals("PJ")){
+		if (BPartnerUtil.getBPTypeBR(bpContador).equals(BPartnerUtil.PJ)){
 			CNPJ = BPartnerUtil.getCNPJ(bpContador, bpcontLoc);
 		}
 		
@@ -208,13 +212,33 @@ public class EFDUtil_PC
 		return new R0110(COD_INC_TRIB,IND_APRO_CRED,COD_TIPO_CONT);
 	} //createR0110
 	
-	public static R0111 createR0111(Map<Integer,Set<RC170>> _RC170){
+	public static R0111 createR0111(Map<Integer,Set<RA170>> _RA170, Map<Integer,Set<RC170>> _RC170){
 		
 		BigDecimal REC_BRU_NCUM_TRIB_MI = Env.ZERO;
 		BigDecimal REC_BRU_NCUM_NT_MI   = Env.ZERO;
 		BigDecimal REC_BRU_NCUM_EXP     = Env.ZERO;
 		BigDecimal REC_BRU_CUM          = Env.ZERO;
 		BigDecimal REC_BRU_TOTAL        = Env.ZERO;
+		
+		//SERVICO
+		Iterator<Integer> listRA100 = _RA170.keySet().iterator();
+		while(listRA100.hasNext()){
+			Set<RA170> setRA170 = _RA170.get(listRA100.next());
+			for (RA170 ra170 : setRA170){
+				Integer CFOP = Integer.parseInt(ra170.getCFOP().substring(0, 1));
+				if (CFOP.intValue() > 4){ //SAIDAS
+					if (ra170.getVL_PIS().signum() == 1){
+						REC_BRU_NCUM_TRIB_MI = REC_BRU_NCUM_TRIB_MI.add(ra170.getVL_OPR());
+					}
+					else if (CFOP == 7){
+						REC_BRU_NCUM_EXP = REC_BRU_NCUM_EXP.add(ra170.getVL_OPR());
+					}
+					else{
+						REC_BRU_NCUM_NT_MI = REC_BRU_NCUM_NT_MI.add(ra170.getVL_OPR());
+					}
+				}
+			}
+		}
 				
 		//PRODUTO
 		Iterator<Integer> listRC100 = _RC170.keySet().iterator();
@@ -247,14 +271,14 @@ public class EFDUtil_PC
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(), get_TrxName());
 
-		String COD_EST     = TextUtil.toNumeric(orgInfo.get_ValueAsString("lbr_CNPJ"));
-		String NOME        = orgInfo.get_ValueAsString("lbr_LegalEntity");
-		String CNPJ        = orgInfo.get_ValueAsString("lbr_CNPJ");
+		String COD_EST     = TextUtil.toNumeric(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ));
+		String NOME        = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity);
+		String CNPJ        = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
 		String UF          = orgLoc.getC_Region().getName();
-		String IE         = orgInfo.get_ValueAsString("lbr_IE");
+		String IE         = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
 		String COD_MUN     = BPartnerUtil.getCityCode(orgLoc);
-		String IM         = orgInfo.get_ValueAsString("lbr_CCM");
-		String SUFRAMA     = orgInfo.get_ValueAsString("lbr_Suframa");
+		String IM         = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM);
+		String SUFRAMA     = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_Suframa);
 
 		return new R0140(COD_EST,NOME,CNPJ,UF,IE,COD_MUN,IM,SUFRAMA);
 	} //createR0140
@@ -287,7 +311,7 @@ public class EFDUtil_PC
 			MCountry bpCountry = new MCountry(getCtx(),loc.getC_Country_ID(),null);
 
 			COD_MUN  = BPartnerUtil.getCityCode(loc);
-			COD_PAIS = bpCountry.get_ValueAsString("lbr_CountryCode");
+			COD_PAIS = bpCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode);
 		}
 		else{
 			log.severe("EFD R0150 - PARCEIRO SEM ENDEREDO. " +
@@ -317,7 +341,7 @@ public class EFDUtil_PC
 		String COD_BARRA     = product.getUPC();
 		String COD_ANT_ITEM  = ""; //CODIGO ANTERIOR //TODO ???
 		String UNID_INV      = nfLine.getlbr_UOMName();
-		String TIPO_ITEM     = product.get_ValueAsString("lbr_ItemTypeBR");
+		String TIPO_ITEM     = product.get_ValueAsString(I_W_M_Product.COLUMNNAME_lbr_ItemTypeBR);
 		if (nfLine.islbr_IsService())
 			TIPO_ITEM = "09"; //SERVICO
 		
@@ -326,7 +350,7 @@ public class EFDUtil_PC
 			COD_NCM = nfLine.getLBR_NCM().getValue();
 		
 		if (COD_NCM == null || COD_NCM.trim().isEmpty())
-			COD_NCM = new MLBRNCM(getCtx(),product.get_ValueAsInt("LBR_NCM_ID"),null).getValue();
+			COD_NCM = new MLBRNCM(getCtx(),product.get_ValueAsInt(I_W_M_Product.COLUMNNAME_LBR_NCM_ID),null).getValue();
 		
 		String EX_IPI        = ""; //EXCECAO TABELA TIPI //TODO ???
 		String COD_LST       = ""; //COD SERVIDO //TODO ???
@@ -340,7 +364,7 @@ public class EFDUtil_PC
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 
-		String CNPJ      = orgInfo.get_ValueAsString("lbr_CNPJ");
+		String CNPJ      = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
 		
 		return new RA010(CNPJ);
 	} //createRA010
@@ -404,7 +428,7 @@ public class EFDUtil_PC
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 
-		String CNPJ      = orgInfo.get_ValueAsString("lbr_CNPJ");
+		String CNPJ      = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
 		String IND_ESCRI = "2"; //Apuração com base no registro individualizado de NF-e (C100 e C170)
 
 		return new RC010(CNPJ,IND_ESCRI);
@@ -426,7 +450,7 @@ public class EFDUtil_PC
 		
 		BigDecimal VL_DESC = nf.getDiscountAmt(nf.getTotalLines());
 		BigDecimal VL_ABAT_NT  = Env.ZERO; //TODO ???
-		BigDecimal VL_MERC = nf.getTotalLines();
+		BigDecimal VL_MERC = nf.getTotalLines().add(nf.getFreightAmt()).add(nf.getlbr_InsuranceAmt());
 		String IND_FRT = nf.getFreightCostRule() == null ? "9" : (nf.getFreightCostRule().equals("E") ? "2" : "1");
 		BigDecimal VL_FRT = nf.getFreightAmt();
 		BigDecimal VL_SEG = nf.getlbr_InsuranceAmt();
@@ -474,7 +498,7 @@ public class EFDUtil_PC
 		
 		String DESCR_COMPL = nfLine.getDescription();
 		BigDecimal QTD = nfLine.getQty();
-		BigDecimal VL_ITEM = nfLine.getLineTotalAmt();
+		BigDecimal VL_ITEM = nfLine.getLineTotalAmt().add(nfLine.getInsuranceAmt()).add(nfLine.getFreightAmt());
 		BigDecimal VL_DESC = nfLine.getDiscountAmt();
 		String     IND_MOV = TIPO_ITEM.equals("09") ? "1" : "0"; //1=SEM MOV, 0=COM MOV
 		String CST_ICMS = nfLine.getCST_ICMS();
@@ -573,7 +597,7 @@ public class EFDUtil_PC
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 
-		String CNPJ      = orgInfo.get_ValueAsString("lbr_CNPJ");
+		String CNPJ      = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
 		
 		return new RD010(CNPJ);
 	} //createRD010
