@@ -18,7 +18,10 @@ package org.adempierelbr.wrapper;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import org.compiere.model.*;
+
+import org.compiere.model.I_AD_OrgInfo;
+import org.compiere.model.I_AD_User;
+import org.compiere.model.I_C_BPartner;
 
 /** Generated Interface for AD_OrgInfo
  *  @author Adempiere (generated) 

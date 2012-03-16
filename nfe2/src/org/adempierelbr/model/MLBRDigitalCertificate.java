@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MOrgInfo;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -83,12 +84,12 @@ public class MLBRDigitalCertificate extends X_LBR_DigitalCertificate
 	
 	public static void setCertificate(Properties ctx, int AD_Org_ID) throws Exception{
 		MOrgInfo oi = MOrgInfo.get(ctx, AD_Org_ID, null);
-		int certWS = oi.get_ValueAsInt("LBR_DC_WS_ID");
+		int certWS = oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_WS_ID);
 		setCertificate(ctx,oi,certWS);
 	}
 	
 	public static void setCertificate(Properties ctx, MOrgInfo oi) throws Exception{
-		setCertificate(ctx,oi,getJKS(ctx,oi.get_ValueAsString("lbr_NFeEnv")));
+		setCertificate(ctx,oi,getJKS(ctx,oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv)));
 	}
 	
 	/**
@@ -97,7 +98,7 @@ public class MLBRDigitalCertificate extends X_LBR_DigitalCertificate
 	 */
 	public static void setCertificate(Properties ctx, MOrgInfo oi, int certWS) throws Exception{
 
-		int certOrg = oi.get_ValueAsInt("LBR_DC_Org_ID");
+		int certOrg = oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_Org_ID);
 		
 		if (certOrg <= 0 || certWS <= 0)
 			throw new Exception("Erro com certificado. " +

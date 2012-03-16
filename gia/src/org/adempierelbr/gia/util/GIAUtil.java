@@ -14,6 +14,7 @@ import org.adempierelbr.gia.beans.CR14;
 import org.adempierelbr.gia.beans.CR20;
 import org.adempierelbr.model.X_LBR_ApuracaoICMSLine;
 import org.adempierelbr.model.X_LBR_ICMSBasis;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPeriod;
@@ -50,8 +51,8 @@ public class GIAUtil{
 	
 	public static CR05 createCR05(){
 		
-		String CNPJ   = orgInfo.get_ValueAsString("lbr_CNPJ");
-		String IE     = orgInfo.get_ValueAsString("lbr_IE");
+		String CNPJ   = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
+		String IE     = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
 		Timestamp REF = period.getStartDate();
 		BigDecimal SALDOCREDPERIODOANT = getCumulatedAmt();
 		

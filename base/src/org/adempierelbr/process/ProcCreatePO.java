@@ -13,12 +13,16 @@
 package org.adempierelbr.process;
 
 import java.util.Properties;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 import org.adempierelbr.callout.CalloutDefineCFOP;
 import org.adempierelbr.callout.CalloutTax;
 import org.adempierelbr.util.TaxesException;
-import org.compiere.model.*;
+import org.compiere.model.MOrder;
+import org.compiere.model.MOrderLine;
+import org.compiere.model.MProduct;
+import org.compiere.model.MRequisition;
+import org.compiere.model.MRequisitionLine;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 
@@ -29,6 +33,7 @@ import org.compiere.process.SvrProcess;
  *	
  *	@author Mario Grigioni (Kenos, www.kenos.com.br)
  *	@version $Id: ProcCreatePO.java, 02/03/2008 15:17:00 mgrigioni
+ *  @deprecated
  */
 public class ProcCreatePO extends SvrProcess
 {

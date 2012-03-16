@@ -28,6 +28,7 @@ import org.compiere.process.SvrProcess;
  * @author Mario Grigioni (Kenos, www.kenos.com.br), mgrigioni
  * @contributor Ricardo Santana (Kenos, www.kenos.com.br), rsantana
  * @version $Id: ProcReturnRPS.java, 06/08/2008 11:15:00 mgrigioni
+ * @deprecated
  */
 public class ProcReturnRPS extends SvrProcess
 {

@@ -51,6 +51,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MOrgInfo;
 import org.compiere.util.CLogger;
@@ -99,7 +100,7 @@ public class AssinaturaDigital
 	 */
 	public static void Assinar(String caminhoxml, MOrgInfo oi, String docType) throws Exception
 	{
-		Integer cert = (Integer) oi.get_Value("LBR_DC_Org_ID");
+		Integer cert = (Integer) oi.get_Value(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_Org_ID);
 		MLBRDigitalCertificate dc = new MLBRDigitalCertificate(Env.getCtx(), cert, null);
 		String aliascliente = dc.getAlias();
 		String password = dc.getPassword();

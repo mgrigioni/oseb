@@ -20,18 +20,21 @@ package org.adempierelbr.model;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_Persistent;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 
 /** Generated Model for LBR_DE
  *  @author ADempiereLBR (generated) 
- *  @version Release 3.6.0LTS - $Id$ */
+ *  @version Release 3.7.0LTS - $Id$ */
 public class X_LBR_DE extends PO implements I_LBR_DE, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20110214L;
+	private static final long serialVersionUID = 20120315L;
 
     /** Standard Constructor */
     public X_LBR_DE (Properties ctx, int LBR_DE_ID, String trxName)

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempierelbr.wrapper.I_W_C_Tax;
 import org.compiere.model.MTable;
 import org.compiere.model.Query;
 import org.compiere.util.CLogger;
@@ -113,7 +114,7 @@ public class MLBRTaxIncludedList extends X_LBR_TaxIncludedList {
 
 		for(Integer C_Tax_ID : list){
 			org.compiere.model.MTax tax = new org.compiere.model.MTax(ctx,C_Tax_ID,trx);
-			Integer LBR_TaxName_ID = (Integer)tax.get_Value("LBR_TaxName_ID");
+			Integer LBR_TaxName_ID = (Integer)tax.get_Value(I_W_C_Tax.COLUMNNAME_LBR_TaxName_ID);
 			if (LBR_TaxName_ID != null && LBR_TaxName_ID.intValue() != 0){
 				X_LBR_TaxName taxName = new X_LBR_TaxName(ctx,LBR_TaxName_ID,trx);
 				String name = taxName.getName().trim();

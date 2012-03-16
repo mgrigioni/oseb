@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MInvoicePaySchedule;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MTable;
@@ -339,7 +340,7 @@ public class MLBROpenItem{
 	public void setInterestAmt(BigDecimal amt){
 
 		MOrgInfo orgInfo     = MOrgInfo.get(Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()),null);
-		BigDecimal interest  = (BigDecimal)orgInfo.get_Value("lbr_Interest");
+		BigDecimal interest  = (BigDecimal)orgInfo.get_Value(I_W_AD_OrgInfo.COLUMNNAME_lbr_Interest);
 		if (interest == null)
 			interest = Env.ZERO;
 

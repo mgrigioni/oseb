@@ -37,6 +37,8 @@ import org.adempierelbr.sped.ecd.beans.RJ990;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_BPartner;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MElementValue;
 import org.compiere.model.MLocation;
@@ -168,11 +170,12 @@ public class ProcGenerateECD extends SvrProcess {
 		String orgCityCode = BPartnerUtil.getCityCode(lOrg);
 
 		R0000 r0000 = new R0000 (p_DateFrom, p_DateTo, (String)
-				oi.get_Value("lbr_LegalEntity"), (String) oi.get_Value("lbr_CNPJ"),
-				lOrg.getRegionName(), (String) oi.get_Value("lbr_IE"),
-				orgCityCode, (String) oi.get_Value("lbr_CCM"), null);
+				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity), 
+				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ),
+				lOrg.getRegionName(), (String) oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE),
+				orgCityCode, oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM), null);
 		//
-		R0007 r0007 = new R0007 (lOrg.getRegionName(), (String) oi.get_Value("lbr_IE"));
+		R0007 r0007 = new R0007 (lOrg.getRegionName(), oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE));
 		result_B0.append(r0007);
 		//
 		RI010 rI010 = new RI010 (p_Type);
@@ -252,12 +255,12 @@ public class ProcGenerateECD extends SvrProcess {
 		//	Adiciona os saldos
 		result_BI_2.append(result_BI_2A);
 		
-		String NIRE = oi.get_ValueAsString("lbr_NIRE");
-		Timestamp dtArq = (Timestamp)oi.get_Value("lbr_DtArq");
+		String NIRE = oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NIRE);
+		Timestamp dtArq = (Timestamp)oi.get_Value(I_W_AD_OrgInfo.COLUMNNAME_lbr_DtArq);
 
 		RI030 rI030 = new RI030 (p_NUM_ORD, "DIARIO GERAL",
-				(String) oi.get_Value("lbr_LegalEntity"),
-				NIRE, (String) oi.get_Value("lbr_CNPJ"), dtArq, dtArq, lOrg.getCity());
+				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity),
+				NIRE, oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ), dtArq, dtArq, lOrg.getCity());
 		result_BI_1.append(rI030);
 
 		
@@ -284,15 +287,15 @@ public class ProcGenerateECD extends SvrProcess {
 		result.append(new RI990());
 		//
 		RJ900 rJ900 = new RJ900 (p_NUM_ORD, p_Type,
-				(String) oi.get_Value("lbr_LegalEntity"), p_DateFrom, p_DateTo);
+				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity), p_DateFrom, p_DateTo);
 
-		MBPartner bpCont = new MBPartner (ctx, (Integer) oi.get_Value("LBR_BP_Accountant_ID"), null);
+		MBPartner bpCont = new MBPartner (ctx, oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_BP_Accountant_ID), null);
 		result.append(new RJ001(true));
 		result.append(rJ900);
-		RJ930 rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString("lbr_CPF"), "Contador", "900", bpCont.get_ValueAsString("lbr_CRC"));
+		RJ930 rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF), "Contador", "900", bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CRC));
 		result.append(rJ930);
-		bpCont = new MBPartner (ctx, (Integer) oi.get_Value("LBR_BP_Director_ID"), null);
-		rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString("lbr_CPF"), "Diretor", "203", null);
+		bpCont = new MBPartner (ctx, (Integer) oi.get_Value("LBR_BP_Director_ID"), null); //FIXME: Criar campo no LBR
+		rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF), "Diretor", "203", null);
 		result.append(rJ930);
 		result.append(new RJ990());
 		//

@@ -9,12 +9,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
-import org.adempierelbr.nfe.beans.InutilizacaoNF;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
 import org.compiere.util.CLogger;
@@ -47,8 +47,8 @@ public class NFeInutilizacao
 	public static String invalidateNF (MOrgInfo oi, InutilizacaoNF iNF) throws Exception
 	{
 		log.fine("ini");
-		String envType 	= oi.get_ValueAsString("lbr_NFeEnv");
-		boolean isSCAN  = oi.get_ValueAsBoolean("lbr_IsScan");
+		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
+		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";

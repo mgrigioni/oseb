@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAcctSchemaElement;
@@ -197,7 +198,7 @@ public class Doc_AllocationHdr extends Doc
 			if(invoice != null)
 			{
 				MDocType dt = new MDocType(getCtx(), invoice.getC_DocTypeTarget_ID(), null);
-				boolean post = dt.get_ValueAsBoolean("lbr_hasOpenItems");
+				boolean post = dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems);
 				if(!post)
 					continue;
 			}

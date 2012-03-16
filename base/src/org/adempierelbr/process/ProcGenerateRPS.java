@@ -43,6 +43,7 @@ import org.compiere.util.Env;
  *  @contributor Mario Grigioni (Kenos, www.kenos.com.br), mgrigioni
  *  @contributor Ricardo Santana (Kenos, www.kenos.com.br), ralexsander
  *	@version $Id: ProcGenerateRPS.java, v2.0 2008/04/17 10:37:22 PM, amontenegro Exp $
+ *  @deprecated
  */
 public class ProcGenerateRPS extends SvrProcess
 {

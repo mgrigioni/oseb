@@ -31,6 +31,7 @@ import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
@@ -157,8 +158,8 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		log.fine("Envia Lote: " + getDocumentNo());
 
 		MOrgInfo oi = MOrgInfo.get(ctx, getAD_Org_ID(), null);
-		String envType 	= oi.get_ValueAsString("lbr_NFeEnv");
-		boolean isSCAN  = oi.get_ValueAsBoolean("lbr_IsScan");
+		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
+		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";
@@ -263,8 +264,8 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		}
 		//
 		MOrgInfo oi = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx), null);
-		String envType 	= oi.get_ValueAsString("lbr_NFeEnv");
-		boolean isSCAN  = oi.get_ValueAsBoolean("lbr_IsScan");
+		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
+		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";

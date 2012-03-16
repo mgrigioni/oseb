@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import org.adempierelbr.model.X_LBR_DocType_Acct;
 import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAcctSchemaElement;
@@ -148,9 +149,8 @@ public class Doc_MatchInv extends Doc
 		MInOut   io  = m_receiptLine.getParent();
 		/**	Tipo de Documento	*/
 		MDocType dtInv = new MDocType(Env.getCtx(), inv.getC_DocType_ID(), null);
-		Boolean hasOpenItems = (Boolean) dtInv.get_Value("lbr_HasOpenItems");
-		if(hasOpenItems == null)
-			hasOpenItems = true;
+		boolean hasOpenItems = dtInv.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems);
+
 		if (!hasOpenItems){
 			log.fine("No Open Items");
 				return facts;

@@ -34,6 +34,7 @@ import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
 import org.compiere.util.CLogger;
@@ -79,8 +80,8 @@ public class NFeCancelamento
 			return "Motivo de cancelamento muito longo. Max: 255 letras.";
 		//
 		MOrgInfo oi = MOrgInfo.get(ctx, nf.getAD_Org_ID(),null);
-		String envType 	= oi.get_ValueAsString("lbr_NFeEnv");
-		boolean isSCAN  = oi.get_ValueAsBoolean("lbr_IsScan");
+		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
+		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 		
 		if (nf.getlbr_MotivoScan() != null && !nf.getlbr_MotivoScan().trim().isEmpty()){
 			isSCAN = true;

@@ -65,6 +65,11 @@ import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_A_Asset;
+import org.adempierelbr.wrapper.I_W_C_BPartner;
+import org.adempierelbr.wrapper.I_W_C_Country;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.MAsset;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
@@ -168,15 +173,15 @@ public class EFDUtil{
 
 		String COD_VER    = getCOD_VERSAO(dateFrom);
 		String COD_FIN    = "0"; //REMESSA ORIGINAL //FIXME
-		String NOME       = orgInfo.get_ValueAsString("lbr_LegalEntity");
-		String CNPJ       = orgInfo.get_ValueAsString("lbr_CNPJ");
+		String NOME       = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity);
+		String CNPJ       = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
 		String UF         = orgLoc.getC_Region().getName();
-		String IE         = orgInfo.get_ValueAsString("lbr_IE");
+		String IE         = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
 		String COD_MUN    = BPartnerUtil.getCityCode(orgLoc);
-		String IM         = orgInfo.get_ValueAsString("lbr_CCM");
-		String SUFRAMA    = orgInfo.get_ValueAsString("lbr_Suframa");
-		String IND_PERFIL = orgInfo.get_ValueAsString("lbr_IndPerfil");
-		String IND_ATIV   = orgInfo.get_ValueAsString("lbr_IndAtividade");
+		String IM         = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM);
+		String SUFRAMA    = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_Suframa);
+		String IND_PERFIL = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IndPerfil);
+		String IND_ATIV   = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IndAtividade);
 
 		return new R0000(COD_VER, COD_FIN, dateFrom, dateTo, NOME, CNPJ, null, UF,
 				IE, COD_MUN, IM, SUFRAMA, IND_PERFIL, IND_ATIV);
@@ -187,14 +192,14 @@ public class EFDUtil{
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(), get_TrxName());
 
-		String FANTASIA = orgInfo.get_ValueAsString("lbr_Fantasia");
+		String FANTASIA = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_Fantasia);
 		String CEP      = orgLoc.getPostal();
 		String END      = orgLoc.getAddress1();
 		String NUM      = orgLoc.getAddress2();
 		String COMPL    = orgLoc.getAddress4();
 		String BAIRRO   = orgLoc.getAddress3();
-		String FONE     = orgInfo.get_ValueAsString("Phone"); 
-		String FAX      = orgInfo.get_ValueAsString("Fax"); 
+		String FONE     = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_Phone); 
+		String FAX      = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_Fax); 
 		String EMAIL    = ""; //TODO EMAIL DE CONTATO
 
 		return new R0005(FANTASIA,CEP,END,NUM,COMPL,BAIRRO,FONE,FAX,EMAIL);
@@ -204,7 +209,7 @@ public class EFDUtil{
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 		
-		int BPAccountant_ID = orgInfo.get_ValueAsInt("LBR_BP_Accountant_ID");
+		int BPAccountant_ID = orgInfo.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_BP_Accountant_ID);
 		if (BPAccountant_ID <= 0){
 			log.severe("EFD R0100 - CONTADOR NAO CADASTRADO");
 			return null;
@@ -220,10 +225,10 @@ public class EFDUtil{
 		MLocation contLoc = new MLocation(getCtx(),bpcontLoc.getC_Location_ID(),get_TrxName());
 
 		String NOME = bpContador.getName();
-		String CPF  = bpContador.get_ValueAsString("lbr_CPF");
-		String CRC  = bpContador.get_ValueAsString("lbr_CRC");
+		String CPF  = bpContador.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF);
+		String CRC  = bpContador.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CRC);
 		String CNPJ = "";
-		if (bpContador.get_ValueAsString("lbr_BPTypeBR").equals("PJ")){
+		if (BPartnerUtil.getBPTypeBR(bpContador).equals(BPartnerUtil.PJ)){
 			CNPJ = BPartnerUtil.getCNPJ(bpContador, bpcontLoc);
 		}
 		
@@ -277,7 +282,7 @@ public class EFDUtil{
 			MCountry bpCountry = new MCountry(getCtx(),loc.getC_Country_ID(),null);
 
 			COD_MUN  = BPartnerUtil.getCityCode(loc);
-			COD_PAIS = bpCountry.get_ValueAsString("lbr_CountryCode");
+			COD_PAIS = bpCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode);
 			if (bpCountry.get_ID() != BPartnerUtil.BRASIL){
 				CNPJ     = "";
 				IE       = "";
@@ -321,7 +326,7 @@ public class EFDUtil{
 			MCountry bpCountry = new MCountry(getCtx(),loc.getC_Country_ID(),null);
 
 			COD_MUN  = BPartnerUtil.getCityCode(loc);
-			COD_PAIS = bpCountry.get_ValueAsString("lbr_CountryCode");
+			COD_PAIS = bpCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode);
 			if (bpCountry.get_ID() != BPartnerUtil.BRASIL){
 				CNPJ     = "";
 				IE       = "";
@@ -364,7 +369,7 @@ public class EFDUtil{
 		String COD_BARRA     = product.getUPC();
 		String COD_ANT_ITEM  = ""; //CODIGO ANTERIOR //TODO ???
 		String UNID_INV      = nfLine.getlbr_UOMName();
-		String TIPO_ITEM     = product.get_ValueAsString("lbr_ItemTypeBR");
+		String TIPO_ITEM     = product.get_ValueAsString(I_W_M_Product.COLUMNNAME_lbr_ItemTypeBR);
 		if (nfLine.islbr_IsService())
 			TIPO_ITEM = "09"; //SERVICO
 		
@@ -373,7 +378,7 @@ public class EFDUtil{
 			COD_NCM = nfLine.getLBR_NCM().getValue();
 		
 		if (COD_NCM == null || COD_NCM.trim().isEmpty())
-			COD_NCM = new MLBRNCM(getCtx(),product.get_ValueAsInt("LBR_NCM_ID"),null).getValue();
+			COD_NCM = new MLBRNCM(getCtx(),product.get_ValueAsInt(I_W_M_Product.COLUMNNAME_LBR_NCM_ID),null).getValue();
 		
 		String EX_IPI        = ""; //EXCECAO TABELA TIPI //TODO ???
 		String COD_LST       = ""; //COD SERVIDO //TODO ???
@@ -390,10 +395,10 @@ public class EFDUtil{
 		String COD_BARRA     = product.getUPC();
 		String COD_ANT_ITEM  = ""; //CODIGO ANTERIOR //TODO ???
 		String UNID_INV      = AdempiereLBR.getUOM_trl(new MUOM(getCtx(),product.getC_UOM_ID(),get_TrxName()));
-		String TIPO_ITEM     = product.get_ValueAsString("lbr_ItemTypeBR");
+		String TIPO_ITEM     = product.get_ValueAsString(I_W_M_Product.COLUMNNAME_lbr_ItemTypeBR);
 		
 		String COD_NCM = "";
-		int LBR_NCM_ID = product.get_ValueAsInt("LBR_NCM_ID");
+		int LBR_NCM_ID = product.get_ValueAsInt(I_W_M_Product.COLUMNNAME_LBR_NCM_ID);
 		if (LBR_NCM_ID > 0)
 			COD_NCM = new MLBRNCM(getCtx(),LBR_NCM_ID,get_TrxName()).getValue();
 		else{
@@ -1189,7 +1194,7 @@ public class EFDUtil{
 		
 		List<RG125> listRG125 = new ArrayList<RG125>();
 		
-		MLBRNotaFiscalLine nfLine = new MLBRNotaFiscalLine(getCtx(),asset.get_ValueAsInt("LBR_NotaFiscalLine_ID"),get_TrxName());
+		MLBRNotaFiscalLine nfLine = new MLBRNotaFiscalLine(getCtx(),asset.get_ValueAsInt(I_W_A_Asset.COLUMNNAME_LBR_NotaFiscalLine_ID),get_TrxName());
 		
 		String COD_IND_BEM  = asset.getValue();
 		Timestamp DT_MOV    = asset.getA_Asset_CreateDate();
@@ -1235,7 +1240,7 @@ public class EFDUtil{
 			MBPartner bp = new MBPartner(getCtx(),nf.getC_BPartner_ID(),get_TrxName());
 			COD_PART = TextUtil.toNumeric(bp.getValue());
 		}
-		String COD_MOD     = nf.get_ValueAsString("lbr_NFModel").isEmpty() ? "01" : nf.get_ValueAsString("lbr_NFModel");
+		String COD_MOD     = nf.getlbr_NFModel().isEmpty() ? "01" : nf.getlbr_NFModel();
 		String SER         = nf.getSerieNo();
 		String NUM_DOC     = nf.getDocNo();
 		String CHV_NFE_CTE = nf.getlbr_NFeID();
@@ -1267,7 +1272,7 @@ public class EFDUtil{
 			DT_RE = DT_AVB;
 		
 		MCountry country = new MCountry(getCtx(),de.getC_Country_ID(),null);
-		String PAIS = country.get_ValueAsString("lbr_CountryCode");
+		String PAIS = country.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode);
 		if (!PAIS.trim().isEmpty() && PAIS.length() > 3)
 			PAIS = PAIS.substring(1, PAIS.length()-1); //PAIS SISCOMEX são só 3 dígitos
 		
@@ -1318,13 +1323,16 @@ public class EFDUtil{
 	                                "FROM M_Storage s " +
 	                                "INNER JOIN M_Locator l ON s.M_Locator_ID = l.M_Locator_ID " +
 	                                "INNER JOIN M_Warehouse w ON l.M_Warehouse_ID=w.M_Warehouse_ID " +
+	                                "INNER JOIN M_Product p ON s.M_Product_ID = p.M_Product_ID " +
+	                             "WHERE p.IsStocked = 'Y' " +
 	                             "GROUP BY w.AD_Client_ID, w.AD_Org_ID, s.M_Product_ID, l.C_BPartner_ID, w.lbr_WarehouseType " +
 	                             "UNION ALL " +
 	                             "SELECT '2', w.AD_Client_ID, w.AD_Org_ID, t.M_Product_ID, SUM(t.MovementQty) * -1 AS QtyOnHand, l.C_BPartner_ID, w.lbr_WarehouseType " +
 	                                "FROM M_Transaction t " +
 	                                "INNER JOIN M_Locator l ON t.M_Locator_ID = l.M_Locator_ID " +
 	                                "INNER JOIN M_Warehouse w ON l.M_Warehouse_ID=w.M_Warehouse_ID " +
-	                             "WHERE TRUNC(t.MovementDate, 'DD') > TRUNC(?, 'DD') " +
+	                                "INNER JOIN M_Product p ON t.M_Product_ID = p.M_Product_ID " +
+	                             "WHERE TRUNC(t.MovementDate, 'DD') > TRUNC(?, 'DD') AND p.IsStocked = 'Y' " +
 	                             "GROUP BY w.AD_Client_ID, w.AD_Org_ID, t.M_Product_ID, l.C_BPartner_ID, w.lbr_WarehouseType) Aux " +
 	                       "GROUP BY AD_Client_ID, AD_Org_ID, M_Product_ID, C_BPartner_ID, lbr_WarehouseType) " +
 	                 "WHERE QtyOnHand > 0 AND AD_Org_ID = ? ORDER BY M_Product_ID";

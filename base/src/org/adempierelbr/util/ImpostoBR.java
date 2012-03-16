@@ -24,6 +24,10 @@ import java.util.logging.Level;
 import org.adempierelbr.model.MLBRTax;
 import org.adempierelbr.model.X_LBR_TaxLine;
 import org.adempierelbr.model.X_LBR_TaxName;
+import org.adempierelbr.wrapper.I_W_C_Invoice;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
+import org.adempierelbr.wrapper.I_W_C_Order;
+import org.adempierelbr.wrapper.I_W_C_OrderLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
@@ -87,19 +91,19 @@ public class ImpostoBR{
 
 		if (isOrder){
 			MOrderLine oLine = new MOrderLine(Env.getCtx(),Line_ID,trx);
-			LBR_Tax_ID = oLine.get_ValueAsInt("LBR_Tax_ID");
+			LBR_Tax_ID = oLine.get_ValueAsInt(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID);
 			C_Tax_ID   = oLine.getC_Tax_ID();
 			//
 			MOrder order = new MOrder(Env.getCtx(),oLine.getC_Order_ID(),trx);
-			transactionType = order.get_ValueAsString("lbr_TransactionType");
+			transactionType = order.get_ValueAsString(I_W_C_Order.COLUMNNAME_lbr_TransactionType);
 		}
 		else{
 			MInvoiceLine iLine = new MInvoiceLine(Env.getCtx(),Line_ID,trx);
-			LBR_Tax_ID = iLine.get_ValueAsInt("LBR_Tax_ID");
+			LBR_Tax_ID = iLine.get_ValueAsInt(I_W_C_InvoiceLine.COLUMNNAME_LBR_Tax_ID);
 			C_Tax_ID   = iLine.getC_Tax_ID();
 			//
 			MInvoice invoice = new MInvoice(Env.getCtx(),iLine.getC_Invoice_ID(),trx);
-			transactionType = invoice.get_ValueAsString("lbr_TransactionType");
+			transactionType = invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_TransactionType);
 		}
 
 		return getImpostoBR(C_Tax_ID,LBR_Tax_ID,transactionType,trx);

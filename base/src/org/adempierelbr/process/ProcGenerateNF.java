@@ -25,6 +25,12 @@ import org.adempierelbr.nfe.NFeXMLGenerator;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_Invoice;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
+import org.adempierelbr.wrapper.I_W_C_Order;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MClient;
@@ -113,7 +119,7 @@ public class ProcGenerateNF extends SvrProcess
 		}
 
 		MInvoice invoice = new MInvoice(getCtx(),p_C_Invoice_ID,get_TrxName());
-		Integer invoice_NF_ID = (Integer)invoice.get_Value("LBR_NotaFiscal_ID");
+		Integer invoice_NF_ID = (Integer)invoice.get_Value(I_W_C_Invoice.COLUMNNAME_LBR_NotaFiscal_ID);
 		if (invoice_NF_ID != null && invoice_NF_ID.intValue() > 0
 				&& invoice_NF_ID.intValue() != p_LBR_NotaFiscal_ID){
 			throw new IllegalArgumentException("Fatura já possui nota fiscal");
@@ -186,12 +192,12 @@ public class ProcGenerateNF extends SvrProcess
 
 			// Org
 			MOrgInfo orgInfo = MOrgInfo.get(ctx, invoice.getAD_Org_ID(), trx);
-			boolean isSCAN   = orgInfo.get_ValueAsBoolean("lbr_IsScan");
+			boolean isSCAN   = orgInfo.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 			NotaFiscal.setAD_Org_ID(invoice.getAD_Org_ID());
 			
 			NotaFiscal.setIsSOTrx(isSOTrx);   //Entrada ou Saída
 			NotaFiscal.setlbr_IsOwnDocument(IsOwnDocument);
-			NotaFiscal.setlbr_TransactionType((String)invoice.get_Value("lbr_TransactionType")); //CORRECAO ELTEK
+			NotaFiscal.setlbr_TransactionType((String)invoice.get_Value(I_W_C_Invoice.COLUMNNAME_lbr_TransactionType)); //CORRECAO ELTEK
 
 			if (IsOwnDocument){
 
@@ -206,11 +212,8 @@ public class ProcGenerateNF extends SvrProcess
 				NotaFiscal.setC_DocType_ID(0);
 				NotaFiscal.setC_DocTypeTarget_ID(0);
 
-				if (invoice.get_Value("lbr_NFEntrada") != null &&
-					!invoice.get_ValueAsString("lbr_NFEntrada").trim().equals("")){
-
-					NotaFiscal.setDocumentNo(invoice.get_ValueAsString("lbr_NFEntrada"));
-
+				if (!invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_NFEntrada).trim().isEmpty()){
+					NotaFiscal.setDocumentNo(invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_NFEntrada));
 				}
 				else{
 					if (NotaFiscal.getDocumentNo() == null || NotaFiscal.getDocumentNo().trim().equals("")){
@@ -232,7 +235,7 @@ public class ProcGenerateNF extends SvrProcess
 			NotaFiscal.setC_Order_ID(order.getC_Order_ID());   /** C_Order_ID **/
 			NotaFiscal.setM_InOut_ID(shipment.getM_InOut_ID());   /** M_InOut_ID **/
 
-			String description = order.get_ValueAsString("lbr_NFDescription");
+			String description = order.get_ValueAsString(I_W_C_Order.COLUMNNAME_lbr_NFDescription);
 			NotaFiscal.setDescription(description); //Observação Nota Fiscal
 
 			/** Parceiro de Negócios **/
@@ -259,12 +262,12 @@ public class ProcGenerateNF extends SvrProcess
 			NotaFiscal.setNoPackages(new BigDecimal(shipment.getNoPackages()));   //Quantidade/Volumes
 
 			/** NF Model **/
-			if(invoice.get_Value("lbr_NFModel") != null && !invoice.get_ValueAsString("lbr_NFModel").equalsIgnoreCase(""))
-				NotaFiscal.setlbr_NFModel(invoice.get_ValueAsString("lbr_NFModel"));
+			if(!invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_NFModel).trim().isEmpty())
+				NotaFiscal.setlbr_NFModel(invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_NFModel));
 			
 			/** Notes **/
-			NotaFiscal.setlbr_BillNote(invoice.get_ValueAsString("lbr_BillNote"));
-			NotaFiscal.setlbr_ShipNote(invoice.get_ValueAsString("lbr_ShipNote"));
+			NotaFiscal.setlbr_BillNote(invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_BillNote));
+			NotaFiscal.setlbr_ShipNote(invoice.get_ValueAsString(I_W_C_Invoice.COLUMNNAME_lbr_ShipNote));
 
 			NotaFiscal.save(trx);
 
@@ -292,13 +295,13 @@ public class ProcGenerateNF extends SvrProcess
 					MProduct   product = new MProduct(ctx,iLine.getM_Product_ID(),trx);
 					MUOM       uom     = new MUOM(ctx,iLine.getC_UOM_ID(),trx);
 
-					Integer LBR_NCM_ID          = (Integer)product.get_Value("LBR_NCM_ID");
+					Integer LBR_NCM_ID          = (Integer)product.get_Value(I_W_M_Product.COLUMNNAME_LBR_NCM_ID);
 					if (LBR_NCM_ID == null) LBR_NCM_ID = 0;
 
-					Integer LBR_CFOP_ID         = (Integer)iLine.get_Value("LBR_CFOP_ID");
+					Integer LBR_CFOP_ID         = (Integer)iLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_CFOP_ID);
 					if (LBR_CFOP_ID == null) LBR_CFOP_ID = 0;
 
-					Integer LBR_LegalMessage_ID = (Integer)iLine.get_Value("LBR_LegalMessage_ID");
+					Integer LBR_LegalMessage_ID = (Integer)iLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_LegalMessage_ID);
 					if (LBR_LegalMessage_ID == null) LBR_LegalMessage_ID = 0;
 
 					/* FRETE */
@@ -363,10 +366,10 @@ public class ProcGenerateNF extends SvrProcess
 					NotaFiscalLine.setVendorProductNo(VendorProductNo);   //Código do Produto (Cliente)
 					NotaFiscalLine.setC_UOM_ID(uom.getC_UOM_ID());   /** C_UOM_ID **/
 					NotaFiscalLine.setlbr_UOMName(uom.getUOMSymbol());   //Unidade de Medida
-					NotaFiscalLine.setlbr_TaxStatus(iLine.get_ValueAsString("lbr_TaxStatus")); //Situação Tributária ICMS
-					NotaFiscalLine.setlbr_TaxStatusIPI((String)iLine.get_Value("lbr_TaxStatusIPI")); 
-					NotaFiscalLine.setlbr_TaxStatusPIS((String)iLine.get_Value("lbr_TaxStatusPIS")); 
-					NotaFiscalLine.setlbr_TaxStatusCOFINS((String)iLine.get_Value("lbr_TaxStatusCOFINS")); 
+					NotaFiscalLine.setlbr_TaxStatus(iLine.get_ValueAsString(I_W_C_InvoiceLine.COLUMNNAME_lbr_TaxStatus)); //Situação Tributária ICMS
+					NotaFiscalLine.setlbr_TaxStatusIPI((String)iLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_lbr_TaxStatusIPI)); 
+					NotaFiscalLine.setlbr_TaxStatusPIS((String)iLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_lbr_TaxStatusPIS)); 
+					NotaFiscalLine.setlbr_TaxStatusCOFINS((String)iLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_lbr_TaxStatusCOFINS)); 
 					NotaFiscalLine.setQty(iLine.getQtyEntered());   //Quantidade
 					NotaFiscalLine.setPrice(Price); //Preço
 					NotaFiscalLine.setPriceListAmt(PriceList); //Preço de Lista
@@ -472,7 +475,7 @@ public class ProcGenerateNF extends SvrProcess
 				if (NotaFiscal.getC_DocType_ID() > 0)
 				{
 					MDocType dt = new MDocType (ctx, NotaFiscal.getC_DocType_ID(), trx);
-					String model = dt.get_ValueAsString("lbr_NFModel");
+					String model = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel);
 					//
 					if (model == null)
 						log.log(Level.INFO, "Tipo de NF não definido.");

@@ -31,6 +31,8 @@ import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoAddressException;
 import org.adempiere.exceptions.DBException;
 import org.adempierelbr.model.MLBRTax;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
+import org.adempierelbr.wrapper.I_W_M_InOut;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -566,9 +568,9 @@ public class MInvoice extends X_C_Invoice implements DocAction
             }
         }
 
-        if(ship.get_Value("lbr_NFEntrada") != null)
+        if(ship.get_Value(I_W_M_InOut.COLUMNNAME_lbr_NFEntrada) != null)
         {
-        	set_Value("lbr_NFEntrada", ship.get_Value("lbr_NFEntrada"));
+        	set_Value(I_W_M_InOut.COLUMNNAME_lbr_NFEntrada, ship.get_Value(I_W_M_InOut.COLUMNNAME_lbr_NFEntrada));
         }
 
 	}	//	setShipment
@@ -715,10 +717,10 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			//
 			//	Begin Kenos - BF [#2445887]
 			//	Usar os valores da invoice original
-			line.set_ValueOfColumn("LBR_CFOP_ID", fromLine.get_Value("LBR_CFOP_ID"));
-			line.set_ValueOfColumn("LBR_LegalMessage_ID", fromLine.get_Value("LBR_LegalMessage_ID"));
-			line.set_ValueOfColumn("lbr_TaxStatus", fromLine.get_Value("lbr_TaxStatus"));
-			Integer LBR_Tax_ID = (Integer) fromLine.get_Value("LBR_Tax_ID");
+			line.set_ValueOfColumn("LBR_CFOP_ID", fromLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_CFOP_ID));
+			line.set_ValueOfColumn("LBR_LegalMessage_ID", fromLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_LegalMessage_ID));
+			line.set_ValueOfColumn("lbr_TaxStatus", fromLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_lbr_TaxStatus));
+			Integer LBR_Tax_ID = (Integer) fromLine.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_Tax_ID);
 			//
 			if (LBR_Tax_ID != null && LBR_Tax_ID.intValue() > 0)
 			{

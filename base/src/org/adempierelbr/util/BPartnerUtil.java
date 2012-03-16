@@ -15,6 +15,9 @@ package org.adempierelbr.util;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempierelbr.wrapper.I_W_C_BPartner;
+import org.adempierelbr.wrapper.I_W_C_BPartner_Location;
+import org.adempierelbr.wrapper.I_W_C_City;
 import org.compiere.model.I_C_BPartner_Location;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
@@ -45,6 +48,9 @@ public abstract class BPartnerUtil{
 	public static final String EXTCOD = "9999999";
 	public static final String EXTREG = "EX";
 	public static final String EXTMUN = "EXTERIOR";
+	
+	public static final String PF = "PF";
+	public static final String PJ = "PJ";
 
 	public static String getCNPJ(Properties ctx, int C_BPartner_ID, int C_BPartner_Location_ID){
 		MBPartner bpartner = new MBPartner(ctx,C_BPartner_ID,null);
@@ -63,7 +69,7 @@ public abstract class BPartnerUtil{
 		if (bp == null)
 			return null;
 		//
-		return bp.get_ValueAsString("lbr_BPTypeBR");
+		return bp.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_BPTypeBR);
 	}	//	getBPTypeBR
 
 	/**
@@ -78,28 +84,25 @@ public abstract class BPartnerUtil{
 		if (bpartner == null)
 			return CNPJ;
 
-		String BPTypeBR = bpartner.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bpartner);
 
-		if (!(BPTypeBR == null || BPTypeBR.equals("")))
-		{
-			if (BPTypeBR.equalsIgnoreCase("PJ"))
-			{
-				CNPJ = bpartner.get_ValueAsString("lbr_CNPJ");   //CNPJ
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if (BPTypeBR.equals(PJ)) {
+				CNPJ = bpartner.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CNPJ);   //CNPJ
 			}
-			else if (BPTypeBR.equalsIgnoreCase("PF"))
-			{
-				CNPJ = bpartner.get_ValueAsString("lbr_CPF");   //CNPJ = CPF
+			else if (BPTypeBR.equals(PF)) {
+				CNPJ = bpartner.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF);   //CNPJ = CPF
 			}
 		}
 
-		if (CNPJ != null && CNPJ.trim().equals(""))
+		if (CNPJ != null && CNPJ.trim().isEmpty())
 			CNPJ = null;
 
 		return CNPJ;
 	}//getCNPJ
 
-	private static String getCNPJ(MBPartnerLocation bpLocation)
-	{
+	private static String getCNPJ(MBPartnerLocation bpLocation) {
+		
 		String  CNPJ = null;
 
 		if (bpLocation == null)
@@ -107,40 +110,35 @@ public abstract class BPartnerUtil{
 
 		MBPartner bp = new MBPartner(Env.getCtx(), bpLocation.getC_BPartner_ID(), null);
 
-		String BPTypeBR = bp.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bp);
 
-		if (BPTypeBR != null && !BPTypeBR.equals(""))
-		{
-			if (BPTypeBR.equalsIgnoreCase("PJ"))
-			{
-				CNPJ = bpLocation.get_ValueAsString("lbr_CNPJ");   //CNPJ
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if (BPTypeBR.equals(PJ)) {
+				CNPJ = bpLocation.get_ValueAsString(I_W_C_BPartner_Location.COLUMNNAME_lbr_CNPJ);   //CNPJ
 			}
-			else if (BPTypeBR.equalsIgnoreCase("PF"))
-			{
-				CNPJ = bp.get_ValueAsString("lbr_CPF");   //CNPJ = CPF
+			else if (BPTypeBR.equals(PF)) {
+				CNPJ = bp.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF);   //CNPJ = CPF
 			}
 		}
 
-		if (CNPJ != null && CNPJ.trim().equals(""))
+		if (CNPJ != null && CNPJ.trim().isEmpty())
 			CNPJ = null;
 
 		return CNPJ;
 	}//getCNPJ
 
 
-	public static String getCNPJ(MBPartner bpartner, MBPartnerLocation bpLocation)
-	{
+	public static String getCNPJ(MBPartner bpartner, MBPartnerLocation bpLocation) {
+		
 		String  CNPJ = null;
-		String BPTypeBR = bpartner.get_ValueAsString("lbr_BPTypeBR");
+		
+		String BPTypeBR = getBPTypeBR(bpartner);
 
-		if (BPTypeBR != null && !BPTypeBR.equals(""))
-		{
-			if(!MSysConfig.getBooleanValue("LBR_USE_UNIFIED_BP",false) || BPTypeBR.equalsIgnoreCase("PF"))
-			{
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if(!MSysConfig.getBooleanValue("LBR_USE_UNIFIED_BP",false) || BPTypeBR.equals(PF)) {
 				CNPJ = getCNPJ(bpartner);
 			}
-			else
-			{
+			else {
 				CNPJ = getCNPJ(bpLocation);
 			}
 		}
@@ -174,22 +172,21 @@ public abstract class BPartnerUtil{
 		if (bpartner == null)
 			return IE;
 
-		String BPTypeBR = bpartner.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bpartner);
 
-		if (!(BPTypeBR == null || BPTypeBR.equals(""))){
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()){
 
-				boolean isIEExempt = bpartner.get_ValueAsBoolean("lbr_IsIEExempt");
+			boolean isIEExempt = bpartner.get_ValueAsBoolean(I_W_C_BPartner.COLUMNNAME_lbr_IsIEExempt);
 
-				if (isIEExempt){
-					IE = "ISENTO";
-				}
-				else{
-					IE = bpartner.get_ValueAsString("lbr_IE");
-				}
-
+			if (isIEExempt){
+				IE = "ISENTO";
+			}
+			else{
+				IE = bpartner.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_IE);
+			}
 		}
 
-		if (IE == null || IE.equals(""))
+		if (IE == null || IE.isEmpty())
 			IE = "ISENTO";
 
 		return IE;
@@ -204,22 +201,20 @@ public abstract class BPartnerUtil{
 
 		MBPartner bp = new MBPartner(Env.getCtx(), bpLocation.getC_BPartner_ID(), null);
 
-		String BPTypeBR = bp.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bp);
 
-		if (BPTypeBR != null && !BPTypeBR.equals(""))
-		{
-			boolean isIEExempt = bpLocation.get_ValueAsBoolean("lbr_IsIEExempt");
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			boolean isIEExempt = bpLocation.get_ValueAsBoolean(I_W_C_BPartner_Location.COLUMNNAME_lbr_IsIEExempt);
 
 			if (isIEExempt){
 				IE = "ISENTO";
 			}
 			else{
-				IE = bpLocation.get_ValueAsString("lbr_IE");
+				IE = bpLocation.get_ValueAsString(I_W_C_BPartner_Location.COLUMNNAME_lbr_IE);
 			}
-
 		}
 
-		if (IE == null || IE.equals(""))
+		if (IE == null || IE.isEmpty())
 			IE = "ISENTO";
 
 		return IE;
@@ -234,16 +229,13 @@ public abstract class BPartnerUtil{
 		else
 			bp = new MBPartner(Env.getCtx(), bpLocation.getC_BPartner_ID(), null);
 
-		String BPTypeBR = bp.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bp);
 
-		if (BPTypeBR != null && !BPTypeBR.equals(""))
-		{
-			if(!MSysConfig.getBooleanValue("LBR_USE_UNIFIED_BP",false) || BPTypeBR.equalsIgnoreCase("PF"))
-			{
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if(!MSysConfig.getBooleanValue("LBR_USE_UNIFIED_BP",false) || BPTypeBR.equals(PF)) {
 				IE = getIE(bpartner);
 			}
-			else
-			{
+			else {
 				IE = getIE(bpLocation);
 			}
 		}
@@ -279,79 +271,69 @@ public abstract class BPartnerUtil{
 	 */
 	private static String getSuframa(MBPartner bpartner){
 
-		String  Suframa = null;
+		String suframa = null;
 
 		if (bpartner == null)
-			return Suframa;
+			return suframa;
 
-		String BPTypeBR = bpartner.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bpartner);
 
-		if (!(BPTypeBR == null || BPTypeBR.equals("")))
-		{
-			if (BPTypeBR.equalsIgnoreCase("PJ"))
-			{
-				Suframa = bpartner.get_ValueAsString("lbr_Suframa");   //Suframa
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if (BPTypeBR.equals(PJ)) {
+				suframa = bpartner.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_Suframa);   //Suframa
 			}
-			else if (BPTypeBR.equalsIgnoreCase("PF"))
-			{
-				Suframa = null;
+			else if (BPTypeBR.equals(PF)) {
+				suframa = null;
 			}
 		}
 
-		if (Suframa != null && Suframa.trim().equals(""))
-			Suframa = null;
+		if (suframa != null && suframa.trim().isEmpty())
+			suframa = null;
 
-		return Suframa;
+		return suframa;
 	}//getSuframa
 
-	private static String getSuframa(MBPartnerLocation bpLocation)
-	{
-		String  Suframa = null;
+	private static String getSuframa(MBPartnerLocation bpLocation) {
+		
+		String suframa = null;
 
 		if (bpLocation == null)
-			return Suframa;
+			return suframa;
 
 		MBPartner bp = new MBPartner(Env.getCtx(), bpLocation.getC_BPartner_ID(), null);
 
-		String BPTypeBR = bp.get_ValueAsString("lbr_BPTypeBR");
+		String BPTypeBR = getBPTypeBR(bp);
 
-		if (BPTypeBR != null && !BPTypeBR.equals(""))
-		{
-			if (BPTypeBR.equalsIgnoreCase("PJ"))
-			{
-				Suframa = bpLocation.get_ValueAsString("lbr_Suframa");   //SUFRAMA
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if (BPTypeBR.equals(PJ)) {
+				suframa = bpLocation.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_Suframa);   //FIXME: Criar campo na C_BPartner_Location
 			}
-			else if (BPTypeBR.equalsIgnoreCase("PF"))
-			{
-				Suframa = null;
+			else if (BPTypeBR.equals(PF)) {
+				suframa = null;
 			}
 		}
 
-		if (Suframa != null && Suframa.trim().equals(""))
-			Suframa = null;
+		if (suframa != null && suframa.trim().equals(""))
+			suframa = null;
 
-		return Suframa;
+		return suframa;
 	}//getSuframa
 
 
-	public static String getSuframa(MBPartner bpartner, MBPartnerLocation bpLocation)
-	{
-		String  Suframa = null;
-		String BPTypeBR = bpartner.get_ValueAsString("lbr_BPTypeBR");
+	public static String getSuframa(MBPartner bpartner, MBPartnerLocation bpLocation) {
+		String suframa = null;
+		String BPTypeBR = getBPTypeBR(bpartner);
 
-		if (BPTypeBR != null && !BPTypeBR.equals(""))
-		{
-			if(!MSysConfig.getBooleanValue("LBR_USE_UNIFIED_BP",false) || BPTypeBR.equalsIgnoreCase("PF"))
-			{
-				Suframa = getSuframa(bpartner);
+		if (BPTypeBR != null && !BPTypeBR.isEmpty()) {
+			if(!MSysConfig.getBooleanValue("LBR_USE_UNIFIED_BP",false) || BPTypeBR.equals(PF)) {
+				suframa = getSuframa(bpartner);
 			}
-			else
-			{
-				Suframa = getSuframa(bpLocation);
+			else {
+				suframa = getSuframa(bpLocation);
 			}
 		}
 
-		return Suframa;
+		return suframa;
 	}//getSuframa
 	
 	public static int getC_Region_ID(String regionName){
@@ -405,7 +387,7 @@ public abstract class BPartnerUtil{
 		if (city == null)
 			return "";
 
-		return city.get_ValueAsString("lbr_CityCode");
+		return city.get_ValueAsString(I_W_C_City.COLUMNNAME_lbr_CityCode);
 	} //getCityCode
 
 	public static X_C_City getX_C_City(Properties ctx, MLocation location, String trxName){
@@ -449,9 +431,9 @@ public abstract class BPartnerUtil{
 			if (listCity.size() == 1)
 				city = listCity.get(0);
 			else if (listCity.size() > 1)
-				log.warning("More than one code found for City"); //: "+location.getCity()+", Region:"+location.getRegionName());
+				log.warning("More than one code found for City");
 			else
-				log.warning("Code not found for City"); //: "+location.getCity()+", Region:"+location.getRegionName());
+				log.warning("Code not found for City");
 		}
 		else
 			city = new X_C_City(ctx, location.getC_City_ID(), trxName);

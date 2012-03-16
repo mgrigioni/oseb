@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TaxBR;
+import org.adempierelbr.wrapper.I_W_A_Asset;
 import org.compiere.model.MAsset;
 import org.compiere.model.MAssetGroupAcct;
 import org.compiere.model.MDepreciationWorkfile;
@@ -147,7 +148,7 @@ public class ProcAssetDepreciate extends SvrProcess
 				A_Accumulated_Depr = oldDepreciation.getA_Accumulated_Depr().add(A_QTY_Current);
 			}
 			else{ //OU PRIMEIRO, PEGA DA NF
-				MLBRNotaFiscalLine nfLine = new MLBRNotaFiscalLine(ctx,asset.get_ValueAsInt("LBR_NotaFiscalLine_ID"),trxName);
+				MLBRNotaFiscalLine nfLine = new MLBRNotaFiscalLine(ctx,asset.get_ValueAsInt(I_W_A_Asset.COLUMNNAME_LBR_NotaFiscalLine_ID),trxName);
 				
 				if (A_Asset_Cost.signum() != 1){
 					A_Asset_Cost = nfLine.getTotalOperationAmt();

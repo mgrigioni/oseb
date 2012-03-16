@@ -124,7 +124,7 @@ public class GenerateModel
 		log.info("Table Like: " + tableLike);
 
 		//complete sql
-			sql.insert(0, "SELECT AD_Table_ID "
+			sql.insert(0, "SELECT AD_Table_ID, EntityType "
 				+ "FROM AD_Table "
 				+ "WHERE (TableName IN ('RV_WarehousePrice','RV_BPartner')"	//	special views
 				+ " OR IsView='N')"

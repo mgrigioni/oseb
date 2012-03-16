@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
 import org.compiere.process.ProcessInfoParameter;
@@ -73,8 +74,8 @@ public class ProcStatusServico extends SvrProcess
 			return "Organização não encontrada";
 
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),null);
-		String envType 	= orgInfo.get_ValueAsString("lbr_NFeEnv");
-		boolean isSCAN  = orgInfo.get_ValueAsBoolean("lbr_IsScan");
+		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
+		boolean isSCAN  = orgInfo.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())

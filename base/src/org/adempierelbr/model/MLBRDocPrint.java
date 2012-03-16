@@ -15,6 +15,7 @@ package org.adempierelbr.model;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MSysConfig;
 import org.compiere.util.Env;
@@ -71,7 +72,7 @@ public class MLBRDocPrint extends X_LBR_DocPrint {
 	public static int getLBR_DocPrint_ID(Properties ctx){
 
 		MOrgInfo orgInfo = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx), null);
-		Integer LBR_DocPrint_ID = (Integer)orgInfo.get_Value("LBR_DocPrint_ID");
+		Integer LBR_DocPrint_ID = (Integer)orgInfo.get_Value(I_W_AD_OrgInfo.COLUMNNAME_LBR_DocPrint_ID);
 		if (LBR_DocPrint_ID == null){
 			LBR_DocPrint_ID = 0;
 		}

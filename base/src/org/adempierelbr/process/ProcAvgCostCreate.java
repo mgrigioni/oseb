@@ -89,7 +89,7 @@ public class ProcAvgCostCreate extends SvrProcess
 		String sql = "";
 		
 		if(costType.equals(PUCHASED)){
-			sql = "SELECT DISTINCT p.M_Product_ID, QtyOnDate(p.M_Product_ID, "+DB.TO_DATE(period.getStartDate())+"), " +
+			sql = "SELECT DISTINCT p.M_Product_ID, QtyOnDate(p.M_Product_ID, ?), " +
 						 "c.CurrentCostPrice, " +
 						 "SUM(il.PriceEntered*il.QtyEntered), SUM(il.QtyEntered) " +
 					"FROM C_Invoice i " +
@@ -106,14 +106,14 @@ public class ProcAvgCostCreate extends SvrProcess
 						 "AND PriceEntered > 0 " +
 						 "AND QtyEntered > 0 " +
 						 "AND dt.DocBaseType = 'API' " +
-						 "AND dt.lbr_HasOpenItems = 'Y' " +
-						 "AND i.DateAcct BETWEEN "+DB.TO_DATE(period.getStartDate())+" AND "+DB.TO_DATE(period.getEndDate())+
+						 "AND ((dt.lbr_HasOpenItems = 'Y' AND il.LBR_CFOP_ID NOT IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.922')) " +
+						    " OR (dt.lbr_HasOpenItems = 'N' AND il.LBR_CFOP_ID IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.116' OR Value LIKE '%.117'))) " +
+						 "AND TRUNC(i.DateAcct) BETWEEN ? AND ? " +
 					" GROUP BY p.M_Product_ID, c.CurrentCostPrice " +
 					"ORDER BY CurrentCostPrice DESC";
 		}
 		else if(costType.equals(MANUFACTURED)){
-			sql = "SELECT PlanCost.M_Product_ID, QtyOnDate(PlanCost.M_Product_ID, " +
-						DB.TO_DATE(period.getStartDate()) + "), c.CurrentCostPrice, " +
+			sql = "SELECT PlanCost.M_Product_ID, QtyOnDate(PlanCost.M_Product_ID, ?), c.CurrentCostPrice, " +
 						"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 					"FROM " +
 						"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, ABS(pp.ProductionQty) AS ProductionQty, " +
@@ -123,7 +123,7 @@ public class ProcAvgCostCreate extends SvrProcess
 							"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +
 						"WHERE pr.Processed='Y' " +
 							"AND pr.AD_Client_ID=? " +
-							"AND TRUNC(pr.MovementDate) BETWEEN "+DB.TO_DATE(period.getStartDate())+" AND "+DB.TO_DATE(period.getEndDate())+
+							"AND TRUNC(pr.MovementDate) BETWEEN ? AND ? " +
 						" GROUP BY pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty " +
 						") PlanCost INNER JOIN M_Cost c ON (c.M_Product_ID=PlanCost.M_Product_ID AND c.M_CostElement_ID=?) " +
 					"GROUP BY PlanCost.M_Product_ID, CurrentCostPrice";
@@ -135,8 +135,11 @@ public class ProcAvgCostCreate extends SvrProcess
 		{
 			int i=1;
 			pstmt = DB.prepareStatement (sql, trxName);
+			pstmt.setTimestamp(i++, period.getStartDate());
 			pstmt.setInt(i++, avgCost.getM_CostElement_ID());
 			pstmt.setInt(i++, avgCost.getAD_Client_ID());
+			pstmt.setTimestamp(i++, period.getStartDate());
+			pstmt.setTimestamp(i++, period.getEndDate());
 			
 			if(costType.equals(MANUFACTURED))
 				pstmt.setInt(i++, avgCost.getM_CostElement_ID());
@@ -189,7 +192,7 @@ public class ProcAvgCostCreate extends SvrProcess
 									" LEFT JOIN LBR_AverageCostLine new_avg_cost ON (new_avg_cost.M_Product_ID=pl.M_Product_ID AND new_avg_cost.LBR_AverageCost_ID=? AND new_avg_cost.lbr_AvgCostType='M') " +
 								"WHERE pr.Processed='Y' " +
 									"AND pr.AD_Client_ID=? " +
-									"AND TRUNC(pr.MovementDate) BETWEEN "+DB.TO_DATE(period.getStartDate())+" AND "+DB.TO_DATE(period.getEndDate())+" " +
+									"AND TRUNC(pr.MovementDate) BETWEEN ? AND ? " +
 								"GROUP BY pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty, avgl.LBR_AverageCostLine_ID " +
 								") PlanCost " +
 							"GROUP BY PlanCost.M_Product_ID, PlanCost.LBR_AverageCostLine_ID";
@@ -199,6 +202,8 @@ public class ProcAvgCostCreate extends SvrProcess
 					pstmt.setInt(i++, avgCost.getLBR_AverageCost_ID());
 					pstmt.setInt(i++, avgCost.getLBR_AverageCost_ID());
 					pstmt.setInt(i++, avgCost.getAD_Client_ID());
+					pstmt.setTimestamp(i++, period.getStartDate());
+					pstmt.setTimestamp(i++, period.getEndDate());
 					
 					rs = pstmt.executeQuery ();
 					while (rs.next ())

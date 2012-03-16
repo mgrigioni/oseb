@@ -18,7 +18,12 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.util.BPartnerUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_BPartner;
+import org.adempierelbr.wrapper.I_W_C_BPartner_Location;
 import org.compiere.apps.search.Info_Column;
+import org.compiere.model.I_C_BPartner;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MClient;
@@ -149,8 +154,8 @@ public class ValidatorBPartner implements ModelValidator
 
 		else if (po instanceof MOrgInfo && (isChange || isAfterChange)){
 
-			String CNPJ = po.get_ValueAsString("lbr_CNPJ");
-			if (!CNPJ.trim().equals("")){
+			String CNPJ = po.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
+			if (!CNPJ.trim().isEmpty()){
 				if (!validaCNPJ(CNPJ)){
 					return "CNPJ Inválido";
 				}
@@ -174,22 +179,21 @@ public class ValidatorBPartner implements ModelValidator
 			return "";
 
 		MBPartner bp = new MBPartner(Env.getCtx(), bpl.getC_BPartner_ID(), bpl.get_TrxName());
-		String  BPTypeBR = (String)bp.get_Value("lbr_BPTypeBR");
+		String  BPTypeBR = BPartnerUtil.getBPTypeBR(bp);
 
-		boolean isValid = bp.get_ValueAsBoolean("lbr_BPTypeBRIsValid");
+		boolean isValid = bp.get_ValueAsBoolean(I_W_C_BPartner.COLUMNNAME_lbr_BPTypeBRIsValid);
 
 		//BF - trying to inactive record
-		if (bpl.is_ValueChanged("IsActive") && !bpl.isActive())
+		if (bpl.is_ValueChanged(I_C_BPartner.COLUMNNAME_IsActive) && !bpl.isActive())
 			return null;
 
-		if (!isValid || BPTypeBR == null || !BPTypeBR.equalsIgnoreCase("PJ"))
+		if (!isValid || BPTypeBR == null || !BPTypeBR.equals(BPartnerUtil.PJ))
 			return null;
 
-		String CNPJMatriz = (String)bp.get_Value("lbr_CNPJ");
-		String CNPJFilial = (String)bpl.get_Value("lbr_CNPJ");
+		String CNPJMatriz = bp.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CNPJ);
+		String CNPJFilial = bpl.get_ValueAsString(I_W_C_BPartner_Location.COLUMNNAME_lbr_CNPJ);
 
-		if(CNPJMatriz.substring(0, 10).equalsIgnoreCase(CNPJFilial.substring(0, 10)))
-		{
+		if(CNPJMatriz.substring(0, 10).equalsIgnoreCase(CNPJFilial.substring(0, 10))) {
 			if (!validaCNPJ(CNPJFilial))
 				return "CNPJ Inválido";
 
@@ -199,16 +203,16 @@ public class ValidatorBPartner implements ModelValidator
 		else
 			return "CNPJ não corresponde com a Matriz.";
 		
-		String IE = bpl.get_ValueAsString("lbr_IE");
+		String IE = bpl.get_ValueAsString(I_W_C_BPartner_Location.COLUMNNAME_lbr_IE);
 		String uf = bpl.getC_Location().getC_Region().getName();
 		
-		if(!(IE.trim()).equals("")){
+		if(!(IE.trim()).isEmpty()){
 			if(validaIE(IE,UF.valueOf(uf)) == null){
 				return "IE inválido";
 			}
 		}
 
-		bpl.set_ValueOfColumn("lbr_BPTypeBRIsValid", true);
+		bpl.set_ValueOfColumn(I_W_C_BPartner_Location.COLUMNNAME_lbr_BPTypeBRIsValid, true);
 
 		return "";
 	}	//	ModelChange - MBPartnerLocation
@@ -217,46 +221,43 @@ public class ValidatorBPartner implements ModelValidator
 
 		int AD_Client_ID = bp.getAD_Client_ID();
 
-		boolean isValid = bp.get_ValueAsBoolean("lbr_BPTypeBRIsValid");
+		boolean isValid = bp.get_ValueAsBoolean(I_W_C_BPartner.COLUMNNAME_lbr_BPTypeBRIsValid);
 
-		String  BPTypeBR = bp.get_ValueAsString("lbr_BPTypeBR");
+		String  BPTypeBR = BPartnerUtil.getBPTypeBR(bp);
 		String  AD_Language = bp.getAD_Language();
 
 		if (AD_Language == null || AD_Language.trim().isEmpty() || !AD_Language.equals(AdempiereLBR.AD_LANGUAGE)) return null;
 
 		//	If not validated or trying to activate an inactive record
-		if (!isValid || (bp.is_ValueChanged("IsActive") && bp.isActive())) {
+		if (!isValid || (bp.is_ValueChanged(I_C_BPartner.COLUMNNAME_IsActive) && bp.isActive())) {
 
 			//If Individual - Validate CPF
-			if (BPTypeBR.equalsIgnoreCase("PF")){
-					String CPF = (String)bp.get_Value("lbr_CPF");
+			if (BPTypeBR.equals(BPartnerUtil.PF)){
+				String CPF = bp.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF);
 
-					if (CPF == null){
-						return "CPF Nulo";
-					}
-
-					if (CPF.indexOf('.') == -1 || CPF.length() < 14){
-						return "CPF Inválido";
-					}
-
-					if (!validaCPF(CPF)){
-						return "CPF Inválido";
-					}
-
-					if (!consultaCPF(CPF, AD_Client_ID, bp.get_ID())){
-						return "CPF Duplicado";
-					}
-					//BF - 3168869 
-					bp.set_ValueOfColumn("lbr_BPTypeBRIsValid", true);
+				if (CPF == null || CPF.isEmpty()){
+					return "CPF Nulo";
+				}
+				if (CPF.indexOf('.') == -1 || CPF.length() < 14){
+					return "CPF Inválido";
+				}
+				if (!validaCPF(CPF)){
+					return "CPF Inválido";
+				}
+				if (!consultaCPF(CPF, AD_Client_ID, bp.get_ID())){
+					return "CPF Duplicado";
+				}
+				
+				//BF - 3168869 
+				bp.set_ValueOfColumn(I_W_C_BPartner.COLUMNNAME_lbr_BPTypeBRIsValid, true);
 			}
 			//Else if Legal Entity - Validate CNPJ
-			else if (BPTypeBR.equalsIgnoreCase("PJ")) {
-				String CNPJ = (String)bp.get_Value("lbr_CNPJ");
+			else if (BPTypeBR.equals(BPartnerUtil.PJ)) {
+				String CNPJ = bp.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CNPJ);
 
-				if (CNPJ == null){
+				if (CNPJ == null || CNPJ.isEmpty()){
 					return "CNPJ Nulo";
 				}
-
 				if (CNPJ.indexOf('.') == -1 || CNPJ.length() < 18){
 					return "CNPJ Inválido";
 				}
@@ -271,40 +272,39 @@ public class ValidatorBPartner implements ModelValidator
 					bp.set_CustomColumn("lbr_CNPJ", CNPJ.substring(0, 10) + "/0000-00");
 				
 				//BF - 3168869 
-				bp.set_ValueOfColumn("lbr_BPTypeBRIsValid", true);
+				bp.set_ValueOfColumn(I_W_C_BPartner.COLUMNNAME_lbr_BPTypeBRIsValid, true);
 			}
 			else
 				//BF - 3168869 
-				bp.set_ValueOfColumn("lbr_BPTypeBRIsValid", false);	
+				bp.set_ValueOfColumn(I_W_C_BPartner.COLUMNNAME_lbr_BPTypeBRIsValid, false);	
 		}
 
 		// FR [ 1898697 ] Validador BPartner - CFOP Group
 		// mgrigioni, 21/02/2008 (Kenos, http://www.kenos.com.br)
 		// Isento IE
-		if (bp.get_ValueAsBoolean("lbr_IsIEExempt")){
+		if (bp.get_ValueAsBoolean(I_W_C_BPartner.COLUMNNAME_lbr_IsIEExempt)){
 
 			//Cliente
 			if (bp.isCustomer()){
-				Integer LBR_CustomerCategory_ID = (Integer)bp.get_Value("LBR_CustomerCategory_ID");
-				if (LBR_CustomerCategory_ID == null || LBR_CustomerCategory_ID.intValue() == 0){
-					bp.set_ValueOfColumn("LBR_CustomerCategory_ID", m_LBR_BPartnerCategory_ID);
+				int LBR_CustomerCategory_ID = bp.get_ValueAsInt(I_W_C_BPartner.COLUMNNAME_LBR_CustomerCategory_ID);
+				if (LBR_CustomerCategory_ID == 0){
+					bp.set_ValueOfColumn(I_W_C_BPartner.COLUMNNAME_LBR_CustomerCategory_ID, m_LBR_BPartnerCategory_ID);
 				}
 			}
 			//Fornecedor
 			if (bp.isVendor()){
-				Integer LBR_VendorCategory_ID = (Integer)bp.get_Value("LBR_VendorCategory_ID");
-				if (LBR_VendorCategory_ID == null || LBR_VendorCategory_ID.intValue() == 0){
-					bp.set_ValueOfColumn("LBR_VendorCategory_ID", m_LBR_BPartnerCategory_ID);
+				int LBR_VendorCategory_ID = bp.get_ValueAsInt(I_W_C_BPartner.COLUMNNAME_LBR_VendorCategory_ID);
+				if (LBR_VendorCategory_ID == 0){
+					bp.set_ValueOfColumn(I_W_C_BPartner.COLUMNNAME_LBR_VendorCategory_ID, m_LBR_BPartnerCategory_ID);
 				}
 			}
-
 		}
 
 		// FR [ 1925151 ] ValidatorBPartner - Tipo de Transação
 		// mgrigioni, 25/03/2008 (Kenos, http://www.kenos.com.br)
-		String lbr_TransactionType = bp.get_ValueAsString("lbr_TransactionType");
-		if (lbr_TransactionType == null || lbr_TransactionType.equals("")){
-			bp.set_ValueOfColumn("lbr_TransactionType", "END"); //End User
+		String lbr_TransactionType = bp.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_TransactionType);
+		if (lbr_TransactionType == null || lbr_TransactionType.isEmpty()){
+			bp.set_ValueOfColumn(I_W_C_BPartner.COLUMNNAME_lbr_TransactionType, "END"); //End User
 		}
 
 		log.info(bp.toString());
@@ -625,4 +625,5 @@ public class ValidatorBPartner implements ModelValidator
 		else
 			return true;
 	}	//	consultaCPF
-}
+	
+} //ValidatorBPartner

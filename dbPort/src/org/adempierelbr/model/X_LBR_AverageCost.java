@@ -19,18 +19,25 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_C_Period;
+import org.compiere.model.I_M_CostElement;
+import org.compiere.model.I_Persistent;
+import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
+import org.compiere.util.KeyNamePair;
 
 /** Generated Model for LBR_AverageCost
  *  @author ADempiereLBR (generated) 
- *  @version Release 3.6.0LTS - $Id$ */
+ *  @version Release 3.7.0LTS - $Id$ */
 public class X_LBR_AverageCost extends PO implements I_LBR_AverageCost, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20110323L;
+	private static final long serialVersionUID = 20120315L;
 
     /** Standard Constructor */
     public X_LBR_AverageCost (Properties ctx, int LBR_AverageCost_ID, String trxName)
@@ -382,6 +389,14 @@ public class X_LBR_AverageCost extends PO implements I_LBR_AverageCost, I_Persis
 	{
 		return (String)get_Value(COLUMNNAME_Name);
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), getName());
+    }
 
 	/** Set Processed.
 		@param Processed 

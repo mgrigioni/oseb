@@ -16,15 +16,17 @@
  *****************************************************************************/
 package org.adempierelbr.process;
 
-import java.util.logging.*;
+import java.util.logging.Level;
 
 import org.adempierelbr.model.X_LBR_AverageCost;
 import org.adempierelbr.model.X_LBR_AverageCostLine;
-import org.compiere.apps.*;
-import org.compiere.model.*;
+import org.compiere.apps.AEnv;
+import org.compiere.apps.AWindow;
+import org.compiere.model.MPeriod;
+import org.compiere.model.MQuery;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
-import org.compiere.util.*;
+import org.compiere.util.DB;
 
 /**
  * 	ProcAvgCostZoom

@@ -32,6 +32,7 @@ import org.adempiere.exceptions.BPartnerNoBillToAddressException;
 import org.adempiere.exceptions.BPartnerNoShipToAddressException;
 import org.adempiere.exceptions.FillMandatoryException;
 import org.adempierelbr.model.MLBRTax;
+import org.adempierelbr.wrapper.I_W_C_OrderLine;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -530,10 +531,10 @@ public class MOrder extends X_C_Order implements DocAction
 			
 			//Begin Kenos - BF [#2445887]
 			//	Usar os valores da invoice original
-			line.set_ValueOfColumn("LBR_CFOP_ID", fromLines[i].get_Value("LBR_CFOP_ID"));
-			line.set_ValueOfColumn("LBR_LegalMessage_ID", fromLines[i].get_Value("LBR_LegalMessage_ID"));
-			line.set_ValueOfColumn("lbr_TaxStatus", fromLines[i].get_Value("lbr_TaxStatus"));
-			Integer LBR_Tax_ID = (Integer) fromLines[i].get_Value("LBR_Tax_ID");
+			line.set_ValueOfColumn("LBR_CFOP_ID", fromLines[i].get_Value(I_W_C_OrderLine.COLUMNNAME_LBR_CFOP_ID));
+			line.set_ValueOfColumn("LBR_LegalMessage_ID", fromLines[i].get_Value(I_W_C_OrderLine.COLUMNNAME_LBR_LegalMessage_ID));
+			line.set_ValueOfColumn("lbr_TaxStatus", fromLines[i].get_Value(I_W_C_OrderLine.COLUMNNAME_lbr_TaxStatus));
+			Integer LBR_Tax_ID = (Integer) fromLines[i].get_Value(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID);
 			//
 			if (LBR_Tax_ID != null && LBR_Tax_ID.intValue() > 0)
 			{

@@ -25,6 +25,9 @@ import org.adempierelbr.model.MLBRTax;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TaxesCalculation;
 import org.adempierelbr.util.TaxesException;
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_Order;
+import org.adempierelbr.wrapper.I_W_C_OrderLine;
 import org.compiere.apps.search.Info_Column;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
@@ -147,21 +150,21 @@ public class ValidatorOrder implements ModelValidator
 
 		if (isNew) {
 			MProduct product = oLine.getProduct();
-			if (product != null && oLine.get_ValueAsInt("LBR_Tax_ID") == 0) {
+			if (product != null && oLine.get_ValueAsInt(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID) == 0) {
 				CalloutTax ct = new CalloutTax();
 				TaxesException tE = ct.getException(ctx,oLine.getParent(),product,null);
 				//
 				if (tE != null) {
-					oLine.set_CustomColumn("LBR_Tax_ID", tE.getLBR_Tax_ID());
-					oLine.set_CustomColumn("lbr_TaxStatus", tE.getlbr_TaxStatus());
+					oLine.set_CustomColumn(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID, tE.getLBR_Tax_ID());
+					oLine.set_CustomColumn(I_W_C_OrderLine.COLUMNNAME_lbr_TaxStatus, tE.getlbr_TaxStatus());
 					if (tE.isSOTrx())
-						oLine.set_CustomColumn("LBR_LegalMessage_ID", tE.getLBR_LegalMessage_ID());
+						oLine.set_CustomColumn(I_W_C_OrderLine.COLUMNNAME_LBR_LegalMessage_ID, tE.getLBR_LegalMessage_ID());
 				}
 			}
 		} //NEW
 
 		else if (isDelete){
-			int LBR_Tax_ID = oLine.get_ValueAsInt("LBR_Tax_ID");
+			int LBR_Tax_ID = oLine.get_ValueAsInt(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID);
 			if (LBR_Tax_ID != 0){
 				MLBRTax lbrTax = new MLBRTax(oLine.getCtx(),LBR_Tax_ID,oLine.get_TrxName());
 				lbrTax.delete(true, oLine.get_TrxName());
@@ -250,13 +253,13 @@ public class ValidatorOrder implements ModelValidator
 					MInvoice invoice = null;
 
 					//Shipment
-					boolean isAutomaticShipment = dt.get_ValueAsBoolean("lbr_IsAutomaticShipment");
+					boolean isAutomaticShipment = dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_IsAutomaticShipment);
 					if (isAutomaticShipment){
 						shipment = createShipment(order,dt,order.getDateOrdered());
 					}
 
 					//Invoice
-					boolean isAutomaticInvoice = dt.get_ValueAsBoolean("lbr_IsAutomaticInvoice");
+					boolean isAutomaticInvoice = dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_IsAutomaticInvoice);
 					if (isAutomaticInvoice){
 
 						if (shipment != null){
@@ -296,7 +299,7 @@ public class ValidatorOrder implements ModelValidator
 
 				DB.executeUpdate(sql, order.get_TrxName());
 
-				int whOrder = order.get_ValueAsInt("LBR_Withhold_Order_ID");
+				int whOrder = order.get_ValueAsInt(I_W_C_Order.COLUMNNAME_LBR_Withhold_Order_ID);
 
 				if (whOrder != 0)
 					return "Não é possível re-abrir uma Ordem que tem Retenções de outra Ordem.";
@@ -375,7 +378,7 @@ public class ValidatorOrder implements ModelValidator
 				continue;
 
 			//	Location
-			Integer M_Locator_ID = (Integer)oLine.get_Value("M_Locator_ID");
+			Integer M_Locator_ID = (Integer)oLine.get_Value(I_W_C_OrderLine.COLUMNNAME_M_Locator_ID);
 			if (M_Locator_ID == null || M_Locator_ID.intValue() == 0){
 				M_Locator_ID = MStorage.getM_Locator_ID (oLine.getM_Warehouse_ID(),
 					oLine.getM_Product_ID(), oLine.getM_AttributeSetInstance_ID(),

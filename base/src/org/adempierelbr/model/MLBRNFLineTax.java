@@ -19,6 +19,8 @@ import java.util.Properties;
 
 import org.adempierelbr.util.ImpostoBR;
 import org.adempierelbr.util.TaxBR;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
+import org.adempierelbr.wrapper.I_W_C_Tax;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MTax;
@@ -101,7 +103,7 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 		MInvoiceLine iLine = new MInvoiceLine(ctx,C_InvoiceLine_ID,trx);
 		
 		X_LBR_TaxName[] taxesName = ImpostoBR.getLBR_TaxName(ctx, C_InvoiceLine_ID, false, trx);
-		Map<Integer,X_LBR_TaxLine> lTaxes = MLBRTax.getLines(ctx, iLine.get_ValueAsInt("LBR_Tax_ID"), trx);
+		Map<Integer,X_LBR_TaxLine> lTaxes = MLBRTax.getLines(ctx, iLine.get_ValueAsInt(I_W_C_InvoiceLine.COLUMNNAME_LBR_Tax_ID), trx);
 
 		for (X_LBR_TaxName taxName : taxesName){
 
@@ -112,7 +114,7 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 				if (C_Tax_ID > 0 && taxLine.islbr_PostTax()){
 
 					MTax tax = new MTax(ctx,C_Tax_ID,trx);
-					int LBR_TaxGroup_ID = tax.get_ValueAsInt("LBR_TaxGroup_ID");
+					int LBR_TaxGroup_ID = tax.get_ValueAsInt(I_W_C_Tax.COLUMNNAME_LBR_TaxGroup_ID);
 					
 					MInvoiceTax iTax = TaxBR.getMInvoiceTax(ctx,iLine.getC_Invoice_ID(),tax.get_ID(),trx);
 					

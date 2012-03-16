@@ -31,6 +31,8 @@ import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_OrderLine;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -1236,15 +1238,15 @@ public class MInOut extends X_M_InOut implements DocAction
 
         /**    Criar movimentação de estoque    **/
         MDocType docTypeInOut = new MDocType(p_ctx, getC_DocType_ID(), get_TrxName());
-    	boolean lbr_IsReturn = docTypeInOut.get_ValueAsBoolean("lbr_IsReturn");
+    	boolean lbr_IsReturn = docTypeInOut.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_IsReturn);
 
-        if(docTypeInOut.get_ValueAsBoolean("lbr_GenerateMovement"))
+        if(docTypeInOut.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_GenerateMovement))
         {
 			MMovement movement = new MMovement(p_ctx, 0, get_TrxName());
 			movement.setMovementDate(getDateAcct());
 
 			Integer C_DocType_ID = null;
-			C_DocType_ID = (Integer)docTypeInOut.get_Value("LBR_DocTypeMovement_ID");
+			C_DocType_ID = (Integer)docTypeInOut.get_Value(I_W_C_DocType.COLUMNNAME_LBR_DocTypeMovement_ID);
 			if (C_DocType_ID == null || C_DocType_ID.intValue() == 0){
 				log.log(Level.SEVERE,"C_DocType_ID = " + C_DocType_ID);
 				return DocAction.STATUS_Invalid;
@@ -1259,7 +1261,7 @@ public class MInOut extends X_M_InOut implements DocAction
 			for(MInOutLine line : lines)
 			{
 				Integer M_Warehouse_ID = null;
-				M_Warehouse_ID = (Integer)docTypeInOut.get_Value("M_Warehouse_ID");
+				M_Warehouse_ID = (Integer)docTypeInOut.get_Value(I_W_C_DocType.COLUMNNAME_M_Warehouse_ID);
 				if (M_Warehouse_ID == null || M_Warehouse_ID.intValue() == 0){
 					log.log(Level.SEVERE,"M_Warehouse_ID = " + M_Warehouse_ID);
 					return DocAction.STATUS_Invalid;
@@ -1267,7 +1269,7 @@ public class MInOut extends X_M_InOut implements DocAction
 
 				Integer M_OrderLineLocator_ID = null;
 				MOrderLine ordLine = new MOrderLine(Env.getCtx(),line.getC_OrderLine_ID(),get_TrxName());
-				M_OrderLineLocator_ID = (Integer)ordLine.get_Value("M_Locator_ID");
+				M_OrderLineLocator_ID = (Integer)ordLine.get_Value(I_W_C_OrderLine.COLUMNNAME_M_Locator_ID);
 
 				MMovementLine mLine = new MMovementLine(movement);
 				mLine.setM_Product_ID(line.getM_Product_ID());

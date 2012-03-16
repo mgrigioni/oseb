@@ -220,7 +220,7 @@ public class ProcGenerateEFD extends SvrProcess
 			log.info("Notas Fiscais - Processado: " + String.format("%,.5f",(((double)aux/(double)count)*100)) + "%");
 			aux++;
 			
-			String COD_MOD  = nf.get_ValueAsString("lbr_NFModel").isEmpty() ? "01" : nf.get_ValueAsString("lbr_NFModel");
+			String COD_MOD  = nf.getlbr_NFModel().isEmpty() ? "01" : nf.getlbr_NFModel();
 			String IND_EMIT = nf.islbr_IsOwnDocument() ? "0" : "1"; //0 = Própria, 1 = Terceiros
 			String nfReg    = EFDUtil.getNFHeaderReg(COD_MOD); //Cabeçalho da NFe
 			
@@ -590,6 +590,10 @@ public class ProcGenerateEFD extends SvrProcess
 					BigDecimal QtyOnHand = rs.getBigDecimal("QtyOnHand");
 					int C_BPartner_ID = rs.getInt("C_BPartner_ID");
 					String lbr_WarehouseType = rs.getString("lbr_WarehouseType");
+					
+					//FIXME: Controle de Estoque de Terceiros por Parceiro
+					if (lbr_WarehouseType.equals("3RD"))
+						continue;
 
 					MProduct product = new MProduct(getCtx(), M_Product_ID, get_TrxName());
 					R0190 r0190 = EFDUtil.createR0190(product);

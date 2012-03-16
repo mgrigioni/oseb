@@ -16,6 +16,9 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
@@ -105,16 +108,16 @@ public class MLBRNCM extends X_LBR_NCM {
 			//if (!product.getProductType().equals(X_M_Product.PRODUCTTYPE_Item))
 			//	continue;
 			
-			int LBR_CFOP_ID = line.get_ValueAsInt("LBR_CFOP_ID");
+			int LBR_CFOP_ID = line.get_ValueAsInt(I_W_C_InvoiceLine.COLUMNNAME_LBR_CFOP_ID);
 			MLBRCFOP cfop = new MLBRCFOP(ctx,LBR_CFOP_ID,trx);
-			if (!dt.get_ValueAsBoolean("lbr_HasFiscalDocument") || 
+			if (!dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasFiscalDocument) || 
 				cfop.islbr_IsService() || //Serviço
 				line.isDescription())
 				continue;
 
-			Integer LBR_NCM_ID = (Integer)line.get_Value("LBR_NCM_ID"); //	NCM da Fatura
+			Integer LBR_NCM_ID = (Integer)line.get_Value("LBR_NCM_ID"); //	NCM da Fatura --FIXME
 			if (LBR_NCM_ID == null || LBR_NCM_ID.intValue() == 0)
-				LBR_NCM_ID = (Integer)product.get_Value("LBR_NCM_ID"); //	NCM do Produto
+				LBR_NCM_ID = (Integer)product.get_Value(I_W_M_Product.COLUMNNAME_LBR_NCM_ID); //	NCM do Produto
 			if (LBR_NCM_ID == null)
 				LBR_NCM_ID = 0; //	Sem NCM
 

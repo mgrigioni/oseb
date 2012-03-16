@@ -27,6 +27,8 @@ import org.adempierelbr.model.MLBRTax;
 import org.adempierelbr.model.X_LBR_DocType_Acct;
 import org.adempierelbr.model.X_LBR_TaxLine;
 import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MClientInfo;
@@ -194,7 +196,7 @@ public class Doc_Invoice extends Doc
 			}	//	correct included Tax
 
 			/**	Total de imposto Brasil	*/
-			Integer LBR_Tax_ID = (Integer) line.get_Value("LBR_Tax_ID");
+			Integer LBR_Tax_ID = (Integer) line.get_Value(I_W_C_InvoiceLine.COLUMNNAME_LBR_Tax_ID);
 			if(LBR_Tax_ID != null && LBR_Tax_ID > 0)
 			{
 				BigDecimal lineTaxAmt = Env.ZERO;
@@ -330,9 +332,7 @@ public class Doc_Invoice extends Doc
 
 		/**	Tipo de Documento	*/
 		MDocType dtInv = new MDocType(Env.getCtx(), getC_DocType_ID(), null);
-		Boolean hasOpenItems = (Boolean) dtInv.get_Value("lbr_HasOpenItems");
-		if(hasOpenItems == null)
-			hasOpenItems = true;
+		boolean hasOpenItems = dtInv.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems);
 
 		//  Cash based accounting
 		if (!as.isAccrual())

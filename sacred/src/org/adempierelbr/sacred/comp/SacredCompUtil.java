@@ -18,16 +18,18 @@ import org.adempierelbr.sacred.comp.beans.B0R0150;
 import org.adempierelbr.sacred.comp.beans.B0R0200;
 import org.adempierelbr.sacred.comp.beans.B0R0300;
 import org.adempierelbr.sacred.comp.beans.B5R5310;
+import org.adempierelbr.sacred.comp.beans.B5R5315;
 import org.adempierelbr.sacred.comp.beans.B5R5325;
 import org.adempierelbr.sacred.comp.beans.B5R5330;
 import org.adempierelbr.sacred.comp.beans.B5R5335;
 import org.adempierelbr.sacred.comp.beans.B5R5350;
 import org.adempierelbr.sacred.comp.beans.B9R9900;
-import org.adempierelbr.sacred.comp.beans.B5R5315;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_Country;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCountry;
@@ -109,10 +111,10 @@ public class SacredCompUtil{
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), Env.getAD_Org_ID(getCtx()),null);
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),null);
 
-		String NOME = orgInfo.get_ValueAsString("lbr_LegalEntity");
-		String CNPJ = orgInfo.get_ValueAsString("lbr_CNPJ");
-		String IE   = orgInfo.get_ValueAsString("lbr_IE");
-		String CNAE = orgInfo.get_ValueAsString("lbr_CNAE");
+		String NOME = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity);
+		String CNPJ = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ);
+		String IE   = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
+		String CNAE = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNAE);
 		String CMUN = BPartnerUtil.getCityCode(orgLoc);
 
 		return new B0R0000(dateFrom, NOME, CNPJ, IE, CNAE, CMUN);
@@ -149,7 +151,7 @@ public class SacredCompUtil{
 			MCountry bpCountry = new MCountry(getCtx(),loc.getC_Country_ID(),null);
 
 			COD_MUN  = BPartnerUtil.getCityCode(loc);
-			COD_PAIS = bpCountry.get_ValueAsString("lbr_CountryCode");
+			COD_PAIS = bpCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode);
 		}
 		else
 			return null; //SEM ENDERECO
@@ -394,7 +396,7 @@ public class SacredCompUtil{
 				COD_LEGAL = "0007";
 			}
 			else{
-				String bpSuframa = nf.get_ValueAsString("lbr_BPSuframa");
+				String bpSuframa = nf.getlbr_BPSuframa();
 				if (!bpSuframa.equals("")){
 					COD_LEGAL = "0009"; //ZONA FRANCA
 				}

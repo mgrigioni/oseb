@@ -41,6 +41,7 @@ import com.sun.rowset.CachedRowSetImpl;
  *	@author Alvaro Montenegro
  *	@contributor Mario Grigioni (Kenos, www.kenos.com.br) mgrigioni
  *	@version $Id: ProcGenerateOtherNF.java, 29/08/2008 10:38:00 amontenegro
+ *  @deprecated
  */
 public class ProcGenerateOtherNF extends SvrProcess
 {

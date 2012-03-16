@@ -65,6 +65,10 @@ public abstract class TaxBR
 	public static final int ROUND_SCALE     = 12;
 	public static final RoundingMode ROUND  = RoundingMode.HALF_UP;
 	public static final MathContext MCROUND = new MathContext(ROUND_SCALE,ROUND);
+	
+	/** TAX STANDARD    */
+	public static final BigDecimal PISRATE    = new BigDecimal("1.65");
+	public static final BigDecimal COFINSRATE = new BigDecimal("7.60");
 
 	/** Produto */
 	public static String taxType_Product      = X_LBR_TaxName.LBR_TAXTYPE_Product;

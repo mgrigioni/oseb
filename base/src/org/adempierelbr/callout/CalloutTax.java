@@ -36,9 +36,14 @@ import org.adempierelbr.model.X_LBR_TaxName;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TaxesException;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_BPartner;
+import org.adempierelbr.wrapper.I_W_C_Order;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.I_C_Order;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCharge;
@@ -237,10 +242,10 @@ public class CalloutTax extends CalloutEngine
 		int LBR_TaxConfiguration_ID     = -1;
 		//
 		int AD_Org_ID              = document.getAD_Org_ID();
-		int C_BPartner_ID          = document.get_ValueAsInt("C_BPartner_ID");
-		int C_BPartnerLocation_ID  = document.get_ValueAsInt("C_BPartner_Location_ID");
-		boolean  isSOTrx 		   = document.get_ValueAsBoolean("IsSOTrx");
-		String transactionType     = document.get_ValueAsString("lbr_TransactionType");
+		int C_BPartner_ID          = document.get_ValueAsInt(I_C_Order.COLUMNNAME_C_BPartner_ID);
+		int C_BPartnerLocation_ID  = document.get_ValueAsInt(I_C_Order.COLUMNNAME_C_BPartner_Location_ID);
+		boolean  isSOTrx 		   = document.get_ValueAsBoolean(I_C_Order.COLUMNNAME_IsSOTrx);
+		String transactionType     = document.get_ValueAsString(I_W_C_Order.COLUMNNAME_lbr_TransactionType);
 		//
 		
 		//FR - Para exportação não existe incidência de impostos
@@ -269,18 +274,18 @@ public class CalloutTax extends CalloutEngine
 		MBPartnerLocation bpLocation = new MBPartnerLocation(ctx, C_BPartnerLocation_ID,null);
 		MLocation location           = new MLocation(ctx, bpLocation.getC_Location_ID(), null);
 		//
-		LBR_NCM_ID = product.get_ValueAsInt("LBR_NCM_ID");
+		LBR_NCM_ID = product.get_ValueAsInt(I_W_M_Product.COLUMNNAME_LBR_NCM_ID);
 		MLBRNCM ncm = new MLBRNCM(ctx,LBR_NCM_ID,null);
 		//
 		//	Grupos de Tributação
 		if (isSOTrx){
-			LBR_FiscalGroup_BPartner_ID = bpartner.get_ValueAsInt("LBR_FiscalGroup_Customer_ID");
+			LBR_FiscalGroup_BPartner_ID = bpartner.get_ValueAsInt(I_W_C_BPartner.COLUMNNAME_LBR_FiscalGroup_Customer_ID);
 		}
 		else{
-			LBR_FiscalGroup_BPartner_ID = bpartner.get_ValueAsInt("LBR_FiscalGroup_Vendor_ID");
+			LBR_FiscalGroup_BPartner_ID = bpartner.get_ValueAsInt(I_W_C_BPartner.COLUMNNAME_LBR_FiscalGroup_Vendor_ID);
 		}
 
-		LBR_FiscalGroup_Product_ID = product.get_ValueAsInt("LBR_FiscalGroup_Product_ID");
+		LBR_FiscalGroup_Product_ID = product.get_ValueAsInt(I_W_M_Product.COLUMNNAME_LBR_FiscalGroup_Product_ID);
 
 		//Define se é Produto ou Serviço
 		if (charge == null && product.getProductType().equalsIgnoreCase(X_M_Product.PRODUCTTYPE_Item)){
@@ -300,10 +305,10 @@ public class CalloutTax extends CalloutEngine
 		 */
 
 		//Taxes defined on the Org
-		setLines(ctx, (Integer)orgInfo.get_Value("LBR_Tax_ID"));
+		setLines(ctx, (Integer)orgInfo.get_Value(I_W_AD_OrgInfo.COLUMNNAME_LBR_Tax_ID));
 
 		//Taxes defined from Region
-		boolean isIEExempt = bpartner.get_ValueAsBoolean("lbr_IsIEExempt");
+		boolean isIEExempt = bpartner.get_ValueAsBoolean(I_W_C_BPartner.COLUMNNAME_lbr_IsIEExempt);
 		int FromRegion_ID  = isSOTrx ? orgLocation.getC_Region_ID() : location.getC_Region_ID();
 		int ToRegion_ID    = isSOTrx ? location.getC_Region_ID() : orgLocation.getC_Region_ID();
 
@@ -322,7 +327,7 @@ public class CalloutTax extends CalloutEngine
 
 		//NCM
 		if (LBR_NCM_ID > 0){
-			setLines(ctx, (Integer)ncm.get_Value("LBR_Tax_ID"));
+			setLines(ctx, ncm.getLBR_Tax_ID());
 		}
 
 		//Exceções (Configurador de Impostos) sem exceções Produto ou Grupo
@@ -420,7 +425,7 @@ public class CalloutTax extends CalloutEngine
 
 		}
 
-		String productSource = product.get_ValueAsString("LBR_ProductSource");
+		String productSource = product.get_ValueAsString(I_W_M_Product.COLUMNNAME_lbr_ProductSource);
 		if (productSource == null || productSource.equals(""))
 			productSource = "0";
 
@@ -437,7 +442,7 @@ public class CalloutTax extends CalloutEngine
 		if (LBR_Tax_ID != 0){
 			tax.setDescription();
 			tax.save();
-			log.info(document.get_ValueAsString("DocumentNo") + ": " + //Order or Invoice No
+			log.info(document.get_ValueAsString(I_C_Order.COLUMNNAME_DocumentNo) + ": " + //Order or Invoice No
 					 tax.getDescription()); //Taxes
 		}
 		else
@@ -499,8 +504,8 @@ public class CalloutTax extends CalloutEngine
 			return "";
 		//
 		MBPartner bpartner = new MBPartner(ctx,C_BPartner_ID,null);
-		String lbr_TransactionType = bpartner.get_ValueAsString("lbr_TransactionType");
-		String  lbr_NFModel        = (String)bpartner.get_Value("lbr_NFModel");
+		String lbr_TransactionType = bpartner.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_TransactionType);
+		String  lbr_NFModel        = (String)bpartner.get_Value(I_W_C_BPartner.COLUMNNAME_lbr_NFModel);
 		//
 		if (lbr_TransactionType != null && !lbr_TransactionType.equals(""))
 			mTab.setValue("lbr_TransactionType", lbr_TransactionType);
@@ -646,7 +651,7 @@ public class CalloutTax extends CalloutEngine
 			return "";
 		
 		MOrder o = new MOrder(ctx, C_Order_ID, null);
-		trxType = (String) o.get_Value("lbr_TransactionType");
+		trxType = (String) o.get_Value(I_W_C_Order.COLUMNNAME_lbr_TransactionType);
 		
 		boolean isTaxIncluded = mTab.getValueAsBoolean("lbr_IsPriceBR");
 		

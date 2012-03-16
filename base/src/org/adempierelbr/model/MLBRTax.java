@@ -26,6 +26,7 @@ import java.util.logging.Level;
 
 import org.adempierelbr.util.ServiceTaxes;
 import org.adempierelbr.util.TaxBR;
+import org.adempierelbr.wrapper.I_W_C_Tax;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
@@ -189,15 +190,15 @@ public class MLBRTax extends X_LBR_Tax {
 			{
 				BigDecimal taxAmount = Env.ZERO;
 
-				Integer C_Tax_ID = (Integer)doctax.get_Value("C_Tax_ID");
+				Integer C_Tax_ID = (Integer)doctax.get_Value(I_W_C_Tax.COLUMNNAME_C_Tax_ID);
 				if (C_Tax_ID == null || C_Tax_ID.intValue() == 0)
 					continue;
 
 				org.compiere.model.MTax tax = new org.compiere.model.MTax(ctx, C_Tax_ID, trx);
-				if (tax.get_Value("LBR_TaxName_ID") == null)
+				if (tax.get_Value(I_W_C_Tax.COLUMNNAME_LBR_TaxName_ID) == null)
 					continue;
 
-				X_LBR_TaxName lbr_TaxName = new X_LBR_TaxName(ctx, (Integer) tax.get_Value("LBR_TaxName_ID"), trx);
+				X_LBR_TaxName lbr_TaxName = new X_LBR_TaxName(ctx, (Integer) tax.get_Value(I_W_C_Tax.COLUMNNAME_LBR_TaxName_ID), trx);
 
 				//Somente continua se o imposto tiver retenção
 				if(!lbr_TaxName.isHasWithHold())

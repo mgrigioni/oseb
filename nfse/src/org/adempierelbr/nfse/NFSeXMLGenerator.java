@@ -33,6 +33,7 @@ import com.thoughtworks.xstream.XStream;
  * 
  * @author Ricardo Santana
  * @version $Id: NFSeXMLGenerator.java, v1.0 2010/05/14 5:21:12 PM, ralexsander Exp $
+ * @deprecated CODIGO IMCOMPLETO
  */
 public class NFSeXMLGenerator
 {

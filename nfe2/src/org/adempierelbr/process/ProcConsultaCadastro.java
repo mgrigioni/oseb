@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
@@ -93,7 +94,7 @@ public class ProcConsultaCadastro extends SvrProcess
 		if (orgInfo == null)
 			return null;
 		
-		boolean isSCAN  = orgInfo.get_ValueAsBoolean("lbr_IsScan");
+		boolean isSCAN  = orgInfo.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 
 		//MLocation orgLoc = new MLocation(ctx,orgInfo.getC_Location_ID(),null);
 

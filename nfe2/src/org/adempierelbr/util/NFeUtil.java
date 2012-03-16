@@ -30,7 +30,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
-import org.adempierelbr.nfe.beans.InutilizacaoNF;
+import org.adempierelbr.nfe.InutilizacaoNF;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.MOrgInfo;
@@ -43,8 +44,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.thoughtworks.xstream.XStream;
-
 import br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2.CadConsultaCadastro2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
@@ -52,6 +51,8 @@ import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfestatusservico2.NfeStatusServico2Stub;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * 	Utilitários para gerar a NFe.
@@ -555,7 +556,7 @@ public abstract class NFeUtil
 	 */
 	public static String getEnvType(Properties ctx){
 		MOrgInfo oi = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx),null);
-		String envType 	= oi.get_ValueAsString("lbr_NFeEnv");
+		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
 
 		if (envType == null || envType.equals(""))
 			envType = "2"; //Homologação
@@ -594,6 +595,12 @@ public abstract class NFeUtil
 	
 	public static String checkXMLFile(MLBRNotaFiscal nf){
 		
+		//Validação preliminar
+	    if (nf == null || nf.getAttachment() == null || 
+	    	nf.getAttachment().getEntry(0) == null){
+	    	return null;
+	    }
+
 		String nfeID = nf.getAttachment().getEntry(0).toString();
 		if(nfeID != null){
 			

@@ -14,6 +14,7 @@ package org.adempierelbr.callout;
 
 import java.util.Properties;
 
+import org.adempierelbr.wrapper.I_W_C_BPartner;
 import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
@@ -61,8 +62,8 @@ public class CalloutInvoice extends CalloutEngine
 
 		MBPartner bpartner = new MBPartner(ctx,C_BPartner_ID,null);
 
-		String  lbr_PaymentRule  = bpartner.get_ValueAsString("lbr_PaymentRule");
-		Integer C_BankAccount_ID = (Integer)bpartner.get_Value("C_BankAccount_ID");
+		String  lbr_PaymentRule  = bpartner.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_PaymentRule);
+		Integer C_BankAccount_ID = 0; //(Integer)bpartner.get_Value("C_BankAccount_ID"); -- FIXME
 
 		mTab.setValue("lbr_PaymentRule", lbr_PaymentRule);
 		mTab.setValue("C_BankAccount_ID", C_BankAccount_ID);

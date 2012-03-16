@@ -18,12 +18,13 @@ package org.adempierelbr.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import org.compiere.model.*;
+
+import org.compiere.model.MTable;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LBR_CFOP
  *  @author Adempiere (generated) 
- *  @version Release 3.6.0LTS
+ *  @version Release 3.7.0LTS
  */
 public interface I_LBR_CFOP 
 {
@@ -117,6 +118,15 @@ public interface I_LBR_CFOP
 	  * Primary key table LBR_CFOP
 	  */
 	public int getLBR_CFOP_ID();
+
+    /** Column name lbr_IsRevenue */
+    public static final String COLUMNNAME_lbr_IsRevenue = "lbr_IsRevenue";
+
+	/** Set Is Revenue	  */
+	public void setlbr_IsRevenue (boolean lbr_IsRevenue);
+
+	/** Get Is Revenue	  */
+	public boolean islbr_IsRevenue();
 
     /** Column name lbr_IsService */
     public static final String COLUMNNAME_lbr_IsService = "lbr_IsService";

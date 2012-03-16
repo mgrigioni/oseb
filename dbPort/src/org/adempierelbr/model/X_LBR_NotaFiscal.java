@@ -21,20 +21,32 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_C_BPartner;
+import org.compiere.model.I_C_BPartner_Location;
+import org.compiere.model.I_C_DocType;
+import org.compiere.model.I_C_Invoice;
+import org.compiere.model.I_C_Location;
+import org.compiere.model.I_C_Order;
+import org.compiere.model.I_C_PaymentTerm;
+import org.compiere.model.I_M_InOut;
+import org.compiere.model.I_Persistent;
+import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Model for LBR_NotaFiscal
  *  @author ADempiereLBR (generated) 
- *  @version Release 3.6.0LTS - $Id$ */
+ *  @version Release 3.7.0LTS - $Id$ */
 public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20110822L;
+	private static final long serialVersionUID = 20120315L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -2179,6 +2191,16 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_ElementoNfeCabecMsgInexistenteNoSOAPHeader = "409";
 	/** Rejeição: Não é permitida a presença de caracteres de edição no início/fim da mensagem ou entre as tags da mensagem = 588 */
 	public static final String LBR_NFESTATUS_RejeiçãoNãoÉPermitidaAPresençaDeCaracteresDeEdiçãoNoInícioFimDaMensagemOuEntreAsTagsDaMensagem = "588";
+	/** Rejeição: CFOP de Importação e não informado dados de II = 599 */
+	public static final String LBR_NFESTATUS_RejeiçãoCFOPDeImportaçãoENãoInformadoDadosDeII = "599";
+	/** Rejeição: CFOP de Importação e não informado dados de IPI = 597 */
+	public static final String LBR_NFESTATUS_RejeiçãoCFOPDeImportaçãoENãoInformadoDadosDeIPI = "597";
+	/** Rejeição: Total do II difere do somatório dos itens = 601 */
+	public static final String LBR_NFESTATUS_RejeiçãoTotalDoIIDifereDoSomatórioDosItens = "601";
+	/** Rejeição: Valor do Produto difere do produto Valor Unitário de Comercialização e Quantidade Comercial = 629 */
+	public static final String LBR_NFESTATUS_RejeiçãoValorDoProdutoDifereDoProdutoValorUnitárioDeComercializaçãoEQuantidadeComercial = "629";
+	/** Rejeição: Valor do Produto difere do produto Valor Unitário de Tributação e Quantidade Tributável = 630 */
+	public static final String LBR_NFESTATUS_RejeiçãoValorDoProdutoDifereDoProdutoValorUnitárioDeTributaçãoEQuantidadeTributável = "630";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe

@@ -1,4 +1,4 @@
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.RemoverAcentos;

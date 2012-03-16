@@ -20,6 +20,11 @@ import java.util.logging.Level;
 
 import org.adempierelbr.model.MLBRNCM;
 import org.adempierelbr.model.X_LBR_CFOPLine;
+import org.adempierelbr.wrapper.I_W_C_BPartner;
+import org.adempierelbr.wrapper.I_W_C_Charge;
+import org.adempierelbr.wrapper.I_W_C_Invoice;
+import org.adempierelbr.wrapper.I_W_C_Order;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
@@ -139,15 +144,15 @@ public class CalloutDefineCFOP extends CalloutEngine {
 		if (mo != null){
 			AD_Org_ID = mo.getAD_Org_ID();
 			C_DocTypeTarget_ID = mo.getC_DocTypeTarget_ID();
-			transactionType = (mo.get_Value("lbr_TransactionType") == null) ? ""
-					: mo.get_Value("lbr_TransactionType").toString();
+			transactionType = (mo.get_Value(I_W_C_Order.COLUMNNAME_lbr_TransactionType) == null) ? ""
+					: mo.get_Value(I_W_C_Order.COLUMNNAME_lbr_TransactionType).toString();
 			isSOTrx = mo.isSOTrx();
 		}
 		else if (mi != null){
 			AD_Org_ID = mi.getAD_Org_ID();
 			C_DocTypeTarget_ID = mi.getC_DocTypeTarget_ID();
-			transactionType = (mi.get_Value("lbr_TransactionType") == null) ? ""
-					: mi.get_Value("lbr_TransactionType").toString();
+			transactionType = (mi.get_Value(I_W_C_Invoice.COLUMNNAME_lbr_TransactionType) == null) ? ""
+					: mi.get_Value(I_W_C_Invoice.COLUMNNAME_lbr_TransactionType).toString();
 			isSOTrx = mi.isSOTrx();
 		}
 		else{
@@ -170,11 +175,11 @@ public class CalloutDefineCFOP extends CalloutEngine {
 		Integer bpCat = null;
 		if (mbp.isCustomer()) {
 			Integer lbrCust = (Integer) mbp
-					.get_Value("LBR_CustomerCategory_ID");
+					.get_Value(I_W_C_BPartner.COLUMNNAME_LBR_CustomerCategory_ID);
 			if (lbrCust != null)
 				bpCat = lbrCust.intValue();
 		} else {
-			Integer lbrCust = (Integer) mbp.get_Value("LBR_VendorCategory_ID");
+			Integer lbrCust = (Integer) mbp.get_Value(I_W_C_BPartner.COLUMNNAME_LBR_CustomerCategory_ID);
 			if (lbrCust != null)
 				bpCat = lbrCust.intValue();
 		}
@@ -188,13 +193,13 @@ public class CalloutDefineCFOP extends CalloutEngine {
 
 		if (M_Product_ID > 0){
 			MProduct mp = new MProduct(ctx, M_Product_ID, null);
-			prdCat = (Integer) mp.get_Value("LBR_ProductCategory_ID");
-			isSubstitute = new MLBRNCM(ctx,mp.get_ValueAsInt("LBR_NCM_ID"),null).hasST(mlbp.getC_Region_ID(),isSOTrx);
-			isManufactured = mp.get_ValueAsBoolean("lbr_IsManufactured");
+			prdCat = (Integer) mp.get_Value(I_W_M_Product.COLUMNNAME_LBR_ProductCategory_ID);
+			isSubstitute = new MLBRNCM(ctx,mp.get_ValueAsInt(I_W_M_Product.COLUMNNAME_LBR_NCM_ID),null).hasST(mlbp.getC_Region_ID(),isSOTrx);
+			isManufactured = mp.get_ValueAsBoolean(I_W_M_Product.COLUMNNAME_lbr_IsManufactured);
 		}
 		else{
 			MCharge mc = new MCharge(ctx, C_Charge_ID, null);
-			prdCat = (Integer) mc.get_Value("LBR_ProductCategory_ID");
+			prdCat = (Integer) mc.get_Value(I_W_C_Charge.COLUMNNAME_LBR_ProductCategory_ID);
 		}
 
 		if (prdCat == null)
@@ -230,7 +235,7 @@ public class CalloutDefineCFOP extends CalloutEngine {
 			pstmt.setInt(2, prdCat);
 			pstmt.setInt(3, bpCat);
 
-			if (mbp.get_Value("lbr_Suframa") != null)
+			if (mbp.get_Value(I_W_C_BPartner.COLUMNNAME_lbr_Suframa) != null)
 				pstmt.setString(4,
 						X_LBR_CFOPLine.LBR_DESTIONATIONTYPE_ZonaFranca);
 			else if (mlbp.getC_Country_ID() != mlo.getC_Country_ID())

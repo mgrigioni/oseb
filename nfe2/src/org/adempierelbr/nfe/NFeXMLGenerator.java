@@ -87,6 +87,10 @@ import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.validator.ValidatorBPartner;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.wrapper.I_W_C_City;
+import org.adempierelbr.wrapper.I_W_C_Country;
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
@@ -226,13 +230,13 @@ public class NFeXMLGenerator
 		 */
 		String indPag = nf.getIndPag();
 		if (indPag.equals("9")) // 9 é usado no SPED EFD
-			indPag = "0";
+			indPag = "2";
 
 		/** Identificação do Ambiente (1 - Produção; 2 - Homologação) */
-		String tpAmb = docType.get_ValueAsString("lbr_NFeEnv");
+		String tpAmb = docType.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
 
 		/** Formato de impressão do DANFE (1 - Retrato; 2 - Paisagem) */
-		String tpImp = docType.get_ValueAsString("lbr_DANFEFormat");
+		String tpImp = docType.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_DANFEFormat);
 
 		/**
 		 * Processo de emissão utilizado com a seguinte codificação:
@@ -254,7 +258,7 @@ public class NFeXMLGenerator
 		 * 4 - Contingência DPEC
 		 * 5 - Contingência FSDA
 		 */
-		String tpEmis = docType.get_ValueAsString("lbr_NFeTpEmi");
+		String tpEmis = docType.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFeTpEmi);
 		if (tpEmis == null)
 			tpEmis = "1";
 		
@@ -319,8 +323,8 @@ public class NFeXMLGenerator
 		identNFe.setTpNF(nf.isSOTrx() ? "1" : "0");
 		Integer orgCityCode = 0;
 
-		if (orgCity != null  && orgCity.get_Value("lbr_CityCode") != null)	//	TODO: Copiar para LBR_NF
-			orgCityCode = (Integer) orgCity.get_Value("lbr_CityCode");
+		if (orgCity != null  && orgCity.get_Value(I_W_C_City.COLUMNNAME_lbr_CityCode) != null)	//	TODO: Copiar para LBR_NF
+			orgCityCode = (Integer) orgCity.get_Value(I_W_C_City.COLUMNNAME_lbr_CityCode);
 
 		identNFe.setcMunFG(orgCityCode.toString());
 		identNFe.setTpImp(tpImp);
@@ -349,19 +353,19 @@ public class NFeXMLGenerator
 		enderEmit.setxMun(RemoverAcentos.remover(nf.getlbr_OrgCity()));
 		enderEmit.setUF(orgRegion.getName());
 		enderEmit.setCEP(TextUtil.toNumeric(orgLoc.getPostal()));
-		enderEmit.setcPais((Integer.parseInt(orgCountry.get_ValueAsString("lbr_CountryCode"))) + "");
+		enderEmit.setcPais((Integer.parseInt(orgCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode))) + "");
 		enderEmit.setxPais(AdempiereLBR.getCountry_trl(orgCountry));
 
 		// 	Dados do Emitente
 		emitente.setCNPJ(chaveNFE.getCNPJ());
-		String orgNome = RemoverAcentos.remover(orgInfo.get_ValueAsString("lbr_LegalEntity")); //TODO: Copiar para NF
+		String orgNome = RemoverAcentos.remover(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity)); //TODO: Copiar para NF
 		emitente.setxNome(orgNome);
-		String orgXFant = RemoverAcentos.remover(orgInfo.get_ValueAsString("lbr_Fantasia"));  //TODO: Copiar para NF
+		String orgXFant = RemoverAcentos.remover(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_Fantasia));  //TODO: Copiar para NF
 		if (orgXFant == null || orgXFant.equals(""))
 			orgXFant = orgNome;
 		emitente.setxFant(orgXFant);
 		//
-		String orgIE = orgInfo.get_ValueAsString("lbr_IE");
+		String orgIE = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
 		UF uf = UF.valueOf(orgRegion.getName());
 		// VALIDACAO IE
 		orgIE = ValidatorBPartner.validaIE(orgIE,uf);
@@ -370,11 +374,11 @@ public class NFeXMLGenerator
 		}
 		//
 		emitente.setIE(orgIE);
-		String orgIM = TextUtil.formatStringCodes(orgInfo.get_ValueAsString("lbr_CCM"));
+		String orgIM = TextUtil.formatStringCodes(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM));
 		if (orgIM == null || orgIM.equals(""))
 			orgIM = "EM ANDAMENTO";
 		emitente.setIM(orgIM);
-		String orgCNAE = TextUtil.formatStringCodes(orgInfo.get_ValueAsString("lbr_CNAE"));
+		String orgCNAE = TextUtil.formatStringCodes(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNAE));
 		emitente.setCNAE(orgCNAE);
 		emitente.setCRT(CRT);
 		emitente.setEnderEmit(enderEmit);
@@ -393,8 +397,8 @@ public class NFeXMLGenerator
 			return "Cidade do Parceiro de Negócios não encontrada";
 		}
 
-		if (bpCity != null && bpCity.get_Value("lbr_CityCode") != null) {
-			bpCityCode = (Integer) bpCity.get_Value("lbr_CityCode");
+		if (bpCity != null && bpCity.get_Value(I_W_C_City.COLUMNNAME_lbr_CityCode) != null) {
+			bpCityCode = (Integer) bpCity.get_Value(I_W_C_City.COLUMNNAME_lbr_CityCode);
 			if ((bpCityCode == null || bpCityCode.intValue() == 0) &
 					bpLoc.getC_Country_ID() == BPartnerUtil.BRASIL){
 				log.log(Level.SEVERE, "Código do cidade (IBGE) não cadastrado");
@@ -422,7 +426,7 @@ public class NFeXMLGenerator
 		}
 
 		MCountry bpCountry = new MCountry(ctx,bpLoc.getC_Country_ID(),null);
-		enderDest.setCPais((Integer.parseInt(bpCountry.get_ValueAsString("lbr_CountryCode"))) + "");
+		enderDest.setCPais((Integer.parseInt(bpCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode))) + "");
 		enderDest.setXPais(AdempiereLBR.getCountry_trl(bpCountry));
 		//enderDest.setFone(TextUtil.checkSizeN(nf.getlbr_BPPhone(),6,14));
 		enderDest.setEmail(null); //TODO
@@ -597,7 +601,7 @@ public class NFeXMLGenerator
 		if (nf.getC_Invoice_ID() > 0){
 			MInvoice invoice = new MInvoice(ctx,nf.getC_Invoice_ID(),trxName);
 			MDocType dt = MDocType.get(ctx, invoice.getC_DocTypeTarget_ID());
-			boolean HasOpenItems = dt.get_ValueAsBoolean("lbr_HasOpenItems");
+			boolean HasOpenItems = dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems);
 
 			if (HasOpenItems && nf.isSOTrx()){
 				
@@ -638,14 +642,12 @@ public class NFeXMLGenerator
 			//Importação - nDI Obrigatório
 			if (nfLine.getlbr_CFOPName() != null &&
 					nfLine.getlbr_CFOPName().startsWith("3")){
-				if (nfLine.get_Value("LBR_NFDI_ID") == null)
+				if (nfLine.getLBR_NFDI_ID() == 0)
 					return "Linha: " + nfLine.getLine() + " CFOP Importação. " +
 							"DI Obrigatório!";
-			}
-
-			//	DI e Adições
-			if (nfLine.get_Value("LBR_NFDI_ID") != null) {
-				X_LBR_NFDI di = new X_LBR_NFDI(Env.getCtx(), (Integer) nfLine.get_Value("LBR_NFDI_ID"), null);
+				
+				//	DI e Adições
+				X_LBR_NFDI di = new X_LBR_NFDI(Env.getCtx(), nfLine.getLBR_NFDI_ID(), null);
 				//
 				declaracao.setcExportador(RemoverAcentos.remover(di.getlbr_CodExportador()));
 				declaracao.setdDesemb(TextUtil.timeToString(di.getlbr_DataDesemb(), "yyyy-MM-dd"));
@@ -658,7 +660,7 @@ public class NFeXMLGenerator
 				adicao.setcFabricante(RemoverAcentos.remover(nfLine.get_ValueAsString("Manufacturer")));
 				adicao.setnAdicao(nfLine.get_ValueAsString("lbr_NumAdicao"));
 				adicao.setnSeqAdic(nfLine.get_ValueAsString("lbr_NumSeqItem"));
-			  //adicao.setVDescDI(Env.ZERO);	//TODO
+				//adicao.setVDescDI(Env.ZERO);	//TODO
 				adicao.setnDI(di.getlbr_DI());
 				declaracao.addAdi(adicao);
 				produtos.setDI(declaracao);
@@ -865,7 +867,7 @@ public class NFeXMLGenerator
 				} //COFINS
 
 				else if(lt.getTaxIndicator().toUpperCase().equals("IPI")) {
-					String CST = nfLine.get_ValueAsString("lbr_TaxStatusIPI");
+					String CST = nfLine.getlbr_TaxStatusIPI();
 					//
 					if (CST == null || CST.equals(""))
 						;

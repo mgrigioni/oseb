@@ -67,7 +67,7 @@ public class ProcGenerateNFEXml extends SvrProcess
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(), p_LBR_NotaFiscal_ID, get_TrxName());
 		
 		//
-		if (nf.get_Value("lbr_NFeProt") != null || nf.isProcessed())
+		if (nf.getlbr_NFeProt() != null || nf.isProcessed())
 		{
 			return "NF já processada.";
 		}

@@ -3,10 +3,11 @@ package org.adempierelbr.process;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
+import org.adempierelbr.nfe.InutilizacaoNF;
 import org.adempierelbr.nfe.NFeInutilizacao;
-import org.adempierelbr.nfe.beans.InutilizacaoNF;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MDocType;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
@@ -94,12 +95,12 @@ public class ProcInutNF extends SvrProcess
 		if (regionCode.isEmpty())
 			return "UF Inválida";
 		//
-		String serie = dt.get_ValueAsString("lbr_NFSerie");
+		String serie = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
 		if (serie == null || serie.trim().isEmpty())
 			serie = "0";
 		
 		InutilizacaoNF iNF = new InutilizacaoNF (oi, regionCode);
-		iNF.setMod(dt.get_ValueAsString("lbr_NFModel"));
+		iNF.setMod(dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel));
 		iNF.setSerie(serie);
 		iNF.setnNFIni(p_DocumentNo.toString());
 		iNF.setnNFFin(p_DocumentNo_To.toString());

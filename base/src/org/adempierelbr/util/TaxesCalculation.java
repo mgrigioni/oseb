@@ -19,10 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.adempierelbr.model.MLBRTaxIncludedList;
 import org.adempierelbr.model.MLBRTax;
+import org.adempierelbr.model.MLBRTaxIncludedList;
 import org.adempierelbr.model.X_LBR_TaxLine;
 import org.adempierelbr.model.X_LBR_TaxName;
+import org.adempierelbr.wrapper.I_W_C_OrderLine;
+import org.adempierelbr.wrapper.I_W_C_Tax;
+import org.adempierelbr.wrapper.I_W_M_PriceList;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
@@ -243,7 +246,7 @@ public class TaxesCalculation{
 			TaxBR.deleteAllTax(getDocument_ID(), m_isOrder, trx);
 		}
 
-		boolean brazilianlist = pList.get_ValueAsBoolean("lbr_BrazilianPriceList");
+		boolean brazilianlist = pList.get_ValueAsBoolean(I_W_M_PriceList.COLUMNNAME_lbr_BrazilianPriceList);
 		ArrayList<Integer> tIncluded = new ArrayList<Integer>();
 		if (brazilianlist){
 			tIncluded = MLBRTaxIncludedList.getTaxes(ctx, pList.getM_PriceList_ID(), trx);
@@ -260,14 +263,14 @@ public class TaxesCalculation{
 
 			for (PO line : lines)
 			{
-				int LBR_Tax_ID = line.get_ValueAsInt("LBR_Tax_ID");
+				int LBR_Tax_ID = line.get_ValueAsInt(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID);
 				if (LBR_Tax_ID > 0){
 
 					Map<Integer,X_LBR_TaxLine> lTaxes = MLBRTax.getLines(ctx, LBR_Tax_ID, trx);
 					MTax cTaxes[] = tax.getChildTaxes(false);
 					for(MTax cTax : cTaxes){
 
-						int LBR_TaxName_ID = cTax.get_ValueAsInt("LBR_TaxName_ID");
+						int LBR_TaxName_ID = cTax.get_ValueAsInt(I_W_C_Tax.COLUMNNAME_LBR_TaxName_ID);
 
 						if (lTaxes.containsKey(LBR_TaxName_ID)) {
 
@@ -355,7 +358,7 @@ public class TaxesCalculation{
 		MPriceList pList = getMPriceList();
 		clearValues();
 
-		boolean brazilianlist = pList.get_ValueAsBoolean("lbr_BrazilianPriceList");
+		boolean brazilianlist = pList.get_ValueAsBoolean(I_W_M_PriceList.COLUMNNAME_lbr_BrazilianPriceList);
 		ArrayList<Integer> tIncluded = new ArrayList<Integer>();
 		if (brazilianlist){
 			tIncluded = MLBRTaxIncludedList.getTaxes(ctx, pList.getM_PriceList_ID(), trx);
@@ -374,7 +377,7 @@ public class TaxesCalculation{
 
 			if (tax.isSummary()){
 
-				int LBR_Tax_ID = line.get_ValueAsInt("LBR_Tax_ID");
+				int LBR_Tax_ID = line.get_ValueAsInt(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID);
 				if (LBR_Tax_ID > 0){
 
 					//CALCULATE THE CURRENT ROW
@@ -384,7 +387,7 @@ public class TaxesCalculation{
 					MTax cTaxes[] = tax.getChildTaxes(false);
 					for(MTax cTax : cTaxes){
 
-						int LBR_TaxName_ID = cTax.get_ValueAsInt("LBR_TaxName_ID");
+						int LBR_TaxName_ID = cTax.get_ValueAsInt(I_W_C_Tax.COLUMNNAME_LBR_TaxName_ID);
 
 						if (lTaxes.containsKey(LBR_TaxName_ID)) {
 

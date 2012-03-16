@@ -42,6 +42,9 @@ import org.compiere.model.MUOMConversion;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
+/**
+ * @deprecated CODIGO INCOMPLETO
+ */
 public class OverallDiscount {
 
 	protected static CLogger log = CLogger.getCLogger(OverallDiscount.class);

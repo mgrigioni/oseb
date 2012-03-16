@@ -64,7 +64,7 @@ public class ProcCancelNF extends SvrProcess
 		{
 			MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),p_LBR_NotaFiscal_ID,get_TrxName());
 			//
-			if (nf.get_Value("lbr_NFeID") != null)
+			if (nf.getlbr_NFeID() != null)
 			{
 				if (nf.isCancelled())
 					return "NF Já está cancelada.";

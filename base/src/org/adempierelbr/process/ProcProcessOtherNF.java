@@ -47,6 +47,7 @@ import com.sun.rowset.CachedRowSetImpl;
  *	 
  *	@author Alvaro Montenegro
  *	@version $Id: ProcProcessOtherNF.java, 29/08/2008 10:38:00 amontenegro
+ *  @deprecated CODIGO IMCOMPLETO
  */
 public class ProcProcessOtherNF extends SvrProcess
 {

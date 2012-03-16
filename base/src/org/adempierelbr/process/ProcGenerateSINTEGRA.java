@@ -26,6 +26,7 @@ import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
@@ -220,11 +221,11 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 		//	Monta o Registro 10
 		log.finer("SINTEGRA: 10");
 		result.append(
-				registro10(oi.get_ValueAsString("lbr_CNPJ"),
-						oi.get_ValueAsString("lbr_IE"),
-						oi.get_ValueAsString("lbr_LegalEntity"),	//	Razão Social
+				registro10(oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ),
+						oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE),
+						oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity),	//	Razão Social
 						ol.getCity(), r.getName(),
-						oi.get_ValueAsString("Fax"), //	Fax
+						oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_Fax), //	Fax
 						p_DateFrom,	p_DateTo, "3", "3",	"1"));
 
 		//	Monta o Registro 11
@@ -233,8 +234,8 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 				registro11(ol.getAddress1(), ol.getAddress2(),
 						ol.getAddress4(), ol.getAddress3(),
 						ol.getPostal(),
-						oi.get_ValueAsString("ContactName"), //	Pessoa Contato
-						oi.get_ValueAsString("Phone")));	//	Telefone Contato
+						oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_ContactName), //	Pessoa Contato
+						oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_Phone)));	//	Telefone Contato
 
 
 		MLBRNotaFiscal[] nfs = getNotasFiscais(ctx,estado);
@@ -313,8 +314,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 						boolean emitente = true;
 						
 						if (!nf.isSOTrx()){
-							if (!nf.get_ValueAsBoolean("lbr_IsOwnDocument") && 
-									nf.getC_DocType_ID() == 0)
+							if (!nf.islbr_IsOwnDocument() && nf.getC_DocType_ID() == 0)
 								emitente = false;
 						}
 						
@@ -403,7 +403,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 									data, nf.getlbr_BPRegion(),
 									modeloNF, nf.getSerieNo(),
 			        				nf.getDocNo(), rs.getString("cfop"),
-			        				nf.get_ValueAsBoolean("lbr_IsOwnDocument"),
+			        				nf.islbr_IsOwnDocument(),
 			        				rs.getBigDecimal("baseICMS"),
 			        				rs.getBigDecimal("valorICMS"),
 			        				rs.getBigDecimal("outrasDesp"),
@@ -519,8 +519,8 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 		StringBuffer registro90 = new StringBuffer("");
 
 		registro90.append(registro90(
-				oi.get_ValueAsString("lbr_CNPJ"),
-				oi.get_ValueAsString("lbr_IE"), 
+				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ),
+				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE), 
 				count50,
 				count51, 
 				count53,
