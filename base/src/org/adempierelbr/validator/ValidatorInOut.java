@@ -81,6 +81,8 @@ public class ValidatorInOut implements ModelValidator
 			log.info("Initializing global validator: "+this.toString());
 		}
 
+		engine.addModelChange(MInOutLine.Table_Name, this);
+		
 		engine.addDocValidate(MInOut.Table_Name, this);
 		engine.addDocValidate(MMovement.Table_Name, this);
 		engine.addDocValidate(MInventory.Table_Name, this);
@@ -120,6 +122,10 @@ public class ValidatorInOut implements ModelValidator
      */
 	public String modelChange (PO po, int type) throws Exception
 	{
+		//Linha do Recebimento/Remesssa
+		if (MInOutLine.Table_Name.equals(po.get_TableName()))
+			return modelChange ((MInOutLine) po, type);
+
 		return null;
 	}	//	modelChange
 
@@ -198,6 +204,22 @@ public class ValidatorInOut implements ModelValidator
 
 		return Env.ZERO;
 	}	//	QtyOnHand
+		
+	/**
+	 * Model Change of a monitored Table.
+	 * @param iol
+	 * @param type
+	 * @return error message or null
+	 * @throws Exception
+	 */
+	public String modelChange (MInOutLine iol, int type) throws Exception {
+		//	Ajusta a Organização
+		if (TYPE_BEFORE_NEW == type && iol.getC_OrderLine_ID() > 0) {
+			iol.setAD_Org_ID(iol.getC_OrderLine().getAD_Org_ID());
+		}
+		
+		return null;
+	}//	modelChange
 
 	/**
 	 *	Validate Movement.
@@ -283,7 +305,7 @@ public class ValidatorInOut implements ModelValidator
 		if(lines == null || lines.length <= 0)
 			return Msg.getMsg(ctx, "NoLines");
 
-		boolean isInternalUse = inv.get_ValueAsBoolean("z_IsInternalUse");
+		boolean isInternalUse = inv.get_ValueAsBoolean("z_IsInternalUse"); //FIXME: colocar no oseb
 
 		if(isInternalUse) {
 			for(MInventoryLine line : lines) {

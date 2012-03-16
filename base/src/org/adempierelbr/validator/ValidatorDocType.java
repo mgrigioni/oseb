@@ -15,9 +15,16 @@ package org.adempierelbr.validator;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.adempierelbr.grid.VCreateFromDEUI;
+import org.adempierelbr.grid.VCreateFromNFeLotUI;
+import org.adempierelbr.model.MLBRNFeLot;
 import org.adempierelbr.model.MLBRTaxConfiguration;
+import org.adempierelbr.model.X_LBR_DE;
 import org.adempierelbr.model.X_LBR_TaxConfiguration;
+import org.adempierelbr.wrapper.I_W_AD_Sequence;
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.apps.search.Info_Column;
+import org.compiere.grid.VCreateFromFactory;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MSequence;
@@ -44,7 +51,6 @@ import org.compiere.util.CLogger;
  */
 public class ValidatorDocType implements ModelValidator
 {
-
 
 	/**
 	 *	Constructor.
@@ -101,6 +107,11 @@ public class ValidatorDocType implements ModelValidator
 	public String login (int AD_Org_ID, int AD_Role_ID, int AD_User_ID)
 	{
 		log.info("AD_User_ID=" + AD_User_ID);
+		
+		//	Registra CreateFrom do LBR
+		VCreateFromFactory.registerClass (MLBRNFeLot.Table_ID, VCreateFromNFeLotUI.class);
+		VCreateFromFactory.registerClass(X_LBR_DE.Table_ID, VCreateFromDEUI.class);
+		
 		return null;
 	}	//	login
 
@@ -137,13 +148,11 @@ public class ValidatorDocType implements ModelValidator
 	public String modelChange(MDocType doc){
 
 
-		boolean lbr_IsAutomaticInvoice = doc.get_ValueAsBoolean("lbr_IsAutomaticInvoice");
-		boolean lbr_IsAutomaticShipment = doc.get_ValueAsBoolean("lbr_IsAutomaticShipment");
-		if(lbr_IsAutomaticInvoice && lbr_IsAutomaticShipment)
-		{
+		boolean lbr_IsAutomaticInvoice = doc.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_IsAutomaticInvoice);
+		boolean lbr_IsAutomaticShipment = doc.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_IsAutomaticShipment);
+		if(lbr_IsAutomaticInvoice && lbr_IsAutomaticShipment) {
 			MDocType shpDoc = new MDocType(doc.getCtx(),doc.getC_DocTypeShipment_ID(),doc.get_TrxName());
-			if((Boolean)shpDoc.get_Value("IsShipConfirm"))
-			{
+			if(shpDoc.isShipConfirm()) {
 				return "Inconsistência nos documentos sub-sequentes";
 			}
 		}
@@ -183,12 +192,12 @@ public class ValidatorDocType implements ModelValidator
 
 	public String modelChange(MSequence sequence){
 
-		boolean isRange = sequence.get_ValueAsBoolean("IsRange");
+		boolean isRange = sequence.get_ValueAsBoolean(I_W_AD_Sequence.COLUMNNAME_IsRange);
 		if (isRange){
 
 			int currentNext = sequence.getCurrentNext();
-			int maxValue    = (Integer)sequence.get_Value("ValueMax") != null ? (Integer)sequence.get_Value("ValueMax") : 0;
-			int minValue    = (Integer)sequence.get_Value("ValueMin") != null ? (Integer)sequence.get_Value("ValueMin") : 0;
+			int maxValue    = sequence.get_ValueAsInt(I_W_AD_Sequence.COLUMNNAME_ValueMax);
+			int minValue    = sequence.get_ValueAsInt(I_W_AD_Sequence.COLUMNNAME_ValueMin);
 
 			if (currentNext > maxValue){
 				sequence.setCurrentNext(minValue);

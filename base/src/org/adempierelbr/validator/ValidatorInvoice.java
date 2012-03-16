@@ -226,35 +226,38 @@ public class ValidatorInvoice implements ModelValidator
 				return null;
 			}
 
-			if (isNew &&  LBR_Tax_ID == 0)
-			{
+			if (isNew){
 				int C_OrderLine_ID = iLine.getC_OrderLine_ID();
-				if (C_OrderLine_ID != 0)
-				{
+				if (C_OrderLine_ID != 0) {
 					MOrderLine oLine = new MOrderLine(ctx, C_OrderLine_ID, trx);
-					// CFOP, Sit. Tributária, Mensagem Legal
-					if (iLine.get_ValueAsInt("LBR_CFOP_ID") <= 0)
-						iLine.set_ValueOfColumn("LBR_CFOP_ID", oLine.get_Value("LBR_CFOP_ID"));
-
-					if (iLine.get_ValueAsInt("LBR_LegalMessage_ID") <= 0)
-						iLine.set_ValueOfColumn("LBR_LegalMessage_ID", oLine.get_Value("LBR_LegalMessage_ID"));
-
-					if (iLine.get_ValueAsString("lbr_TaxStatus").isEmpty())
-						iLine.set_ValueOfColumn("lbr_TaxStatus", oLine.get_Value("lbr_TaxStatus"));
-
-					if(iLine.getDescription() == null || iLine.getDescription().equals(""))
-						iLine.setDescription(oLine.getDescription());
-
-					//
-					LBR_Tax_ID = oLine.get_ValueAsInt("LBR_Tax_ID");
-					if (LBR_Tax_ID != 0)
-					{
-						MLBRTax oTax = new MLBRTax(ctx, LBR_Tax_ID, trx);
-						MLBRTax newTax = oTax.copyTo();
+					//Org
+					iLine.setAD_Org_ID(oLine.getAD_Org_ID());
+					
+					if (LBR_Tax_ID == 0){
+						// CFOP, Sit. Tributária, Mensagem Legal
+						if (iLine.get_ValueAsInt("LBR_CFOP_ID") <= 0)
+							iLine.set_ValueOfColumn("LBR_CFOP_ID", oLine.get_Value("LBR_CFOP_ID"));
+	
+						if (iLine.get_ValueAsInt("LBR_LegalMessage_ID") <= 0)
+							iLine.set_ValueOfColumn("LBR_LegalMessage_ID", oLine.get_Value("LBR_LegalMessage_ID"));
+	
+						if (iLine.get_ValueAsString("lbr_TaxStatus").isEmpty())
+							iLine.set_ValueOfColumn("lbr_TaxStatus", oLine.get_Value("lbr_TaxStatus"));
+	
+						if(iLine.getDescription() == null || iLine.getDescription().equals(""))
+							iLine.setDescription(oLine.getDescription());
+	
 						//
-						iLine.set_ValueOfColumn("LBR_Tax_ID", newTax.getLBR_Tax_ID());
+						LBR_Tax_ID = oLine.get_ValueAsInt("LBR_Tax_ID");
+						if (LBR_Tax_ID != 0)
+						{
+							MLBRTax oTax = new MLBRTax(ctx, LBR_Tax_ID, trx);
+							MLBRTax newTax = oTax.copyTo();
+							//
+							iLine.set_ValueOfColumn("LBR_Tax_ID", newTax.getLBR_Tax_ID());
+						}
 					}
-				}
+				}//orderLine_ID <> 0
 			} // new
 			else
 			{
