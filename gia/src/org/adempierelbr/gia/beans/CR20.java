@@ -34,13 +34,13 @@ public class CR20 extends RegGIA{
 		super();
 		this.CODSUBITEM = CODSUBITEM;
 		this.VALOR = VALOR;
+		this.PROPOUST   = PROPOUST;
 		
-		if (CODSUBITEM.endsWith("99")){ //APENAS QUANDO COD = XXX99
-			this.PROPOUST   = PROPOUST;
+		if (CODSUBITEM.endsWith("99")){ //APENAS QUANDO COD = XXX99	
 			this.FLEGAL = FLEGAL;
+			this.OCORRENCIA = OCORRENCIA;
 		}
 		
-		this.OCORRENCIA = OCORRENCIA;
 	} // CR20
 	
 	public String toString(){

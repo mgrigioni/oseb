@@ -33,6 +33,7 @@ public class CR05 extends RegGIA{
 	private BigDecimal ICMSFIXPER            = Env.ZERO;
 	private BigDecimal CHAVEINTERNA          = Env.ZERO; //ZEROS, QUANDO SISTEMA PROPRIO
 	
+	private int Q07 = 0; //Quantidade CR=07
 	private int Q10 = 0; //Quantidade CR=10
 	private int Q20 = 0; //Quantidade CR=20
 	private int Q30 = 0; //Quantidade CR=30
@@ -58,6 +59,7 @@ public class CR05 extends RegGIA{
 	
 	public String toString(){
 		
+		Q07 = CounterGIA.getCounter("07");
 		Q10 = CounterGIA.getCounter("10");
 		Q20 = CounterGIA.getCounter("20");
 		Q30 = CounterGIA.getCounter("30");
@@ -80,6 +82,7 @@ public class CR05 extends RegGIA{
 			+ ORIGEMPREDIG
 			+ TextUtil.lPad(ICMSFIXPER, 15)
 			+ TextUtil.lPad(CHAVEINTERNA, 32)
+			+ TextUtil.lPad(Q07, 4)
 			+ TextUtil.lPad(Q10, 4)
 			+ TextUtil.lPad(Q20, 4)
 			+ TextUtil.lPad(Q30, 4)
