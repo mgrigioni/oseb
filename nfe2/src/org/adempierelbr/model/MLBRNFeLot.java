@@ -172,7 +172,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		//
 
 		//INICIALIZA CERTIFICADO
-		MLBRDigitalCertificate.setCertificate(ctx, getAD_Org_ID());
+		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,getAD_Org_ID(),get_TrxName()));
 		//
 
 		try{
@@ -278,7 +278,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		//
 
 		//INICIALIZA CERTIFICADO
-		MLBRDigitalCertificate.setCertificate(ctx, getAD_Org_ID());
+		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,getAD_Org_ID(),get_TrxName()));
 		//
 		try{
 			String nfeConsultaDadosMsg 	= NFeUtil.geraMsgRetRecepcao(getlbr_NFeRecID(), envType);

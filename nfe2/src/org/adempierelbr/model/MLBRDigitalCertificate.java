@@ -12,15 +12,18 @@
  *****************************************************************************/
 package org.adempierelbr.model;
 
-import java.io.File;
-import java.security.Security;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
+import java.util.Enumeration;
 import java.util.Properties;
 
-import org.adempierelbr.util.NFeUtil;
-import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.adempierelbr.util.SocketFactoryDinamico;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.compiere.model.MOrgInfo;
-import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 /**
@@ -28,7 +31,8 @@ import org.compiere.util.Env;
  *
  *	@author Ricardo Santana (Kenos, www.kenos.com.br)
  *	@contributor Mario Grigioni
- *	@version $Id: MDigitalCertificate.java,v 1.0 2009/08/23 00:51:27 ralexsander Exp $
+ *  @contributor Claudemir Todo Bom ( http://todobom.com )
+ *         FR-LBR-34 - suporte a socket ssl dinâmico
  */
 public class MLBRDigitalCertificate extends X_LBR_DigitalCertificate
 {
@@ -36,12 +40,6 @@ public class MLBRDigitalCertificate extends X_LBR_DigitalCertificate
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-
-	/**	Certificado do Cliente		*/
-	private static String certTypeOrg 	= "";
-
-	/**	Certificado do WS			*/
-	private static String certTypeWS	= "";
 
 	/**************************************************************************
 	 *  Default Constructor
@@ -63,92 +61,51 @@ public class MLBRDigitalCertificate extends X_LBR_DigitalCertificate
 	{
 		super(ctx, rs, trxName);
 	}
-	
-	/**
-	 * getJKS
-	 * Retorna o LBR_DigitalCertificate_ID referente ao Estado e Ambiente da NFe
-	 * @param ctx
-	 * @param envType
-	 * @param C_Region_ID
-	 * @return LBR_DigitalCertificate_ID
-	 */
-	public static int getJKS(Properties ctx, String envType){
-		
-		String sql = "SELECT MAX(LBR_DigitalCertificate_ID) " +
-				     "FROM LBR_DigitalCertificate " +
-				     "WHERE AD_Client_ID = ? AND lbr_NFeEnv = ? " +
-				     "AND lbr_CertType = ? AND IsActive = 'Y'";
-		
-		return DB.getSQLValue(null, sql, new Object[]{Env.getAD_Client_ID(ctx),envType,MLBRDigitalCertificate.LBR_CERTTYPE_JavaKeyStore});
-	} //getJKS
-	
-	public static void setCertificate(Properties ctx, int AD_Org_ID) throws Exception{
-		MOrgInfo oi = MOrgInfo.get(ctx, AD_Org_ID, null);
-		int certWS = oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_WS_ID);
-		setCertificate(ctx,oi,certWS);
-	}
-	
-	public static void setCertificate(Properties ctx, MOrgInfo oi) throws Exception{
-		setCertificate(ctx,oi,getJKS(ctx,oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv)));
-	}
-	
+
 	/**
 	 * setCertificate
 	 * Set all System.property for webservice connection
 	 */
-	public static void setCertificate(Properties ctx, MOrgInfo oi, int certWS) throws Exception{
+	public static void setCertificate(Properties ctx, MOrgInfo oi) throws Exception{
 
-		int certOrg = oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_Org_ID);
-		
-		if (certOrg <= 0 || certWS <= 0)
-			throw new Exception("Erro com certificado. " +
-					        "Certificado Org = " + certOrg + " - Certificado WS = " + certWS);
-		
+		Integer certOrg = (Integer) oi.get_Value("LBR_DC_Org_ID");
+		Integer certWS = (Integer) oi.get_Value("LBR_DC_WS_ID");
 		MLBRDigitalCertificate dcOrg = new MLBRDigitalCertificate(Env.getCtx(), certOrg, null);
 		MLBRDigitalCertificate dcWS = new MLBRDigitalCertificate(Env.getCtx(), certWS, null);
 
-		//CERTIFICADO CLIENTE
-		if (dcOrg.getlbr_CertType() == null)
-			throw new Exception("Certificate Type is NULL");
-		else if (dcOrg.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_PKCS12))
-			certTypeOrg = "PKCS12";
-		else if (dcOrg.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_JavaKeyStore))
-			certTypeOrg = "JKS";
-		else
-			throw new Exception("Unknow Certificate Type or Not implemented yet");
+		InputStream certFileOrg = dcOrg.getAttachment(true).getEntry(0).getInputStream();
+		if (certFileOrg == null) {
+			throw new Exception("Unable to find private key attachment");
+		}
 
-		File certFileOrg = NFeUtil.getAttachmentEntryFile(dcOrg.getAttachment(true).getEntry(0));
+		String orgPassword = dcOrg.getPassword();
+		
+		KeyStore ks = KeyStore.getInstance("pkcs12");
+		try {
+			ks.load(certFileOrg, orgPassword.toCharArray());
+		} catch (IOException e) {
+			throw new Exception("Incorrect Certificate Password");
+		}
+		
+		InputStream certFileWS = dcWS.getAttachment(true).getEntry(0).getInputStream();
+		if (certFileWS == null) {
+			throw new Exception("Unable to find webservices keystore attachment");
+		}
 
-		//CERTIFICADO WS
-		if (dcWS.getlbr_CertType() == null)
-			throw new Exception("Certificate Type is NULL");
-		else if (dcWS.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_PKCS12))
-			certTypeWS = "PKCS12";
-		else if (dcWS.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_JavaKeyStore))
-			certTypeWS = "JKS";
-		else
-			throw new Exception("Unknow Certificate Type or Not implemented yet");
+        String alias = "";  
+        Enumeration<String> aliasesEnum = ks.aliases();  
+        while (aliasesEnum.hasMoreElements()) {  
+            alias = (String) aliasesEnum.nextElement();  
+            if (ks.isKeyEntry(alias)) break;  
+        }
+  		X509Certificate certificate = (X509Certificate) ks.getCertificate(alias);
+		PrivateKey privateKey = (PrivateKey) ks.getKey(alias, orgPassword.toCharArray());
+		SocketFactoryDinamico socketFactoryDinamico = new SocketFactoryDinamico(certificate, privateKey);
+		socketFactoryDinamico.setFileCacerts(certFileWS,dcWS.getPassword());
 
-		File certFileWS = NFeUtil.getAttachmentEntryFile(dcWS.getAttachment(true).getEntry(0));
-
-		//
-		Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-		//
-		Properties props = System.getProperties();
-		props.setProperty("java.protocol.handler.pkgs", "com.sun.net.ssl.internal.www.protocol");
-		//
-		props.setProperty("javax.net.ssl.keyStoreType", certTypeOrg);
-		props.setProperty("javax.net.ssl.keyStore", certFileOrg.toString());
-		props.setProperty("javax.net.ssl.keyStorePassword", dcOrg.getPassword());
-		//
-		props.setProperty("javax.net.ssl.trustStoreType", certTypeWS);	
-		props.setProperty("javax.net.ssl.trustStore", certFileWS.toString());
-		if(dcWS.getPassword()!=null && !"".equals(dcWS.getPassword()))
-			props.setProperty("javax.net.ssl.trustStorePassword", dcWS.getPassword());
-		// BF - JRE > 1.6.19
-		props.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
-
-		System.setProperties(props);
+        Protocol protocol = new Protocol("https", socketFactoryDinamico, 443);  
+        Protocol.registerProtocol("https", protocol);    		
+		
 	} //setCertificate
 
 }	//	MDigitalCertificate

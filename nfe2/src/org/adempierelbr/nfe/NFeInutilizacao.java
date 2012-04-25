@@ -76,7 +76,7 @@ public class NFeInutilizacao
 		nfePedInutMsg   = "<nfeDadosMsg>" + nfePedInutMsg + "</nfeDadosMsg>";
 		XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(nfePedInutMsg));
 
-		MLBRDigitalCertificate.setCertificate(Env.getCtx(), oi.getAD_Org_ID());
+		MLBRDigitalCertificate.setCertificate(Env.getCtx(), oi);
 		
 		NfeInutilizacao2Stub.NfeDadosMsg dadosMsg = NfeInutilizacao2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 		NfeInutilizacao2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecInutilizacao(region);

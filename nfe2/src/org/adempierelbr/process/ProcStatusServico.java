@@ -82,7 +82,7 @@ public class ProcStatusServico extends SvrProcess
 			return "UF Inválida";
 
 		//INICIALIZA CERTIFICADO
-		MLBRDigitalCertificate.setCertificate(getCtx(), Env.getAD_Org_ID(getCtx()));
+		MLBRDigitalCertificate.setCertificate(getCtx(), MOrgInfo.get(getCtx(),Env.getAD_Org_ID(getCtx()),get_TrxName()));
 		//
 		String status = "Erro na verificação de Status";
 

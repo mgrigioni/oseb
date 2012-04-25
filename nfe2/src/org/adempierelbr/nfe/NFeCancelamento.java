@@ -98,7 +98,7 @@ public class NFeCancelamento
 		//
 
 		//INICIALIZA CERTIFICADO
-		MLBRDigitalCertificate.setCertificate(ctx, Env.getAD_Org_ID(ctx));
+		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,Env.getAD_Org_ID(ctx),trxName));
 		//
 
 		try{
