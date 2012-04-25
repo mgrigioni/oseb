@@ -13,10 +13,15 @@
 package org.adempierelbr.validator;
 
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.DBException;
 import org.adempierelbr.model.MLBRBoleto;
 import org.adempierelbr.model.MLBRProductMovementFiller;
 import org.adempierelbr.model.MLBRTax;
@@ -454,6 +459,21 @@ public class ValidatorInvoice implements ModelValidator
 				// CANCELA BOLETO E CNAB
 				MLBRBoleto.cancelBoleto(invoice.getCtx(), invoice.getC_Invoice_ID(), invoice.get_TrxName());
 
+				//BF: Anular faturas sem contas a pagar/receber, deve anular alocação
+				if (timing == TIMING_AFTER_VOID){
+					MDocType dt = MDocType.get(ctx, invoice.getC_DocTypeTarget_ID());
+					boolean hasOpenItems      = dt.get_ValueAsBoolean("lbr_HasOpenItems");
+					if (!hasOpenItems){
+						List<MAllocationHdr> allocs = getAllocationHdr(invoice);
+						for(MAllocationHdr alloc : allocs){
+							if (alloc.voidIt())
+								alloc.save(invoice.get_TrxName());
+							else
+								return "Problemas ao anular alocação de pagamento";
+						}
+					}
+				}
+				
 				//FIXME
 				//CANCELA CONSIGNAÇÃO
 				/*
@@ -499,6 +519,45 @@ public class ValidatorInvoice implements ModelValidator
 		 */
 		return false;
 	} // updateInfoColumns
+	
+	/**
+	 * getAllocationHdr
+	 * @param invoice
+	 * @return List<MAllocationHdr> allocs
+	 */
+	private List<MAllocationHdr> getAllocationHdr (MInvoice invoice){
+		
+		List<MAllocationHdr> allocs = new ArrayList<MAllocationHdr>();
+		
+		String sql = "SELECT DISTINCT al.C_AllocationHdr_ID "
+		           + "FROM C_AllocationLine al "
+			       + "INNER JOIN C_AllocationHdr ah ON (al.C_AllocationHdr_ID=ah.C_AllocationHdr_ID) "
+			       + "INNER JOIN C_Invoice i ON (al.C_Invoice_ID=i.C_Invoice_ID) "
+			       + "WHERE al.C_Invoice_ID=? "
+			       + "AND ah.IsActive='Y' ";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = DB.prepareStatement(sql, invoice.get_TrxName());
+			pstmt.setInt(1, invoice.getC_Invoice_ID());
+			rs = pstmt.executeQuery();
+			if (rs.next()){
+				allocs.add(new MAllocationHdr(invoice.getCtx(),rs.getInt(1),invoice.get_TrxName()));
+			}
+			rs.close();
+			pstmt.close();
+			pstmt = null;
+		}
+		catch (SQLException e){
+			throw new DBException(e, sql);
+		}
+		finally{
+			DB.close(rs, pstmt);
+			rs = null; pstmt = null;
+		}
+
+		return allocs;
+	}	//	getAllocationHdr
 
 	private String validatePaymentTerm(MInvoice invoice)
 	{
