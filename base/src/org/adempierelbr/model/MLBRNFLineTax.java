@@ -13,9 +13,11 @@
 package org.adempierelbr.model;
 
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.adempierelbr.util.ImpostoBR;
 import org.adempierelbr.util.TaxBR;
@@ -25,6 +27,7 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MTax;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 
 /**
  *	MLBRNFLineTax
@@ -141,19 +144,87 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 	} //createLBR_NFLineTax
 	
 	/**
+	 * Cria registros na tabela LBR_NFTax
+	 * @param ctx
+	 * @param LBR_NotaFiscal_ID
+	 * @param trx
+	 */
+	public boolean updateLBR_NFTax(){
+
+		boolean success = true;
+		
+		MLBRNotaFiscalLine nfLine = new MLBRNotaFiscalLine(getCtx(),getLBR_NotaFiscalLine_ID(),get_TrxName());
+
+		String sql = "SELECT t.LBR_TaxGroup_ID, SUM(t.lbr_TaxBaseAmt), SUM(t.lbr_TaxAmt) " + //1..3
+			         "FROM LBR_NFLineTax t " +
+		             "INNER JOIN LBR_NotaFiscalLine nfl ON (t.LBR_NotaFiscalLine_ID = nfl.LBR_NotaFiscalLine_ID) " +
+		             "WHERE nfl.LBR_NotaFiscal_ID = ? AND t.LBR_TaxGroup_ID = ? " + //#1..2
+		             "GROUP BY t.LBR_TaxGroup_ID";
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = DB.prepareStatement (sql, get_TrxName());
+			pstmt.setInt (1, nfLine.getLBR_NotaFiscal_ID());
+			pstmt.setInt(2, getLBR_TaxGroup_ID());
+			rs = pstmt.executeQuery ();
+			if (rs.next ()){
+				
+				MLBRNFTax nfTax = MLBRNFTax.get(getCtx(), nfLine.getLBR_NotaFiscal_ID(), getLBR_TaxGroup_ID(), get_TrxName());
+				if (nfTax == null)
+					nfTax = new MLBRNFTax(getCtx(),0,get_TrxName());
+				
+				/* SE A SOMA FOR = 0, APAGA O REGISTRO */
+				if (rs.getBigDecimal(2).signum() == 0 && nfTax.get_ID() > 0){ 
+					nfTax.delete(true, get_TrxName());
+				}
+				else{
+					nfTax.setLBR_TaxGroup_ID(getLBR_TaxGroup_ID());
+					nfTax.setLBR_NotaFiscal_ID(nfLine.getLBR_NotaFiscal_ID());
+					nfTax.setlbr_TaxBaseAmt(rs.getBigDecimal(2));
+					nfTax.setlbr_TaxAmt(rs.getBigDecimal(3));
+					if (!nfTax.save(get_TrxName())){
+						log.severe("Erro ao salvar LBR_NFTax." +
+								   " LBR_NotaFiscal_ID = " + nfLine.getLBR_NotaFiscal_ID() +
+								   " LBR_TaxGroup_ID = " + getLBR_TaxGroup_ID());
+						success = false;
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, sql, e);
+			success = false;
+		}
+		finally {
+			DB.close(rs, pstmt);
+		}
+
+		return success;
+	} //createLBR_NFTax
+	
+	/**
+	 * Quando deletar a LBR_NFLineTax, atualizar também a LBR_NFTax
+	 */
+	protected boolean afterDelete(boolean success){
+		
+		if (!updateLBR_NFTax()) {
+			return false;
+		}
+		
+		return success;
+	} //afterDelete
+	
+	/**
 	 * Quando atualizar a LBR_NFLineTax, atualizar também a LBR_NFTax
 	 */
 	protected boolean afterSave(boolean newRecord, boolean success){
 		
-		if (newRecord || !success)
-			return true;
-		
-		MLBRNotaFiscalLine nfLine = new MLBRNotaFiscalLine(getCtx(),getLBR_NotaFiscalLine_ID(),get_TrxName());
-		if (!MLBRNFTax.createLBR_NFTax(getCtx(), nfLine.getLBR_NotaFiscal_ID(), nfLine.getAD_Org_ID(), get_TrxName())){
+		if (!updateLBR_NFTax()) {
 			return false;
 		}
 		
-		return true;
-	}
+		return success;
+	} //afterSave
 
 } //MLBRNFLineTax

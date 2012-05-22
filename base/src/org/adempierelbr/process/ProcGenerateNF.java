@@ -18,7 +18,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.adempierelbr.model.MLBRNFLineTax;
-import org.adempierelbr.model.MLBRNFTax;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.nfe.NFeXMLGenerator;
@@ -441,9 +440,6 @@ public class ProcGenerateNF extends SvrProcess
 
 			/** Lançamento Impostos Frete **/
 			NotaFiscal.setFreightTax();
-			
-			/** Lançamento Impostos Nota Fiscal **/
-			MLBRNFTax.createLBR_NFTax(ctx, NotaFiscal.getLBR_NotaFiscal_ID(), NotaFiscal.getAD_Org_ID(), trx);
 			
 			/** Código de Barras **/
 			StringBuilder Barcode1 = new StringBuilder();
