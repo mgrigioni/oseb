@@ -79,7 +79,7 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 		
 		MTable table = MTable.get(Env.getCtx(), MLBRNFeWebService.Table_Name);
 		Query query =  new Query(Env.getCtx(), table, whereClause.toString(), null);
-	 		  query.setParameters(new Object[]{name,envType,versionNo,C_Region_ID});
+	 		  query.setParameters(new Object[]{name.toUpperCase(),envType,versionNo,C_Region_ID});
 		
 		MLBRNFeWebService webService = query.firstOnly();
 		if (webService == null) {
