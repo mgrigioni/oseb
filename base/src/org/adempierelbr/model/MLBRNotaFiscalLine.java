@@ -493,7 +493,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 		if (CST_PIS == null || CST_PIS.trim().isEmpty()){
 			if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) {//ENTRADA
-				CST_PIS = "54";
+				CST_PIS = "56";
 				if (cfop.isDevol())
 					CST_PIS = "50";
 			}
@@ -505,7 +505,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		}
 				
 		if (getTaxAmt("PIS").signum() != 1){ //ISENTO
-			if (CST_PIS.equals("50") || CST_PIS.equals("54"))
+			if (CST_PIS.equals("50") || CST_PIS.equals("56"))
 				CST_PIS = "98";
 			else if (CST_PIS.equals("01") || CST_PIS.equals("02")){
 				CST_PIS = "07";
@@ -529,7 +529,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 		if (CST_COFINS == null || CST_COFINS.trim().isEmpty()){
 			if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) {//ENTRADA
-				CST_COFINS = "54";
+				CST_COFINS = "56";
 				if (cfop.isDevol())
 					CST_COFINS = "50";
 			}
@@ -541,7 +541,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		}
 				
 		if (getTaxAmt("COFINS").signum() != 1){ //ISENTO
-			if (CST_COFINS.equals("50") || CST_COFINS.equals("54"))
+			if (CST_COFINS.equals("50") || CST_COFINS.equals("56"))
 				CST_COFINS = "98";
 			else if (CST_COFINS.equals("01") || CST_COFINS.equals("02")){
 				CST_COFINS = "07";
