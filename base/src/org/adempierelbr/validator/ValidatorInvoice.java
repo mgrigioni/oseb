@@ -28,6 +28,7 @@ import org.adempierelbr.model.MLBRTax;
 import org.adempierelbr.process.ProcGenerateNF;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TaxesCalculation;
+import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.apps.search.Info_Column;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
@@ -195,6 +196,15 @@ public class ValidatorInvoice implements ModelValidator
 
 		if (invoice.get_ValueAsInt("C_BankAccount_ID") == 0) {
 			invoice.set_ValueOfColumn("C_BankAccount_ID", order.get_Value("C_BankAccount_ID"));
+		}
+		
+		if (invoice.get_ValueAsString("lbr_NFModel").isEmpty()){ //Tipo de Nota Fiscal
+			MDocType dt = new MDocType(invoice.getCtx(),invoice.getC_DocTypeTarget_ID(),invoice.get_TrxName());
+			String nfModel = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel);
+			if (nfModel == null || nfModel.trim().isEmpty())
+				nfModel = "55"; //NFe
+			
+			invoice.set_ValueOfColumn("lbr_NFModel", nfModel); 
 		}
 
 		return validatePaymentTerm(invoice);
