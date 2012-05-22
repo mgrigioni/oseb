@@ -33,8 +33,7 @@ public class NfeConsulta2Stub extends org.apache.axis2.client.Stub {
 	private static String stubAddress = "";
 	
 	public static void setAmbiente(String ambiente, int C_Region_ID, boolean isSCAN) {
-		stubAddress = isSCAN ?  MLBRNFeWebService.getSCANURL(MLBRNFeWebService.CONSULTA,ambiente, "2.00")
-			: MLBRNFeWebService.getURL(MLBRNFeWebService.CONSULTA,ambiente, "2.00", C_Region_ID);
+		stubAddress = MLBRNFeWebService.getURL(MLBRNFeWebService.CONSULTA,ambiente, "2.00", C_Region_ID,isSCAN);
 	}
 
 	//

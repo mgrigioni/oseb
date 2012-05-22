@@ -18,8 +18,11 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.MTable;
+import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 /**
  *	Model for LBR_NFeWebService
@@ -66,26 +69,28 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 		super(ctx, rs, trxName);
 	}
 	
-	public static String getURL (String name, String envType, String versionNo, int C_Region_ID){
+	public static String getURL (String name, String envType, String versionNo, int C_Region_ID, boolean isSCAN){
 		
-		String sql = "SELECT URL FROM LBR_NFeWebService " +
-				     "WHERE UPPER(Name) LIKE ? AND lbr_NFeEnv = ? " +
-				     "AND VersionNo = ? AND C_Region_ID = ?";
+		StringBuilder whereClause = new StringBuilder("UPPER(Name) LIKE ? AND lbr_NFeEnv = ? AND VersionNo = ? ");
+		if (isSCAN) //SCAN Region=NULL
+			whereClause.append("AND " + C_Region_ID + "=? AND C_Region_ID IS NULL");
+		else
+			whereClause.append("AND C_Region_ID=?");
+		
+		MTable table = MTable.get(Env.getCtx(), MLBRNFeWebService.Table_Name);
+		Query query =  new Query(Env.getCtx(), table, whereClause.toString(), null);
+	 		  query.setParameters(new Object[]{name,envType,versionNo,C_Region_ID});
+		
+		MLBRNFeWebService webService = query.firstOnly();
+		if (webService == null) {
+			log.log(Level.SEVERE, "Webservice not found for " + name + 
+					" region " + Integer.toString(C_Region_ID)  + " environment " + envType  );
+			return null;
+		}
 
-		return DB.getSQLValueString(null, sql, 
-				new Object[]{name.toUpperCase(),envType,versionNo,C_Region_ID});
+		return webService.getURL();
 	} //getURL
-	
-	public static String getSCANURL (String name, String envType, String versionNo){
 		
-		String sql = "SELECT URL FROM LBR_NFeWebService " +
-				     "WHERE UPPER(Name) LIKE ? AND lbr_NFeEnv = ? " +
-				     "AND VersionNo = ?";
-
-		return DB.getSQLValueString(null, sql, 
-				new Object[]{name.toUpperCase(),envType,versionNo});
-	} //getSCANURL
-	
 	public static String[] getURL (String envType){
 		
 		String sql = "SELECT URL FROM LBR_NFeWebService " +
