@@ -62,8 +62,6 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final String lote = "NFe Lote ";
-
 	/**	Logger				*/
 	private static CLogger log = CLogger.getCLogger(MLBRNFeLot.class);
 
@@ -97,41 +95,38 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 	 */
 	public String geraLote (String envType) throws Exception
 	{
-		log.fine("Gera Lote: " + envType);
-		String[] xmlGerado = getXMLs();
-		//
-		String dados[] = new String[xmlGerado.length];
-		String conjunto = "";
-		//
-		for (int i = 0; i < xmlGerado.length; i++)
-		{
-			File xml = new File(xmlGerado[i]);
-	        dados[i] = NFeUtil.XMLtoString(xml);
-	        //
-	        String validation = ValidaXML.validaXML(dados[i]);
-	        if (!validation.equals(""))
-	        {
+		
+		MAttachment attach = getAttachment(true);
+		if (attach != null) {
+			if (!attach.delete(true)) // Apaga o XML antigo
+				log.warning("Erro ao apagar lote antigo");
+		}
+		
+		List<String> xmlNFes = getXMLs();
+		StringBuilder nfesLote = new StringBuilder("");
+		
+		for (String xmlNFe : xmlNFes) {
+			File xml = new File(xmlNFe);
+	        String dados = NFeUtil.XMLtoString(xml);
+	        
+	        String validation = ValidaXML.validaXML(dados);
+	        if (!validation.equals("")) {
 	        	String error = "Validation individuals XML files for LOT Error: "+validation;
 	        	log.severe(error);
 	        	throw new Exception(error);
 	        }
-			conjunto += dados[i];
+	        nfesLote.append(dados);
 		}
-		//
-		String lote = getDocumentNo();
-        String cabecalho = NFeUtil.geraCabecLoteNFe(lote);
-		String rodape 	=  "</enviNFe>";
-		String contatosEmXML = cabecalho + conjunto + rodape;
-		//
-		String validation = ValidaXML.validaEnvXML(contatosEmXML);
-		if (!validation.equals(""))
-		{
+		
+		String xmlLote = NFeUtil.geraCabecLoteNFe(getDocumentNo()) + nfesLote.toString() + "</enviNFe>";
+		String validation = ValidaXML.validaEnvXML(xmlLote);
+		if (!validation.equals("")) {
 			String error = "Validation XML LOT Error: "+validation;
 			log.severe(error);
 			throw new Exception(error);
 		}
-		//
-		File attachFile = new File(TextUtil.generateTmpFile(contatosEmXML, lote+"-env-lot.xml"));
+		
+		File attachFile = new File(TextUtil.generateTmpFile(xmlLote, getDocumentNo()+"-env-lot.xml"));
 
 		//Verificação tamanho do Arquivo - Erro 214 / Tamanho Arquivo
 		String error = NFeUtil.validateSize(attachFile);
@@ -141,8 +136,8 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		MAttachment attachLotNFe = createAttachment();
 		attachLotNFe.addEntry(attachFile);
 		attachLotNFe.save();
-		//
-		return contatosEmXML;
+		
+		return xmlLote;
 	}	//	gerarLote
 
 	/**
@@ -175,7 +170,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,getAD_Org_ID(),get_TrxName()));
 		//
 
-		try{
+		try {
 			String nfeLotDadosMsg 	= geraLote(envType);
 
 			//	Validação envio
@@ -360,7 +355,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 		if (newRecord && (getName() == null || getName().trim().equals(""))){
 			String documentno = DB.getDocumentNo(getAD_Client_ID(), p_info.getTableName(), get_TrxName(), this);
 			setDocumentNo(documentno);
-			setName(lote + documentno);
+			setName("NFe Lote " + documentno);
 		}
 
 		return true;
@@ -379,11 +374,11 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 
 	/**
 	 * XMLs
-	 * @return String[] XML
+	 * @return List<String> XML
 	 */
-	public String[] getXMLs ()
+	public List<String> getXMLs ()
 	{
-		ArrayList<String> xmls = new ArrayList<String>();
+		List<String> xmls = new ArrayList<String>();
 		String whereClause = "LBR_NFeLot_ID=?";
 		//
 		MTable table = MTable.get(getCtx(), MLBRNotaFiscal.Table_Name);
@@ -401,11 +396,8 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 	 		File xml = NFeUtil.getAttachmentEntryFile(NF.getAttachment().getEntry(0));
 	 		xmls.add(xml.toString());
 	 	}
-	 	//
-	 	String[] result = new String[xmls.size()];
-	 	xmls.toArray(result);
-	 	//
-		return result;
+
+		return xmls;
 	}	//	getXMLs
 
 }	//	MNFeLot
