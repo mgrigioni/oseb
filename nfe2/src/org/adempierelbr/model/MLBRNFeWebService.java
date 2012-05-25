@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.model.POWrapper;
+import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.compiere.model.MOrgInfo;
 import org.compiere.model.MTable;
 import org.compiere.model.Query;
 import org.compiere.util.CLogger;
@@ -47,6 +51,7 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 	public static final String CANCELAMENTO        = "NfeCancelamento";
 	public static final String RETRECEPCAO         = "NfeRetRecepcao";
 	public static final String RECEPCAO            = "NfeRecepcao";
+	public static final String RECEPCAOEVENTO	   = "RecepcaoEvento";
 	
 	/**************************************************************************
 	 *  Default Constructor
@@ -69,7 +74,30 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 		super(ctx, rs, trxName);
 	}
 	
-	public static String getURL (String name, String envType, String versionNo, int C_Region_ID, boolean isSCAN){
+	/**
+	 * Return MLBRWebService based on Record OrgInfo and name of service
+	 * @param record OrgInfo
+	 * @param name of service
+	 * @return MLBRNFeWebService ws
+	 */
+	public static MLBRNFeWebService get(MOrgInfo oi, String name){
+		I_W_AD_OrgInfo oiW = POWrapper.create (oi, I_W_AD_OrgInfo.class); 
+		return get(name,oiW.getlbr_NFeEnv(),NFeUtil.VERSAO,oi.getC_Location().getC_Region_ID(),oiW.islbr_IsScan());
+	}
+
+	/**
+	 * Return MLBRWebService based on Record OrgInfo, name of service and partner address
+	 * @param record OrgInfo
+	 * @param name of service
+	 * @param C_Region_ID (BPartner Location)
+	 * @return MLBRNFeWebService ws
+	 */
+	public static MLBRNFeWebService get(MOrgInfo oi, String name, int C_Region_ID){
+		I_W_AD_OrgInfo oiW = POWrapper.create (oi, I_W_AD_OrgInfo.class); 
+		return get(name,oiW.getlbr_NFeEnv(),NFeUtil.VERSAO,C_Region_ID,oiW.islbr_IsScan());
+	}
+
+	private static MLBRNFeWebService get(String name, String envType, String versionNo, int C_Region_ID, boolean isSCAN){
 		
 		StringBuilder whereClause = new StringBuilder("UPPER(Name) LIKE ? AND lbr_NFeEnv = ? AND VersionNo = ? ");
 		if (isSCAN) //SCAN Region=NULL
@@ -85,12 +113,11 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 		if (webService == null) {
 			log.log(Level.SEVERE, "Webservice not found for " + name + 
 					" region " + Integer.toString(C_Region_ID)  + " environment " + envType  );
-			return null;
 		}
-
-		return webService.getURL();
-	} //getURL
 		
+		return webService;
+	}
+	
 	public static String[] getURL (String envType){
 		
 		String sql = "SELECT URL FROM LBR_NFeWebService " +

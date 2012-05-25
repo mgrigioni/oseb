@@ -67,9 +67,10 @@ import org.w3c.dom.NodeList;
 public class AssinaturaDigital
 {
 	/**		Document Type 	*/
-	public static final String RECEPCAO_NFE			="1";
-	public static final String CANCELAMENTO_NFE		="2";
-	public static final String INUTILIZACAO_NFE		="3";
+	public static final String RECEPCAO_NFE		   = "1";
+	public static final String CANCELAMENTO_NFE	   = "2";
+	public static final String INUTILIZACAO_NFE	   = "3";
+	public static final String CARTADECORRECAO_CCE = "4";
 	
 	/**		Algoritmos		*/
 	public static final String ALGORITIMO = "RSA";
@@ -145,6 +146,8 @@ public class AssinaturaDigital
 			cert = (X509Certificate) keystore.getCertificate(alias);
 			keyP = new KeyPair(publicKey, (PrivateKey) key);
 		}
+		
+		cert.checkValidity();
 	}	//	loadKeys
 
 	public static boolean verificarAssinatura(PublicKey chave, byte[] buffer,
@@ -208,6 +211,8 @@ public class AssinaturaDigital
 			tag = "infCanc";
 		else if (docType.equals(INUTILIZACAO_NFE))
 			tag = "infInut";
+		else if (docType.equals(CARTADECORRECAO_CCE))
+			tag = "infEvento";
 		
 		NodeList elements = doc.getElementsByTagName(tag);
 		org.w3c.dom.Element el = (org.w3c.dom.Element) elements.item(0);

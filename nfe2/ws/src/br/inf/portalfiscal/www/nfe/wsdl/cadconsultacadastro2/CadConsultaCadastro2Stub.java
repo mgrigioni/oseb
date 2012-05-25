@@ -8,6 +8,7 @@
         package br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2;
 
 import org.adempierelbr.model.MLBRNFeWebService;
+import org.adempierelbr.util.NFeUtil;
 
         
 
@@ -15,7 +16,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
         *  CadConsultaCadastro2Stub java implementation
         */
 
-        
+		@SuppressWarnings({ "rawtypes", "unchecked", "unused", "serial", "deprecation" })
         public class CadConsultaCadastro2Stub extends org.apache.axis2.client.Stub
         {
         protected org.apache.axis2.description.AxisOperation[] _operations;
@@ -27,11 +28,11 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         private static int counter = 0;
         
-    	// mgrigioni, 09/04/2010
+    	// mgrigioni, 25/05/2012
     	private static String stubAddress = "";
 
-    	public static void setAmbiente(String ambiente, int C_Region_ID, boolean isSCAN) {
-    		stubAddress = MLBRNFeWebService.getURL(MLBRNFeWebService.CADCONSULTACADASTRO,ambiente, "2.00", C_Region_ID,isSCAN);
+    	public static void setAddress(MLBRNFeWebService ws) {
+    		stubAddress = ws.getURL();
     	}
 
         private static synchronized java.lang.String getUniqueSuffix(){

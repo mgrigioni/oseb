@@ -19,12 +19,7 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-
-import org.compiere.model.I_C_DocType;
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 
 /** Generated Model for LBR_OtherNFLink
  *  @author ADempiereLBR (generated) 
@@ -35,7 +30,7 @@ public class X_LBR_OtherNFLink extends PO implements I_LBR_OtherNFLink, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120315L;
+	private static final long serialVersionUID = 20120525L;
 
     /** Standard Constructor */
     public X_LBR_OtherNFLink (Properties ctx, int LBR_OtherNFLink_ID, String trxName)

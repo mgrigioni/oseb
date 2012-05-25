@@ -20,12 +20,7 @@ package org.adempierelbr.model;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
-
-import org.compiere.model.I_C_BankAccount;
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 
 /** Generated Model for LBR_CNAB
  *  @author ADempiereLBR (generated) 
@@ -36,7 +31,7 @@ public class X_LBR_CNAB extends PO implements I_LBR_CNAB, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120315L;
+	private static final long serialVersionUID = 20120525L;
 
     /** Standard Constructor */
     public X_LBR_CNAB (Properties ctx, int LBR_CNAB_ID, String trxName)

@@ -21,6 +21,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
@@ -75,7 +76,6 @@ public class ProcStatusServico extends SvrProcess
 
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),null);
 		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		boolean isSCAN  = orgInfo.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())
@@ -83,7 +83,12 @@ public class ProcStatusServico extends SvrProcess
 
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(getCtx(), MOrgInfo.get(getCtx(),Env.getAD_Org_ID(getCtx()),get_TrxName()));
-		//
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.STATUSSERVICO);
+		if (ws == null)
+			return "Não foi encontrado um endereço WebServices válido.";
+		
 		String status = "Erro na verificação de Status";
 
 		try{
@@ -92,7 +97,7 @@ public class ProcStatusServico extends SvrProcess
 			NfeStatusServico2Stub.NfeDadosMsg dadosMsg = NfeStatusServico2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeStatusServico2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecStatusServico(region);
 
-			NfeStatusServico2Stub.setAmbiente(envType,orgLoc.getC_Region_ID(),isSCAN);
+			NfeStatusServico2Stub.setAddress(ws);
 			NfeStatusServico2Stub stub = new NfeStatusServico2Stub();
 
 			String respStatus = stub.nfeStatusServicoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();

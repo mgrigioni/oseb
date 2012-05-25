@@ -19,11 +19,7 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 
 /** Generated Model for LBR_DocPrint
  *  @author ADempiereLBR (generated) 
@@ -34,7 +30,7 @@ public class X_LBR_DocPrint extends PO implements I_LBR_DocPrint, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120315L;
+	private static final long serialVersionUID = 20120525L;
 
     /** Standard Constructor */
     public X_LBR_DocPrint (Properties ctx, int LBR_DocPrint_ID, String trxName)

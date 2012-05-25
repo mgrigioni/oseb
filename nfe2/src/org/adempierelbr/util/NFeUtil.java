@@ -51,6 +51,7 @@ import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfestatusservico2.NfeStatusServico2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -68,6 +69,7 @@ public abstract class NFeUtil
 	/** Versão              */
 	public static final String VERSAO      = "2.00";
 	public static final String VERSAO_APP  = "2.00";
+	public static final String VERSAO_CCE  = "1.00";
 
 	/** XML                 */
 	private static String FILE_EXT      = "-dst.xml";
@@ -106,7 +108,7 @@ public abstract class NFeUtil
 	/**
 	 * Gera o cabeçalho distribuição
 	 *
-	 * @return Cabeçalho distribuiçãi
+	 * @return Cabeçalho distribuição
 	 */
 	public static String geraCabecDistribuicao(){
 		String cabecalho = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
@@ -114,6 +116,23 @@ public abstract class NFeUtil
 
 		return cabecalho;
 	}
+	
+	/**
+	 * Gera o cabeçalho evento
+	 * @param region
+	 * @return
+	 */
+	public static RecepcaoEventoStub.NfeCabecMsgE geraCabecEvento (String region)
+	{
+		RecepcaoEventoStub.NfeCabecMsg cabecMsg = new RecepcaoEventoStub.NfeCabecMsg();
+		cabecMsg.setCUF(region);
+		cabecMsg.setVersaoDados(VERSAO_CCE);
+
+		RecepcaoEventoStub.NfeCabecMsgE cabecMsgE = new RecepcaoEventoStub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	}	//	geraCabecEvento
 
 	/**
 	 * Rodapé padrão Distribuição

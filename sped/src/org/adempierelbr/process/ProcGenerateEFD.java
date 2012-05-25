@@ -252,7 +252,7 @@ public class ProcGenerateEFD extends SvrProcess
 				R0200 r0200 = null; //PRODUTO
 				
 				//BF: Não criar detalhes quando for NFe de emissão própria
-				if (!(COD_MOD.equals("55") && IND_EMIT.equals("0"))){ 
+				if (!(COD_MOD.equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) && IND_EMIT.equals("0"))){ 
 				
 					r0190 = EFDUtil.createR0190(nfLine);
 					if (_R0190.contains(r0190))
@@ -733,7 +733,7 @@ public class ProcGenerateEFD extends SvrProcess
 				Arrays.sort(arrayRC170);
 				int index = 0;
 				for(RC170 rc170 : arrayRC170){
-					if (rc100.getCOD_MOD().equals("55") && 
+					if (rc100.getCOD_MOD().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) && 
 						rc100.getIND_EMIT().equals("0")){ //NFe própria não informar C170
 						rc170.subtractCounter();
 					}

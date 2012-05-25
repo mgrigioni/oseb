@@ -208,7 +208,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 	public boolean beforeDelete(){
 
 		// Se for transmitida não exclui mais...
-		if(getlbr_NFModel() != null && getlbr_NFModel().equals("55") && 
+		if(getlbr_NFModel() != null && getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) && 
 				getlbr_NFeProt() != null && !getlbr_NFeProt().isEmpty())
 			return false;
 		

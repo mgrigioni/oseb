@@ -39,7 +39,6 @@ import org.compiere.model.MTable;
 import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
-import org.compiere.util.Env;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -152,14 +151,13 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 
 		log.fine("Envia Lote: " + getDocumentNo());
 
-		MOrgInfo oi = MOrgInfo.get(ctx, getAD_Org_ID(), null);
-		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
+		MOrgInfo orgInfo = MOrgInfo.get(ctx, getAD_Org_ID(), null);
+		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";
 		//
-		MLocation orgLoc = new MLocation(getCtx(),oi.getC_Location_ID(),null);
+		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),null);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())
@@ -168,7 +166,11 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,getAD_Org_ID(),get_TrxName()));
-		//
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.RECEPCAO);
+		if (ws == null)
+			return "Não foi encontrado um endereço WebServices válido.";
 
 		try {
 			String nfeLotDadosMsg 	= geraLote(envType);
@@ -186,7 +188,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 			NfeRecepcao2Stub.NfeDadosMsg dadosMsg = NfeRecepcao2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeRecepcao2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecRecepcao(region);
 
-			NfeRecepcao2Stub.setAmbiente(envType,orgLoc.getC_Region_ID(),isSCAN);
+			NfeRecepcao2Stub.setAddress(ws);
 			NfeRecepcao2Stub stub = new NfeRecepcao2Stub();
 
 			String respLote = stub.nfeRecepcaoLote2(dadosMsg, cabecMsgE).getExtraElement().toString();
@@ -258,14 +260,13 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 			throw new Exception("LOT not sent yet");
 		}
 		//
-		MOrgInfo oi = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx), null);
-		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
+		MOrgInfo orgInfo = MOrgInfo.get(ctx, getAD_Org_ID(), null);
+		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";
 		//
-		MLocation orgLoc = new MLocation(getCtx(),oi.getC_Location_ID(),null);
+		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),null);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())
@@ -274,7 +275,12 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,getAD_Org_ID(),get_TrxName()));
-		//
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.RETRECEPCAO);
+		if (ws == null)
+			return "Não foi encontrado um endereço WebServices válido.";
+		
 		try{
 			String nfeConsultaDadosMsg 	= NFeUtil.geraMsgRetRecepcao(getlbr_NFeRecID(), envType);
 
@@ -291,7 +297,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot
 			NfeRetRecepcao2Stub.NfeDadosMsg dadosMsg = NfeRetRecepcao2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeRetRecepcao2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecRetRecepcao(region);
 
-			NfeRetRecepcao2Stub.setAmbiente(envType,orgLoc.getC_Region_ID(),isSCAN);
+			NfeRetRecepcao2Stub.setAddress(ws);
 			NfeRetRecepcao2Stub stub = new NfeRetRecepcao2Stub();
 
 			String respConsulta = stub.nfeRetRecepcao2(dadosMsg, cabecMsgE).getExtraElement().toString();

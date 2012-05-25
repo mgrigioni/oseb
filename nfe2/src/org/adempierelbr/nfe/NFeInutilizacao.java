@@ -9,6 +9,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
@@ -40,20 +41,19 @@ public class NFeInutilizacao
 	 * 	Inutiliza a NF
 	 * 
 	 * @param xmlGerado
-	 * @param oi
+	 * @param orgInfo
 	 * @return
 	 * @throws Exception
 	 */
-	public static String invalidateNF (MOrgInfo oi, InutilizacaoNF iNF) throws Exception
+	public static String invalidateNF (MOrgInfo orgInfo, InutilizacaoNF iNF) throws Exception
 	{
 		log.fine("ini");
-		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
+		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";
 		//
-		MLocation orgLoc = new MLocation(Env.getCtx(),oi.getC_Location_ID(),null);
+		MLocation orgLoc = new MLocation(Env.getCtx(),orgInfo.getC_Location_ID(),null);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())
@@ -63,8 +63,8 @@ public class NFeInutilizacao
 		log.fine (nfePedInutMsg);
 		//
 		File attachFile = new File(TextUtil.generateTmpFile(nfePedInutMsg, iNF.getID()+"-ped-inu.xml"));
-		System.out.println();
-		AssinaturaDigital.Assinar(attachFile.toString(), oi, AssinaturaDigital.INUTILIZACAO_NFE);
+
+		AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.INUTILIZACAO_NFE);
 		nfePedInutMsg = NFeUtil.XMLtoString(attachFile).replaceAll("[\r\n]+", "");
 		log.fine (nfePedInutMsg);
 
@@ -76,11 +76,17 @@ public class NFeInutilizacao
 		nfePedInutMsg   = "<nfeDadosMsg>" + nfePedInutMsg + "</nfeDadosMsg>";
 		XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(nfePedInutMsg));
 
-		MLBRDigitalCertificate.setCertificate(Env.getCtx(), oi);
+		//INICIALIZA CERTIFICADO
+		MLBRDigitalCertificate.setCertificate(Env.getCtx(), orgInfo);
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.INUTILIZACAO);
+		if (ws == null)
+			return "Não foi encontrado um endereço WebServices válido.";
 		
 		NfeInutilizacao2Stub.NfeDadosMsg dadosMsg = NfeInutilizacao2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 		NfeInutilizacao2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecInutilizacao(region);
-		NfeInutilizacao2Stub.setAmbiente(envType,orgLoc.getC_Region_ID(),isSCAN);
+		NfeInutilizacao2Stub.setAddress(ws);
 		NfeInutilizacao2Stub stub = new NfeInutilizacao2Stub();
 
 		String respLote = stub.nfeInutilizacaoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();

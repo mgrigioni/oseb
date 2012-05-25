@@ -22,9 +22,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
-import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
@@ -88,29 +88,29 @@ public class ProcConsultaCadastro extends SvrProcess
 	public static String[] consultaCadastro(Properties ctx, MLocation bpLoc, String bpIE, String bpCNPJ) throws Exception{
 
 		String habilitado = "Y";
-		String envType    = "1"; //Produção
-
+		
 		MOrgInfo orgInfo = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx),null);
 		if (orgInfo == null)
 			return null;
-		
-		boolean isSCAN  = orgInfo.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
-
-		//MLocation orgLoc = new MLocation(ctx,orgInfo.getC_Location_ID(),null);
-
+				
 		String region = BPartnerUtil.getRegionCode(bpLoc);
 		if (region.isEmpty())
 			return null;
 
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(ctx, orgInfo);
-		//
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.CADCONSULTACADASTRO,bpLoc.getC_Region_ID());
+		if (ws == null)
+			return new String[]{habilitado,"Não foi encontrado um endereço WebServices válido."};
+		
 		String status = "Erro na verificação de Status";
 
 		try{
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaCadastro(bpLoc.getC_Region().getName(),bpIE,bpCNPJ)));
 
-			CadConsultaCadastro2Stub.setAmbiente(envType,bpLoc.getC_Region_ID(),isSCAN);
+			CadConsultaCadastro2Stub.setAddress(ws);
 			CadConsultaCadastro2Stub.NfeDadosMsg_type0 dadosMsg = CadConsultaCadastro2Stub.NfeDadosMsg_type0.Factory.parse(dadosXML);
 			CadConsultaCadastro2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsultaCadastro(region);
 			CadConsultaCadastro2Stub.ConsultaCadastro2 consulta = new CadConsultaCadastro2Stub.ConsultaCadastro2();

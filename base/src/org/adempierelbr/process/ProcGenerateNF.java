@@ -481,7 +481,7 @@ public class ProcGenerateNF extends SvrProcess
 						NotaFiscal.save(trx);
 					}
 					//
-					else if (model.equals("55") && 
+					else if (model.equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) && 
 							MSysConfig.getBooleanValue("LBR_AUTO_GENERATE_XML", false, NotaFiscal.getAD_Client_ID()))
 						NFeXMLGenerator.geraCorpoNFe(LBR_NotaFiscal_ID, trx);
 				}

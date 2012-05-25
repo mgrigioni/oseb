@@ -24,6 +24,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
@@ -101,9 +102,7 @@ public class ProcConsultaNFe extends SvrProcess
 		if (orgInfo == null)
 			return "Organização não encontrada";
 
-		//MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),null);
 		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		boolean isSCAN  = orgInfo.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
 
 		MBPartnerLocation bpl = new MBPartnerLocation(ctx,nf.getC_BPartner_Location_ID(),null);
 		MLocation bpLoc = new MLocation(ctx,bpl.getC_Location_ID(),null);
@@ -114,7 +113,12 @@ public class ProcConsultaNFe extends SvrProcess
 
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(ctx, orgInfo);
-		//
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.CONSULTA,bpLoc.getC_Region_ID());
+		if (ws == null)
+			return "Não foi encontrado um endereço WebServices válido.";;
+		
 		String status = "Erro na verificação de Status";
 
 		try{
@@ -123,7 +127,7 @@ public class ProcConsultaNFe extends SvrProcess
 			NfeConsulta2Stub.NfeDadosMsg dadosMsg = NfeConsulta2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta(region);
 
-			NfeConsulta2Stub.setAmbiente(envType,bpLoc.getC_Region_ID(),isSCAN);
+			NfeConsulta2Stub.setAddress(ws);
 			NfeConsulta2Stub stub = new NfeConsulta2Stub();
 
 			String respStatus = stub.nfeConsultaNF2(dadosMsg, cabecMsgE).getExtraElement().toString();

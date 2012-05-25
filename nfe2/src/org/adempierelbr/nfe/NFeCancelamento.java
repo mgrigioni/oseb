@@ -26,6 +26,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
@@ -79,18 +80,13 @@ public class NFeCancelamento
 		else if (motivoCanc.length() >= 255)
 			return "Motivo de cancelamento muito longo. Max: 255 letras.";
 		//
-		MOrgInfo oi = MOrgInfo.get(ctx, nf.getAD_Org_ID(),null);
-		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		boolean isSCAN  = oi.get_ValueAsBoolean(I_W_AD_OrgInfo.COLUMNNAME_lbr_IsScan);
-		
-		if (nf.getlbr_MotivoScan() != null && !nf.getlbr_MotivoScan().trim().isEmpty()){
-			isSCAN = true;
-		}
+		MOrgInfo orgInfo = MOrgInfo.get(ctx, nf.getAD_Org_ID(),null);
+		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
 		//
 		if (envType == null || envType.equals(""))
 			return "Ambiente da NF-e deve ser preenchido.";
 		//
-		MLocation orgLoc = new MLocation(ctx,oi.getC_Location_ID(),null);
+		MLocation orgLoc = new MLocation(ctx,orgInfo.getC_Location_ID(),null);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())
@@ -99,7 +95,11 @@ public class NFeCancelamento
 
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(ctx, MOrgInfo.get(ctx,Env.getAD_Org_ID(ctx),trxName));
-		//
+		
+		//PROCURA WEBSERVICE
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.CANCELAMENTO);
+		if (ws == null)
+			return "Não foi encontrado um endereço WebServices válido.";
 
 		try{
 			String chNFe 	= nf.getlbr_NFeID();
@@ -108,7 +108,7 @@ public class NFeCancelamento
 			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(chNFe, pclNFe, envType, RemoverAcentos.remover(motivoCanc));
 
 			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, nf.getDocumentNo()+"-ped-can.xml"));
-			AssinaturaDigital.Assinar(attachFile.toString(), oi, AssinaturaDigital.CANCELAMENTO_NFE);
+			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.CANCELAMENTO_NFE);
 			nfeCancDadosMsg = NFeUtil.XMLtoString(attachFile);
 
 			String validation = ValidaXML.validaPedCancelamentoNFe(nfeCancDadosMsg);
@@ -126,7 +126,7 @@ public class NFeCancelamento
 			NfeCancelamento2Stub.NfeDadosMsg dadosMsg = NfeCancelamento2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecCancelamento(region);
 
-			NfeCancelamento2Stub.setAmbiente(envType,orgLoc.getC_Region_ID(),isSCAN);
+			NfeCancelamento2Stub.setAddress(ws);
 			NfeCancelamento2Stub stub = new NfeCancelamento2Stub();
 
 			String respCanc = stub.nfeCancelamentoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();

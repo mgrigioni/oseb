@@ -23,6 +23,7 @@ import java.util.logging.Level;
 
 import org.adempiere.exceptions.DBException;
 import org.adempierelbr.model.MLBRBoleto;
+import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRProductMovementFiller;
 import org.adempierelbr.model.MLBRTax;
 import org.adempierelbr.process.ProcGenerateNF;
@@ -172,7 +173,7 @@ public class ValidatorInvoice implements ModelValidator
 		if (C_Order_ID <= 0)
 			return null;
 
-		MOrder order = new MOrder(invoice.getCtx(), C_Order_ID, invoice.get_TrxName());;
+		MOrder order = new MOrder(invoice.getCtx(), C_Order_ID, invoice.get_TrxName());
 
 		if (invoice.get_ValueAsString("lbr_TransactionType").equals("")){
 			invoice.set_ValueOfColumn("lbr_TransactionType", order.get_Value("lbr_TransactionType"));
@@ -202,7 +203,7 @@ public class ValidatorInvoice implements ModelValidator
 			MDocType dt = new MDocType(invoice.getCtx(),invoice.getC_DocTypeTarget_ID(),invoice.get_TrxName());
 			String nfModel = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel);
 			if (nfModel == null || nfModel.trim().isEmpty())
-				nfModel = "55"; //NFe
+				nfModel = MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica; //NFe
 			
 			invoice.set_ValueOfColumn("lbr_NFModel", nfModel); 
 		}

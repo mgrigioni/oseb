@@ -15,12 +15,14 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.adempierelbr.model.MLBRNFeWebService;
+import org.adempierelbr.util.NFeUtil;
 import org.apache.axiom.om.OMAttribute;
 
 /*
  *  NfeCancelamento2Stub java implementation
  */
 
+@SuppressWarnings({ "rawtypes", "unchecked", "unused", "serial", "deprecation" })
 public class NfeCancelamento2Stub extends org.apache.axis2.client.Stub {
 	protected org.apache.axis2.description.AxisOperation[] _operations;
 
@@ -31,11 +33,11 @@ public class NfeCancelamento2Stub extends org.apache.axis2.client.Stub {
 
 	private static int counter = 0;
 
-	// mgrigioni, 09/04/2010
+	// mgrigioni, 25/05/2012
 	private static String stubAddress = "";
 
-	public static void setAmbiente(String ambiente, int C_Region_ID, boolean isSCAN) {
-		stubAddress = MLBRNFeWebService.getURL(MLBRNFeWebService.CANCELAMENTO,ambiente, "2.00", C_Region_ID,isSCAN);
+	public static void setAddress(MLBRNFeWebService ws) {
+		stubAddress = ws.getURL();
 	}
 
 	//

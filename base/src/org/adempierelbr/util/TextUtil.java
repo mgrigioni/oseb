@@ -87,8 +87,7 @@ public abstract class TextUtil
 	 * @author Fernando Moraes (fernando.moraes @ faire.com.br)
 	 * @param num numero da combinacao a ser gerada
 	 * @return referente ao numero desejado 
-	 *  0=A, 26 = AA, 42 = AP
-	 *  52=BA
+	 *  0 = A, 26 = AA, 42 = AP, 52 = BA
 	 */
 	public static String getALFAB(int num){
 		int quociente = num /ALFAB.length;
@@ -99,6 +98,7 @@ public abstract class TextUtil
 			return ALFAB[quociente-1]+ getALFAB(resto);
 		
 	}
+	
 	/**
 	 *  readFile
 	 *  Reads a file and return the lines into a string array
