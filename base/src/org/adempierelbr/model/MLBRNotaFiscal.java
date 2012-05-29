@@ -1397,7 +1397,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 	        	try {
 	        		nf.setlbr_NFeStatus(cStat);
 				} catch (Exception e) {
-					nf.setlbr_NFeStatus(MLBRNotaFiscal.LBR_NFESTATUS_RejeiçãoErroNãoCatalogado);
+					nf.setlbr_NFeStatus(MLBRNotaFiscal.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção);
 				}
 	        }
 	        

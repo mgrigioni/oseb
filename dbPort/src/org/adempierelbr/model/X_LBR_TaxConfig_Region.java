@@ -30,7 +30,7 @@ public class X_LBR_TaxConfig_Region extends PO implements I_LBR_TaxConfig_Region
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120525L;
+	private static final long serialVersionUID = 20120529L;
 
     /** Standard Constructor */
     public X_LBR_TaxConfig_Region (Properties ctx, int LBR_TaxConfig_Region_ID, String trxName)

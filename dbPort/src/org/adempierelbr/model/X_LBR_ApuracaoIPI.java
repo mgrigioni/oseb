@@ -32,7 +32,7 @@ public class X_LBR_ApuracaoIPI extends PO implements I_LBR_ApuracaoIPI, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120525L;
+	private static final long serialVersionUID = 20120529L;
 
     /** Standard Constructor */
     public X_LBR_ApuracaoIPI (Properties ctx, int LBR_ApuracaoIPI_ID, String trxName)

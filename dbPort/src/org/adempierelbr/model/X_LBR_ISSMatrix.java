@@ -30,7 +30,7 @@ public class X_LBR_ISSMatrix extends PO implements I_LBR_ISSMatrix, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120525L;
+	private static final long serialVersionUID = 20120529L;
 
     /** Standard Constructor */
     public X_LBR_ISSMatrix (Properties ctx, int LBR_ISSMatrix_ID, String trxName)

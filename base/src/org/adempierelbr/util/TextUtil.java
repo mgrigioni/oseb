@@ -100,10 +100,29 @@ public abstract class TextUtil
 	}
 	
 	/**
+	 * readFile
+	 *  Reads a file and return the lines into a string array
+	 *  @param  File
+	 *  @return String dados
+	 * @throws FileNotFoundException
+	 */
+	public static String readFile(File file) throws FileNotFoundException{
+		
+		String[] array = readFile(file.toString());
+		StringBuilder dados = new StringBuilder();
+		for(int i=0;i<array.length;i++){
+			dados.append(array[i]);
+		}
+		
+		return dados.toString();
+	} //readFile
+	
+	/**
 	 *  readFile
 	 *  Reads a file and return the lines into a string array
 	 *  @param  String FileName (FilePath)
 	 *  @return String[] lines
+	 *  @throws FileNotFoundException
 	 */
 	public static String[] readFile (String FileName) throws FileNotFoundException{
 
