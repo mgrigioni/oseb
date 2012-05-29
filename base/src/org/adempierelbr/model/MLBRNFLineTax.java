@@ -168,12 +168,12 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 			pstmt.setInt (1, nfLine.getLBR_NotaFiscal_ID());
 			pstmt.setInt(2, getLBR_TaxGroup_ID());
 			rs = pstmt.executeQuery ();
+			
+			MLBRNFTax nfTax = MLBRNFTax.get(getCtx(), nfLine.getLBR_NotaFiscal_ID(), getLBR_TaxGroup_ID(), get_TrxName());
+			if (nfTax == null)
+				nfTax = new MLBRNFTax(getCtx(),0,get_TrxName());
+			
 			if (rs.next ()){
-				
-				MLBRNFTax nfTax = MLBRNFTax.get(getCtx(), nfLine.getLBR_NotaFiscal_ID(), getLBR_TaxGroup_ID(), get_TrxName());
-				if (nfTax == null)
-					nfTax = new MLBRNFTax(getCtx(),0,get_TrxName());
-				
 				/* SE A SOMA FOR = 0, APAGA O REGISTRO */
 				if (rs.getBigDecimal(2).signum() == 0 && nfTax.get_ID() > 0){ 
 					nfTax.delete(true, get_TrxName());
@@ -190,6 +190,9 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 						success = false;
 					}
 				}
+			}
+			else{
+				nfTax.delete(true, get_TrxName());
 			}
 		}
 		catch (Exception e) {
