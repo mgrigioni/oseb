@@ -92,19 +92,6 @@ public interface I_LBR_NFeLot
 	  */
 	public String getCreateFrom();
 
-    /** Column name DateFinish */
-    public static final String COLUMNNAME_DateFinish = "DateFinish";
-
-	/** Set Finish Date.
-	  * Finish or (planned) completion date
-	  */
-	public void setDateFinish (Timestamp DateFinish);
-
-	/** Get Finish Date.
-	  * Finish or (planned) completion date
-	  */
-	public Timestamp getDateFinish();
-
     /** Column name DateTrx */
     public static final String COLUMNNAME_DateTrx = "DateTrx";
 
@@ -130,6 +117,32 @@ public interface I_LBR_NFeLot
 	  * Optional short description of the record
 	  */
 	public String getDescription();
+
+    /** Column name DocAction */
+    public static final String COLUMNNAME_DocAction = "DocAction";
+
+	/** Set Document Action.
+	  * The targeted status of the document
+	  */
+	public void setDocAction (String DocAction);
+
+	/** Get Document Action.
+	  * The targeted status of the document
+	  */
+	public String getDocAction();
+
+    /** Column name DocStatus */
+    public static final String COLUMNNAME_DocStatus = "DocStatus";
+
+	/** Set Document Status.
+	  * The current status of the document
+	  */
+	public void setDocStatus (String DocStatus);
+
+	/** Get Document Status.
+	  * The current status of the document
+	  */
+	public String getDocStatus();
 
     /** Column name DocumentNo */
     public static final String COLUMNNAME_DocumentNo = "DocumentNo";
@@ -157,37 +170,6 @@ public interface I_LBR_NFeLot
 	  */
 	public boolean isActive();
 
-    /** Column name lbr_LotReceived */
-    public static final String COLUMNNAME_lbr_LotReceived = "lbr_LotReceived";
-
-	/** Set Lot Received	  */
-	public void setlbr_LotReceived (boolean lbr_LotReceived);
-
-	/** Get Lot Received	  */
-	public boolean islbr_LotReceived();
-
-    /** Column name lbr_LotSent */
-    public static final String COLUMNNAME_lbr_LotSent = "lbr_LotSent";
-
-	/** Set Lot Sent	  */
-	public void setlbr_LotSent (boolean lbr_LotSent);
-
-	/** Get Lot Sent	  */
-	public boolean islbr_LotSent();
-
-    /** Column name lbr_NFeAnswerStatus */
-    public static final String COLUMNNAME_lbr_NFeAnswerStatus = "lbr_NFeAnswerStatus";
-
-	/** Set NFe Answer Status.
-	  * Status of Answer NFe
-	  */
-	public void setlbr_NFeAnswerStatus (String lbr_NFeAnswerStatus);
-
-	/** Get NFe Answer Status.
-	  * Status of Answer NFe
-	  */
-	public String getlbr_NFeAnswerStatus();
-
     /** Column name LBR_NFeLot_ID */
     public static final String COLUMNNAME_LBR_NFeLot_ID = "LBR_NFeLot_ID";
 
@@ -206,15 +188,6 @@ public interface I_LBR_NFeLot
 	/** Get Recebimento ID	  */
 	public String getlbr_NFeRecID();
 
-    /** Column name lbr_NFeRespID */
-    public static final String COLUMNNAME_lbr_NFeRespID = "lbr_NFeRespID";
-
-	/** Set Resposta ID	  */
-	public void setlbr_NFeRespID (String lbr_NFeRespID);
-
-	/** Get Resposta ID	  */
-	public String getlbr_NFeRespID();
-
     /** Column name lbr_NFeStatus */
     public static final String COLUMNNAME_lbr_NFeStatus = "lbr_NFeStatus";
 
@@ -228,19 +201,6 @@ public interface I_LBR_NFeLot
 	  */
 	public String getlbr_NFeStatus();
 
-    /** Column name Name */
-    public static final String COLUMNNAME_Name = "Name";
-
-	/** Set Name.
-	  * Alphanumeric identifier of the entity
-	  */
-	public void setName (String Name);
-
-	/** Get Name.
-	  * Alphanumeric identifier of the entity
-	  */
-	public String getName();
-
     /** Column name Processed */
     public static final String COLUMNNAME_Processed = "Processed";
 
@@ -253,24 +213,6 @@ public interface I_LBR_NFeLot
 	  * The document has been processed
 	  */
 	public boolean isProcessed();
-
-    /** Column name Processing */
-    public static final String COLUMNNAME_Processing = "Processing";
-
-	/** Set Process Now	  */
-	public void setProcessing (boolean Processing);
-
-	/** Get Process Now	  */
-	public boolean isProcessing();
-
-    /** Column name Processing2 */
-    public static final String COLUMNNAME_Processing2 = "Processing2";
-
-	/** Set Process Now	  */
-	public void setProcessing2 (String Processing2);
-
-	/** Get Process Now	  */
-	public String getProcessing2();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

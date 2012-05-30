@@ -307,10 +307,10 @@ public abstract class NFeUtil
 	 * @param region
 	 * @return NfeRecepcao2Stub.NfeCabecMsgE
 	 */
-	public static NfeRecepcao2Stub.NfeCabecMsgE geraCabecRecepcao(String region){
+	public static NfeRecepcao2Stub.NfeCabecMsgE geraCabecRecepcao(int C_Region_ID){
 
 		NfeRecepcao2Stub.NfeCabecMsg cabecMsg = new NfeRecepcao2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
 		cabecMsg.setVersaoDados(VERSAO);
 
 		NfeRecepcao2Stub.NfeCabecMsgE cabecMsgE = new NfeRecepcao2Stub.NfeCabecMsgE();
@@ -324,10 +324,10 @@ public abstract class NFeUtil
 	 * @param region
 	 * @return NfeRetRecepcao2Stub.NfeCabecMsgE
 	 */
-	public static NfeRetRecepcao2Stub.NfeCabecMsgE geraCabecRetRecepcao(String region){
+	public static NfeRetRecepcao2Stub.NfeCabecMsgE geraCabecRetRecepcao(int C_Region_ID){
 
 		NfeRetRecepcao2Stub.NfeCabecMsg cabecMsg = new NfeRetRecepcao2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
 		cabecMsg.setVersaoDados(VERSAO);
 
 		NfeRetRecepcao2Stub.NfeCabecMsgE cabecMsgE = new NfeRetRecepcao2Stub.NfeCabecMsgE();

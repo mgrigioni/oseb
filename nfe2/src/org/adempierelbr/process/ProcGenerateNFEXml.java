@@ -78,12 +78,11 @@ public class ProcGenerateNFEXml extends SvrProcess
 		{
 			//Se lote não foi enviado apaga o lote ou processado
 			MLBRNFeLot lot = new MLBRNFeLot(getCtx(),nf.getLBR_NFeLot_ID(),get_TrxName());
-			if (lot.islbr_LotSent() && !lot.isProcessed())
+			if (lot.getDocStatus().equals(MLBRNFeLot.DOCSTATUS_InProgress))
 				return "Lote já enviado. Processar retorno para verificar erros.";
 			
 			//BF  3169145 
-			//if (!lot.isProcessed()){
-			if (!lot.islbr_LotSent()){
+			if (lot.getlbr_NFeRecID() == null || lot.getlbr_NFeRecID().isEmpty()){
 				log.log(Level.WARNING, "Lote excluído: " + lot.getDocumentNo());
 				lot.delete(true); 
 			}
