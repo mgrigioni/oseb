@@ -929,7 +929,7 @@ public class NFeXMLGenerator
 		{
 			log.fine("Assinando NF-e");
 			arquivoXML = TextUtil.generateTmpFile(NFeUtil.removeIndent(NFeEmXML), arquivoXML);
-			AssinaturaDigital.Assinar(arquivoXML, orgInfo, AssinaturaDigital.RECEPCAO_NFE);
+			AssinaturaDigital.Assinar(arquivoXML, orgInfo, AssinaturaDigital.DOCTYPE_RECEPCAO_NFE);
 		}
 		catch (Exception e){
 			log.severe(e.getMessage());
@@ -957,7 +957,7 @@ public class NFeXMLGenerator
 				validar += line;
 			}
 			//
-			retValidacao = ValidaXML.validaXML(validar);
+			retValidacao = ValidaXML.validaNFe(validar);
 		}
 		catch (Exception e){
 			log.severe(e.getMessage());

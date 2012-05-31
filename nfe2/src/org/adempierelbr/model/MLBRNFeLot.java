@@ -149,7 +149,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			String respLote = stub.nfeRecepcaoLote2(dadosMsg, cabecMsgE).getExtraElement().toString();
 
 			//	Validar resposta
-			String validation = ValidaXML.validaRetXML(respLote);
+			String validation = ValidaXML.validaRetEnviNFe(respLote);
 			if (!validation.isEmpty()){
 				m_processMsg = validation;
 			}
@@ -225,7 +225,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			String nfeConsultaDadosMsg 	= NFeUtil.geraMsgRetRecepcao(getlbr_NFeRecID(), oiW.getlbr_NFeEnv());
 
 			//	Validação envio
-			String validation = ValidaXML.validaConsultaProt(nfeConsultaDadosMsg);
+			String validation = ValidaXML.validaConsReciNFe(nfeConsultaDadosMsg);
 			if (!validation.isEmpty()){
 				m_processMsg = validation;
 				return false;
@@ -307,7 +307,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		}
 		
 		String xmlLote = NFeUtil.geraCabecLoteNFe(getDocumentNo()) + nfesLote.toString() + "</enviNFe>";
-		String validation = ValidaXML.validaEnvXML(xmlLote);
+		String validation = ValidaXML.validaEnviNFe(xmlLote);
 		if (!validation.isEmpty()) {
 			String error = "Validation XML LOT Error: "+validation;
 			log.severe(error);

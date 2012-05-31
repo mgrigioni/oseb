@@ -295,7 +295,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 		try
 		{
 			log.fine ("Assinando XML: " + xml);
-			AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.CARTADECORRECAO_CCE);
+			AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
 			
 			//	Lê o arquivo assinado
 			xstream = new XStream (new DomDriver());
@@ -312,7 +312,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			xml =  new StringBuilder (sw.toString());
 		
 			log.fine ("XML: " + xml);
-			String result = ValidaXML.ValidaDoc (xml.toString(), "CCe_v1.00a/envCCe_v1.00.xsd");
+			String result = ValidaXML.validaEnvCCe(xml.toString());
 			
 			if (result != null && !result.isEmpty())
 			{
@@ -387,7 +387,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 				attachCCe.save();
 				
 				//	Valida o resultado do SEFAZ, gerando um LOG, mas não impede o processo
-				result = ValidaXML.ValidaDoc (sw.toString(), "CCe_v1.00a/procCCeNFe_v1.00.xsd");
+				result = ValidaXML.validaProcCCeNFe(sw.toString());
 				
 				if (result != null && !result.isEmpty())
 					log.severe ("Erro na validação da resposta: " + result);

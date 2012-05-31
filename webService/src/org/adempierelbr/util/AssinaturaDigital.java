@@ -67,10 +67,10 @@ import org.w3c.dom.NodeList;
 public class AssinaturaDigital
 {
 	/**		Document Type 	*/
-	public static final String RECEPCAO_NFE		   = "1";
-	public static final String CANCELAMENTO_NFE	   = "2";
-	public static final String INUTILIZACAO_NFE	   = "3";
-	public static final String CARTADECORRECAO_CCE = "4";
+	public static final String DOCTYPE_RECEPCAO_NFE		   = "1";
+	public static final String DOCTYPE_CANCELAMENTO_NFE	   = "2";
+	public static final String DOCTYPE_INUTILIZACAO_NFE	   = "3";
+	public static final String DOCTYPE_CARTADECORRECAO_CCE = "4";
 	
 	/**		Algoritmos		*/
 	public static final String ALGORITIMO = "RSA";
@@ -205,13 +205,13 @@ public class AssinaturaDigital
 		
 		String tag = null;
 
-		if (docType.equals(RECEPCAO_NFE))
+		if (docType.equals(DOCTYPE_RECEPCAO_NFE))
 			tag = "infNFe";
-		else if (docType.equals(CANCELAMENTO_NFE))
+		else if (docType.equals(DOCTYPE_CANCELAMENTO_NFE))
 			tag = "infCanc";
-		else if (docType.equals(INUTILIZACAO_NFE))
+		else if (docType.equals(DOCTYPE_INUTILIZACAO_NFE))
 			tag = "infInut";
-		else if (docType.equals(CARTADECORRECAO_CCE))
+		else if (docType.equals(DOCTYPE_CARTADECORRECAO_CCE))
 			tag = "infEvento";
 		
 		NodeList elements = doc.getElementsByTagName(tag);

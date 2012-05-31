@@ -13,7 +13,7 @@
         *  ServiceGinfesImplServiceStub java implementation
         */
 
-        
+        @SuppressWarnings({ "rawtypes", "unchecked", "unused", "serial", "deprecation" })
         public class ServiceGinfesImplServiceStub extends org.apache.axis2.client.Stub
         {
         protected org.apache.axis2.description.AxisOperation[] _operations;

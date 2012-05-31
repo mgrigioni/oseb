@@ -293,7 +293,7 @@ public class InutilizacaoNF
 				getnNFFin().length() > 9 || !NumberUtils.isNumber(getnNFFin()))
 			msg = "Número Final da NF para inutilização é inválido\n";
 		if (getxJust() == null || getxJust().length() < 15)
-			msg = "Código da UF inválido\n";
+			msg = "Justificativa deve ser maior que 15 caracteres\n";
 		//
 		if (msg.equals(""))
 		{

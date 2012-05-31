@@ -64,12 +64,12 @@ public class NFeInutilizacao
 		//
 		File attachFile = new File(TextUtil.generateTmpFile(nfePedInutMsg, iNF.getID()+"-ped-inu.xml"));
 
-		AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.INUTILIZACAO_NFE);
+		AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_INUTILIZACAO_NFE);
 		nfePedInutMsg = NFeUtil.XMLtoString(attachFile).replaceAll("[\r\n]+", "");
 		log.fine (nfePedInutMsg);
 
 		//	Validação envio
-		String validation = ValidaXML.validaPedInutilizacaoNFe(nfePedInutMsg);
+		String validation = ValidaXML.validaInutNFe(nfePedInutMsg);
 		if (!validation.equals(""))
 			return validation;
 
@@ -96,7 +96,7 @@ public class NFeInutilizacao
 			//	Status
 			log.fine (respLote);
 			//
-			String valid = ValidaXML.validaRetInutilizacaoNFe(respLote);
+			String valid = ValidaXML.validaRetInutNFe(respLote);
 			if (!valid.equals(""))
 			{
 				log.warning("Validation Response Invalidation Error\n"+valid);

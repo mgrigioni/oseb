@@ -108,10 +108,10 @@ public class NFeCancelamento
 			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(chNFe, pclNFe, envType, RemoverAcentos.remover(motivoCanc));
 
 			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, nf.getDocumentNo()+"-ped-can.xml"));
-			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.CANCELAMENTO_NFE);
+			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_CANCELAMENTO_NFE);
 			nfeCancDadosMsg = NFeUtil.XMLtoString(attachFile);
 
-			String validation = ValidaXML.validaPedCancelamentoNFe(nfeCancDadosMsg);
+			String validation = ValidaXML.validaCancNFe(nfeCancDadosMsg);
 			if (!validation.isEmpty())
 			{
 				log.severe("Validation Cancel Data Error: " + validation);
@@ -132,7 +132,7 @@ public class NFeCancelamento
 			String respCanc = stub.nfeCancelamentoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
 
 			//	Resposta do Envio
-			validation = ValidaXML.validaRetCancelamentoNFe(respCanc);
+			validation = ValidaXML.validaRetCancNFe(respCanc);
 			if (!validation.isEmpty())
 				return validation;
 			//
