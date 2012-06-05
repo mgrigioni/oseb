@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import org.adempiere.model.POWrapper;
 import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.util.AssinaturaDigital;
@@ -45,21 +46,21 @@ public class NFeInutilizacao
 	 * @return
 	 * @throws Exception
 	 */
-	public static String invalidateNF (MOrgInfo orgInfo, InutilizacaoNF iNF) throws Exception
-	{
-		log.fine("ini");
-		String envType 	= orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-		//
-		if (envType == null || envType.equals(""))
+	public static String invalidateNF (MOrgInfo orgInfo, InutilizacaoNF iNF) throws Exception {
+		
+		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
+		
+		if (oiW.getlbr_NFeEnv() == null || oiW.getlbr_NFeEnv().isEmpty()){
 			return "Ambiente da NF-e deve ser preenchido.";
-		//
+		}
+
 		MLocation orgLoc = new MLocation(Env.getCtx(),orgInfo.getC_Location_ID(),null);
 
 		String region = BPartnerUtil.getRegionCode(orgLoc);
 		if (region.isEmpty())
 			return "UF Inválida";
 		//
-		String nfePedInutMsg = NFeUtil.removeIndent(NFeUtil.geraInutilizacao(iNF));
+		String nfePedInutMsg = NFeUtil.geraInutilizacao(iNF);
 		log.fine (nfePedInutMsg);
 		//
 		File attachFile = new File(TextUtil.generateTmpFile(nfePedInutMsg, iNF.getID()+"-ped-inu.xml"));
@@ -115,22 +116,7 @@ public class NFeInutilizacao
 					String cStat 	= NFeUtil.getValue (node, "cStat");
 					String xMotivo 	= NFeUtil.getValue (node, "xMotivo");
 					//
-					if (cStat != null && cStat.equals("102"))
-					{
-//						String verAplic	= NFeUtil.getValue (node, "verAplic");
-//		    			String cUF 		= NFeUtil.getValue (node, "cUF");
-//						String ano 		= NFeUtil.getValue (node, "ano");
-//						String CNPJ 	= NFeUtil.getValue (node, "CNPJ");
-//						String mod 		= NFeUtil.getValue (node, "mod");
-//						String serie 	= NFeUtil.getValue (node, "serie");
-//						String nNFIni 	= NFeUtil.getValue (node, "nNFIni");
-//						String nNFFin 	= NFeUtil.getValue (node, "nNFFin");
-//						String dhRecbto = NFeUtil.getValue (node, "dhRecbto");
-//						String nProt 	= NFeUtil.getValue (node, "nProt");
-						//	TODO:	Criar uma janela para lançar as NF inutilizadas
-//						MNote note = new MNote(Env.getCtx(), 225, 100, null);
-//						note.setTextMsg(nfeResposta);
-//						note.save();
+					if (cStat != null && cStat.equals("102")) {
 						new File(TextUtil.generateTmpFile(respLote, iNF.getID()+"-inu.xml"));
 						//
 						return "NF-e Inutilizada com sucesso.";
@@ -153,4 +139,5 @@ public class NFeInutilizacao
 		//
 		return "Processo completado.";
 	}	//	invalidateNF
+	
 }	//	NFeInutilizacao

@@ -54,6 +54,7 @@ import br.inf.portalfiscal.www.nfe.wsdl.nfestatusservico2.NfeStatusServico2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 /**
  * 	Utilitários para gerar a NFe.
@@ -469,46 +470,6 @@ public abstract class NFeUtil
 	} //XMLtoString
 	
 	/**
-	 * removeIndent
-	 * @param xml
-	 * @return
-	 */
-	public static String removeIndent(String xml){
-		
-		StringBuilder newXML = new StringBuilder("");
-		
-		int i = 0;
-		while (i < xml.length()){
-			int end = xml.indexOf(">", i);
-			if (end != -1){
-				newXML.append(xml.substring(i, end+1));
-				i = end + 1;
-				
-				int newTag = xml.indexOf("<", i);
-				int endTag = xml.indexOf("</", i);
-				
-				if (endTag > newTag){
-					i = newTag;
-				}
-				
-				//check if value is blank
-				if (endTag != -1){
-					String value = xml.substring(i, endTag);
-					if (value.trim().isEmpty())
-						i = endTag;
-				}
-				
-			}
-			else{ //BF - se não tiver ">" fica em loop infinito
-				break;
-			}
-		}
-					
-		return newXML.toString();
-	} //removeIndent
-	
-	
-	/**
 	 * Get Attachment
 	 *
 	 * @param entry
@@ -734,19 +695,16 @@ public abstract class NFeUtil
 	 * 
 	 * 	@return cabeçalho de envio
 	 */
-	public static String geraInutilizacao (InutilizacaoNF nf)
-	{
-		XStream xml = new XStream();
-		//
-		xml.alias("infInut", InutilizacaoNF.class);
-		xml.useAttributeFor(InutilizacaoNF.class, "Id");
-		xml.omitField(InutilizacaoNF.class, "msg");
-		xml.omitField(InutilizacaoNF.class, "log");
+	public static String geraInutilizacao (InutilizacaoNF nf) {
+		XStream xstream = new XStream();
+		xstream.processAnnotations(InutilizacaoNF.class);
 		// 
-		StringBuffer inut = new StringBuffer("");
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (nf,  new CompactWriter (sw));
 		//
+		StringBuilder inut = new StringBuilder();
 		inut.append("<inutNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"2.00\">");
-		inut.append(xml.toXML(nf));
+		inut.append(sw.toString());
 		inut.append("</inutNFe>");
 		//
 		return inut.toString();

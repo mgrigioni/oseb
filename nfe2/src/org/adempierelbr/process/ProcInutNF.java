@@ -3,10 +3,12 @@ package org.adempierelbr.process;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
+import org.adempiere.model.POWrapper;
 import org.adempierelbr.nfe.InutilizacaoNF;
 import org.adempierelbr.nfe.NFeInutilizacao;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MDocType;
 import org.compiere.model.MLocation;
@@ -31,8 +33,8 @@ public class ProcInutNF extends SvrProcess
 	private static Integer 	p_C_DocType_ID 	= 0;
 	
 	/**	Sequência de NF			  	*/
-	private static Integer 	p_DocumentNo 		= 0;
-	private static Integer 	p_DocumentNo_To 	= 0;
+	private static Integer 	p_DocumentNo    = 0;
+	private static Integer 	p_DocumentNo_To = 0;
 	
 	/**	Justificativa			  	*/
 	private static String 	p_Just 			= "";
@@ -88,31 +90,34 @@ public class ProcInutNF extends SvrProcess
 		if (p_DocumentNo_To < p_DocumentNo)
 			throw new Exception ("@Mandatory@ @DocumentNo@");
 		//
-		MOrgInfo oi = MOrgInfo.get(Env.getCtx(), p_AD_Org_ID, get_TrxName());
+		MOrgInfo orgInfo = MOrgInfo.get(Env.getCtx(), p_AD_Org_ID, get_TrxName());
+		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
+		
 		MDocType dt = new MDocType(Env.getCtx(), p_C_DocType_ID, get_TrxName());
+		I_W_C_DocType dtW = POWrapper.create(dt, I_W_C_DocType.class);
 		//
-		String regionCode = BPartnerUtil.getRegionCode(new MLocation(getCtx(), oi.getC_Location_ID(), get_TrxName()));
+		String regionCode = BPartnerUtil.getRegionCode(new MLocation(getCtx(), oiW.getC_Location_ID(), get_TrxName()));
 		if (regionCode.isEmpty())
 			return "UF Inválida";
-		//
-		String serie = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
+		
+		String serie = dtW.getlbr_NFSerie();
 		if (serie == null || serie.trim().isEmpty())
 			serie = "0";
 		
-		InutilizacaoNF iNF = new InutilizacaoNF (oi, regionCode);
-		iNF.setMod(dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel));
+		InutilizacaoNF iNF = new InutilizacaoNF (oiW, regionCode);
+		iNF.setMod(dtW.getlbr_NFModel());
 		iNF.setSerie(serie);
 		iNF.setnNFIni(p_DocumentNo.toString());
 		iNF.setnNFFin(p_DocumentNo_To.toString());
 		iNF.setxJust(p_Just);
 		iNF.setAno(TextUtil.timeToString(p_DateDoc, "yy"));
 		//
-		if (!iNF.isValid())
-		{
+		if (!iNF.isValid()){
 			log.severe(iNF.getMsg());
 			return "NF não pode ser inutilizada. Verificar log. " + iNF.getMsg();
 		}
 		//
-		return NFeInutilizacao.invalidateNF(oi, iNF);
+		return NFeInutilizacao.invalidateNF(orgInfo, iNF);
 	}	//	doIt
+	
 }	//	ProcInutNF

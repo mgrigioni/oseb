@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -109,6 +110,7 @@ import org.compiere.util.Env;
 import br.gov.sp.fazenda.dsge.brazilutils.uf.UF;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 /**
  * Gera o arquivo XML
@@ -921,14 +923,18 @@ public class NFeXMLGenerator
 			dados.setInfAdic(infAdi);
 		}
 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (dados,  new CompactWriter (sw));
+		
 		String nfeID = dados.getId().substring(3);
 		String arquivoXML = nfeID + FILE_EXT;
-		String NFeEmXML = NFeUtil.geraCabecNFe() + TextUtil.removeEOL(xstream.toXML(dados)) + NFeUtil.geraRodapNFe();
+		
+		String NFeEmXML = NFeUtil.geraCabecNFe() + TextUtil.removeEOL(sw.toString()) + NFeUtil.geraRodapNFe();
 		
 		try
 		{
 			log.fine("Assinando NF-e");
-			arquivoXML = TextUtil.generateTmpFile(NFeUtil.removeIndent(NFeEmXML), arquivoXML);
+			arquivoXML = TextUtil.generateTmpFile(NFeEmXML, arquivoXML);
 			AssinaturaDigital.Assinar(arquivoXML, orgInfo, AssinaturaDigital.DOCTYPE_RECEPCAO_NFE);
 		}
 		catch (Exception e){

@@ -1,13 +1,14 @@
 package org.adempierelbr.nfe;
 
-import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.apache.commons.lang.math.NumberUtils;
-import org.compiere.model.MDocType;
-import org.compiere.model.MOrgInfo;
 import org.compiere.util.CLogger;
-import org.compiere.util.Env;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
  * 	Inutilização da Numeração da NF.
@@ -15,42 +16,19 @@ import org.compiere.util.Env;
  * 	@author Ricardo Santana
  *	@version $Id: InutilizacaoNF.java, v1.0 2010/08/04 11:45:26 AM, ralexsander Exp $
  */
-public class InutilizacaoNF
-{
-	/**
-	 * 	Default Constructor
-	 */
-	public InutilizacaoNF (MOrgInfo oi, String regionCode)
-	{
-		setCNPJ(oi.get_ValueAsString("lbr_CNPJ"));
-		setTpAmb(oi.get_ValueAsString("lbr_NFeEnv"));
-		setcUF(regionCode);
-	}	//	InutilizacaoNF
+@XStreamAlias ("infInut")
+public class InutilizacaoNF {
 	
-	/**
-	 * 	Constructor
-	 * 
-	 * @param nf Nota Fiscal
-	 */
-	public InutilizacaoNF (MLBRNotaFiscal nf, String tpAmb, String regionCode)
-	{
-		MDocType dt = new MDocType (Env.getCtx(), nf.getC_DocTypeTarget_ID(), null);
-		//
-		setcUF(regionCode);
-		if (nf.getDateDoc() != null)
-			setAno(TextUtil.timeToString(nf.getDateDoc(), "yy"));
-		setCNPJ(nf.getlbr_CNPJ());
-		setMod(dt.get_ValueAsString("lbr_NFModel"));
-		setSerie(dt.get_ValueAsString("lbr_NFSerie"));
-		setnNFIni(nf.getDocumentNo());
-		setnNFFin(nf.getDocumentNo());
-		setxJust(nf.get_ValueAsString("lbr_MotivoCancel"));
-		//
-		setTpAmb(tpAmb);
-	}	//	InutilizacaoNF
+	/**	Logger */
+	@XStreamOmitField
+	private static CLogger log = CLogger.getCLogger(InutilizacaoNF.class);
 	
-	/**	Campos para compor o XML	*/
+	@XStreamOmitField
+	private String msg = "";
+	
+	@XStreamAsAttribute
 	private String Id;
+	
 	private String tpAmb;
 	private final String xServ = "INUTILIZAR"; 
 	private String cUF;
@@ -62,14 +40,17 @@ public class InutilizacaoNF
 	private String nNFFin;
 	private String xJust;
 	
-	/**	Campos auxiliares			*/
-	private String msg = "";
+	/**
+	 * 	Default Constructor
+	 */
+	public InutilizacaoNF (I_W_AD_OrgInfo oiW, String regionCode) {
+		setCNPJ(oiW.getlbr_CNPJ());
+		setTpAmb(oiW.getlbr_NFeEnv());
+		setcUF(regionCode);
+	}	//	InutilizacaoNF
 	
-	/**	Logger						*/
-	private static CLogger log = CLogger.getCLogger(InutilizacaoNF.class);
 	
-	public String getxServ()
-	{
+	public String getxServ() {
 		return xServ;
 	}	//	getxServ
 	
@@ -309,8 +290,8 @@ public class InutilizacaoNF
 	 * 
 	 * 	@return Error Msg
 	 */
-	public String getMsg()
-	{
+	public String getMsg() {
 		return msg;
 	}	//	getMsg
+	
 }	//	InutilizacaoNF
