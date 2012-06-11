@@ -67,10 +67,11 @@ import org.w3c.dom.NodeList;
 public class AssinaturaDigital
 {
 	/**		Document Type 	*/
-	public static final String DOCTYPE_RECEPCAO_NFE		   = "1";
-	public static final String DOCTYPE_CANCELAMENTO_NFE	   = "2";
-	public static final String DOCTYPE_INUTILIZACAO_NFE	   = "3";
-	public static final String DOCTYPE_CARTADECORRECAO_CCE = "4";
+	public static final int DOCTYPE_RECEPCAO_NFE		= 1;
+	public static final int DOCTYPE_CANCELAMENTO_NFE	= 2;
+	public static final int DOCTYPE_INUTILIZACAO_NFE	= 3;
+	public static final int DOCTYPE_CARTADECORRECAO_CCE = 4;
+	public static final int DOCTYPE_GINFES_RPS          = 5;
 	
 	/**		Algoritmos		*/
 	public static final String ALGORITIMO = "RSA";
@@ -99,7 +100,7 @@ public class AssinaturaDigital
 	 * @param OrgInfo
 	 * @throws Exception
 	 */
-	public static void Assinar(String caminhoxml, MOrgInfo oi, String docType) throws Exception
+	public static void Assinar(String caminhoxml, MOrgInfo oi, int docType) throws Exception
 	{
 		Integer cert = (Integer) oi.get_Value(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_Org_ID);
 		MLBRDigitalCertificate dc = new MLBRDigitalCertificate(Env.getCtx(), cert, null);
@@ -185,7 +186,7 @@ public class AssinaturaDigital
 		}
 	}	//	getValidade
 	
-	public static void assinarDocumento(String localDocumento, String docType) throws Exception
+	public static void assinarDocumento(String localDocumento, int docType) throws Exception
 	{
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
@@ -204,16 +205,15 @@ public class AssinaturaDigital
 		transformList.add(c14n);
 		
 		String tag = null;
-
-		if (docType.equals(DOCTYPE_RECEPCAO_NFE))
-			tag = "infNFe";
-		else if (docType.equals(DOCTYPE_CANCELAMENTO_NFE))
-			tag = "infCanc";
-		else if (docType.equals(DOCTYPE_INUTILIZACAO_NFE))
-			tag = "infInut";
-		else if (docType.equals(DOCTYPE_CARTADECORRECAO_CCE))
-			tag = "infEvento";
 		
+		switch (docType) {
+			case DOCTYPE_RECEPCAO_NFE:        tag = "infNFe";    break;
+			case DOCTYPE_CANCELAMENTO_NFE:    tag = "infCanc";   break;
+			case DOCTYPE_INUTILIZACAO_NFE:    tag = "infInut";   break;
+			case DOCTYPE_CARTADECORRECAO_CCE: tag = "infEvento"; break;
+			case DOCTYPE_GINFES_RPS:          tag = "InfRps";    break;
+		}
+				
 		NodeList elements = doc.getElementsByTagName(tag);
 		org.w3c.dom.Element el = (org.w3c.dom.Element) elements.item(0);
 		String id = el.getAttribute("Id");

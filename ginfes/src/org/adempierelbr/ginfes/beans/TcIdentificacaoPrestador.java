@@ -20,60 +20,49 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
- *  TcIdentificacaoRps
+ *  TcIdentificacaoPrestador
  *  @author Mario Grigioni
- *  @version $Id: TcIdentificacaoRps.java,v 1.0 04/06/2012 16:07:00 mgrigioni Exp $
+ *  @version $Id: TcIdentificacaoPrestador.java,v 1.0 05/06/2012 14:06:00 mgrigioni Exp $
  */
-@XStreamAlias ("IdentificacaoRps")
-public class TcIdentificacaoRps {
+@XStreamAlias ("Prestador")
+public class TcIdentificacaoPrestador {
 	
 	@XStreamOmitField
-	private CLogger log =  CLogger.getCLogger(TcIdentificacaoRps.class);
+	private CLogger log =  CLogger.getCLogger(TcIdentificacaoPrestador.class);
 	
-	private String Numero;
-	private String Serie;
-	private String Tipo = "1"; //RPS
+	private String Cnpj;
+	private String InscricaoMunicipal;
 	
 	/**
 	 * Constructor
-	 * @param numero
-	 * @param serie
-	 * @param tipo
+	 * @param cnpj
+	 * @param inscricaoMunicipal
 	 */
-	public TcIdentificacaoRps(String numero, String serie) {
+	public TcIdentificacaoPrestador(String cnpj, String inscricaoMunicipal) {
 		super();
-		setNumero(numero);
-		setSerie(serie);
+		setCnpj(cnpj);
+		setInscricaoMunicipal(inscricaoMunicipal);
 	}
-	
-	public String getNumero() {
-		return Numero;
+	public String getCnpj() {
+		return Cnpj;
 	}
-	public void setNumero(String numero) {
-		Numero = TextUtil.toNumeric(numero);
-	}
-	
-	public String getSerie() {
-		return Serie;
-	}
-	public void setSerie(String serie) {
-		serie = TextUtil.checkSize(serie,5);
-		if (serie.isEmpty())
-			serie = "0";
+	private void setCnpj(String cnpj) {
+		cnpj = TextUtil.toNumeric(cnpj);
+		if (cnpj.length() != 14)
+			log.warning("(CNPJ Inválido) - " + cnpj);
 		
-		Serie = serie;
+		Cnpj = cnpj;
 	}
 	
-	public String getTipo() {
-		return Tipo;
+	public String getInscricaoMunicipal() {
+		return InscricaoMunicipal;
 	}
-	public void setTipo(String tipo) {
-		tipo = TextUtil.toNumeric(tipo);
-		if("123".indexOf(tipo) == -1){
-			log.warning("(Tipo de documento inválido) - " + tipo);
-		}
+	private void setInscricaoMunicipal(String inscricaoMunicipal) {
+		inscricaoMunicipal = TextUtil.checkSize(inscricaoMunicipal, 15);
+		if (inscricaoMunicipal.isEmpty())
+			inscricaoMunicipal = null;
 		
-		Tipo = tipo;
+		InscricaoMunicipal = inscricaoMunicipal;
 	}
 	
-}	// TcIdentificacaoRps
+}	// TcIdentificacaoPrestador

@@ -14,66 +14,47 @@
 package org.adempierelbr.ginfes.beans;
 
 import org.adempierelbr.util.TextUtil;
-import org.compiere.util.CLogger;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
- *  TcIdentificacaoRps
+ *  TcIdentificacaoTomador
  *  @author Mario Grigioni
- *  @version $Id: TcIdentificacaoRps.java,v 1.0 04/06/2012 16:07:00 mgrigioni Exp $
+ *  @version $Id: TcIdentificacaoTomador.java,v 1.0 05/06/2012 14:11:00 mgrigioni Exp $
  */
-@XStreamAlias ("IdentificacaoRps")
-public class TcIdentificacaoRps {
-	
-	@XStreamOmitField
-	private CLogger log =  CLogger.getCLogger(TcIdentificacaoRps.class);
-	
-	private String Numero;
-	private String Serie;
-	private String Tipo = "1"; //RPS
-	
+@XStreamAlias ("IdentificacaoTomador")
+public class TcIdentificacaoTomador {
+		
+	private TcCpfCnpj CpfCnpj;
+	private String InscricaoMunicipal;
+		
 	/**
 	 * Constructor
-	 * @param numero
-	 * @param serie
-	 * @param tipo
+	 * @param cpfCnpj
+	 * @param inscricaoMunicipal
 	 */
-	public TcIdentificacaoRps(String numero, String serie) {
+	public TcIdentificacaoTomador(TcCpfCnpj cpfCnpj, String inscricaoMunicipal) {
 		super();
-		setNumero(numero);
-		setSerie(serie);
+		setCnpj(cpfCnpj);
+		setInscricaoMunicipal(inscricaoMunicipal);
 	}
 	
-	public String getNumero() {
-		return Numero;
+	public TcCpfCnpj getCpfCnpj() {
+		return CpfCnpj;
 	}
-	public void setNumero(String numero) {
-		Numero = TextUtil.toNumeric(numero);
+	private void setCnpj(TcCpfCnpj cpfCnpj) {
+		CpfCnpj = cpfCnpj;
 	}
-	
-	public String getSerie() {
-		return Serie;
+
+	public String getInscricaoMunicipal() {
+		return InscricaoMunicipal;
 	}
-	public void setSerie(String serie) {
-		serie = TextUtil.checkSize(serie,5);
-		if (serie.isEmpty())
-			serie = "0";
+	private void setInscricaoMunicipal(String inscricaoMunicipal) {
+		inscricaoMunicipal = TextUtil.checkSize(inscricaoMunicipal, 15);
+		if (inscricaoMunicipal.isEmpty())
+			inscricaoMunicipal = null;
 		
-		Serie = serie;
+		InscricaoMunicipal = inscricaoMunicipal;
 	}
 	
-	public String getTipo() {
-		return Tipo;
-	}
-	public void setTipo(String tipo) {
-		tipo = TextUtil.toNumeric(tipo);
-		if("123".indexOf(tipo) == -1){
-			log.warning("(Tipo de documento inválido) - " + tipo);
-		}
-		
-		Tipo = tipo;
-	}
-	
-}	// TcIdentificacaoRps
+}	// TcIdentificacaoTomador

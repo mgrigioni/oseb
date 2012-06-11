@@ -14,66 +14,42 @@
 package org.adempierelbr.ginfes.beans;
 
 import org.adempierelbr.util.TextUtil;
-import org.compiere.util.CLogger;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
- *  TcIdentificacaoRps
+ *  TcDadosConstrucaoCivil
  *  @author Mario Grigioni
- *  @version $Id: TcIdentificacaoRps.java,v 1.0 04/06/2012 16:07:00 mgrigioni Exp $
+ *  @version $Id: TcDadosConstrucaoCivil.java,v 1.0 05/06/2012 15:30:00 mgrigioni Exp $
  */
-@XStreamAlias ("IdentificacaoRps")
-public class TcIdentificacaoRps {
+@XStreamAlias ("ConstrucaoCivil")
+public class TcDadosConstrucaoCivil {
 	
-	@XStreamOmitField
-	private CLogger log =  CLogger.getCLogger(TcIdentificacaoRps.class);
-	
-	private String Numero;
-	private String Serie;
-	private String Tipo = "1"; //RPS
+	private String CodigoObra;
+	private String Art;
 	
 	/**
 	 * Constructor
-	 * @param numero
-	 * @param serie
-	 * @param tipo
+	 * @param codigoObra
+	 * @param art
 	 */
-	public TcIdentificacaoRps(String numero, String serie) {
+	public TcDadosConstrucaoCivil(String codigoObra, String art) {
 		super();
-		setNumero(numero);
-		setSerie(serie);
+		setCodigoObra(codigoObra);
+		setArt(art);
+	}
+	public String getCodigoObra() {
+		return CodigoObra;
+	}
+	private void setCodigoObra(String codigoObra) {
+		CodigoObra = TextUtil.checkSize(codigoObra,15);
 	}
 	
-	public String getNumero() {
-		return Numero;
+	public String getArt() {
+		return Art;
 	}
-	public void setNumero(String numero) {
-		Numero = TextUtil.toNumeric(numero);
-	}
-	
-	public String getSerie() {
-		return Serie;
-	}
-	public void setSerie(String serie) {
-		serie = TextUtil.checkSize(serie,5);
-		if (serie.isEmpty())
-			serie = "0";
-		
-		Serie = serie;
+	private void setArt(String art) {
+		Art = TextUtil.checkSize(art,15);
 	}
 	
-	public String getTipo() {
-		return Tipo;
-	}
-	public void setTipo(String tipo) {
-		tipo = TextUtil.toNumeric(tipo);
-		if("123".indexOf(tipo) == -1){
-			log.warning("(Tipo de documento inválido) - " + tipo);
-		}
-		
-		Tipo = tipo;
-	}
-	
-}	// TcIdentificacaoRps
+}	// TcDadosConstrucaoCivil

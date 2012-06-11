@@ -208,4 +208,13 @@ public class ValidaXML {
 		return ValidaDoc(stringXml, "cce/procCCeNFe_v1.00.xsd");
 	}
 	
+	/**
+	 * Validate xml file against xsd schema (ginfes/servico_enviar_lote_rps_envio_v03.xsd")
+	 * @param stringXml
+	 * @return validation result
+	 */
+	public static String validaServicoEnviarLoteRpsEnvio(String stringXML) {
+		return ValidaDoc(stringXML, "ginfes/servico_enviar_lote_rps_envio_v03.xsd");
+	}
+	
 } //ValidaXML
