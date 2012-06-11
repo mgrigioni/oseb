@@ -610,7 +610,7 @@ public class EFDUtil{
 		BigDecimal VL_BC_IRRF = nfLine.getTaxBaseAmt("IR").abs();
 		BigDecimal VL_IRRF = nfLine.getTaxAmt("IR").abs();
 		BigDecimal VL_BC_PREV = nfLine.getTaxBaseAmt("INSS").abs();
-		BigDecimal VL_PREV = nfLine.getTaxAmt("INSS"); 
+		BigDecimal VL_PREV = nfLine.getTaxAmt("INSS").abs(); 
 		
 		return new RC172(rc170,VL_SERV_NT,VL_BC_ISSQN,ALIQ_ISSQN,VL_ISSQN,
 				VL_BC_IRRF,VL_IRRF,VL_BC_PREV,VL_PREV);
