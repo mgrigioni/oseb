@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
@@ -155,6 +156,8 @@ public class ProcGenerateCert extends SvrProcess
 			    socket.close();
 			    System.out.println();
 			    System.out.println("No errors, certificate is already trusted");
+			} catch (SocketTimeoutException eTimeout){
+				continue;
 			} catch (SSLException e) {
 			    System.out.println("Certificate chain needed");
 			    //e.printStackTrace(System.out);

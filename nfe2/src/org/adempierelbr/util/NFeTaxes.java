@@ -14,9 +14,10 @@ package org.adempierelbr.util;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 
+import org.adempierelbr.model.MLBRNFLineTax;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
-import org.adempierelbr.model.X_LBR_NFLineTax;
 import org.adempierelbr.model.X_LBR_TaxGroup;
 import org.compiere.util.Env;
 
@@ -99,9 +100,9 @@ public class NFeTaxes
 	{
 		HashMap<String, NFeTaxes> txs = new HashMap<String, NFeTaxes>();
 		//
-		X_LBR_NFLineTax[] lineTaxes = nfl.getTaxes();
+		List<MLBRNFLineTax> lineTaxes = nfl.getTaxes();
 		//
-		for (X_LBR_NFLineTax lt : lineTaxes)
+		for (MLBRNFLineTax lt : lineTaxes)
 		{
 			X_LBR_TaxGroup taxGroup =
 				new X_LBR_TaxGroup(Env.getCtx(), lt.getLBR_TaxGroup_ID(), null);

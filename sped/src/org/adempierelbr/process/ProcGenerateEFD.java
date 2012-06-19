@@ -211,9 +211,9 @@ public class ProcGenerateEFD extends SvrProcess
 		CounterSped.clear();
 				
 		//Notas Fiscais Período
-		MLBRNotaFiscal[] nfs = MLBRNotaFiscal.get(dateFrom,dateTo,p_AD_Org_ID,get_TrxName());
+		List<MLBRNotaFiscal> nfs = MLBRNotaFiscal.get(dateFrom,dateTo,p_AD_Org_ID,get_TrxName());
 		
-		int count = nfs.length;
+		int count = nfs.size();
 		int aux   = 1;
 		for (MLBRNotaFiscal nf : nfs){
 			
@@ -245,7 +245,7 @@ public class ProcGenerateEFD extends SvrProcess
 			if (nf.isCancelled()) //NF Cancelada não precisa de registros detalhados
 				continue;
 			
-			MLBRNotaFiscalLine[] nfLines = nf.getLines("Line");
+			List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 			for (MLBRNotaFiscalLine nfLine : nfLines){
 				
 				R0190 r0190 = null; //UDM
@@ -487,7 +487,7 @@ public class ProcGenerateEFD extends SvrProcess
 			
 			for (MLBRNotaFiscal exp : exps){
 				
-				MLBRNotaFiscalLine[] nfLines = exp.getLines("Line");
+				List<MLBRNotaFiscalLine> nfLines = exp.getLines();
 				for (MLBRNotaFiscalLine nfLine : nfLines){
 					
 					R0190 r0190 = EFDUtil.createR0190(nfLine);
@@ -503,7 +503,7 @@ public class ProcGenerateEFD extends SvrProcess
 						_R0200.add(r0200);
 					
 					R1105 r1105 = new R1105(exp.getlbr_NFModel(),exp.getSerieNo(),
-							exp.getDocNo(),exp.getlbr_NFeID(),exp.getDateDoc(),
+							exp.getDocumentNo(true),exp.getlbr_NFeID(),exp.getDateDoc(),
 							r0200.getCOD_ITEM());
 					
 					if (setR1105.contains(r1105))

@@ -34,7 +34,7 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20120618L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -42,6 +42,10 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
       super (ctx, LBR_NotaFiscal_ID, trxName);
       /** if (LBR_NotaFiscal_ID == 0)
         {
+			setDocAction (null);
+// CO
+			setDocStatus (null);
+// DR
 			setDocumentNo (null);
 			setIsCancelled (false);
 // 'N'
@@ -86,34 +90,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
         .append(get_ID()).append("]");
       return sb.toString();
     }
-
-	public I_C_BPartner_Location getBill_Location() throws RuntimeException
-    {
-		return (I_C_BPartner_Location)MTable.get(getCtx(), I_C_BPartner_Location.Table_Name)
-			.getPO(getBill_Location_ID(), get_TrxName());	}
-
-	/** Set Invoice Location.
-		@param Bill_Location_ID 
-		Business Partner Location for invoicing
-	  */
-	public void setBill_Location_ID (int Bill_Location_ID)
-	{
-		if (Bill_Location_ID < 1) 
-			set_Value (COLUMNNAME_Bill_Location_ID, null);
-		else 
-			set_Value (COLUMNNAME_Bill_Location_ID, Integer.valueOf(Bill_Location_ID));
-	}
-
-	/** Get Invoice Location.
-		@return Business Partner Location for invoicing
-	  */
-	public int getBill_Location_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_Bill_Location_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
 
 	/** Set BP Name.
 		@param BPName BP Name	  */
@@ -394,6 +370,98 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	/** DocAction AD_Reference_ID=135 */
+	public static final int DOCACTION_AD_Reference_ID=135;
+	/** Complete = CO */
+	public static final String DOCACTION_Complete = "CO";
+	/** Approve = AP */
+	public static final String DOCACTION_Approve = "AP";
+	/** Reject = RJ */
+	public static final String DOCACTION_Reject = "RJ";
+	/** Post = PO */
+	public static final String DOCACTION_Post = "PO";
+	/** Void = VO */
+	public static final String DOCACTION_Void = "VO";
+	/** Close = CL */
+	public static final String DOCACTION_Close = "CL";
+	/** Reverse - Correct = RC */
+	public static final String DOCACTION_Reverse_Correct = "RC";
+	/** Reverse - Accrual = RA */
+	public static final String DOCACTION_Reverse_Accrual = "RA";
+	/** Invalidate = IN */
+	public static final String DOCACTION_Invalidate = "IN";
+	/** Re-activate = RE */
+	public static final String DOCACTION_Re_Activate = "RE";
+	/** <None> = -- */
+	public static final String DOCACTION_None = "--";
+	/** Prepare = PR */
+	public static final String DOCACTION_Prepare = "PR";
+	/** Unlock = XL */
+	public static final String DOCACTION_Unlock = "XL";
+	/** Wait Complete = WC */
+	public static final String DOCACTION_WaitComplete = "WC";
+	/** Set Document Action.
+		@param DocAction 
+		The targeted status of the document
+	  */
+	public void setDocAction (String DocAction)
+	{
+
+		set_Value (COLUMNNAME_DocAction, DocAction);
+	}
+
+	/** Get Document Action.
+		@return The targeted status of the document
+	  */
+	public String getDocAction () 
+	{
+		return (String)get_Value(COLUMNNAME_DocAction);
+	}
+
+	/** DocStatus AD_Reference_ID=131 */
+	public static final int DOCSTATUS_AD_Reference_ID=131;
+	/** Drafted = DR */
+	public static final String DOCSTATUS_Drafted = "DR";
+	/** Completed = CO */
+	public static final String DOCSTATUS_Completed = "CO";
+	/** Approved = AP */
+	public static final String DOCSTATUS_Approved = "AP";
+	/** Not Approved = NA */
+	public static final String DOCSTATUS_NotApproved = "NA";
+	/** Voided = VO */
+	public static final String DOCSTATUS_Voided = "VO";
+	/** Invalid = IN */
+	public static final String DOCSTATUS_Invalid = "IN";
+	/** Reversed = RE */
+	public static final String DOCSTATUS_Reversed = "RE";
+	/** Closed = CL */
+	public static final String DOCSTATUS_Closed = "CL";
+	/** Unknown = ?? */
+	public static final String DOCSTATUS_Unknown = "??";
+	/** In Progress = IP */
+	public static final String DOCSTATUS_InProgress = "IP";
+	/** Waiting Payment = WP */
+	public static final String DOCSTATUS_WaitingPayment = "WP";
+	/** Waiting Confirmation = WC */
+	public static final String DOCSTATUS_WaitingConfirmation = "WC";
+	/** Set Document Status.
+		@param DocStatus 
+		The current status of the document
+	  */
+	public void setDocStatus (String DocStatus)
+	{
+
+		set_Value (COLUMNNAME_DocStatus, DocStatus);
+	}
+
+	/** Get Document Status.
+		@return The current status of the document
+	  */
+	public String getDocStatus () 
+	{
+		return (String)get_Value(COLUMNNAME_DocStatus);
 	}
 
 	/** Set Document No.
@@ -929,176 +997,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		return (String)get_Value(COLUMNNAME_lbr_BPIE);
 	}
 
-	/** Set BP Invoice Address 1.
-		@param lbr_BPInvoiceAddress1 
-		BP Invoice Address 1 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress1 (String lbr_BPInvoiceAddress1)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceAddress1, lbr_BPInvoiceAddress1);
-	}
-
-	/** Get BP Invoice Address 1.
-		@return BP Invoice Address 1 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress1 () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceAddress1);
-	}
-
-	/** Set BP Invoice Address 2.
-		@param lbr_BPInvoiceAddress2 
-		BP Invoice Address 2 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress2 (String lbr_BPInvoiceAddress2)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceAddress2, lbr_BPInvoiceAddress2);
-	}
-
-	/** Get BP Invoice Address 2.
-		@return BP Invoice Address 2 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress2 () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceAddress2);
-	}
-
-	/** Set BP Invoice Address 3.
-		@param lbr_BPInvoiceAddress3 
-		BP Invoice Address 3 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress3 (String lbr_BPInvoiceAddress3)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceAddress3, lbr_BPInvoiceAddress3);
-	}
-
-	/** Get BP Invoice Address 3.
-		@return BP Invoice Address 3 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress3 () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceAddress3);
-	}
-
-	/** Set BP Invoice Address 4.
-		@param lbr_BPInvoiceAddress4 
-		BP Invoice Address 4 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress4 (String lbr_BPInvoiceAddress4)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceAddress4, lbr_BPInvoiceAddress4);
-	}
-
-	/** Get BP Invoice Address 4.
-		@return BP Invoice Address 4 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress4 () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceAddress4);
-	}
-
-	/** Set BP Invoice City.
-		@param lbr_BPInvoiceCity 
-		BP Invoice City - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceCity (String lbr_BPInvoiceCity)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceCity, lbr_BPInvoiceCity);
-	}
-
-	/** Get BP Invoice City.
-		@return BP Invoice City - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceCity () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceCity);
-	}
-
-	/** Set BP Invoice CNPJ.
-		@param lbr_BPInvoiceCNPJ 
-		BP Invoice CNPJ - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceCNPJ (String lbr_BPInvoiceCNPJ)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceCNPJ, lbr_BPInvoiceCNPJ);
-	}
-
-	/** Get BP Invoice CNPJ.
-		@return BP Invoice CNPJ - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceCNPJ () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceCNPJ);
-	}
-
-	/** Set BP Invoice Country.
-		@param lbr_BPInvoiceCountry 
-		BP Invoice Country - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceCountry (String lbr_BPInvoiceCountry)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceCountry, lbr_BPInvoiceCountry);
-	}
-
-	/** Get BP Invoice Country.
-		@return BP Invoice Country - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceCountry () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceCountry);
-	}
-
-	/** Set BP Invoice IE.
-		@param lbr_BPInvoiceIE 
-		BP Invoice IE - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceIE (String lbr_BPInvoiceIE)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceIE, lbr_BPInvoiceIE);
-	}
-
-	/** Get BP Invoice IE.
-		@return BP Invoice IE - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceIE () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceIE);
-	}
-
-	/** Set BP Invoice Postal.
-		@param lbr_BPInvoicePostal 
-		BP Invoice Postal - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoicePostal (String lbr_BPInvoicePostal)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoicePostal, lbr_BPInvoicePostal);
-	}
-
-	/** Get BP Invoice Postal.
-		@return BP Invoice Postal - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoicePostal () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoicePostal);
-	}
-
-	/** Set BP InvoiceRegion.
-		@param lbr_BPInvoiceRegion 
-		BP InvoiceRegion - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceRegion (String lbr_BPInvoiceRegion)
-	{
-		set_Value (COLUMNNAME_lbr_BPInvoiceRegion, lbr_BPInvoiceRegion);
-	}
-
-	/** Get BP InvoiceRegion.
-		@return BP InvoiceRegion - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceRegion () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_BPInvoiceRegion);
-	}
-
 	/** Set BP Phone.
 		@param lbr_BPPhone 
 		BP Phone - Copied from the BP Location into Brazilan Legal and Tax Books
@@ -1563,20 +1461,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		return (String)get_Value(COLUMNNAME_lbr_FiscalOBS);
 	}
 
-	/** Set Generate NFe XML.
-		@param lbr_GenerateNFeXML Generate NFe XML	  */
-	public void setlbr_GenerateNFeXML (String lbr_GenerateNFeXML)
-	{
-		set_Value (COLUMNNAME_lbr_GenerateNFeXML, lbr_GenerateNFeXML);
-	}
-
-	/** Get Generate NFe XML.
-		@return Generate NFe XML	  */
-	public String getlbr_GenerateNFeXML () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_GenerateNFeXML);
-	}
-
 	/** Set Gross Weight.
 		@param lbr_GrossWeight 
 		Defines the Gross Weight
@@ -1689,23 +1573,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		return (String)get_Value(COLUMNNAME_lbr_MotivoScan);
 	}
 
-	/** Set NCM Reference.
-		@param lbr_NCMReference 
-		Defines the NCM Reference
-	  */
-	public void setlbr_NCMReference (String lbr_NCMReference)
-	{
-		set_Value (COLUMNNAME_lbr_NCMReference, lbr_NCMReference);
-	}
-
-	/** Get NCM Reference.
-		@return Defines the NCM Reference
-	  */
-	public String getlbr_NCMReference () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_NCMReference);
-	}
-
 	/** Set Net Weight.
 		@param lbr_NetWeight 
 		Defines the Net Weight
@@ -1783,20 +1650,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
-	}
-
-	/** Set NFe No.
-		@param lbr_NFENo NFe No	  */
-	public void setlbr_NFENo (String lbr_NFENo)
-	{
-		set_Value (COLUMNNAME_lbr_NFENo, lbr_NFENo);
-	}
-
-	/** Get NFe No.
-		@return NFe No	  */
-	public String getlbr_NFENo () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_NFENo);
 	}
 
 	/** Set NFe Protocol.
@@ -2801,23 +2654,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		return (String)get_Value(COLUMNNAME_lbr_PackingType);
 	}
 
-	/** Set Process Cancel Nota Fiscal.
-		@param lbr_ProcCancelNF 
-		Process to Cancel Nota Fiscal
-	  */
-	public void setlbr_ProcCancelNF (String lbr_ProcCancelNF)
-	{
-		set_Value (COLUMNNAME_lbr_ProcCancelNF, lbr_ProcCancelNF);
-	}
-
-	/** Get Process Cancel Nota Fiscal.
-		@return Process to Cancel Nota Fiscal
-	  */
-	public String getlbr_ProcCancelNF () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_ProcCancelNF);
-	}
-
 	public org.adempierelbr.model.I_LBR_NotaFiscal getLBR_RefNotaFiscal() throws RuntimeException
     {
 		return (org.adempierelbr.model.I_LBR_NotaFiscal)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_NotaFiscal.Table_Name)
@@ -3118,58 +2954,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 			return "Y".equals(oo);
 		}
 		return false;
-	}
-
-	/** Set Process Now.
-		@param Processing Process Now	  */
-	public void setProcessing (boolean Processing)
-	{
-		set_Value (COLUMNNAME_Processing, Boolean.valueOf(Processing));
-	}
-
-	/** Get Process Now.
-		@return Process Now	  */
-	public boolean isProcessing () 
-	{
-		Object oo = get_Value(COLUMNNAME_Processing);
-		if (oo != null) 
-		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
-			return "Y".equals(oo);
-		}
-		return false;
-	}
-
-	/** Set Process Now.
-		@param Processing2 Process Now	  */
-	public void setProcessing2 (String Processing2)
-	{
-		set_Value (COLUMNNAME_Processing2, Processing2);
-	}
-
-	/** Get Process Now.
-		@return Process Now	  */
-	public String getProcessing2 () 
-	{
-		return (String)get_Value(COLUMNNAME_Processing2);
-	}
-
-	/** Set Reactivate Nota Fiscal.
-		@param ProcReactivateNF 
-		This Process Reactivates the Nota Fiscal Document
-	  */
-	public void setProcReactivateNF (String ProcReactivateNF)
-	{
-		set_Value (COLUMNNAME_ProcReactivateNF, ProcReactivateNF);
-	}
-
-	/** Get Reactivate Nota Fiscal.
-		@return This Process Reactivates the Nota Fiscal Document
-	  */
-	public String getProcReactivateNF () 
-	{
-		return (String)get_Value(COLUMNNAME_ProcReactivateNF);
 	}
 
 	/** Set Total Lines.

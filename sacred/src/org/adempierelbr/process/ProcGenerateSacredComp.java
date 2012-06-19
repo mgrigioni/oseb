@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -146,7 +147,7 @@ public class ProcGenerateSacredComp extends SvrProcess
 			if (r0150 != null)
 				result.append(r0150);
 			
-			MLBRNotaFiscalLine[] lines = nf.getLines("Line");
+			List<MLBRNotaFiscalLine> lines = nf.getLines();
 			for (MLBRNotaFiscalLine line : lines){
 				B0R0200 r0200 = SacredCompUtil.createR0200(line);
 				if (r0200 != null)

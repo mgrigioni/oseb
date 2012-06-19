@@ -118,28 +118,6 @@ public interface I_LBR_CFOP
 	  */
 	public int getLBR_CFOP_ID();
 
-    /** Column name lbr_IsRevenue */
-    public static final String COLUMNNAME_lbr_IsRevenue = "lbr_IsRevenue";
-
-	/** Set Is Revenue	  */
-	public void setlbr_IsRevenue (boolean lbr_IsRevenue);
-
-	/** Get Is Revenue	  */
-	public boolean islbr_IsRevenue();
-
-    /** Column name lbr_IsService */
-    public static final String COLUMNNAME_lbr_IsService = "lbr_IsService";
-
-	/** Set Is Service.
-	  * Defines if the lines is a Service
-	  */
-	public void setlbr_IsService (boolean lbr_IsService);
-
-	/** Get Is Service.
-	  * Defines if the lines is a Service
-	  */
-	public boolean islbr_IsService();
-
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 

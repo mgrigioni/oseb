@@ -20,10 +20,12 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.model.MLBRCFOP;
 import org.adempierelbr.model.MLBRNCMIVA;
 import org.adempierelbr.model.MLBRNotaFiscal;
@@ -136,7 +138,7 @@ public class NFeXMLGenerator
 	 * @param trxName Transação
 	 * @return
 	 */
-	public static String geraCorpoNFe (int LBR_NotaFiscal_ID, String trxName) throws Exception {
+	public static String geraCorpoNFe (int LBR_NotaFiscal_ID, String trxName) throws AdempiereException {
 		
 		log.fine("Gerando corpo NF-e");
 		
@@ -187,7 +189,7 @@ public class NFeXMLGenerator
 			return "Nota fiscal inexistente";
 
 		X_LBR_NFTax[] nfTaxes = nf.getTaxes();
-		MLBRNotaFiscalLine[] nfLines = nf.getLines(null);
+		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 
 		// DADOS DA ORG DE VENDA/COMPRA
 		MOrg org = new MOrg(ctx, nf.getAD_Org_ID(), trxName);

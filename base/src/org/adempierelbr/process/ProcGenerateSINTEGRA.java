@@ -293,7 +293,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 						linha.append(
 								registro70(nf.getlbr_BPCNPJ(),nf.getlbr_BPIE(),
 			    				data, nf.getlbr_BPRegion(), "08", nf.getSerieNo(), "",
-			    				nf.getDocNo(), CFOP,
+			    				nf.getDocumentNo(true), CFOP,
 			    				rs.getBigDecimal("valorContabil"),
 			    				rs.getBigDecimal("baseICMS"),
 			    				rs.getBigDecimal("valorICMS"),
@@ -321,7 +321,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 						linha.append(
 								registro50(nf.getlbr_BPCNPJ(), nf.getlbr_BPIE(),
 			    				data, nf.getlbr_BPRegion(), modeloNF,
-			    				nf.getSerieNo(), nf.getDocNo(),
+			    				nf.getSerieNo(), nf.getDocumentNo(true),
 			    				CFOP, emitente ? "Y" : "N",
 			    				rs.getBigDecimal("valorContabil"),
 			    				rs.getBigDecimal("baseICMS"),
@@ -365,7 +365,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 	        				data,
 	        				nf.getlbr_BPRegion(),
 	        				nf.getSerieNo(),
-	        				nf.getDocNo(),
+	        				nf.getDocumentNo(true),
 	        				CFOP,
 	        				rs.getBigDecimal("valorTotal"),
 	        				rs.getBigDecimal("valorIPI"),
@@ -402,7 +402,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 							registro53(nf.getlbr_BPCNPJ(), nf.getlbr_BPIE(),
 									data, nf.getlbr_BPRegion(),
 									modeloNF, nf.getSerieNo(),
-			        				nf.getDocNo(), rs.getString("cfop"),
+			        				nf.getDocumentNo(true), rs.getString("cfop"),
 			        				nf.islbr_IsOwnDocument(),
 			        				rs.getBigDecimal("baseICMS"),
 			        				rs.getBigDecimal("valorICMS"),
@@ -418,7 +418,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 					continue;
 				
 				// Registro tipo 54 e 75
-				MLBRNotaFiscalLine[] nfLines = getLines(nf);
+				List<MLBRNotaFiscalLine> nfLines = getLines(nf);
 				String CFOP = "";
 				int line = 0;
 				for (MLBRNotaFiscalLine nfLine : nfLines) {
@@ -432,7 +432,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 					count54++;
 					registro54.append(
 							registro54(nf.getlbr_BPCNPJ(), nf.getlbr_BPRegion(),
-							modeloNF,nf.getSerieNo(),nf.getDocNo(),
+							modeloNF,nf.getSerieNo(),nf.getDocumentNo(true),
 							nfLine.getlbr_CFOPName(),
 							nfLine.getlbr_TaxStatus(),"" + line,
 							nfLine.getProductValue(),
@@ -482,7 +482,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 					registro54.append(registro54(
 							nf.getlbr_BPCNPJ(), nf.getlbr_BPRegion(), modeloNF,
 							nf.getSerieNo(),
-							nf.getDocNo(),
+							nf.getDocumentNo(true),
 							CFOP, "   ", "991", "  ", //FRETE
 							Env.ONE, Env.ZERO,
 							nf.getFreightAmt(), Env.ZERO,
@@ -496,7 +496,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 					registro54.append(registro54(
 							nf.getlbr_BPCNPJ(), nf.getlbr_BPRegion(), modeloNF,
 							nf.getSerieNo(),
-							nf.getDocNo(),
+							nf.getDocumentNo(true),
 							CFOP, "   ", "992", "  ", //SEGURO
 							Env.ONE, Env.ZERO,
 							nf.getlbr_InsuranceAmt(), Env.ZERO,
@@ -1380,7 +1380,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 	 *  @param String MNotaFiscal
 	 *  @return MNotaFiscalLine[] lines
 	 */
-	private MLBRNotaFiscalLine[] getLines(MLBRNotaFiscal nf)
+	private List<MLBRNotaFiscalLine> getLines(MLBRNotaFiscal nf)
 	{
 
 		String whereClause = "LBR_NotaFiscal_ID = ? "
@@ -1392,7 +1392,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 		String orderBy = "Line";
 		Object[] parameters = new Object[]{nf.getLBR_NotaFiscal_ID()};
 
-		return nf.getLines(parameters, whereClause, orderBy);
+		return nf.getLines(parameters, whereClause, orderBy, true);
 	}//	getLines
 
 }	//	ProcGenerateSINTEGRA

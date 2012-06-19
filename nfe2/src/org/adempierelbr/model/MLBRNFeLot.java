@@ -255,7 +255,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 
 			    for (int i=0; i< infProt.getLength(); i++) {
 		        	Node node = infProt.item(i);
-		        	String error = MLBRNotaFiscal.authorizeNFe(node,get_TrxName());
+		        	String error = NFeUtil.authorizeNFe(node,get_TrxName());
 		        	if (error != null){
 		        		m_processMsg = error;
 		        		throw new Exception(error);

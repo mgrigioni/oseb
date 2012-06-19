@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -15,6 +16,7 @@ package org.adempierelbr.model;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
 import org.adempierelbr.wrapper.I_W_C_OrderLine;
@@ -30,22 +32,19 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 /**
- *	MCFOP
+ *	MLBRCFOP
  *
  *	Model for X_LBR_CFOP
  *
  *	@author Mario Grigioni
- *	@version $Id: MCFOP.java, 10/11/2009 12:29:00 mgrigioni
+ *	@version $Id: MLBRCFOP.java, v2.0 18/06/2012 09:55:00 mgrigioni
  */
 public class MLBRCFOP extends X_LBR_CFOP {
 
 	/**
-	 *
+	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-
-	/**	Logger			*/
-	//private static CLogger log = CLogger.getCLogger(MCFOP.class);
+	private static final long serialVersionUID = -8075892015699275974L;
 
 	/**************************************************************************
 	 *  Default Constructor
@@ -57,18 +56,65 @@ public class MLBRCFOP extends X_LBR_CFOP {
 		super(ctx,ID,trx);
 	}
 	
-	/*
-	 * Devolução
+	/**
+	 * @return true se for uma operação de devolução
 	 */
-	public boolean isDevol(){
+	public boolean isDevolution(){
 		
 		if (getDescription() != null && 
 		   (getDescription().toUpperCase()).indexOf("DEVOL") != -1)
 				return true;	
 		
 		return false;
-	} //isDevol
+	} //isDevolution
+	
+	/**
+	 * @return true se for uma prestação de serviço
+	 */
+	public boolean isService(){
+		
+		if (getDescription() != null){
+			if((getDescription().toUpperCase()).indexOf("SERVI") != -1){
+				if ((getDescription().toUpperCase()).indexOf("UTILIZA") != -1)
+					return false;
+				return true;
+			}
+		}
+		
+		return false;
+	} //isService
 
+	/**
+	 * @return true se for uma operação que possui receita
+	 */
+	public boolean isRevenue(){
+		
+		String value = TextUtil.lPad(TextUtil.toNumeric(getValue()),4);
+		if (Integer.valueOf(value.substring(0, 1)).intValue() < 5){ //Entrada = FALSE
+			return false;
+		}
+		
+		if (getDescription() != null){
+			if((getDescription().toUpperCase()).indexOf("REMESSA") != -1) //SIMPLES REMESSA = FALSE
+				return false;
+			
+			if((getDescription().toUpperCase()).indexOf("OUTRA SA") != -1) //OUTRAS SAIDAS = FALSE
+				return false;
+			
+			if((getDescription().toUpperCase()).indexOf("VENDA") != -1) //VENDA = TRUE
+				return true;
+			
+			if ((getDescription().toUpperCase()).indexOf("PRESTA") != -1) //PRESTACAO DE SERVICO = TRUE
+				return true;
+			
+			if ((getDescription().toUpperCase()).indexOf("FATURAMENTO") != -1) //FATURAMENTO = TRUE
+				return true;
+		}
+		
+		return false;
+	} //isRevenue
+	
+	
 	/**
 	 *  Load Constructor
 	 *  @param ctx context
@@ -106,19 +152,9 @@ public class MLBRCFOP extends X_LBR_CFOP {
 		MBPartnerLocation bpLocation = new MBPartnerLocation(ctx,invoice.getC_BPartner_Location_ID(),trx);
 		MLocation         location   = bpLocation.getLocation(false);
 
-		boolean isSOTrx = true;
+		boolean isSOTrx = invoice.isCreditMemo() ? !invoice.isSOTrx() : invoice.isSOTrx();
 		MDocType dt = new MDocType(ctx,invoice.getC_DocTypeTarget_ID(),trx);
-		if (dt.getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo) ||
-			dt.getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice)){
 
-			isSOTrx = true;
-		}
-		else if (dt.getDocBaseType().equals(MDocType.DOCBASETYPE_APInvoice) ||
-				 dt.getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)){
-
-			isSOTrx = false;
-		}
-		
 		if (!dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasFiscalDocument)) //SEM NF NÃO VERIFICA CFOP
 			return null;
 

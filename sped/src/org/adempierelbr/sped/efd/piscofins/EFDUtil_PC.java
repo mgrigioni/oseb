@@ -375,7 +375,7 @@ public class EFDUtil_PC
 		String COD_SIT    = nf.isCancelled() ? "02" : "00";
 		String SER        = nf.getSerieNo();
 		String SUB        = ""; //TODO
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		String CHV_NFSE   = nf.getlbr_NFeID();
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_EXE_SERV = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
@@ -385,10 +385,10 @@ public class EFDUtil_PC
 			IND_PAG = "1";
 		
 		BigDecimal VL_DESC = nf.getDiscountAmt(nf.getlbr_ServiceTotalAmt());
-		BigDecimal VL_BC_PIS = nf.getTaxBaseAmtService("PIS", true);
-		BigDecimal VL_PIS = nf.getTaxAmtService("PIS", true);
-		BigDecimal VL_BC_COFINS = nf.getTaxBaseAmtService("COFINS", true);
-		BigDecimal VL_COFINS = nf.getTaxAmtService("COFINS", true);
+		BigDecimal VL_BC_PIS = nf.getTaxBaseAmt("PIS", true);
+		BigDecimal VL_PIS = nf.getTaxAmt("PIS", true);
+		BigDecimal VL_BC_COFINS = nf.getTaxBaseAmt("COFINS", true);
+		BigDecimal VL_COFINS = nf.getTaxAmt("COFINS", true);
 		BigDecimal VL_PIS_RET = nf.getTaxAmt("PISRT").abs();
 		BigDecimal VL_COFINS_RET = nf.getTaxAmt("COFINSRT").abs();
 		BigDecimal VL_ISS = nf.getTaxAmt("ISS").abs();
@@ -439,7 +439,7 @@ public class EFDUtil_PC
 		String IND_OPER   = nf.isSOTrx() ? "1" : "0"; //0 = Entrada, 1 = Saída
 		String COD_SIT    = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER        = nf.getSerieNo();
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		String CHV_NFE    = nf.getlbr_NFeID();
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_E_S  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
@@ -463,8 +463,8 @@ public class EFDUtil_PC
 		BigDecimal VL_BC_ICMS_ST = nf.getTaxBaseAmt("ICMSST");
 		BigDecimal VL_ICMS_ST = nf.getTaxAmt("ICMSST");
 		BigDecimal VL_IPI = nf.getIPIAmt();
-		BigDecimal VL_PIS = nf.getTaxAmtService("PIS", false);
-		BigDecimal VL_COFINS = nf.getTaxAmtService("COFINS", false);
+		BigDecimal VL_PIS = nf.getTaxAmt("PIS", false);
+		BigDecimal VL_COFINS = nf.getTaxAmt("COFINS", false);
 		BigDecimal VL_PIS_ST = Env.ZERO; //TODO ???
 		BigDecimal VL_COFINS_ST = Env.ZERO; //TODO ???
 	
@@ -547,7 +547,7 @@ public class EFDUtil_PC
 		String COD_SIT    = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER        = nf.getSerieNo();
 		String SUB        = ""; //TODO
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_ENT  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal();
@@ -611,7 +611,7 @@ public class EFDUtil_PC
 		String COD_SIT     = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER         = nf.getSerieNo();
 		String SUB         = ""; //TODO ???
-		String NUM_DOC     = nf.getDocNo();
+		String NUM_DOC     = nf.getDocumentNo(true);
 		String CHV_CTE     = (IND_EMIT.equals("0")) ? nf.getlbr_NFeID() : "";
 		Timestamp DT_DOC   = nf.getDateDoc();
 		Timestamp DT_A_P   = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
@@ -696,7 +696,7 @@ public class EFDUtil_PC
 		String COD_SIT    = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER        = nf.getSerieNo();
 		String SUB        = ""; //TODO ???
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_A_P  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal();	

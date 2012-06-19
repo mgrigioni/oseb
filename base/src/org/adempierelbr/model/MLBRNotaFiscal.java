@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,106 +13,111 @@
  *****************************************************************************/
 package org.adempierelbr.model;
 
+import java.io.File;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
+import java.util.Set;
 
-import org.adempierelbr.nfe.beans.ChaveNFE;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
+import org.adempiere.exceptions.AdempiereException;
+import org.adempiere.model.POWrapper;
+import org.adempierelbr.nfe.NFeXMLGenerator;
+import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeEmail;
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_Invoice;
+import org.compiere.model.I_C_Country;
 import org.compiere.model.MAcctSchema;
+import org.compiere.model.MAttachment;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
-import org.compiere.model.MConversionRate;
 import org.compiere.model.MCost;
 import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPaymentTerm;
+import org.compiere.model.MPeriod;
 import org.compiere.model.MProduct;
-import org.compiere.model.MRegion;
-import org.compiere.model.MSequence;
 import org.compiere.model.MShipper;
-import org.compiere.model.MSysConfig;
 import org.compiere.model.MTable;
-import org.compiere.model.MUser;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.Query;
+import org.compiere.model.X_M_InOut;
+import org.compiere.process.DocAction;
+import org.compiere.process.DocOptions;
+import org.compiere.process.DocumentEngine;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.w3c.dom.Node;
+import org.compiere.util.Msg;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
 
 /**
- *	MNotaFiscal
+ *  LBR_NotaFiscal Model
+ *  
+ *  Class that process brazilian fiscal documents (a.k.a Nota Fiscal)
  *
- *	Model for X_LBR_NotaFiscal
- *
- *	@author Mario Grigioni (Kenos, www.kenos.com.br)
- *	@version $Id: MNotaFiscal.java, 08/01/2008 10:56:00 mgrigioni
+ *	@author Mario Grigioni
+ *	@version $Id: MLBRNotaFiscal.java, v2.0 11/06/2012 14:53:00 mgrigioni
  */
-public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
+public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOptions{
 
 	/**
-	 *
+	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8230577201526704731L;
 
-	/**	Logger			*/
+	/**	Logger				*/
 	private static CLogger log = CLogger.getCLogger(MLBRNotaFiscal.class);
-
-	/**	Process Message */
-	private String		m_processMsg = null;
-
-	/** REFERENCE */
-	public Map<String,String> m_refNCM  = new HashMap<String, String>(); //Referência NCM
-	public Map<String,String> m_refCFOP = new HashMap<String, String>(); //Referência CFOP
-	public ArrayList<Integer> m_refLegalMessage = new ArrayList<Integer>(); //Referência Mensagem Legal
-
-	/** STRING */
-	String m_NCMReference  = "";
-	String m_CFOPNote      = "";
-	String m_CFOPReference = "";
-	String m_LegalMessage  = "";
-
-	/** CONSTANT */
-	public final static int BRAZIL = 139;
 	
-	/**	RPS sem número do documento	*/
-	public static final String RPS_TEMP = "RPS-TEMP";
-
-	public String getProcessMsg() {
-
-		if (m_processMsg == null)
-			m_processMsg = "";
-
-		return m_processMsg;
-	}
-
+	//Referência CFOP
+	public Set<String> m_refCFOP  = new LinkedHashSet<String>(); 
+	public String m_CFOPNote      = "";
+	public String m_CFOPReference = "";
+	
+	private List<MLBRNotaFiscalLine> m_lines = new ArrayList<MLBRNotaFiscalLine>();
+	
+	/**	Process Message 			*/
+	private String		m_processMsg = null;
+	/**	Just Prepared Flag			*/
+	private boolean		m_justPrepared = false;
+	
 	/**************************************************************************
 	 *  Default Constructor
 	 *  @param Properties ctx
 	 *  @param int ID (0 create new)
 	 *  @param String trx
 	 */
-	public MLBRNotaFiscal(Properties ctx, int ID, String trx){
+	public MLBRNotaFiscal (Properties ctx, int ID, String trx) {
 		super(ctx,ID,trx);
 	}
 
@@ -121,45 +127,36 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 	 *  @param rs result set record
 	 *  @param trxName transaction
 	 */
-	public MLBRNotaFiscal (Properties ctx, ResultSet rs, String trxName)
-	{
+	public MLBRNotaFiscal (Properties ctx, ResultSet rs, String trxName) {
 		super(ctx, rs, trxName);
 	}
-
+	
 	/**
-	 * Retorna as Notas Fiscais por período (compra e venda)
-	 * @param dateFrom
-	 * @param dateTo
-	 * @return MNotaFiscal[]
+	 * Create a new MLBRNotaFiscal object based on MInvoice
+	 * @param ctx
+	 * @param invoice
+	 * @param trx
 	 */
-	public static MLBRNotaFiscal[] get(Timestamp dateFrom, Timestamp dateTo,String trxName){
-		return get(dateFrom,dateTo,0,null,trxName);
+	public MLBRNotaFiscal(Properties ctx, MInvoice invoice, String trx){
+		this(ctx,0,trx);
+		setInvoice(invoice);
 	}
 	
-	public static MLBRNotaFiscal[] get(Timestamp dateFrom, Timestamp dateTo, int AD_Org_ID, String trxName){
-		return get(dateFrom,dateTo,AD_Org_ID,null,trxName);
-	}
-	
-	public static MLBRNotaFiscal[] get(Timestamp dateFrom, Timestamp dateTo, Boolean isSOTrx, String trxName){
-		return get(dateFrom,dateTo,0,isSOTrx,trxName);
-	}
-
-	/**
+	/**************************************************************************
 	 * Retorna as Notas Fiscais por período (compra, venda ou ambos)
 	 * @param dateFrom
 	 * @param dateTo
 	 * @param isSOTrx: true = venda, false = compra, null = ambos
-	 * @return MNotaFiscal[]
+	 * @return List<MLBRNotaFiscal> nf
 	 */
-	public static MLBRNotaFiscal[] get(Timestamp dateFrom, Timestamp dateTo, int AD_Org_ID, Boolean isSOTrx, String trxName){
+	private static List<MLBRNotaFiscal> get(Timestamp dateFrom, Timestamp dateTo, int AD_Org_ID, Boolean isSOTrx, String trxName){
 
 		String whereClause = "AD_Client_ID=? AND " +
 				             "AD_Org_ID IN (0,?) AND " +
 							 "(CASE WHEN IsSOTrx='Y' THEN TRUNC(DateDoc) " +
-							 "ELSE TRUNC(NVL(lbr_DateInOut, DateDoc)) END) BETWEEN ? AND ?";
+							 "ELSE TRUNC(COALESCE(lbr_DateInOut, DateDoc)) END) BETWEEN ? AND ?";
 
-		String orderBy = "(CASE WHEN IsSOTrx='Y' THEN TRUNC(DateDoc) ELSE TRUNC(NVL(lbr_DateInOut, DateDoc)) END)";
-
+		String orderBy = "(CASE WHEN IsSOTrx='Y' THEN TRUNC(DateDoc) ELSE TRUNC(COALESCE(lbr_DateInOut, DateDoc)) END)";
 		//
 		if (isSOTrx != null)
 			whereClause += " AND IsSOTrx='" + (isSOTrx ? "Y" : "N") + "'";
@@ -169,39 +166,418 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 	          q.setOrderBy(orderBy);
 		      q.setParameters(new Object[]{Env.getAD_Client_ID(Env.getCtx()),AD_Org_ID > 0 ? AD_Org_ID : Env.getAD_Org_ID(Env.getCtx()),dateFrom,dateTo});
 
-	    List<MLBRNotaFiscal> list = q.list();
-	    MLBRNotaFiscal[] nfs = new MLBRNotaFiscal[list.size()];
-	    return list.toArray(nfs);
+		return q.list();
+	}
+	
+	public static List<MLBRNotaFiscal> get(Timestamp dateFrom, Timestamp dateTo,String trxName){
+		return get(dateFrom,dateTo,0,null,trxName);
+	}
+	
+	public static List<MLBRNotaFiscal> get(Timestamp dateFrom, Timestamp dateTo, int AD_Org_ID, String trxName){
+		return get(dateFrom,dateTo,AD_Org_ID,null,trxName);
+	}
+	
+	public static List<MLBRNotaFiscal> get(Timestamp dateFrom, Timestamp dateTo, Boolean isSOTrx, String trxName){
+		return get(dateFrom,dateTo,0,isSOTrx,trxName);
+	}
+	
+	/**
+	 * Retorna o MLBRNotaFiscal para um determinado NFeID (Número NFe)
+	 * @param nfeID
+	 * @return MLBRNotaFiscal
+	 */
+	public static MLBRNotaFiscal get(String nfeID, String trxName){
+		return get("lbr_NFeID = ?",new Object[]{nfeID},trxName);
+	}
+	
+	/**
+	 * Retorna o MLBRNotaFiscal conforme parâmetros abaixo
+	 * @param DocumentNo
+	 * @param C_BPartner_ID
+	 * @param isSOTrx
+	 * @return MLBRNotaFiscal
+	 */
+	public static MLBRNotaFiscal get(String DocumentNo, int C_BPartner_ID, boolean isSOTrx, String trxName){
+		return get("DocumentNo = ? AND C_BPartner_ID=? AND IsSOtrx=?",
+				new Object[]{DocumentNo,C_BPartner_ID,isSOTrx},trxName);
+	}
+	
+	private static MLBRNotaFiscal get(String whereClause, Object[] parameters, String trxName){
+		MTable table = MTable.get(Env.getCtx(), MLBRNotaFiscal.Table_Name);
+		Query q =  new Query(Env.getCtx(), table, whereClause.toString(), trxName);
+			  q.setClient_ID();
+		      q.setParameters(parameters);
+		return q.first();
 	}
 
+	/**************************************************************************
+	 * get Nota Fiscal lines
+	 * @param Object[] parameters
+	 * @param String whereClause
+	 * @param String orderBy
+	 * @param boolean reQuery
+	 * @return List<MLBRNotaFiscalLine> lines
+	 */
+	public List<MLBRNotaFiscalLine> getLines(Object[] parameters, String whereClause, String orderBy, boolean reQuery){
+
+		if (!reQuery && m_lines.size() > 0)
+			return m_lines;
+		
+		MTable table = MTable.get(getCtx(), MLBRNotaFiscalLine.Table_Name);
+		Query query =  new Query(getCtx(), table, whereClause, get_TrxName());
+	 		  query.setParameters(parameters);
+
+	 	orderBy = TextUtil.checkOrderBy(orderBy);
+	 	if (orderBy != null)
+	 		  query.setOrderBy(orderBy);
+
+	 	m_lines = query.list();
+	 	return m_lines;
+	} //getLines
+	
+	/**
+	 *  get Nota Fiscal lines orderdBy LineNo
+	 *  @param reQuery = false, return from cache
+	 *  @return List<MLBRNotaFiscalLine> lines
+	 */
+	public List<MLBRNotaFiscalLine> getLines(boolean reQuery){
+		return getLines("Line",reQuery);
+	}
+	
+	/**
+	 *  get Nota Fiscal lines orderdBy LineNo
+	 *  @return List<MLBRNotaFiscalLine> lines
+	 */
+	public List<MLBRNotaFiscalLine> getLines(){
+		return getLines(true);
+	}
+	
+	/**
+	 *  get Nota Fiscal lines
+	 *  @param String orderBy or null
+	 *  @return List<MLBRNotaFiscalLine> lines
+	 */
+	public List<MLBRNotaFiscalLine> getLines(String orderBy,boolean reQuery){
+
+		String   whereClause = "LBR_NotaFiscal_ID = ?";
+		Object[] parameters  = new Object[]{getLBR_NotaFiscal_ID()};
+
+		return getLines(parameters,whereClause,orderBy,reQuery);
+	} //getLines
+	
+	/**
+	 * 	Get Document Info
+	 *	@return document info (untranslated)
+	 */
+	public String getDocumentInfo() {
+		MDocType dt = MDocType.get(getCtx(), getC_DocType_ID());
+		return dt.getName() + " - " + getDocumentNo();
+	}	//	getDocumentInfo
+
+	/**
+	 * 	Create PDF
+	 *	@return File or null
+	 */
+	public File createPDF () {
+		try
+		{
+			File temp = File.createTempFile(get_TableName()+get_ID()+"_", ".pdf");
+			return createPDF (temp);
+		}
+		catch (Exception e)
+		{
+			log.severe("Could not create PDF - " + e.getMessage());
+		}
+		return null;
+	}	//	getPDF
+
+	/**
+	 * 	Create PDF file
+	 *	@param file output file
+	 *	@return file if success
+	 */
+	public File createPDF (File file) {
+		return null;
+	}	//	createPDF
+
+	/**************************************************************************
+	 * 	Process document
+	 *	@param processAction document action
+	 *	@return true if performed
+	 */
+	public boolean processIt (String processAction) {
+		m_processMsg = null;
+		DocumentEngine engine = new DocumentEngine (this, getDocStatus());
+		return engine.processIt (processAction, getDocAction());
+	}	//	processIt
+	
+	/**
+	 * 	Unlock Document.
+	 * 	@return true if success 
+	 */
+	public boolean unlockIt() {
+		log.info("unlockIt - " + toString());
+		return true;
+	}	//	unlockIt
+	
+	/**
+	 * 	Invalidate Document
+	 * 	@return true if success 
+	 */
+	public boolean invalidateIt() {
+		log.info("invalidateIt - " + toString());
+		return true;
+	}	//	invalidateIt
+	
+	/**
+	 *	Prepare Document
+	 * 	@return new status (In Progress or Invalid) 
+	 */
+	public String prepareIt() {
+		
+		log.info(toString());
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_PREPARE);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+		
+		//	Std Period open?
+		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
+		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
+			m_processMsg = "@PeriodClosed@";
+			return DocAction.STATUS_Invalid;
+		}
+
+		//RATEIO VALORES DE FRETE E SISCOMEX
+		if (!setFreightTax() || !setSiscomexTax())
+			return DocAction.STATUS_Invalid;
+	
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+		m_justPrepared = true;
+
+		return DocAction.STATUS_InProgress;
+	}	//	prepareIt
+	
+	/**
+	 * 	Approve Document
+	 * 	@return true if success 
+	 */
+	public boolean  approveIt() {
+		log.info("approveIt - " + toString());
+		return true;
+	}	//	approveIt
+	
+	/**
+	 * 	Reject Approval
+	 * 	@return true if success 
+	 */
+	public boolean rejectIt() {
+		log.info("rejectIt - " + toString());
+		return true;
+	}	//	rejectIt
+	
+	/**
+	 * 	Complete Document
+	 * 	@return new status (Complete, In Progress, Invalid, Waiting ..)
+	 */
+	public String completeIt() {
+				
+		//	Re-Check
+		if (!m_justPrepared) {
+			String status = prepareIt();
+			if (!DocAction.STATUS_InProgress.equals(status))
+				return status;
+		}
+
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_COMPLETE);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+		
+		//Processar NFe
+		m_processMsg = processNFe();
+		if (m_processMsg != null && !m_processMsg.isEmpty())
+			return DocAction.STATUS_Invalid;
+			
+		//	User Validation
+		String valid = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_COMPLETE);
+		if (valid != null) {
+			m_processMsg = valid;	
+			return DocAction.STATUS_Invalid;
+		}
+
+		setProcessed(true);
+		setDocAction(DOCACTION_Re_Activate);
+		return DocAction.STATUS_Completed;
+	}	//	completeIt
+
+	/**
+	 * 	Void Document.
+	 * 	@return true if success
+	 */
+	public boolean voidIt(){
+
+		log.info(toString());
+		
+		//	Std Period open?
+		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
+		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
+			m_processMsg = "@PeriodClosed@";
+		}
+		
+		// Before Void
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
+		if (m_processMsg != null)
+			return false;
+
+		if (!islbr_IsOwnDocument()){
+			m_processMsg = "Não é possível cancelar documento de terceiros. É necessário estonar a fatura associada";
+			return false;
+		}
+		
+		if (isNFe()){ //Executa processo para cancelar NFe junto ao Sefaz
+			try{
+				m_processMsg = voidNFe();
+			} catch (Exception e){
+				log.warning(e.getLocalizedMessage());
+			}
+			
+			if (m_processMsg != null && !m_processMsg.isEmpty())
+				return false;		
+		}
+
+		// After Void
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
+		if (m_processMsg != null)
+			return false;
+
+		setIsCancelled(true);
+		
+		return true;
+	}
+	
+	/**
+	 * 	Close Document.
+	 * 	Cancel not delivered Qunatities
+	 * 	@return true if success 
+	 */
+	public boolean closeIt() {
+		log.info("closeIt - " + toString());
+		m_processMsg = "Não é permitido fechar o documento.";
+		return false;
+	}	//	closeIt
+	
+	/**
+	 * 	Reverse Correction
+	 * 	@return true if success 
+	 */
+	public boolean reverseCorrectIt() {
+		log.info("reverseCorrectIt - " + toString());
+		return false;
+	}	//	reverseCorrectionIt
+	
+	/**
+	 * 	Reverse Accrual - none
+	 * 	@return true if success 
+	 */
+	public boolean reverseAccrualIt() {
+		log.info("reverseAccrualIt - " + toString());
+		return false;
+	}	//	reverseAccrualIt
+	
+	/**
+	 * 	Re-activate
+	 * 	@return false
+	 */
+	public boolean reActivateIt()
+	{
+		log.info("reActivateIt - " + toString());
+		
+		//	Std Period open?
+		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
+		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
+			m_processMsg = "@PeriodClosed@";
+		}
+		
+		// Before reActivate
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_REACTIVATE);
+		if (m_processMsg != null)
+			return false;
+
+		//NFe já processada, não deixa reativar
+		if (getlbr_NFeProt() == null || getlbr_NFeProt().isEmpty()){
+			m_processMsg = "Não é possível reativar uma NFe processada";
+			return false;
+		}
+		
+		// After reActivate
+		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_REACTIVATE);
+		if (m_processMsg != null)
+			return false;
+
+		setDocAction(DOCACTION_Complete);
+		setProcessed(false);
+		return true;
+	}	//	reActivateIt
+	
+	/*************************************************************************
+	 * 	Get Summary
+	 *	@return Summary of Document
+	 */
+	public String getSummary() {
+		StringBuilder sb = new StringBuilder(getDocumentNo());
+		sb.append(": ").append(Msg.translate(getCtx(), "GrandTotal")).append("=")
+		.append(getGrandTotal()).append(" (#").append(getLines(false).size()).append(")");
+		return sb.toString();
+	}	//	getSummary
+
+	/**
+	 * 	Get Process Message
+	 *	@return clear text error message
+	 */
+	public String getProcessMsg() {
+		return m_processMsg;
+	}	//	getProcessMsg
+	
+	/**
+	 * 	Get Document Owner (Responsible)
+	 *	@return AD_User_ID
+	 */
+	public int getDoc_User_ID() {
+		return getCreatedBy();
+	}	//	getDoc_User_ID
+
+	/**
+	 * 	Get Document Approval Amount
+	 *	@return amount
+	 */
+	public BigDecimal getApprovalAmt() {
+		return getGrandTotal();
+	}	//	getApprovalAmt
+	
+	/**
+	 * 	Get Document Currency
+	 *	@return C_Currency_ID
+	 */
+	public int getC_Currency_ID() {
+		return 297; //BRL
+	}	//	getC_Currency_ID
+	
+	/**
+	 *	
+	 */
+	public String toString()  {
+		return "MLBRNotaFiscal[ID=" + get_ID() + ", DocStatus='" + getDocStatus() + "']";
+	}	//	toString
+	
 	/**************************************************************************
 	 * 	Before Save
 	 *	@param newRecord
 	 *	@return true if it can be sabed
 	 */
-	protected boolean beforeSave (boolean newRecord)
-	{
+	protected boolean beforeSave (boolean newRecord) {
 		if (getC_DocType_ID() != getC_DocTypeTarget_ID())
 			setC_DocType_ID(getC_DocTypeTarget_ID()); 	//	Define que o C_DocType_ID = C_DocTypeTarget_ID
-		
-		//	Opcionalmente pode gerar o RPS apenas na hora da transmissão
-		if (newRecord)
-		{
-			Integer vC_DocTypeTarget_ID = getC_DocTypeTarget_ID();
-			//
-			if (vC_DocTypeTarget_ID != null
-					&& vC_DocTypeTarget_ID.intValue() > 0)
-			{
-				MDocType dt = new MDocType (Env.getCtx(), vC_DocTypeTarget_ID, null);
-				String nfModel = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel);
-				//
-				if (nfModel != null && nfModel.startsWith("RPS"))
-				{
-					if (!MSysConfig.getBooleanValue("LBR_REALTIME_RPS_NUMBER", true, getAD_Client_ID()))
-						setDocumentNo(RPS_TEMP);
-				}
-			}
-		}
 		return true;
 	}	//	beforeSave
 
@@ -211,41 +587,1004 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 		if(getlbr_NFModel() != null && getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) && 
 				getlbr_NFeProt() != null && !getlbr_NFeProt().isEmpty())
 			return false;
-		
-		String trxName = get_TrxName();
 
-		int C_Invoice_ID = getC_Invoice_ID();
-		if (C_Invoice_ID > 0){
-			MInvoice invoice = new MInvoice(getCtx(),C_Invoice_ID,trxName);
+		if (getC_Invoice_ID() > 0){
+			MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
 			invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", null);
-			if (!invoice.save(trxName))
+			if (!invoice.save(get_TrxName()))
 				return false;
 		}
 
-		if (!deleteLBR_NFTax(get_ID(),trxName))
-			return false;
+		if (!deleteLBR_NFTax()) return false;
+		if (!deleteLBR_NFLineTax()) return false;
+		if (!deleteLBR_NotaFiscalLine()) return false;
 
-		if (!deleteLBR_NFLineTax(get_ID(),trxName))
-			return false;
+		return true;
+	} //beforeDelete
+	
+	/**
+	 * 	Document Status is Complete or Closed
+	 *	@return true if CO, CL or RE
+	 */
+	public boolean isComplete()
+	{
+		String ds = getDocStatus();
+		return DOCSTATUS_Completed.equals(ds) 
+			|| DOCSTATUS_Closed.equals(ds)
+			|| DOCSTATUS_Reversed.equals(ds);
+	}	//	isComplete
+	
+	/**
+	 * Adiciona uma novo texto antes da descrição atual
+	 * @param nfeDesc
+	 */
+	public void appendNFeDesc(String nfeDesc){
+		if (nfeDesc == null)
+			return;
+		
+		if (getlbr_NFeDesc() == null)
+			setlbr_NFeDesc(nfeDesc);
+		else
+			setlbr_NFeDesc(nfeDesc + getlbr_NFeDesc());
+	}
+	
+	/**
+	 * NFe Própria = Processo para criar o XML e anexar ao objeto
+	 * NFe Terceiros = Processo para verificar o status junto ao Sefaz
+	 * @return
+	 */
+	private String processNFe(){
+		
+		if (!isNFe())
+			return null;
+		
+		if (!islbr_IsOwnDocument()){
+			try{
+				getNFeStatus();
+			} catch (Exception e){
+				log.warning(e.getLocalizedMessage());
+			}
+		} //NFe terceiros
+		else {
+			if (getLBR_NFeLot_ID() > 0) {
+						
+				//Se lote não foi enviado apaga o lote ou processado
+				MLBRNFeLot lot = new MLBRNFeLot(getCtx(),getLBR_NFeLot_ID(),get_TrxName());
+				if (lot.getDocStatus().equals(MLBRNFeLot.DOCSTATUS_InProgress)){
+					return "Lote já enviado. Processar retorno.";
+				}
+					
+				if (lot.getlbr_NFeRecID() == null || lot.getlbr_NFeRecID().isEmpty()){
+					log.fine("Lote excluído: " + lot.getDocumentNo());
+					lot.delete(true); 
+				}
+						
+				// Remove do Lote
+				setLBR_NFeLot_ID(0);
+				appendNFeDesc("["+TextUtil.timeToString(new Timestamp(System.currentTimeMillis()), "yyyy-MM-dd HH:mm:ss")+"] NF removida do lote anterior\n");
+			}
+				
+				
+			if (getlbr_NFeID() != null && !getlbr_NFeID().isEmpty()){
+				MAttachment attach = getAttachment(true);
+				if (attach != null){
+					if (attach.delete(true)) // Apaga o XML antigo
+						appendNFeDesc("["+TextUtil.timeToString(new Timestamp(System.currentTimeMillis()), "yyyy-MM-dd HH:mm:ss")+"] XML antigo deletado\n");
+				}
+			}
+		
+			try {
+				return NFeXMLGenerator.geraCorpoNFe(get_ID(),get_TrxName());
+			} catch (AdempiereException e) {
+				e.printStackTrace();
+				return e.getLocalizedMessage();
+			}
+		} //NFe própria
+		
+		return null;
+	} //generateXML
+	
+	/**
+	 * Verifica o status da NFe junto ao Sefaz
+	 * @throws Exception
+	 */
+	private void getNFeStatus() throws Exception{
+		
+		if (getlbr_NFeID() == null || getlbr_NFeID().isEmpty())
+			return;
+		
+		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
+		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
+		
+		if (oiW.getlbr_NFeEnv() == null || oiW.getlbr_NFeEnv().isEmpty()){
+			log.warning("Ambiente da NF-e deve ser preenchido.");
+			return;
+		}
+		
+		int C_Location_ID = islbr_IsOwnDocument() ? 
+				getOrg_Location().getC_Location_ID() : getC_BPartner_Location().getC_Location_ID();
+		MLocation bpLoc = new MLocation(getCtx(),C_Location_ID,get_TrxName());
 
-		if (!deleteLBR_NotaFiscalLine(get_ID(),trxName))
+		//PREPARA AMBIENTE PARA CONSULTA
+		MLBRDigitalCertificate.setCertificate(getCtx(), orgInfo);
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.CONSULTA,bpLoc.getC_Region_ID());
+		if (ws == null) {
+			log.warning("Não foi encontrado um endereço WebServices válido.");
+			return;
+		}
+		
+		try{
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsulta(oiW.getlbr_NFeEnv(), getlbr_NFeID())));
+
+			NfeConsulta2Stub.NfeDadosMsg dadosMsg = NfeConsulta2Stub.NfeDadosMsg.Factory.parse(dadosXML);
+			NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta(bpLoc.getC_Region_ID());
+
+			NfeConsulta2Stub.setAddress(ws);
+			NfeConsulta2Stub stub = new NfeConsulta2Stub();
+
+			String respStatus = stub.nfeConsultaNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
+
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		    Document doc = builder.parse(new InputSource(new StringReader(respStatus)));
+
+		    String cStat   = NFeUtil.getValue(doc, "cStat");
+		    String xMotivo = NFeUtil.getValue(doc, "xMotivo");
+		    
+		    if (cStat != null && xMotivo != null){
+		    	setlbr_NFeStatus(cStat);
+		    	appendNFeDesc("["+TextUtil.timeToString(new Timestamp(System.currentTimeMillis()), "yyyy-MM-dd HH:mm:ss")+"] " + xMotivo + "\n");
+		    }
+		}
+		catch (Throwable e1){
+			log.severe(e1.getLocalizedMessage());
+			e1.printStackTrace();
+		}
+		
+	} //getNFeStatus
+	
+	/**
+	 * Processo para cancelar NFe
+	 * @return resultado do cancelamento
+	 * @throws Exception
+	 */
+	private String voidNFe() throws Exception {
+
+		if (getlbr_MotivoCancel() == null)
+			return "Sem motivo de cancelamento";
+		else if (getlbr_MotivoCancel().length() < 16 || getlbr_MotivoCancel().length() >= 255)
+			return "Tamanho Motivo de cancelamento inválido. Min: 15 letras Max: 254 letras";
+
+		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
+		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
+		
+		if (oiW.getlbr_NFeEnv() == null || oiW.getlbr_NFeEnv().isEmpty()){
+			return "Ambiente da NF-e deve ser preenchido.";
+		}
+		
+		//PREPARA AMBIENTE PARA CONSULTA
+		MLBRDigitalCertificate.setCertificate(getCtx(), orgInfo);
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.CANCELAMENTO);
+		if (ws == null) {
+			return "Não foi encontrado um endereço WebServices válido.";
+		}
+		
+		try{
+			String chNFe  = getlbr_NFeID();
+			String pclNFe = getlbr_NFeProt();
+
+			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(chNFe, pclNFe, oiW.getlbr_NFeEnv(), RemoverAcentos.remover(getlbr_MotivoCancel()));
+
+			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, getDocumentNo()+"-ped-can.xml"));
+			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_CANCELAMENTO_NFE);
+			nfeCancDadosMsg = NFeUtil.XMLtoString(attachFile);
+
+			String validation = ValidaXML.validaCancNFe(nfeCancDadosMsg);
+			if (!validation.isEmpty()) {
+	        	return validation;
+			}
+			
+			//
+			nfeCancDadosMsg   = "<nfeDadosMsg>" + nfeCancDadosMsg + "</nfeDadosMsg>";
+
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(nfeCancDadosMsg));
+
+			NfeCancelamento2Stub.NfeDadosMsg dadosMsg = NfeCancelamento2Stub.NfeDadosMsg.Factory.parse(dadosXML);
+			NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecCancelamento(orgInfo.getC_Location().getC_Region_ID());
+
+			NfeCancelamento2Stub.setAddress(ws);
+			NfeCancelamento2Stub stub = new NfeCancelamento2Stub();
+
+			String respCanc = stub.nfeCancelamentoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
+
+			//	Resposta do Envio
+			validation = ValidaXML.validaRetCancNFe(respCanc);
+			if (!validation.isEmpty())
+				return validation;
+			//
+
+	        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	        Document doc = builder.parse(new InputSource(new StringReader(respCanc)));
+	        //
+	        String cStat = 		NFeUtil.getValue (doc, "cStat");
+	        String xMotivo = 	NFeUtil.getValue (doc, "xMotivo");
+	        String nProt = 		NFeUtil.getValue (doc, "nProt");
+	        String dhRecbto = 	NFeUtil.getValue (doc, "dhRecbto");
+	        //
+	        appendNFeDesc("["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n");
+	        setlbr_NFeStatus(cStat);
+	        //
+	        if (cStat.equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)) {
+		        setlbr_NFeProt(nProt);
+		        setDateTrx(NFeUtil.stringToTime(dhRecbto));
+		        
+				//Atualiza XML para padrão de distribuição - Cancelamento
+				try {
+					if (!NFeUtil.updateAttach(this, NFeUtil.generateDistribution(this)))
+						return "Problemas ao atualizar o XML para o padrão de distribuição";
+
+					NFeEmail.sendMail(this);
+				} catch (Exception e) {
+					log.warning(e.getLocalizedMessage());
+				}
+
+	        }
+		}
+		catch (Throwable e1){
+			e1.printStackTrace();
+			return e1.getLocalizedMessage();
+		}
+		
+		return null;
+	} //voidNFe
+	
+	private boolean setSiscomexTax(){
+
+		BigDecimal TotalLinesAmt = getTotalLines();
+		if (TotalLinesAmt.signum() == 0)
+			return true;
+
+		BigDecimal TotalSiscomexAmt = getlbr_TotalSISCOMEX();
+		if (TotalSiscomexAmt.signum() == 0)
+			return true;
+
+		List<MLBRNotaFiscalLine> nfLines = getLines(false);
+		for (MLBRNotaFiscalLine nfLine : nfLines){
+
+			BigDecimal lineAmt = nfLine.getLineTotalAmt();
+			//siscomexAmt = lineAmt/totalLinesAmt (porcentagem do total da nf)
+			//siscomexAmt = TotalSiscomex*siscomexamt (siscomex proporcional)
+			BigDecimal siscomexAmt = lineAmt.divide(TotalLinesAmt, TaxBR.MCROUND);
+			           siscomexAmt = TotalSiscomexAmt.multiply(siscomexAmt);
+
+			nfLine.setlbr_LineTotalSISCOMEX(siscomexAmt.setScale(TaxBR.SCALE, TaxBR.ROUND));
+			nfLine.save();
+
+			BigDecimal ICMSRate = nfLine.getICMSRate();
+			if (ICMSRate == null || ICMSRate.signum() == 0)
+				continue;
+
+			//siscomex/(1-(ICMS/100))
+			BigDecimal taxBaseAmt = siscomexAmt.divide((Env.ONE.subtract(
+					                                   (ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND))))
+					                                   ,TaxBR.MCROUND);
+			//taxBase*(ICMS/100)
+			BigDecimal taxAmt     = taxBaseAmt.multiply((ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
+
+			int LBR_TaxGroup_ID   = TaxBR.getTaxGroup_ID("ICMS");
+			if (LBR_TaxGroup_ID > 0){
+				MLBRNFLineTax nfLineTax = new MLBRNFLineTax(LBR_TaxGroup_ID,nfLine);
+				nfLineTax.setlbr_TaxBaseAmt(taxBaseAmt);
+				nfLineTax.setlbr_TaxAmt(taxAmt);
+				nfLineTax.setlbr_TaxRate(ICMSRate);
+				nfLineTax.setDescription("SISCOMEX");
+				if (!nfLineTax.save(get_TrxName())){
+					return false;
+				}
+			}
+
+		} //for lines
+
+		return true;
+	} //setSiscomexTax
+
+	private boolean setFreightTax(){
+
+		BigDecimal TotalLinesAmt = getTotalLines();
+		if (TotalLinesAmt.signum() == 0)
+			return true;
+
+		BigDecimal TotalFreightAmt = getFreightAmt();
+		if (TotalFreightAmt.signum() == 0)
+			return true;
+
+		List<MLBRNotaFiscalLine> nfLines = getLines(false);
+		for (MLBRNotaFiscalLine nfLine : nfLines){
+
+			BigDecimal ICMSRate = nfLine.getICMSRate();
+			if (ICMSRate == null || ICMSRate.signum() == 0)
+				continue;
+
+			BigDecimal freightAmt = nfLine.getFreightAmt(TotalLinesAmt, TotalFreightAmt);
+
+			//frete/(1-(ICMS/100))
+			BigDecimal taxBaseAmt = freightAmt.divide((Env.ONE.subtract(
+					                                   (ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND))))
+					                                   ,TaxBR.MCROUND);
+			//taxBase*(ICMS/100)
+			BigDecimal taxAmt     = taxBaseAmt.multiply((ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
+
+			int LBR_TaxGroup_ID   = TaxBR.getTaxGroup_ID("ICMS");
+			if (LBR_TaxGroup_ID > 0){
+				MLBRNFLineTax nfLineTax = new MLBRNFLineTax(LBR_TaxGroup_ID,nfLine);
+				nfLineTax.setlbr_TaxBaseAmt(taxBaseAmt);
+				nfLineTax.setlbr_TaxAmt(taxAmt);
+				nfLineTax.setlbr_TaxRate(ICMSRate);
+				nfLineTax.setDescription("FRETE");
+				if (!nfLineTax.save(get_TrxName())){
+					return false;
+				}
+			}
+
+		} //for lines
+
+		return true;
+	} //setFreightTax
+
+	private MBPartnerLocation getBPartnerLocation(MOrder order, MInvoice invoice, MInOut shipment){
+
+		MBPartnerLocation bpLocation = null;
+
+		if (invoice != null){
+			bpLocation = new MBPartnerLocation(getCtx(),invoice.getC_BPartner_Location_ID(),get_TrxName());
+		}
+		else if (shipment != null && shipment.getC_BPartner_Location_ID() != 0){
+			bpLocation = new MBPartnerLocation(getCtx(),shipment.getC_BPartner_Location_ID(),get_TrxName());
+		}
+		else if (order != null && order.getC_BPartner_Location_ID() != 0){
+			bpLocation = new MBPartnerLocation(getCtx(),order.getC_BPartner_Location_ID(),get_TrxName());
+		}
+		
+		return bpLocation;
+	} //getBPartnerLocation
+
+	private void setOrgInfo(MOrg org){
+		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), org.get_ID(), get_TrxName());
+		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
+		
+		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),get_TrxName());
+		MCountry orgCountry = new MCountry(getCtx(),orgLoc.getC_Country_ID(),get_TrxName());
+
+		String legalEntity = oiW.getlbr_LegalEntity();
+		if (legalEntity == null || legalEntity.trim().isEmpty())
+			legalEntity = org.getName();
+
+		setOrg_Location_ID(orgLoc.getC_Location_ID());
+		setlbr_OrgAddress1(orgLoc.getAddress1());
+		setlbr_OrgAddress2(orgLoc.getAddress2());
+		setlbr_OrgAddress3(orgLoc.getAddress3());
+		setlbr_OrgAddress4(orgLoc.getAddress4());
+		setlbr_OrgName(legalEntity);
+		setlbr_OrgCity(orgLoc.getCity());
+		setlbr_OrgPostal(orgLoc.getPostal());
+		setlbr_OrgCountry(orgCountry.getCountryCode());
+		setlbr_OrgRegion(orgLoc.getRegionName(true));
+		setlbr_OrgCCM(oiW.getlbr_CCM());
+		setlbr_CNPJ(oiW.getlbr_CNPJ());
+		setlbr_IE(oiW.getlbr_IE());
+	} //setOrgInfo
+
+	private void setBPartner(MBPartner bpartner, MBPartnerLocation bpLocation){
+
+		if (bpartner == null || bpLocation == null)
+			return;
+
+		MLocation location = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
+		I_C_Country country = location.getC_Country();
+		
+		setC_BPartner_ID(bpartner.getC_BPartner_ID());
+		setC_BPartner_Location_ID(bpLocation.getC_BPartner_Location_ID());
+		setBPName(bpartner.getName());
+		setlbr_BPPhone(bpLocation.getPhone());
+		//
+		setlbr_BPCNPJ(BPartnerUtil.getCNPJ(bpartner,bpLocation));
+		setlbr_BPIE(BPartnerUtil.getIE(bpartner,bpLocation));
+		setlbr_BPSuframa(BPartnerUtil.getSuframa(bpartner,bpLocation));
+		//
+		setlbr_BPAddress1(location.getAddress1()); //Endereço
+		setlbr_BPAddress2(location.getAddress2()); //Número
+		setlbr_BPAddress3(location.getAddress3()); //Bairro
+		setlbr_BPAddress4(location.getAddress4()); //Complemento
+		setlbr_BPCity(location.getCity());
+		setlbr_BPPostal(location.getPostal());
+		setlbr_BPCountry(location.getC_Country().getCountryCode());
+		setlbr_BPRegion(location.getRegionName(true)); 
+
+		if (country.getC_Country_ID() != AdempiereLBR.BRASIL)
+			setlbr_BPRegion(BPartnerUtil.EXTREG);
+	} //setBPartner
+
+	private void setDeliveryBPartner(MOrder order, MInvoice invoice, MInOut io){
+
+		MBPartnerLocation bpLocation = null;
+		MLocation         location   = null;
+
+		if (io != null && io.get_ID() != 0) {
+			bpLocation = new MBPartnerLocation(getCtx(),io.getC_BPartner_Location_ID(),get_TrxName());
+			location   = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
+
+			setNoPackages(new BigDecimal(io.getNoPackages()));
+			setlbr_PackingType((String)io.get_Value("lbr_PackingType")); //FIXME
+			setlbr_GrossWeight((BigDecimal)io.get_Value("GrossWeight")); //FIXME
+			setlbr_NetWeight((BigDecimal)io.get_Value("NetWeight"));     //FIXME
+		}
+		else if (invoice != null) {
+			bpLocation = new MBPartnerLocation(getCtx(),invoice.getC_BPartner_Location_ID(),get_TrxName());
+			location   = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
+		}
+		else return;
+		
+		I_C_Country country = location.getC_Country();
+		//
+		setlbr_Delivery_Location_ID(bpLocation.get_ID());
+		setlbr_BPDeliveryCNPJ(BPartnerUtil.getCNPJ(getCtx(), bpLocation.getC_BPartner_ID(),bpLocation.get_ID()));   //CNPJ Entrega
+		setlbr_BPDeliveryIE(BPartnerUtil.getIE(getCtx(), bpLocation.getC_BPartner_ID(),bpLocation.get_ID()));   //IE Entrega
+		//
+		setlbr_BPDeliveryAddress1(location.getAddress1()); //Endereço
+		setlbr_BPDeliveryAddress2(location.getAddress2()); //Número
+		setlbr_BPDeliveryAddress3(location.getAddress3()); //Bairro
+		setlbr_BPDeliveryAddress4(location.getAddress4()); //Complemento
+		setlbr_BPDeliveryCity(location.getCity());
+		setlbr_BPDeliveryPostal(location.getPostal());
+		setlbr_BPDeliveryCountry(country.getCountryCode());
+		setlbr_BPDeliveryRegion(location.getRegionName(true)); 
+
+		if (country.getC_Country_ID() != AdempiereLBR.BRASIL)
+			setlbr_BPDeliveryRegion(BPartnerUtil.EXTREG);
+		
+		setFreightCostRule(order,io);
+		setShipper(io);
+	} //setDeliveryBPartner
+	
+	private void setFreightCostRule(MOrder order, MInOut io){
+		if (order != null && order.get_ID() > 0)
+			setFreightCostRule(order.getFreightCostRule());
+		else if (io != null && io.get_ID() > 0)
+			setFreightCostRule(io.getFreightCostRule());
+
+		if (getFreightCostRule() == null || getFreightCostRule().isEmpty())
+			setFreightCostRule(X_M_InOut.FREIGHTCOSTRULE_FreightIncluded);
+	} //setFreightCostRule
+
+	private void setShipper(MInOut io){
+
+		MShipper shipper = new MShipper(getCtx(),0,get_TrxName());
+		
+		if (io != null && io.getDeliveryViaRule().equals(MInOut.DELIVERYVIARULE_Shipper))
+			shipper = new MShipper(getCtx(),io.getM_Shipper_ID(),get_TrxName());
+		
+		setM_Shipper_ID(shipper.getM_Shipper_ID());
+		setlbr_BPShipperName(shipper.getName());
+
+		MBPartner transp = new MBPartner(getCtx(),shipper.getC_BPartner_ID(),get_TrxName());
+
+		//Localização Transportadora
+		MBPartnerLocation transpLocation = transp.getPrimaryC_BPartner_Location();
+		if (transpLocation != null){
+			
+			MLocation location = new MLocation(getCtx(),transpLocation.getC_Location_ID(),get_TrxName());
+			I_C_Country country = location.getC_Country();
+			//
+			setlbr_BPShipperCNPJ(BPartnerUtil.getCNPJ(transp,transpLocation));
+			setlbr_BPShipperIE(BPartnerUtil.getIE(transp,transpLocation));
+			//
+			setlbr_BPShipperAddress1(location.getAddress1());
+			setlbr_BPShipperAddress2(location.getAddress2());
+			setlbr_BPShipperAddress3(location.getAddress3());
+			setlbr_BPShipperAddress4(location.getAddress4());
+			setlbr_BPShipperCity(location.getCity());
+			setlbr_BPShipperPostal(location.getPostal());
+			setlbr_BPShipperCountry(country.getCountryCode());
+			
+			if (location.get_ID() == 0){
+				setlbr_BPShipperRegion("");
+				setlbr_BPShipperCountry("");
+			}
+			else{
+				setlbr_BPShipperRegion(location.getRegionName(true)); 
+				if (country.getC_Country_ID() != AdempiereLBR.BRASIL)
+					setlbr_BPShipperRegion(BPartnerUtil.EXTREG);
+			}
+		}
+		else {
+			setlbr_BPShipperCNPJ(BPartnerUtil.getCNPJ(transp,null));
+			setlbr_BPShipperIE(BPartnerUtil.getIE(transp,null));
+		}
+
+	} //setShipper
+	
+	public void setInvoice(MInvoice invoice) throws AdempiereException{
+		
+		if (invoice == null)
+			throw new AdempiereException(Msg.getMsg(getCtx(), "Invoice") + " = null");
+		
+		if (!cleanOldData())
+			throw new AdempiereException("Erro ao apagar dados antigos da Nota Fiscal");
+		
+		/**
+		 * Objetos
+		 */
+		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), invoice.getAD_Org_ID(),get_TrxName());
+		MOrder order = new MOrder(getCtx(),invoice.getC_Order_ID(),get_TrxName());
+		int M_InOut_ID = AdempiereLBR.getM_InOut_ID(invoice.get_ID(), get_TrxName());
+		MInOut io = new MInOut(getCtx(),M_InOut_ID,get_TrxName());
+		MBPartner bpartner = new MBPartner(getCtx(),invoice.getC_BPartner_ID(),get_TrxName());
+		
+		/**
+		 * Wrappers
+		 */
+		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo,I_W_AD_OrgInfo.class);
+		I_W_C_Invoice iW   = POWrapper.create(invoice,I_W_C_Invoice.class);
+		
+		//Define Ids
+		setAD_Org_ID(invoice.getAD_Org_ID());
+		setC_Invoice_ID(invoice.get_ID());
+		setC_Order_ID(order.get_ID());
+		setM_InOut_ID(io.get_ID());
+		setC_PaymentTerm_ID(invoice.getC_Payment_ID());
+		
+		//Informações do Documento
+		setIsSOTrx(invoice.isCreditMemo() ? !invoice.isSOTrx() : invoice.isSOTrx());
+		setlbr_IsOwnDocument(isSOTrx() ? true : (iW.getlbr_TransactionType().equals("IMP") ? true : false));
+		setlbr_TransactionType(iW.getlbr_TransactionType());
+		setlbr_NFModel(iW.getlbr_NFModel());
+		setDateDoc(invoice.getDateInvoiced());
+		setlbr_DateInOut(invoice.getDateAcct());
+		
+		if (islbr_IsOwnDocument()){
+			MDocType docType = AdempiereLBR.getNFBDocType(invoice, getAD_Org_ID(), isSOTrx(), oiW.islbr_IsScan());
+			if (docType == null)
+				throw new AdempiereException("Tipo de documento para Nota Fiscal não encontrado");
+			
+			setC_DocTypeTarget_ID(docType.get_ID());
+			setlbr_NFModel(docType.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFModel));
+		}
+		else{
+			if (iW.getlbr_NFEntrada() == null && iW.getlbr_NFEntrada().trim().isEmpty())
+				throw new AdempiereException ("Número da Nota Fiscal de Entrada inválido");
+			
+			setC_DocTypeTarget_ID(0);
+			setDocumentNo(iW.getlbr_NFEntrada());
+			setlbr_NFeID(invoice.get_ValueAsString("lbr_NFeID")); //FIXME
+		}
+		
+		//Dados da Empresa, Parceiro e Entrega
+		setOrgInfo(MOrg.get(getCtx(), orgInfo.get_ID()));
+		
+		MBPartnerLocation bpLocation = getBPartnerLocation(order,invoice,io);
+		setBPartner(bpartner,bpLocation);
+		setDeliveryBPartner(order,invoice,io);
+		
+		//Observações
+		setlbr_BillNote(iW.getlbr_BillNote());
+		setlbr_ShipNote(iW.getlbr_ShipNote());
+		
+		StringBuilder nfDesc = new StringBuilder();
+		if (order != null && order.get_ID() > 0)
+			nfDesc.append(order.getDocumentNo() + " "); //Número do Pedido
+
+		if (invoice.getPOReference() != null && !invoice.getPOReference().trim().isEmpty())
+			nfDesc.append(invoice.getPOReference() + " "); //Referência da Fatura
+
+		if (invoice.getDescription() != null && !invoice.getDescription().trim().equals(""))
+			nfDesc.append("\n" + invoice.getDescription()); //Observação da Fatura
+		
+		String description = order.get_ValueAsString("lbr_NFDescription"); //Observação NF
+		if (description != null && !description.trim().equals("")) 
+			nfDesc.append("\n" + description);
+
+		setDescription(TextUtil.itrim(nfDesc.toString())); //Observação Nota Fiscal
+		save(get_TrxName());
+		//
+		createLines(invoice.getLines());
+	} //setInvoice
+		
+	private void createLines(MInvoiceLine[] iLines) throws AdempiereException{
+		
+		if (get_ID() == 0)
+			throw new AdempiereException(Msg.getMsg(getCtx(), "SaveParentFirst"));
+		
+		if (iLines == null || iLines.length <= 0)
+			throw new AdempiereException("Nenhuma linha informada");
+		
+		for(MInvoiceLine iLine : iLines){
+			new MLBRNotaFiscalLine(this,iLine);
+		}
+		
+		setlbr_CFOPNote(getCFOPNote()); //Natureza da Operação
+		setlbr_CFOPReference(getCFOPReference()); //Lista de CFOPs
+	} //setLines
+		
+	private boolean cleanOldData(){
+		if (!deleteLBR_NFTax()) return false;	
+		if (!deleteLBR_NFLineTax()) return false;
+		if (!deleteLBR_NotaFiscalLine()) return false;
+		
+		//Valores
+		setGrandTotal(Env.ZERO);  //Total NF
+		setDiscountAmt(Env.ZERO); //Total de Descontos
+		setTotalLines(Env.ZERO);  //Total de Produtos
+		setlbr_ServiceTotalAmt(Env.ZERO); //Total de Serviços
+		//Entrega
+		setNoPackages(null);
+		setlbr_PackingType(null);
+		setlbr_GrossWeight(null);
+		setlbr_NetWeight(null);
+		
+		return true;	
+	} //cleanOldData
+
+	private boolean deleteLBR_NotaFiscalLine (){
+		StringBuffer sql = new StringBuffer("DELETE FROM ")
+		   .append(X_LBR_NotaFiscalLine.Table_Name)
+		   .append(" WHERE LBR_NotaFiscal_ID = ")
+		   .append(get_ID());
+
+		if (DB.executeUpdate(sql.toString(), get_TrxName()) == -1)
 			return false;
 
 		return true;
+	} //deleteLBR_NotaFiscalLine
+
+	private boolean deleteLBR_NFTax (){
+		StringBuffer sql = new StringBuffer("DELETE FROM ")
+		   .append(X_LBR_NFTax.Table_Name)
+		   .append(" WHERE LBR_NotaFiscal_ID = ")
+		   .append(get_ID());
+
+		if (DB.executeUpdate(sql.toString(), get_TrxName()) == -1)
+			return false;
+
+		return true;
+	} //deleteLBR_NFTax
+
+	private boolean deleteLBR_NFLineTax (){
+		StringBuffer sql = new StringBuffer("DELETE FROM ")
+		   .append(X_LBR_NFLineTax.Table_Name)
+		   .append(" WHERE LBR_NotaFiscalLine_ID IN ")
+		   .append("(SELECT LBR_NotaFiscalLine_ID FROM ")
+		   .append(X_LBR_NotaFiscalLine.Table_Name)
+		   .append(" WHERE LBR_NotaFiscal_ID = ")
+		   .append(get_ID()).append(")");
+
+		if (DB.executeUpdate(sql.toString(), get_TrxName()) == -1)
+			return false;
+
+		return true;
+	} //deleteLBR_NFLineTax
+	
+	/**
+	 * retorna o valor do imposto
+	 * @param taxIndicator (Ex. IPI, ICMS)
+	 * @return valor do imposto
+	 */
+	public BigDecimal getTaxAmt(String taxIndicator){
+
+		if (taxIndicator == null)
+			return Env.ZERO;
+
+		String sql = "SELECT SUM(lbr_TaxAmt) FROM LBR_NFTax " +
+		             "WHERE LBR_NotaFiscal_ID = ? " +
+		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
+		//
+		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		return result == null ? Env.ZERO : result;
+	} //getTaxAmt
+	
+	/**
+	 * retorna a base de cálculo do imposto
+	 * @param taxIndicator (Ex. IPI, ICMS)
+	 * @return valor da base de cálculo
+	 */
+	public BigDecimal getTaxBaseAmt(String taxIndicator){
+
+		if (taxIndicator == null)
+			return Env.ZERO;
+
+		String sql = "SELECT SUM(lbr_TaxBaseAmt) FROM LBR_NFTax " +
+		             "WHERE LBR_NotaFiscal_ID = ? " +
+		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
+		//
+		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		return result == null ? Env.ZERO : result;
+	} //getTaxAmt
+	
+	/**
+	 * retorna o valor do imposto
+	 * @param taxIndicator (Ex. PIS, COFINS)
+	 * @param onlyService - true, só impostos de serviço, false, só impostos exceto serviços
+	 * @return valor do imposto
+	 */
+	public BigDecimal getTaxAmt(String taxIndicator, boolean onlyService){
+
+		if (taxIndicator == null)
+			return Env.ZERO;
+
+		String sql = "SELECT SUM(lbr_TaxAmt) FROM LBR_NFLineTax " +
+		             "WHERE LBR_NotaFiscalLine_ID IN " +
+		             "(SELECT LBR_NotaFiscalLine_ID FROM LBR_NotaFiscalLine " +
+		             "WHERE LBR_NotaFiscal_ID = ? AND lbr_CFOPName" + (onlyService ? " LIKE " : " NOT LIKE ") + "'%.933')"  +
+		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
+		//
+
+		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		return result == null ? Env.ZERO : result;
+	} //getTaxAmtService
+		
+	/**
+	 * retorna a base de cálculo do imposto
+	 * @param taxIndicator (Ex. PIS, COFINS)
+	 * @param onlyService - true, só impostos de serviço, false, só impostos exceto serviços
+	 * @return valor da base de cálculo
+	 */
+	public BigDecimal getTaxBaseAmt(String taxIndicator, boolean onlyService){
+
+		if (taxIndicator == null)
+			return Env.ZERO;
+
+		String sql = "SELECT SUM(lbr_TaxBaseAmt) FROM LBR_NFLineTax " +
+		             "WHERE LBR_NotaFiscalLine_ID IN " +
+		             "(SELECT LBR_NotaFiscalLine_ID FROM LBR_NotaFiscalLine " +
+		             "WHERE LBR_NotaFiscal_ID = ? AND lbr_CFOPName" + (onlyService ? " LIKE " : " NOT LIKE ") + "'%.933')"  +
+		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
+		//
+
+		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		return result == null ? Env.ZERO : result;
+	} //getTaxBaseAmtService
+
+	/**
+	 * retorna a alíquota do imposto
+	 * Se existe mais de uma alíquota na NF para o mesmo imposto é calculada a média
+	 * @param taxIndicator (Ex. IPI, ICMS)
+	 * @return alíquota do imposto
+	 */
+	public BigDecimal getTaxRate(String taxIndicator){
+
+		if (taxIndicator == null)
+			return Env.ZERO;
+
+		String sql = "SELECT AVG(lbr_TaxRate) FROM LBR_NFLineTax " +
+		             "WHERE LBR_NotaFiscalLine_ID IN " +
+		             "(SELECT LBR_NotaFiscalLine_ID FROM LBR_NotaFiscalLine WHERE LBR_NotaFiscal_ID = ?) " +
+		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
+		//
+
+		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		return result == null ? Env.ZERO : result;
+	} //getTaxRate
+	
+	/**
+	 * @return Base de Cálculo ICMS
+	 */
+	public BigDecimal getICMSBase() {
+		return getTaxBaseAmt("ICMS");
+	}	//	getICMSBase
+
+	/**
+	 * @return Base de Cálculo ICMSST
+	 */
+	public BigDecimal getICMSSTBase() {
+		return getTaxBaseAmt("ICMSST");
+	}	//	getICMSBaseST
+
+	/**
+	 * @return Valor ICMS
+	 */
+	public BigDecimal getICMSAmt() {
+		return getTaxAmt("ICMS");
+	}	//	getICMSAmt
+
+	/**
+	 * @return Alíquota ICMS
+	 */
+	public BigDecimal getICMSRate() {
+		return getTaxRate("ICMS");
+	}	//	getICMSRate
+
+	/**
+	 * @return Valor ICMS ST
+	 */
+	public BigDecimal getICMSSTAmt() {
+		return getTaxAmt("ICMSST");
+	}	//	getICMSAmtST
+
+	/**
+	 * @return Valor IPI
+	 */
+	public BigDecimal getIPIAmt() {
+		return getTaxAmt("IPI");
+	}	//	getIPIAmt
+
+	/**
+	 * @return Valor PIS
+	 */
+	public BigDecimal getPISAmt() {
+		return getTaxAmt("PIS");
+	}	//	getPISAmt
+
+	/**
+	 * @return Valor COFINS
+	 */
+	public BigDecimal getCOFINSAmt() {
+		return getTaxAmt("COFINS");
+	}	//	getCOFINSAmt
+	
+	/**
+	 * Retorna a base de cálculo e o valor do ICMS para as linhas de ativo fixo
+	 * @return BigDecimla[] 0 = Base de Cálculo, 1 = Valor do Imposto
+	 */
+	public BigDecimal[] getAssetTaxAmt(){
+		
+		BigDecimal[] assetAmt = new BigDecimal[]{Env.ZERO,Env.ZERO};
+		
+		List<MLBRNotaFiscalLine> nfLines = getLines();
+		
+		for (MLBRNotaFiscalLine nfLine : nfLines){
+			if (!nfLine.isAsset())
+				continue;
+			
+			assetAmt[0] = assetAmt[0].add(nfLine.getICMSBaseAmt());
+			assetAmt[1] = assetAmt[1].add(nfLine.getICMSAmt());
+		}
+		
+		return assetAmt;
+	} //getAssetAmt
+	
+	/**
+	 * retorno o custo da nota fiscal
+	 * @param C_AcctSchema_ID
+	 * @param C_CostElement_ID
+	 * @return custo
+	 */
+	public BigDecimal getCost(int C_AcctSchema_ID, int C_CostElement_ID){
+
+		BigDecimal currentCost = Env.ZERO;
+
+		List<MLBRNotaFiscalLine> lines = getLines();
+		for(MLBRNotaFiscalLine line : lines){
+			int M_Product_ID = line.getM_Product_ID();
+			if (M_Product_ID == 0)
+				continue;
+
+			MProduct product = new MProduct(getCtx(),M_Product_ID,get_TrxName());
+			MAcctSchema as   = MAcctSchema.get(getCtx(), C_AcctSchema_ID);
+
+			MCost cost = MCost.get(product,0,as,0,C_CostElement_ID,get_TrxName());
+			if (cost != null)
+				currentCost = currentCost.add(cost.getCurrentCostPrice().multiply(line.getQty()));
+		}
+
+		return currentCost.setScale(TaxBR.SCALE, TaxBR.ROUND);
+	} //getCost
+	
+	
+	/**
+	 * Retorna o desconto proporcional ao base amt
+	 * Usado para saber o desconto das linhas só de serviço ou só de produtos
+	 * @param baseAmt
+	 * @return
+	 */
+	public BigDecimal getDiscountAmt(BigDecimal baseAmt){
+
+		if (baseAmt.signum() <= 0 || baseAmt.signum() <= 0)
+			return Env.ZERO;
+		
+		BigDecimal discountAmt = baseAmt.divide(getTotalLines().add(getlbr_ServiceTotalAmt()), TaxBR.MCROUND);
+		           discountAmt = getDiscountAmt().multiply(discountAmt);
+
+		return discountAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
+	} //getDiscountAmt
+
+	/**
+	 * 	Retorna o CFOP das linhas, no caso de mais de 1 CFOP,
+	 * 		retorna o ref. ao Maior Valor
+	 *
+	 * @return CFOP
+	 */
+	public String getCFOP()
+	{
+		String sql = "SELECT lbr_CFOPName " +
+					 "FROM LBR_NotaFiscalLine " +
+					 "WHERE LBR_NotaFiscal_ID=? ORDER BY LineTotalAmt DESC";
+
+		return DB.getSQLValueString(null, sql, getLBR_NotaFiscal_ID());
+	}
+	
+	public String getCFOPNote() {
+		return TextUtil.retiraPontoFinal(m_CFOPNote);
 	}
 
-	public int getLBR_DocTypeNF_ID(MInvoice invoice){
+	public String getCFOPReference() {
+		return TextUtil.retiraPontoFinal(m_CFOPReference);
+	}
 
-		Integer LBR_DocTypeNF_ID = 0;
+	/**************************************************************************
+	 *  getTaxes
+	 *  @return X_LBR_NFLineTax[] taxes
+	 */
+	public X_LBR_NFTax[] getTaxes(){
 
-		MDocType docType = new MDocType(getCtx(), invoice.getC_DocTypeTarget_ID(), get_TrxName());
+		String whereClause = "LBR_NotaFiscal_ID = ?";
 
-		LBR_DocTypeNF_ID = (Integer)docType.get_Value(I_W_C_DocType.COLUMNNAME_LBR_DocTypeNF_ID);
-		if (LBR_DocTypeNF_ID == null)
-			LBR_DocTypeNF_ID = 0;
+		MTable table = MTable.get(getCtx(), X_LBR_NFTax.Table_Name);
+		Query query =  new Query(getCtx(), table, whereClause, get_TrxName());
+	 		  query.setParameters(new Object[]{getLBR_NotaFiscal_ID()});
 
-		return LBR_DocTypeNF_ID.intValue();
-	} //getLBR_DocTypeNF_ID
+		List<X_LBR_NFLineTax> list = query.list();
+
+		return list.toArray(new X_LBR_NFTax[list.size()]);
+	} //getTaxes
+
+	/**************************************************************************
+	 *  getDIs
+	 *  @return X_LBR_NFDI[] taxes
+	 */
+	public X_LBR_NFDI[] getDIs(){
+
+		String whereClause = "LBR_NotaFiscal_ID = ?";
+
+		MTable table = MTable.get(getCtx(), X_LBR_NFDI.Table_Name);
+		Query query =  new Query(getCtx(), table, whereClause, get_TrxName());
+	 		  query.setParameters(new Object[]{getLBR_NotaFiscal_ID()});
+
+		List<X_LBR_NFDI> list = query.list();
+
+		return list.toArray(new X_LBR_NFDI[list.size()]);
+	}	//	getDIs
+		
+	/**
+	 * retorna o DocumentNo sem a série
+	 * @param withoutSerie = true (sem série), false = super.getDocumentNo()
+	 * @return documentNo
+	 */
+	public String getDocumentNo(boolean withoutSerie) {
+		
+		String documentNo = getDocumentNo();
+		
+		if (withoutSerie && documentNo != null && !documentNo.startsWith("-")){
+			if (documentNo.indexOf('-') == -1){
+				documentNo = TextUtil.toNumeric(documentNo);
+			}
+			else{
+				documentNo = TextUtil.toNumeric(documentNo.substring(0, documentNo.indexOf('-')));
+			}
+			
+			if (!documentNo.isEmpty())
+				return String.valueOf(Integer.parseInt(documentNo));
+		}
+		
+		return documentNo;
+	}//getDocumentNo
+
+	/**
+	 * Extrai a série do DocumentNo ou 
+	 * se for documento própria olha a série do tipo de documento
+	 * @return serieNo
+	 */
+	public String getSerieNo(){
+		
+		String serieNo = getDocumentNo();
+		if (serieNo != null && serieNo.indexOf('-') != -1 && !serieNo.endsWith("-"))
+			serieNo = serieNo.substring(1+serieNo.indexOf('-'), serieNo.length());
+		else
+			serieNo = "";
+		
+		if (serieNo.isEmpty() && islbr_IsOwnDocument()){
+			MDocType dt = new MDocType(getCtx(),getC_DocTypeTarget_ID(),get_TrxName());
+			serieNo = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
+		}
+		return serieNo;
+	}
 	
 	/**
 	 * Indicador do tipo de pagamento (Utilizado na NFe e SPED)
@@ -283,1409 +1622,60 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal {
 
 		return indPag;
 	} //getIndPag
-
-	public boolean setSiscomexTax(){
-
-		BigDecimal TotalLinesAmt = getTotalLines();
-		if (TotalLinesAmt.signum() == 0)
-			return true;
-
-		BigDecimal TotalSiscomexAmt = getlbr_TotalSISCOMEX();
-		if (TotalSiscomexAmt.signum() == 0)
-			return true;
-
-		MLBRNotaFiscalLine[] nfLines = getLines("Line");
-		for (MLBRNotaFiscalLine nfLine : nfLines){
-
-			BigDecimal lineAmt = nfLine.getLineTotalAmt();
-			//siscomexAmt = lineAmt/totalLinesAmt (porcentagem do total da nf)
-			//siscomexAmt = TotalSiscomex*siscomexamt (siscomex proporcional)
-			BigDecimal siscomexAmt = lineAmt.divide(TotalLinesAmt, TaxBR.MCROUND);
-			           siscomexAmt = TotalSiscomexAmt.multiply(siscomexAmt);
-
-			nfLine.setlbr_LineTotalSISCOMEX(siscomexAmt.setScale(TaxBR.SCALE, TaxBR.ROUND));
-			nfLine.save();
-
-			BigDecimal ICMSRate = nfLine.getICMSRate();
-			if (ICMSRate == null || ICMSRate.signum() == 0)
-				continue;
-
-			//siscomex/(1-(ICMS/100))
-			BigDecimal TaxBaseAmt = siscomexAmt.divide((Env.ONE.subtract(
-					                                   (ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND))))
-					                                   ,TaxBR.MCROUND);
-			//taxBase*(ICMS/100)
-			BigDecimal TaxAmt     = TaxBaseAmt.multiply((ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
-
-			int LBR_TaxGroup_ID   = TaxBR.getTaxGroup_ID("ICMS");
-			if (LBR_TaxGroup_ID > 0){
-				MLBRNFLineTax nfLineTax = new MLBRNFLineTax(getCtx(), LBR_TaxGroup_ID, nfLine.get_ID(), TaxBaseAmt.setScale(TaxBR.SCALE, TaxBR.ROUND),
-						TaxAmt.setScale(TaxBR.SCALE, TaxBR.ROUND), ICMSRate, Env.ZERO, "SISCOMEX", getAD_Org_ID(), get_TrxName());
-				if (!nfLineTax.save(get_TrxName())){
-					return false;
-				}
-			}
-
-		} //for lines
-
-		return true;
-	} //setSiscomexTax
-
-	public boolean setFreightTax(){
-
-		BigDecimal TotalLinesAmt = getTotalLines();
-		if (TotalLinesAmt.signum() == 0)
-			return true;
-
-		BigDecimal TotalFreightAmt = getFreightAmt();
-		if (TotalFreightAmt.signum() == 0)
-			return true;
-
-		MLBRNotaFiscalLine[] nfLines = getLines("Line");
-		for (MLBRNotaFiscalLine nfLine : nfLines){
-
-			BigDecimal ICMSRate = nfLine.getICMSRate();
-			if (ICMSRate == null || ICMSRate.signum() == 0)
-				continue;
-
-			BigDecimal freightAmt = nfLine.getFreightAmt(TotalLinesAmt, TotalFreightAmt);
-
-			//frete/(1-(ICMS/100))
-			BigDecimal TaxBaseAmt = freightAmt.divide((Env.ONE.subtract(
-					                                   (ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND))))
-					                                   ,TaxBR.MCROUND);
-			//taxBase*(ICMS/100)
-			BigDecimal TaxAmt     = TaxBaseAmt.multiply((ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
-
-			int LBR_TaxGroup_ID   = TaxBR.getTaxGroup_ID("ICMS");
-			if (LBR_TaxGroup_ID > 0){
-				MLBRNFLineTax nfLineTax = new MLBRNFLineTax(getCtx(), LBR_TaxGroup_ID, nfLine.get_ID(), TaxBaseAmt.setScale(TaxBR.SCALE, TaxBR.ROUND),
-						TaxAmt.setScale(TaxBR.SCALE, TaxBR.ROUND), ICMSRate, Env.ZERO, "FRETE", getAD_Org_ID(), get_TrxName());
-				if (!nfLineTax.save(get_TrxName())){
-					return false;
-				}
-			}
-
-		} //for lines
-
-		return true;
-	} //setFreightTax
-
-	/**************************************************************************
-	 *  getLines
-	 *  @return MNotaFiscalLine[] lines
-	 *  @deprecated
-	 */
-	public MLBRNotaFiscalLine[] getLines(){
-		return getLines(null);
-	}
-	
-	/**************************************************************************
-	 *  getLines
-	 *  @param String orderBy or null
-	 *  @return MNotaFiscalLine[] lines
-	 */
-	public MLBRNotaFiscalLine[] getLines(String orderBy){
-
-		String   whereClause = "LBR_NotaFiscal_ID = ?";
-		Object[] parameters  = new Object[]{getLBR_NotaFiscal_ID()};
-
-		return getLines(parameters,whereClause,orderBy);
-	} //getLines
-
-	/**
-	 * getLines
-	 * @param Object[] parameters
-	 * @param String whereClause
-	 * @param String orderBy
-	 * @return MNotaFiscalLine[] lines
-	 */
-	public MLBRNotaFiscalLine[] getLines(Object[] parameters, String whereClause, String orderBy){
-
-		MTable table = MTable.get(getCtx(), MLBRNotaFiscalLine.Table_Name);
-		Query query =  new Query(getCtx(), table, whereClause, get_TrxName());
-	 		  query.setParameters(parameters);
-
-	 	orderBy = TextUtil.checkOrderBy(orderBy);
-	 	if (orderBy != null)
-	 		  query.setOrderBy(orderBy);
-
-	 	List<MLBRNotaFiscalLine> list = query.list();
-	 	return list.toArray(new MLBRNotaFiscalLine[list.size()]);
-	} //getLines
-
-	public void setDescription(String description){
-		if (description == null)
-			super.setDescription("");
-		else{
-			description = description.replaceAll("null", " ");
-			super.setDescription(description.trim());
-		}
-	}
-
-	public MBPartnerLocation getBPartnerLocation(MOrder order, MInvoice invoice, MInOut shipment){
-
-		MBPartnerLocation bpLocation = null;
-
-		if (shipment != null && shipment.getC_BPartner_Location_ID() != 0){
-			bpLocation = new MBPartnerLocation(getCtx(),shipment.getC_BPartner_Location_ID(),get_TrxName());
-		}
-		else if (order != null && order.getC_BPartner_Location_ID() != 0){
-			bpLocation = new MBPartnerLocation(getCtx(),order.getC_BPartner_Location_ID(),get_TrxName());
-		}
-		else if (invoice != null){
-			bpLocation = new MBPartnerLocation(getCtx(),invoice.getC_BPartner_Location_ID(),get_TrxName());
-		}
-
-		return bpLocation;
-	} //getBPartnerLocation
-
-	public void setOrgInfo(int AD_Org_ID){
-		MOrg org = MOrg.get(getCtx(), AD_Org_ID);
-		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
-		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(),get_TrxName());
-		MCountry orgCountry = new MCountry(getCtx(),orgLoc.getC_Country_ID(),get_TrxName());
-
-		String legalEntity = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity);
-		if (legalEntity == null || legalEntity.length() < 1)
-			legalEntity = org.getName();
-
-		setOrg_Location_ID(orgLoc.getC_Location_ID());
-		setlbr_OrgAddress1(orgLoc.getAddress1());
-		setlbr_OrgAddress2(orgLoc.getAddress2());
-		setlbr_OrgAddress3(orgLoc.getAddress3());
-		setlbr_OrgAddress4(orgLoc.getAddress4());
-		setlbr_OrgName(legalEntity);
-		setlbr_OrgCity(orgLoc.getCity());
-		setlbr_OrgPostal(orgLoc.getPostal());
-		setlbr_OrgCountry(orgCountry.getCountryCode());
-		setlbr_OrgRegion(orgLoc.getRegionName(true));
-		setlbr_OrgCCM(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM));
-		setlbr_CNPJ(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ));
-		setlbr_IE(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE));
-	} //setOrgInfo
-
-	public void setBPartner(MBPartner bpartner, MBPartnerLocation bpLocation){
-
-		if (bpartner == null || bpLocation == null)
-			return;
-
-		setC_BPartner_ID(bpartner.getC_BPartner_ID());   /** C_BPartner_ID **/
-		setC_BPartner_Location_ID(bpLocation.getC_BPartner_Location_ID());   /** C_BPartner_Location_ID **/
-		setBPName(bpartner.getName());   //Nome Destinatário
-		setlbr_BPPhone(bpLocation.getPhone());   //Telefone Destinatário
-
-		setlbr_BPCNPJ(BPartnerUtil.getCNPJ(bpartner,bpLocation));   //CNPJ Destinatário
-		setlbr_BPIE(BPartnerUtil.getIE(bpartner,bpLocation));   //IE Destinatário
-		setlbr_BPSuframa(BPartnerUtil.getSuframa(bpartner,bpLocation)); //Suframa Destinatário
-
-		MLocation location = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
-		setlbr_BPAddress1(location.getAddress1());   //Endereço Destinatário
-		setlbr_BPAddress2(location.getAddress2());   //Endereço Destinatário
-		setlbr_BPAddress3(location.getAddress3());   //Endereço Destinatário
-		setlbr_BPAddress4(location.getAddress4());   //Endereço Destinatário
-		setlbr_BPCity(location.getCity());   //Cidade Destinatário
-		setlbr_BPPostal(location.getPostal());   //CEP Destinatário
-
-		MCountry country = new MCountry(getCtx(),location.getC_Country_ID(),get_TrxName());
-		setlbr_BPCountry(country.getCountryCode());   //País Destinatário
-
-		if (country.get_ID() != BRAZIL)
-			setlbr_BPRegion("EX");
-		else{
-			MRegion region = new MRegion(getCtx(),location.getC_Region_ID(),get_TrxName());
-			setlbr_BPRegion(region.getName());   //Estado Destinatário
-		}
-	} //setBPartner
-
-	public void setInvoiceBPartner(MInvoice invoice){
-
-		if (invoice == null)
-			return;
-
-		setBill_Location_ID(invoice.getC_BPartner_Location_ID());   /** InvoiceLocation_ID **/
-		setC_PaymentTerm_ID(invoice.getC_PaymentTerm_ID());   /** C_PaymentTerm_ID **/
-
-		MBPartnerLocation bpLocation = new MBPartnerLocation(getCtx(),invoice.getC_BPartner_Location_ID(),get_TrxName());
-		MLocation         location   = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
-
-		setlbr_BPInvoiceCNPJ(BPartnerUtil.getCNPJ(getCtx(), invoice.getC_BPartner_ID(),bpLocation.getC_BPartner_Location_ID()));   //CNPJ Fatura
-		setlbr_BPInvoiceIE(BPartnerUtil.getIE(getCtx(), invoice.getC_BPartner_ID(),bpLocation.getC_BPartner_Location_ID()));   //IE Fatura
-
-		setlbr_BPInvoiceAddress1(location.getAddress1());   //Endereço Fatura
-		setlbr_BPInvoiceAddress2(location.getAddress2());   //Endereço Fatura
-		setlbr_BPInvoiceAddress3(location.getAddress3());   //Endereço Fatura
-		setlbr_BPInvoiceAddress4(location.getAddress4());   //Endereço Fatura
-		setlbr_BPInvoiceCity(location.getCity());   //Cidade Fatura
-		setlbr_BPInvoicePostal(location.getPostal());   //CEP Fatura
-
-		MCountry country = new MCountry(getCtx(),location.getC_Country_ID(),get_TrxName());
-		setlbr_BPInvoiceCountry(country.getCountryCode());   //País Fatura
-
-		if (country.get_ID() != BRAZIL)
-			setlbr_BPInvoiceRegion("EX");
-		else{
-			MRegion region = new MRegion(getCtx(),location.getC_Region_ID(),get_TrxName());
-			setlbr_BPInvoiceRegion(region.getName());   //Estado Fatura
-		}
-	} //setInvoiceBPartner
-
-	public void setShipmentBPartner(MInOut shipment, MInvoice invoice){
-
-		MBPartnerLocation bpLocation = null;
-		MLocation         location   = null;
-
-		if (shipment != null && shipment.getM_InOut_ID() != 0) {
-			bpLocation = new MBPartnerLocation(getCtx(),shipment.getC_BPartner_Location_ID(),get_TrxName());
-			location   = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
-
-			setlbr_BPDeliveryCNPJ(BPartnerUtil.getCNPJ(getCtx(), shipment.getC_BPartner_ID(),bpLocation.getC_BPartner_Location_ID()));   //CNPJ Entrega
-			setlbr_BPDeliveryIE(BPartnerUtil.getIE(getCtx(), shipment.getC_BPartner_ID(),bpLocation.getC_BPartner_Location_ID()));   //IE Entrega
-		}
-		else if (invoice != null) {
-			bpLocation = new MBPartnerLocation(getCtx(),invoice.getC_BPartner_Location_ID(),get_TrxName());
-			location   = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
-
-			setlbr_BPDeliveryCNPJ(BPartnerUtil.getCNPJ(getCtx(), invoice.getC_BPartner_ID(),bpLocation.getC_BPartner_Location_ID()));   //CNPJ Entrega
-			setlbr_BPDeliveryIE(BPartnerUtil.getIE(getCtx(), invoice.getC_BPartner_ID(),bpLocation.getC_BPartner_Location_ID()));   //IE Entrega
-		}
-		else return;
-
-		setlbr_BPDeliveryAddress1(location.getAddress1());   //Endereço Entrega
-		setlbr_BPDeliveryAddress2(location.getAddress2());   //Endereço Entrega
-		setlbr_BPDeliveryAddress3(location.getAddress3());   //Endereço Entrega
-		setlbr_BPDeliveryAddress4(location.getAddress4());   //Endereço Entrega
-		setlbr_BPDeliveryCity(location.getCity());   //Cidade Entrega
-		setlbr_BPDeliveryPostal(location.getPostal());   //CEP Entrega
-
-		MCountry country = new MCountry(getCtx(),location.getC_Country_ID(),get_TrxName());
-		setlbr_BPDeliveryCountry(country.getCountryCode());   //País Entrega
-
-		if (country.get_ID() != BRAZIL)
-			setlbr_BPDeliveryRegion("EX");
-		else{
-			MRegion region = new MRegion(getCtx(),location.getC_Region_ID(),get_TrxName());
-			setlbr_BPDeliveryRegion(region.getName());   //Estado Entrega
-		}
-
-		setFreightCostRule(shipment.getFreightCostRule()); //Frete por Conta
-	} //setShipmentBPartner
-
-	public void setShipper(MShipper shipper, String LicensePlate){
-
-		setlbr_BPShipperLicensePlate(LicensePlate);
-		if (shipper == null)
-			return;
-
-		setM_Shipper_ID(shipper.getM_Shipper_ID());
-		setlbr_BPShipperName(shipper.getName());
-
-		MBPartner transp = new MBPartner(getCtx(),shipper.getC_BPartner_ID(),get_TrxName());
-
-		//Localização Transportadora
-		MBPartnerLocation[] transpLocations = transp.getLocations(false);
-		MLocation location = null;
-
-		if (transpLocations.length > 0){
-
-			location = new MLocation(getCtx(),transpLocations[0].getC_Location_ID(),get_TrxName());
-			setlbr_BPShipperCNPJ(BPartnerUtil.getCNPJ(transp,transpLocations[0]));   //CNPJ Transportadora
-			setlbr_BPShipperIE(BPartnerUtil.getIE(transp,transpLocations[0]));   //IE Transportadora
-
-			setlbr_BPShipperAddress1(location.getAddress1());   //Endereço Transportadora
-			setlbr_BPShipperAddress2(location.getAddress2());   //Endereço Transportadora
-			setlbr_BPShipperAddress3(location.getAddress3());   //Endereço Transportadora
-			setlbr_BPShipperAddress4(location.getAddress4());   //Endereço Transportadora
-
-			setlbr_BPShipperCity(location.getCity());   //Cidade Transportadora
-			setlbr_BPShipperPostal(location.getPostal());   //CEP Transportadora
-
-			MCountry country = new MCountry(getCtx(),location.getC_Country_ID(),get_TrxName());
-			setlbr_BPShipperCountry(country.getCountryCode());   //País Transportadora
-
-			if (country.get_ID() != BRAZIL)
-				setlbr_BPShipperRegion("EX");
-			else{
-				MRegion region = new MRegion(getCtx(),location.getC_Region_ID(),get_TrxName());
-				setlbr_BPShipperRegion(region.getName());   //Estado Transportadora
-			}
-
-		}
-		else
-		{
-			setlbr_BPShipperCNPJ(BPartnerUtil.getCNPJ(transp,null));   //CNPJ Transportadora
-			setlbr_BPShipperIE(BPartnerUtil.getIE(transp,null));   //IE Transportadora
-		}
-
-	} //setShipper
-
-	/**
-	 * Retorna o NCM ou a Referência do NCM
-	 * 	de acordo com a configuração do sistema.
-	 *
-	 * @param LBR_NCM_ID
-	 * @return
-	 */
-	public String getNCM(Integer LBR_NCM_ID)
-	{
-		if (LBR_NCM_ID == null || LBR_NCM_ID.intValue() == 0)
-			return null;
-
-		X_LBR_NCM ncm = new X_LBR_NCM(getCtx(),LBR_NCM_ID,get_TrxName());
-		String ncmName = ncm.getValue();
-
-		if (!(ncmName == null || ncmName.equals("")))
-		{
-			//	Retorna a Ref. do NCM
-			if (m_refNCM.containsKey(ncmName))
-			{
-				//	Retorna o NCM
-				if (!MSysConfig.getBooleanValue("LBR_REF_NCM", false, Env.getAD_Client_ID(Env.getCtx())))
-					return ncmName;
-				//	Retorna a Chave
-				else
-					return m_refNCM.get(ncmName).toString();	//	NCM
-			}
-			else
-			{
-				String cl = TextUtil.getALFAB(m_refNCM.size());
-				m_refNCM.put(ncmName, cl);
-				setNCMReference(ncmName,cl,true);
-				//	Retorna o NCM
-				if (!MSysConfig.getBooleanValue("LBR_REF_NCM", false, Env.getAD_Client_ID(Env.getCtx())))
-					return ncmName;
-				//	Retorna a Chave
-				else
-					return cl;
-			}
-		}
-		//
-		return null;
-	}	//	getNCM
 	
 	/**
-	 * Retorna o valor do Imposto
-	 * @return BigDecimal amt
+	 * Verifica se a Nota Fiscal é uma operação que "gera" receita.
+	 * Utilizado para o SPED EFD Pis/Cofins
+	 * @return 
 	 */
-	public BigDecimal getTaxAmt(String taxIndicator){
-
-		if (taxIndicator == null)
-			return Env.ZERO;
-
-		String sql = "SELECT SUM(lbr_TaxAmt) FROM LBR_NFTax " +
-		             "WHERE LBR_NotaFiscal_ID = ? " +
-		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
-		//
-		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
-		return result == null ? Env.ZERO : result;
-	} //getTaxAmt
-	
-	/**
-	 * Retorna o valor do Imposto sem as linhas com serviço
-	 * @param taxIndicator
-	 * @param onlyService - true, só impostos de serviço, false, só impostos exceto serviços
-	 * @return BigDecimal amt
-	 */
-	public BigDecimal getTaxAmtService(String taxIndicator, boolean onlyService){
-
-		if (taxIndicator == null)
-			return Env.ZERO;
-
-		String sql = "SELECT SUM(lbr_TaxAmt) FROM LBR_NFLineTax " +
-		             "WHERE LBR_NotaFiscalLine_ID IN " +
-		             "(SELECT LBR_NotaFiscalLine_ID FROM LBR_NotaFiscalLine " +
-		             "WHERE LBR_NotaFiscal_ID = ? AND lbr_CFOPName" + (onlyService ? " LIKE " : " NOT LIKE ") + "'%.933')"  +
-		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
-		//
-
-		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
-		return result == null ? Env.ZERO : result;
-	} //getTaxAmtService
-	
-	/**
-	 * Retorna a Base de Cálculo do Imposto
-	 * @return BigDecimal TaxBaseAmt
-	 */
-	public BigDecimal getTaxBaseAmt(String taxIndicator){
-
-		if (taxIndicator == null)
-			return Env.ZERO;
-
-		String sql = "SELECT SUM(lbr_TaxBaseAmt) FROM LBR_NFTax " +
-		             "WHERE LBR_NotaFiscal_ID = ? " +
-		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
-		//
-		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
-		return result == null ? Env.ZERO : result;
-	} //getTaxAmt
-	
-	/**
-	 * Retorna o valor do Imposto sem as linhas com serviço
-	 * @param taxIndicator
-	 * @param onlyService - true, só impostos de serviço, false, só impostos exceto serviços
-	 * @return BigDecimal amt
-	 */
-	public BigDecimal getTaxBaseAmtService(String taxIndicator, boolean onlyService){
-
-		if (taxIndicator == null)
-			return Env.ZERO;
-
-		String sql = "SELECT SUM(lbr_TaxBaseAmt) FROM LBR_NFLineTax " +
-		             "WHERE LBR_NotaFiscalLine_ID IN " +
-		             "(SELECT LBR_NotaFiscalLine_ID FROM LBR_NotaFiscalLine " +
-		             "WHERE LBR_NotaFiscal_ID = ? AND lbr_CFOPName" + (onlyService ? " LIKE " : " NOT LIKE ") + "'%.933')"  +
-		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
-		//
-
-		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
-		return result == null ? Env.ZERO : result;
-	} //getTaxBaseAmtService
-
-	/**
-	 * Retorna a Alíquota do Imposto
-	 * @return BigDecimal TaxRate
-	 */
-	public BigDecimal getTaxRate(String taxIndicator){
-
-		if (taxIndicator == null)
-			return Env.ZERO;
-
-		String sql = "SELECT AVG(lbr_TaxRate) FROM LBR_NFLineTax " +
-		             "WHERE LBR_NotaFiscalLine_ID IN " +
-		             "(SELECT LBR_NotaFiscalLine_ID FROM LBR_NotaFiscalLine WHERE LBR_NotaFiscal_ID = ?) " +
-		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
-		//
-
-		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
-		return result == null ? Env.ZERO : result;
-	} //getTaxRate
-	
-	/**
-	 * Retorna a base de cálculo e o valor do ICMS para as linhas de ativo fixo
-	 * @return BigDecimla[] 0 = Base de Cálculo, 1 = Valor do Imposto
-	 */
-	public BigDecimal[] getAssetTaxAmt(){
-		
-		BigDecimal[] assetAmt = new BigDecimal[]{Env.ZERO,Env.ZERO};
-		
-		MLBRNotaFiscalLine[] nfLines = getLines("Line");
-		
-		for (MLBRNotaFiscalLine nfLine : nfLines){
-			if (!nfLine.isAsset())
-				continue;
-			
-			assetAmt[0] = assetAmt[0].add(nfLine.getICMSBaseAmt());
-			assetAmt[1] = assetAmt[1].add(nfLine.getICMSAmt());
-		}
-		
-		return assetAmt;
-	} //getAssetAmt
-	
-	public BigDecimal getCost(int C_AcctSchema_ID, int C_CostElement_ID){
-
-		BigDecimal currentCost = Env.ZERO;
-
-		MLBRNotaFiscalLine[] lines = getLines("line");
-		for(MLBRNotaFiscalLine line : lines){
-			int M_Product_ID = line.getM_Product_ID();
-			if (M_Product_ID == 0)
-				continue;
-
-			MProduct product = new MProduct(getCtx(),M_Product_ID,get_TrxName());
-			MAcctSchema as   = MAcctSchema.get(getCtx(), C_AcctSchema_ID);
-
-			MCost cost = MCost.get(product,0,as,0,C_CostElement_ID,get_TrxName());
-			if (cost != null)
-				currentCost = currentCost.add(cost.getCurrentCostPrice().multiply(line.getQty()));
-		}
-
-		return currentCost.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getCost
-
-	/**
-	 *  Retorno o valor da Base de ICMS
-	 *
-	 *  @return	BigDecimal	Base ICMS
-	 */
-	public BigDecimal getICMSBase()
-	{
-		return getTaxBaseAmt("ICMS");
-	}	//	getICMSBase
-
-	/**
-	 *  Retorno o valor da Base de ICMSST
-	 *
-	 *  @return	BigDecimal	Base ICMSST
-	 */
-	public BigDecimal getICMSSTBase()
-	{
-		return getTaxBaseAmt("ICMSST");
-	}	//	getICMSBaseST
-
-	/**
-	 *  Retorno o valor do ICMS
-	 *
-	 *  @return	BigDecimal	ICMS
-	 */
-	public BigDecimal getICMSAmt()
-	{
-		return getTaxAmt("ICMS");
-	}	//	getICMSAmt
-
-	public BigDecimal getICMSDebAmt(){
-
-		String sql = "SELECT SUM(ValorICMS) FROM lbr_SitICMS_V " +
-                     "WHERE LBR_NotaFiscal_ID = ?";
-        //
-		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID()});
-		return result == null ? Env.ZERO : result;
-	} // getICMSDebAmt
-
-	/**
-	 *  Retorno a média das alíquotas do ICMS
-	 *
-	 *  @return	BigDecimal	ICMS Rate
-	 */
-	public BigDecimal getICMSRate()
-	{
-		return getTaxRate("ICMS");
-	}	//	getICMSRate
-
-	/**
-	 * Retorno o valor do ICMS
-	 * @param ctx
-	 * @param LBR_NotaFiscal_ID
-	 * @param trx
-	 * @return BigDecimal ICMS
-	 * @deprecated
-	 */
-	public static BigDecimal getICMSAmt(Properties ctx, int LBR_NotaFiscal_ID, String trx){
-		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx,LBR_NotaFiscal_ID,trx);
-		return nf.getICMSAmt();
-	} //getICMSAMt
-
-	/**
-	 *  Retorno o valor do ICMSST
-	 *
-	 *  @return	BigDecimal	ICMSST
-	 */
-	public BigDecimal getICMSSTAmt()
-	{
-		return getTaxAmt("ICMSST");
-	}	//	getICMSAmtST
-
-	/**
-	 *  Retorno o valor do IPI
-	 *
-	 *  @return	BigDecimal	IPI
-	 */
-	public BigDecimal getIPIAmt()
-	{
-		return getTaxAmt("IPI");
-	}	//	getIPIAmt
-
-	/**
-	 *  Retorno o valor do PIS
-	 *
-	 *  @return	BigDecimal	PIS
-	 */
-	public BigDecimal getPISAmt()
-	{
-		return getTaxAmt("PIS");
-	}	//	getPISAmt
-
-	/**
-	 *  Retorno o valor do COFINS
-	 *
-	 *  @return	BigDecimal	COFINS
-	 */
-	public BigDecimal getCOFINSAmt()
-	{
-		return getTaxAmt("COFINS");
-	}	//	getCOFINSAmt
-	
-	/**
-	 * Retorna o desconto proporcional ao base amt
-	 * Usado para saber o desconto das linhas só de serviço ou só de produtos
-	 * @param baseAmt
-	 * @return
-	 */
-	public BigDecimal getDiscountAmt(BigDecimal baseAmt){
-
-		if (baseAmt.signum() <= 0 || baseAmt.signum() <= 0)
-			return Env.ZERO;
-		
-		BigDecimal discountAmt = baseAmt.divide(getTotalLines().add(getlbr_ServiceTotalAmt()), TaxBR.MCROUND);
-		           discountAmt = getDiscountAmt().multiply(discountAmt);
-
-		return discountAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getDiscountAmt
-
-	public static int getLBR_NotaFiscal_ID(String DocumentNo,boolean IsSOTrx, String trx)
-	{
-
-		String sql = "SELECT LBR_NotaFiscal_ID FROM LBR_NotaFiscal " +
-				     "WHERE DocumentNo = ? AND AD_Client_ID = ? " +
-				     "AND IsSOTrx = ? " +
-				     "ORDER BY LBR_NotaFiscal_ID desc";
-
-		Integer LBR_NotaFiscal_ID = DB.getSQLValue(trx, sql,
-				new Object[]{DocumentNo, Env.getAD_Client_ID(Env.getCtx()),IsSOTrx});
-
-		return LBR_NotaFiscal_ID;
-	}	//	getLBR_NotaFiscal_ID
-
-	public static int getNFB(int AD_Org_ID)
-	{
-		return getNFB(AD_Org_ID,true);
-	}
-	
-	public static int getNFB(int AD_Org_ID, boolean isSOTrx){
-		return getNFB(AD_Org_ID,isSOTrx,false);
-	}
-
-	public static int getNFB(int AD_Org_ID, boolean isSOTrx, boolean isSCAN) {
-
-		String sql = "SELECT C_DocType_ID FROM C_DocType " +
-				     "WHERE DocBaseType = 'NFB' " +
-				     "AND AD_Client_ID = ? AND AD_Org_ID IN (0,?) " +
-				     "AND IsSOTrx = ? AND lbr_NFeTpEmi = ?" +
-				     "order by C_DocType_ID, AD_Org_ID desc";
-
-		int C_DocType_ID = DB.getSQLValue(null, sql,
-				new Object[]{Env.getAD_Client_ID(Env.getCtx()), AD_Org_ID, isSOTrx, isSCAN ? "3" : "1"});
-
-		return C_DocType_ID;
-	}	//	getNFB
-
-	/**
-	 * 	Retorna o CFOP das linhas, no caso de mais de 1 CFOP,
-	 * 		retorna o ref. ao Maior Valor
-	 *
-	 * @return CFOP
-	 */
-	public String getCFOP()
-	{
-		String sql = "SELECT lbr_CFOPName " +
-					 "FROM LBR_NotaFiscalLine " +
-					 "WHERE LBR_NotaFiscal_ID=? ORDER BY LineTotalAmt DESC";
-
-		return DB.getSQLValueString(null, sql, getLBR_NotaFiscal_ID());
-	}
-
-	/**
-	 * Retorna o CFOP ou a Referência do CFOP
-	 * 	de acordo com a configuração do sistema.
-	 *
-	 * @param LBR_CFOP_ID
-	 * @return CFOP ou Ref. do CFOP
-	 */
-	public String getCFOP(Integer LBR_CFOP_ID)
-	{
-		if (LBR_CFOP_ID == null || LBR_CFOP_ID.intValue() == 0)
-			return null;
-		//
-		X_LBR_CFOP cfop = new X_LBR_CFOP(getCtx(),LBR_CFOP_ID,get_TrxName());
-		String cfopName = cfop.getValue();
-		//
-		if (!(cfopName == null || cfopName.equals("")))
-		{
-			//	Retorna a Ref. do CFOP
-			if (m_refCFOP.containsKey(cfopName))
-			{
-				//	Retorna o CFOP
-				if (!MSysConfig.getBooleanValue("LBR_REF_CFOP", false, Env.getAD_Client_ID(Env.getCtx())))
-					return cfopName;
-				//	Retorna a Chave
-				else
-					return m_refCFOP.get(cfopName).toString();	//	CFOP
-			}
-			else
-			{
-				String cl = TextUtil.getALFAB(m_refCFOP.size());
-				m_refCFOP.put(cfopName, cl);
-				setCFOPNote(cfop.getDescription() + ", ",true);
-				setCFOPReference(cfopName,cl);
-				//	Retorna o CFOP
-				if (!MSysConfig.getBooleanValue("LBR_REF_CFOP", false, Env.getAD_Client_ID(Env.getCtx())))
-					return cfopName;
-				//	Retorna a Chave
-				else
-					return cl;
-			}
-		}
-		//
-		return null;
-	}	//	getCFOP
-
-	public void setLegalMessage(Integer LBR_LegalMessage_ID){
-
-		if (LBR_LegalMessage_ID == null || LBR_LegalMessage_ID.intValue() == 0)
-			return;
-
-		X_LBR_LegalMessage lMessage = new X_LBR_LegalMessage(getCtx(),LBR_LegalMessage_ID,get_TrxName());
-
-		if (!m_refLegalMessage.contains(LBR_LegalMessage_ID)){
-
-			m_refLegalMessage.add(LBR_LegalMessage_ID);
-			setLegalMessage(lMessage.getTextMsg() + ", ",true);
-		}
-	} //setLegalMessage
-
-	/**************************************************************************
-	 *  lastPrinted
-	 *  @return int documentno
-	 */
-	public int lastPrinted(){
-
-		String sql = "SELECT max(DocumentNo) FROM LBR_NotaFiscal " +
-				     "WHERE AD_Org_ID = ? AND C_DocType_ID = ? " +
-				     "AND IsSOTrx = ? AND IsPrinted = 'Y'";
-
-		int documentno = DB.getSQLValue(get_TrxName(), sql,
-				new Object[]{getAD_Org_ID(), getC_DocType_ID(), isSOTrx()});
-
-		return documentno;
-	} //lastPrinted
-
-	/**
-	 * Convert Amt
-	 * @throws Exception
-	 */
-	public BigDecimal convertAmt(BigDecimal Amt, int C_Currency_ID) throws Exception{
-
-		Amt = MConversionRate.convertBase(getCtx(), Amt, C_Currency_ID,
-				  getDateDoc(), 0, Env.getAD_Client_ID(getCtx()),
-				  Env.getAD_Org_ID(getCtx()));
-
-		if (Amt == null){
-			log.log(Level.SEVERE,"null if no rate = " + getDateDoc() + " / Currency = " + C_Currency_ID);
-			throw new Exception();
-		}
-
-		return Amt;
-	} //convertAmt
-
-	/**
-	 * 	Void Document.
-	 * 	@return true if success
-	 */
-	public boolean voidIt(){
-
-		log.info(toString());
-		// Before Void
-		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
-		if (m_processMsg != null)
-			return false;
-
-		if (isCancelled()) return false; //Já está cancelada
-
-		if (isPrinted()){
-
-			MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
-			if (invoice.getDocStatus().equals(MInvoice.DOCSTATUS_Voided) || //Already Voided
-				invoice.getDocStatus().equals(MInvoice.DOCSTATUS_Reversed))
-				;
-			else
-				if (invoice.voidIt()){
-					invoice.save(get_TrxName());
-				}
-				else {
-					m_processMsg = invoice.getProcessMsg();
-					return false;
-				}
-
-			if (getM_InOut_ID() != 0){
-				MInOut shipment = new MInOut(getCtx(),getM_InOut_ID(),get_TrxName());
-				if (shipment.getDocStatus().equals(MInOut.DOCSTATUS_Voided) || //Already Voided
-				    shipment.getDocStatus().equals(MInOut.DOCSTATUS_Reversed))
-						;
-				else
-					if (shipment.voidIt()){
-						shipment.save(get_TrxName());
-					}
-					else {
-						m_processMsg = shipment.getProcessMsg();
-						return false;
-					}
-			}
-
-			/* CANCELA OV - Utilizar código no validator do cliente no AFTER_VOID
-			if (getC_Order_ID() != 0){
-				MOrder order = new MOrder(getCtx(),getC_Order_ID(),get_TrxName());
-				if (order.getDocStatus().equals(MOrder.DOCSTATUS_Voided) || //Already Voided
-				    order.getDocStatus().equals(MOrder.DOCSTATUS_Reversed))
-						;
-				else
-					if (order.voidIt()){
-						order.save(get_TrxName());
-					}
-					else return false;
-			}
-			*/
-
-		} //printed
-		else{
-
-			MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
-			invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", null);
-			invoice.save(get_TrxName());
-
-			if (getC_DocTypeTarget_ID() != 0){
-
-				MDocType docType = new MDocType(getCtx(),getC_DocTypeTarget_ID(),get_TrxName());
-				if (docType.getDocNoSequence_ID() != 0){
-					MSequence sequence = new MSequence(getCtx(), docType.getDocNoSequence_ID(), get_TrxName());
-
-					int actual = sequence.getCurrentNext()-1;
-					if (actual == Integer.parseInt(getDocumentNo())){
-						sequence.setCurrentNext(sequence.getCurrentNext()-1);
-						sequence.save(get_TrxName());
-					}
-					else{
-						log.log(Level.SEVERE, "Existem notas com numeração superior " +
-								"no sistema. Nota: " + getDocumentNo());
-						return false;
-					}
-				}
-
-			}
-
-		}
-
-		setIsCancelled(true);
-
-		// After Void
-		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
-		if (m_processMsg != null)
-			return false;
-
-		return true;
-	}
-
-	public static boolean deleteLBR_NotaFiscalLine (int LBR_NotaFiscal_ID, String trx){
-
-		StringBuffer sql = new StringBuffer("DELETE FROM ")
-		   .append(X_LBR_NotaFiscalLine.Table_Name)
-		   .append(" WHERE LBR_NotaFiscal_ID = ")
-		   .append(LBR_NotaFiscal_ID);
-
-		if (DB.executeUpdate(sql.toString(), trx) == -1)
-			return false;
-
-		return true;
-	} //deleteLBR_NotaFiscalLine
-
-	public static boolean deleteLBR_NFTax (int LBR_NotaFiscal_ID, String trx){
-
-		StringBuffer sql = new StringBuffer("DELETE FROM ")
-		   .append(X_LBR_NFTax.Table_Name)
-		   .append(" WHERE LBR_NotaFiscal_ID = ")
-		   .append(LBR_NotaFiscal_ID);
-
-		if (DB.executeUpdate(sql.toString(), trx) == -1)
-			return false;
-
-		return true;
-	} //deleteLBR_NFTax
-
-	public static boolean deleteLBR_NFLineTax (int LBR_NotaFiscal_ID, String trx){
-
-		StringBuffer sql = new StringBuffer("DELETE FROM ")
-		   .append(X_LBR_NFLineTax.Table_Name)
-		   .append(" WHERE LBR_NotaFiscalLine_ID IN ")
-		   .append("(SELECT LBR_NotaFiscalLine_ID FROM ")
-		   .append(X_LBR_NotaFiscalLine.Table_Name)
-		   .append(" WHERE LBR_NotaFiscal_ID = ")
-		   .append(LBR_NotaFiscal_ID).append(")");
-
-		if (DB.executeUpdate(sql.toString(), trx) == -1)
-			return false;
-
-		return true;
-	} //deleteLBR_NFLineTax
-
-	public String getNCMReference() {
-		return TextUtil.retiraPontoFinal(m_NCMReference);
-	}
-
-	/**
-	 * 	Set NCM Reference
-	 *
-	 * 	A-0000.00.00, B-9999.99.99
-	 *
-	 * @param ncmName
-	 * @param cl
-	 * @param concat
-	 */
-	private void setNCMReference(String ncmName, String cl, boolean concat)
-	{
-		if (concat)
-		{
-			if (m_NCMReference.equals(""))
-				m_NCMReference += "Classif: ";
-			//
-			m_NCMReference += cl + "-" + ncmName + ", ";
-		}
-		else
-			m_NCMReference = ncmName;
-	}
-
-	public String getCFOPNote() {
-		return TextUtil.retiraPontoFinal(m_CFOPNote);
-	}
-
-	private void setCFOPNote(String cfopNote, boolean concat) {
-
-		if (concat){
-			m_CFOPNote += cfopNote;
-		}
-		else{
-			m_CFOPNote = cfopNote;
-		}
-	}
-
-	public String getCFOPReference() {
-		return TextUtil.retiraPontoFinal(m_CFOPReference);
-	}
-
-	/**
-	 * 	Set CFOP Reference.
-	 *
-	 * 	A-5.101, B-5.102
-	 *
-	 * @param cfopName
-	 * @param cl
-	 * @param concat
-	 */
-	private void setCFOPReference(String cfopName, String cl)
-	{
-		if (m_CFOPReference == null
-				|| m_CFOPReference.equals(""))
-		{
-			if (MSysConfig.getBooleanValue("LBR_REF_CFOP", false, Env.getAD_Client_ID(Env.getCtx())))
-				m_CFOPReference = cl + "-" + cfopName;
-			else
-				m_CFOPReference = cfopName;
-		}
-		else
-		{
-			if (MSysConfig.getBooleanValue("LBR_REF_CFOP", false, Env.getAD_Client_ID(Env.getCtx())))
-				m_CFOPReference += ", " + cl + "-" + cfopName;
-			else
-				m_CFOPReference += ", " + cfopName;
-		}
-	}
-
-	public String getLegalMessage() {
-		return TextUtil.retiraPontoFinal(m_LegalMessage);
-	}
-
-	private void setLegalMessage(String legalMessage, boolean concat) {
-		if (concat){
-			m_LegalMessage += legalMessage;
-		}
-		else{
-			m_LegalMessage = legalMessage;
-		}
-	}
-
-	/**************************************************************************
-	 *  getTaxes
-	 *  @return X_LBR_NFLineTax[] taxes
-	 */
-	public X_LBR_NFTax[] getTaxes(){
-
-		String whereClause = "LBR_NotaFiscal_ID = ?";
-
-		MTable table = MTable.get(getCtx(), X_LBR_NFTax.Table_Name);
-		Query query =  new Query(getCtx(), table, whereClause, get_TrxName());
-	 		  query.setParameters(new Object[]{getLBR_NotaFiscal_ID()});
-
-		List<X_LBR_NFLineTax> list = query.list();
-
-		return list.toArray(new X_LBR_NFTax[list.size()]);
-	} //getTaxes
-
-	/**************************************************************************
-	 *  getDIs
-	 *  @return X_LBR_NFDI[] taxes
-	 */
-	public X_LBR_NFDI[] getDIs(){
-
-		String whereClause = "LBR_NotaFiscal_ID = ?";
-
-		MTable table = MTable.get(getCtx(), X_LBR_NFDI.Table_Name);
-		Query query =  new Query(getCtx(), table, whereClause, get_TrxName());
-	 		  query.setParameters(new Object[]{getLBR_NotaFiscal_ID()});
-
-		List<X_LBR_NFDI> list = query.list();
-
-		return list.toArray(new X_LBR_NFDI[list.size()]);
-	}	//	getDIs
-	
 	public boolean isRevenue(){
-		
-		String cfopReference = getCFOPReference();
-		List<String> list = new ArrayList<String>();
-		
-		if (cfopReference.indexOf(",") != -1){
-			String[] cfops = cfopReference.split(",");
-			for (String cfop : cfops){
-				list.add(cfop);
-			}
+		for(MLBRNotaFiscalLine line : getLines()){
+			MLBRCFOP cfop = new MLBRCFOP(getCtx(),line.getLBR_CFOP_ID(),get_TrxName());
+			return cfop.isRevenue();
 		}
-		else{
-			list.add(cfopReference);
-		}
-		
-		for (String cfop : list){
-			MLBRCFOP codigo = MLBRCFOP.getCFOP(getCtx(), cfop, get_TrxName());
-			if (!codigo.islbr_IsRevenue())
-				return false;
-		}
-		
 		return true;
 	} //isRevenue
-
-	/**
-	 * Atualiza autorização NF-e e XML de distribuicao
-	 *
-	 * return null (success) or error message
-	 * @throws Exception
-	 */
-	public static String authorizeNFe(Node node, String trxName){
-
-		String error = null;
-
-		if (node.getNodeType() == Node.ELEMENT_NODE)
-		{
-			String chNFe	= NFeUtil.getValue (node, "chNFe");
-			String xMotivo 	= NFeUtil.getValue (node, "xMotivo");
-			String digVal 	= NFeUtil.getValue (node, "digVal");
-			String dhRecbto = NFeUtil.getValue (node, "dhRecbto");
-			String cStat 	= NFeUtil.getValue (node, "cStat");
-			String nProt 	= NFeUtil.getValue (node, "nProt");
-			//
-			MLBRNotaFiscal nf = getNFe(chNFe, trxName);
-			if (nf == null)
-			{
-				error = "NF não encontrada";
-				log.severe(error);
-				return error;
-			}
-
-			if (nf.getlbr_NFeStatus() != null && nf.getlbr_NFeStatus().equals(NFeUtil.AUTORIZADA)){ //
-				log.fine("NF já processada. " + nf.getDocumentNo());
-				return error;
-			}
-
-	        Timestamp ts = NFeUtil.stringToTime(dhRecbto);
-	        //
-	        String nfeDesc = "["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n";
-	        if (nf.getlbr_NFeDesc() == null)
-	        	nf.setlbr_NFeDesc(nfeDesc);
-	        else
-	        	nf.setlbr_NFeDesc(nfeDesc + nf.getlbr_NFeDesc());
-
-	        nf.setlbr_DigestValue(digVal);
-
-
-	        // BF ID: 3391601
-	        if(cStat != null)
-	        {
-	        	try {
-	        		nf.setlbr_NFeStatus(cStat);
-				} catch (Exception e) {
-					nf.setlbr_NFeStatus(MLBRNotaFiscal.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção);
-				}
-	        }
-	        
-	        //
-	        if(nProt != null)
-	        	nf.setlbr_NFeProt(nProt);
-	        
-	        //
-	        if(ts != null)
-	        	nf.setDateTrx(ts);
-	        
-	        nf.setProcessed(true);
-			nf.save(trxName);
-
-			//Atualiza XML para padrão de distribuição
-			try {
-				if (!NFeUtil.updateAttach(nf, NFeUtil.generateDistribution(nf)))
-					error = "Problemas ao atualizar o XML para o padrão de distribuição";
-
-				if (error == null &&
-				   (nf.getlbr_NFeStatus().equals(NFeUtil.AUTORIZADA) ||
-				    nf.getlbr_NFeStatus().equals(NFeUtil.CANCELADA))){
-					NFeEmail.sendMail(nf);
-				}
-
-			} catch (Exception e) {
-				log.log(Level.WARNING,"",e);
-			}
-
-		}
-
-		return error;
-	} //authorizeNFe
-	
-	public boolean checkNFeID(){
-		return checkNFeID(getDocNo(),getlbr_NFeID());
-	} //checkNFeID
-	
-	public static boolean checkNFeID(String documentNo, String nfeID){
-		
-		if (documentNo == null || nfeID == null)
-			return false;
-		
-		documentNo = getDocNo(documentNo);
-		
-		if (nfeID.length() != 44)
-			return false;
-		
-		int digito = ChaveNFE.gerarDigito(nfeID.substring(0, 43));
-		if (digito != Integer.parseInt(nfeID.substring(43)))
-			return false;
-		
-		int nfNo  = Integer.parseInt(documentNo);		
-		int nfeNo = Integer.parseInt(nfeID.substring(25, 34));
-		
-		if (nfNo != nfeNo)
-			return false;
-		
-		return true;
-	} //checkNFeID
 	
 	/**
-	 * 	Encontra a NF pelo ID de NF-e
-	 *
-	 * @param NFeID
-	 * @return
+	 * Verifica se é uma Nota Fiscal Eletrônica (Modelo 55 (NFe) ou Model 57 (CTe)
+	 * @return boolean isNFe
 	 */
-	public static MLBRNotaFiscal getNFe (String NFeID, String trxName)
-	{
-		String sql =  "SELECT LBR_NotaFiscal_ID FROM LBR_NotaFiscal " +
-					   "WHERE lbr_NFeID = ? AND AD_Client_ID = ?";
+	public boolean isNFe(){
+		
+		if (getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) ||
+			getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_ConhecimentoDeTransporteEletrônicoCT_E))
+			return true;
+		
+		return false;
+	} //isNFe
+	
+	public boolean isNFeProcessed(){
+		
+		if (getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado))
+			return true;
+		
+		return false;
+	} //isNFeProcessed
+		
+	public int customizeValidActions(String docStatus, Object processing,
+			String orderType, String isSOTrx, int AD_Table_ID,
+			String[] docAction, String[] options, int index) {
 
-		int LBR_NotaFiscal_ID = DB.getSQLValue(trxName, sql,
-				new Object[]{NFeID, Env.getAD_Client_ID(Env.getCtx())});
-
-		if (LBR_NotaFiscal_ID > 0)
-			return new MLBRNotaFiscal (Env.getCtx(), LBR_NotaFiscal_ID, trxName);
-		else{
-			log.warning("NFe " + NFeID);
-			return null;
+		//	Draft..  DR/IP/IN
+		if (docStatus.equals(DocumentEngine.STATUS_Drafted) || docStatus.equals(DocumentEngine.STATUS_InProgress)
+			|| docStatus.equals(DocumentEngine.STATUS_Invalid)) {
+			options[index++] = DocumentEngine.ACTION_Prepare;
+			options[index++] = DocumentEngine.ACTION_Close;
 		}
-	}	//	get
-
-	/**
-	 * 	Verifica se existe NF registrada com este número para Cliente/Fornecedor
-	 *
-	 * @param String DocumentNo
-	 * @param int C_BPartner_ID
-	 * @return true if exists or false if not
-	 */
-	public static boolean ifExists (String documentno, int C_BPartner_ID, boolean isSOTrx)
-	{
-
-		String sql =  "SELECT LBR_NotaFiscal_ID FROM LBR_NotaFiscal " +
-					  "WHERE DocumentNo = ? AND C_BPartner_ID = ? " +
-					  "AND AD_Client_ID = ? AND IsSOTrx = ?";
-
-		int LBR_NotaFiscal_ID = DB.getSQLValue(null, sql,
-				new Object[]{documentno, C_BPartner_ID,
-				Env.getAD_Client_ID(Env.getCtx()), isSOTrx});
-
-		return LBR_NotaFiscal_ID == -1 ? false : true;
-	}//ifExists
-
-	/**
-	 * Extrai o número da NF
-	 *
-	 * @param	String	No da NF com a Série
-	 * @return	String	No da NF sem a Série
-	 */
-	public static String getDocNo(String documentNo)
-	{
-		if (documentNo == null || documentNo.startsWith("-"))
-			return "";
-		//
-		if (documentNo.indexOf('-') == -1){
-			documentNo = TextUtil.toNumeric(documentNo);
-		}
-		else{
-			documentNo = TextUtil.toNumeric(documentNo.substring(0, documentNo.indexOf('-')));
+		//	Complete                    ..  CO
+		else if (docStatus.equals(DocumentEngine.STATUS_Completed))
+		{
+			options[index++] = DocumentEngine.ACTION_Void;
+			options[index++] = DocumentEngine.ACTION_ReActivate;
 		}
 		
-		if (!documentNo.isEmpty())
-			return String.valueOf(Integer.parseInt(documentNo));
-		
-		return "";
-	}//getdocNo
-
-	public String getDocNo(){
-		return getDocNo(getDocumentNo());
-	}
+		return index;
+	} //customizeValidActions
 	
-	/**
-	 * 	TODO: Replicar o campo email para a Nota Fiscal com a opção de ter um e-mail
-	 * 		cadastrado para recepção de NF. Discutir se este e-mail deve ser por BP
-	 * 		ou por Endereço.
-	 * 
-	 * @return Email
-	 */
-	public String getInvoiceContactEMail()
-	{
-		if (getC_Invoice_ID() > 0)
-		{
-			MInvoice i = new MInvoice (Env.getCtx(), getC_Invoice_ID(), null);
-			if (i.getAD_User_ID() > 0)
-			{
-				MUser u = new MUser (Env.getCtx(), i.getAD_User_ID(), null);
-				//
-				if (u.getEMail() != null)
-					return u.getEMail();
-			}
-		}
-		//
-		return "";
-	}	//	getEMail
-
-	/**
-	 * Extrai a Série da NF
-	 *
-	 * @param	String	No da NF com a Série
-	 * @return	String	Série da NF
-	 */
-	public static String getSerieNo(String documentNo)
-	{
-		if (documentNo == null || documentNo.indexOf('-') == -1 ||
-			documentNo.endsWith("-"))
-			return "";
-		//
-
-		return documentNo.substring(1+documentNo.indexOf('-'), documentNo.length());
-	}//getserieNo
-
-	public String getSerieNo(){
-		String serieNo = getSerieNo(getDocumentNo());
-		if (serieNo.isEmpty() && islbr_IsOwnDocument()){
-			MDocType dt = new MDocType(getCtx(),getC_DocTypeTarget_ID(),get_TrxName());
-			serieNo = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
-		}
-		return serieNo;
-	}
-	
-	/**
-	 * 	Preenche o campo descrição com toda a discriminação dos serviços
-	 */
-	public void setlbr_ServiceTaxes()
-	{
-		String serviceDescription = "";
-		MLBRNotaFiscalLine[] lines = getLines(null);
-		//
-		for (MLBRNotaFiscalLine line : lines)
-		{
-			if (line.getLBR_NotaFiscalLine_ID() <= 0
-					|| line.getQty().compareTo(Env.ZERO) <= 0)
-				continue;
-			//
-			serviceDescription += line.getQty() + " " + line.getlbr_UOMName() + "\t";
-			serviceDescription += line.getProductName();
-			//
-			if (line.getDescription() != null 
-					&& !line.getDescription().equals(""))
-			{
-				if (line.getProductName() != null && !"".equals(line.getProductName()))
-					serviceDescription += ", " + line.getDescription();
-				else
-					serviceDescription += line.getDescription();
-			}
-			
-			if (line.getQty().compareTo(Env.ONE) == 1)
-				serviceDescription += ", Valor Unitário R$ " + line.getPrice().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace('.', ',');
-			
-			serviceDescription += ", Valor Total R$ " + line.getLineTotalAmt().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace('.', ',') + ".";
-			//
-			serviceDescription += "\n";
-		}
-		//
-		X_LBR_NFTax[] taxes = getTaxes();
-		String header = "";
-		String content = "";
-		String footer = "";
-		Boolean printTaxes = false;
-		//
-		if (taxes == null)
-			;
-		else
-		{
-			header += "\n" + TextUtil.rPad("Valor Bruto:", 15);
-			header += "- R$ ";
-			header += TextUtil.lPad(getlbr_ServiceTotalAmt().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace('.', ','), ' ', 13);
-			header += "\n\n";
-			//
-			if (taxes.length == 1)
-				header += "Retenção:\n";
-			else if (taxes.length > 1)
-				header += "Retenções:\n";
-			//
-			for (X_LBR_NFTax tax : taxes)
-			{
-				X_LBR_TaxGroup tg = new X_LBR_TaxGroup (Env.getCtx(), tax.getLBR_TaxGroup_ID(), null);
-				if (tg.getName() == null || tg.getName().equals("ISS"))	//	ISS ja e destacado normalmente
-					continue;
-				//
-				printTaxes = true;
-				//
-				content += TextUtil.rPad(tg.getName(), 15);
-				content += "- R$ ";
-				content += TextUtil.lPad(tax.getlbr_TaxAmt().abs().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace('.', ','), ' ', 13);
-				content += "\n";
-			}
-			footer += "\n" + TextUtil.rPad("Valor Líquido:", 15);
-			footer += "- R$ ";
-			footer += TextUtil.lPad(getGrandTotal().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace('.', ','), ' ', 13);
-			footer += "\n";
-		}
-		//
-		if (printTaxes)
-			serviceDescription += header + content + footer;
-		//
-		MLBROpenItem[] ois = MLBROpenItem.getOpenItem(getC_Invoice_ID(), get_TrxName());
-		if (ois == null)
-			;
-		else if (ois.length == 1)
-			serviceDescription += "\nVencimento em " + TextUtil.timeToString(ois[0].getDueDate(), "dd/MM/yyyy");
-		else if (ois.length > 1)
-		{
-			serviceDescription += "\nVencimentos:\n";
-			//
-			for (MLBROpenItem oi : ois)
-			{
-				serviceDescription += TextUtil.timeToString(oi.getDueDate(), "dd/MM/yyyy");
-				serviceDescription += "     - R$ ";
-				serviceDescription += TextUtil.lPad(oi.getGrandTotal().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace('.', ','), ' ', 13);
-				serviceDescription += "\n";
-			}
-		}
-		//	FIXME: Verificar como resolver o problema do POReference
-//		if (getPOReference() != null 
-//				&& !getPOReference().trim().equals(""))
-//			serviceDescription += "\nReferência: " + getPOReference() + "\n";
-		//
-		if (getC_DocTypeTarget_ID() > 0)
-		{
-			MDocType dt = new MDocType (Env.getCtx(), getC_DocTypeTarget_ID(), null);
-			//
-			if (dt.getDocumentNote() != null && !dt.getDocumentNote().trim().equals(""))
-				serviceDescription += "\n" + dt.getDocumentNote();
-		}
-		//
-		setDescription(serviceDescription.trim());
-	}	//	setlbr_ServiceTaxes
-
-} //MNotaFiscal
+} //MLBRNotaFiscal

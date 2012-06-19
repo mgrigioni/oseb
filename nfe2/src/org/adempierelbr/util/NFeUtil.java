@@ -21,6 +21,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -31,6 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.nfe.InutilizacaoNF;
+import org.adempierelbr.nfe.beans.ChaveNFE;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
@@ -68,17 +70,13 @@ public abstract class NFeUtil
 	private static CLogger log = CLogger.getCLogger(NFeUtil.class);
 
 	/** Versão              */
+	public static final String VERSAO_APP  = TextUtil.checkSize(AdempiereLBR.VERSION,20);
 	public static final String VERSAO      = "2.00";
-	public static final String VERSAO_APP  = "2.00";
 	public static final String VERSAO_CCE  = "1.00";
 
 	/** XML                 */
 	private static String FILE_EXT      = "-dst.xml";
 	public static final long XML_SIZE   = 500;
-
-	/** STATUS              */
-	public static final String AUTORIZADA = "100";
-	public static final String CANCELADA  = "101";
 
 	/** Reference NFeStatus */
 	public static final int NFeReference   = 1100004;
@@ -168,10 +166,10 @@ public abstract class NFeUtil
 	 * @param region
 	 * @return NfeConsulta2Stub.NfeCabecMsgE
 	 */
-	public static NfeConsulta2Stub.NfeCabecMsgE geraCabecConsulta(String region){
+	public static NfeConsulta2Stub.NfeCabecMsgE geraCabecConsulta(int C_Region_ID){
 
 		NfeConsulta2Stub.NfeCabecMsg cabecMsg = new NfeConsulta2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
 		cabecMsg.setVersaoDados(VERSAO);
 
 		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
@@ -357,10 +355,10 @@ public abstract class NFeUtil
 	 * @param region
 	 * @return NfeCancelamento2Stub.NfeCabecMsgE
 	 */
-	public static NfeCancelamento2Stub.NfeCabecMsgE geraCabecCancelamento(String region){
+	public static NfeCancelamento2Stub.NfeCabecMsgE geraCabecCancelamento(int C_Region_ID){
 
 		NfeCancelamento2Stub.NfeCabecMsg cabecMsg = new NfeCancelamento2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
 		cabecMsg.setVersaoDados(VERSAO);
 
 		NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = new NfeCancelamento2Stub.NfeCabecMsgE();
@@ -400,10 +398,10 @@ public abstract class NFeUtil
 
 		String status = nf.getlbr_NFeStatus();
 
-		if (status.equals(AUTORIZADA)){ //Autorizado o uso da NF-e
+		if (status.equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //Autorizado o uso da NF-e
 			FILE_EXT = "-dst.xml";
 		}
-		else if (status.equals(CANCELADA)){ //Cancelamento de NF-e homologado
+		else if (status.equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)){ //Cancelamento de NF-e homologado
 			FILE_EXT = "-can.xml";
 		}
 
@@ -443,6 +441,76 @@ public abstract class NFeUtil
 
 		return true;
 	}
+	
+	/**
+	 * Atualiza autorização NF-e e XML de distribuicao
+	 *
+	 * return null (success) or error message
+	 * @throws Exception
+	 */
+	public static String authorizeNFe(Node node, String trxName){
+
+		String error = null;
+
+		if (node.getNodeType() == Node.ELEMENT_NODE) {
+			String chNFe	= NFeUtil.getValue (node, "chNFe");
+			String xMotivo 	= NFeUtil.getValue (node, "xMotivo");
+			String digVal 	= NFeUtil.getValue (node, "digVal");
+			String dhRecbto = NFeUtil.getValue (node, "dhRecbto");
+			String cStat 	= NFeUtil.getValue (node, "cStat");
+			String nProt 	= NFeUtil.getValue (node, "nProt");
+			//
+			MLBRNotaFiscal nf = MLBRNotaFiscal.get(chNFe, trxName);
+			if (nf == null) {
+				error = "NF não encontrada";
+				log.severe(error);
+				return error;
+			}
+
+			if (nf.getlbr_NFeStatus() != null && nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //
+				log.fine("NF já processada. " + nf.getDocumentNo());
+				return error;
+			}
+
+
+	        nf.appendNFeDesc("["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n");
+	        nf.setlbr_DigestValue(digVal);
+	        nf.setlbr_NFeProt(nProt);
+	        nf.setDateTrx(NFeUtil.stringToTime(dhRecbto));
+
+
+	        // BF ID: 3391601
+	        if(cStat != null)
+	        {
+	        	try {
+	        		nf.setlbr_NFeStatus(cStat);
+				} catch (Exception e) {
+					nf.setlbr_NFeStatus(MLBRNotaFiscal.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção);
+				}
+	        }
+	        
+	        
+			nf.save(trxName);
+
+			//Atualiza XML para padrão de distribuição
+			try {
+				if (!NFeUtil.updateAttach(nf, NFeUtil.generateDistribution(nf)))
+					error = "Problemas ao atualizar o XML para o padrão de distribuição";
+
+				if (error == null &&
+				   (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
+				    nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado))){
+					NFeEmail.sendMail(nf);
+				}
+
+			} catch (Exception e) {
+				log.log(Level.WARNING,"",e);
+			}
+
+		}
+
+		return error;
+	} //authorizeNFe
 
 	public static String XMLtoString(File xml) throws Exception{
 
@@ -528,6 +596,31 @@ public abstract class NFeUtil
 	public static String timeToString(Timestamp dhRecbto){
 		return TextUtil.timeToString(dhRecbto, "yyyy-MM-dd HH:mm:ss").replace(' ', 'T');
 	} //DateToString
+	
+	public static boolean checkNFeID(String documentNo, String nfeID){
+		
+		if (documentNo == null || nfeID == null)
+			return false;
+		
+		if (documentNo.indexOf('-') != -1){
+			documentNo = TextUtil.toNumeric(documentNo.substring(0, documentNo.indexOf('-')));
+		}
+		
+		if (nfeID.length() != 44)
+			return false;
+		
+		int digito = ChaveNFE.gerarDigito(nfeID.substring(0, 43));
+		if (digito != Integer.parseInt(nfeID.substring(43)))
+			return false;
+		
+		int nfNo  = Integer.parseInt(documentNo);		
+		int nfeNo = Integer.parseInt(nfeID.substring(25, 34));
+		
+		if (nfNo != nfeNo)
+			return false;
+		
+		return true;
+	} //checkNFeID
 
 	/**
 	 * getEnvType

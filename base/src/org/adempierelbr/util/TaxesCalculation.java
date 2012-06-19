@@ -395,7 +395,7 @@ public class TaxesCalculation{
 							X_LBR_TaxName taxName = new X_LBR_TaxName(ctx,taxLine.getLBR_TaxName_ID(),trx);
 
 							int        C_Tax_ID       = cTax.get_ID();
-							BigDecimal taxLineAmt     = taxLine.getlbr_TaxAmt();
+							BigDecimal taxLineAmt     = taxName.isHasWithHold() ? taxLine.getlbr_TaxAmt().negate() : taxLine.getlbr_TaxAmt();
 							BigDecimal taxLineBaseAmt = taxLine.getlbr_TaxBaseAmt();
 
 							//Verifica se o Imposto deve ser Contabilizado

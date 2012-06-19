@@ -242,43 +242,11 @@ public class MLBRTax extends X_LBR_Tax {
 					boolean retroactive = MSysConfig.getBooleanValue("LBR_ALLOW_RETROACTIVE_SERVICETAX", true, document.getAD_Client_ID());
 
 					//Invoice com retenção própria.
-					if(taxLines.length == 0 || !hasLeastThanThreshold)
-					{
-
-						/**
-						 * Caso a linha possua imposto incluso o valor total estará correto,
-						 * caso contrário o processo de calcular os impostos terá adicionado o valor das
-						 * reteções indevidamente, então deve tirar a retenção e tirar o valor que foi
-						 * adicionado indevidamente.
-						 * */
-						if (isOrder)
-							taxAmount = ((MOrderTax) doctax).isTaxIncluded() ? taxAmount : taxAmount.multiply(new BigDecimal("2"));
-						else
-							taxAmount = ((MInvoiceTax) doctax).isTaxIncluded() ? taxAmount : taxAmount.multiply(new BigDecimal("2"));
-
-
-						/**
-						 * O campo LBR_Withhold_Document_ID preenchido significa que a reteção foi
-						 * efetuada, este campo NULL significa que não há retenção ou o limiar ainda
-						 * não foi atingido.
-						 * */
-						if (isOrder){
-							log.info("LBR_Withhold_Order_ID: " + whDocument +
-									 " GrandTotal = " + ((MOrder)document).getGrandTotal() + " + " + taxAmount);
-
-							document.set_ValueOfColumn("LBR_Withhold_Order_ID", whDocument);
-							((MOrder)document).setGrandTotal(((MOrder)document).getGrandTotal().add(taxAmount));
-							((MOrder)document).save(trx);
-						}
-						else{
-							log.info("LBR_Withhold_Invoice_ID: " + whDocument +
-									 " GrandTotal = " + ((MInvoice)document).getGrandTotal() + " + " + taxAmount);
-
-							document.set_ValueOfColumn("LBR_Withhold_Invoice_ID", whDocument);
-							((MInvoice)document).setGrandTotal(((MInvoice)document).getGrandTotal().add(taxAmount));
-							((MInvoice)document).save(trx);
-						}
-
+					if(taxLines.length == 0 || !hasLeastThanThreshold) {
+						document.set_ValueOfColumn("LBR_Withhold_Invoice_ID", whDocument);
+						((MInvoice)document).setGrandTotal(((MInvoice)document).getGrandTotal().add(taxAmount));
+						((MInvoice)document).save(trx);
+						
 						continue;
 					}
 

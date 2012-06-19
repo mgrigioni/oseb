@@ -14,6 +14,7 @@
 package org.adempierelbr.process;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.adempierelbr.ginfes.beans.TcCpfCnpj;
@@ -49,7 +50,7 @@ public class ProcGenerateRpsXml extends SvrProcess
 {
 	
 	/**	Logger			*/
-	private static CLogger log = CLogger.getCLogger(ProcGenerateNFEXml.class);
+	private static CLogger log = CLogger.getCLogger(ProcGenerateRpsXml.class);
 
 	/**
 	 *  Prepare - e.g., get Parameters.
@@ -80,18 +81,18 @@ public class ProcGenerateRpsXml extends SvrProcess
 		if (nf.get_ID() <= 0)
 			return  Msg.getMsg(Env.getAD_Language(nf.getCtx()), "ProcessFailed", true);
 		
-		MLBRNotaFiscalLine[] nfLines = nf.getLines("Line");
-		if (nfLines.length > 1){
+		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
+		if (nfLines.size() != 1){
 			log.severe("RPS só pode conter um serviço");
 			return  Msg.getMsg(Env.getAD_Language(nf.getCtx()), "ProcessFailed", true);
 		}
 		
-		MLBRNotaFiscalLine nfLine = nfLines[0];
+		MLBRNotaFiscalLine nfLine = nfLines.iterator().next();
 		MOrgInfo orgInfo = MOrgInfo.get(nf.getCtx(), nf.getAD_Org_ID(), nf.get_TrxName());
 		MLocation orgLocation = new MLocation(nf.getCtx(),orgInfo.getC_Location_ID(),nf.get_TrxName());
 		
 		//DADOS DO DOCUMENTO
-		TcIdentificacaoRps identificacaoRps = new TcIdentificacaoRps(nf.getDocNo(),nf.getSerieNo());
+		TcIdentificacaoRps identificacaoRps = new TcIdentificacaoRps(nf.getDocumentNo(true),nf.getSerieNo());
 		//DADOS DO SERVICO
 		TcValores valores = createTcValores(nfLine);
 		TcDadosServico servico = 
@@ -107,7 +108,7 @@ public class ProcGenerateRpsXml extends SvrProcess
 				nf.getlbr_BPRegion(), nf.getlbr_BPPostal());
 		TcDadosTomador tomador = new TcDadosTomador(identificacaoTomador, nf.getBPName(), enderecoTomador, null);
 				
-		TcRps rps = new TcRps(orgInfo, nf, new TcInfRps(nf.getDocNo(), identificacaoRps, 
+		TcRps rps = new TcRps(orgInfo, nf, new TcInfRps(nf.getDocumentNo(true), identificacaoRps, 
 				nf.getUpdated(), false, false, servico, prestador, tomador));
 		
 		rps.toXML();

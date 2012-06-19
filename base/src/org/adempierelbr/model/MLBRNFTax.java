@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -19,19 +20,19 @@ import org.compiere.model.MTable;
 import org.compiere.model.Query;
 
 /**
- *	MLBRNFTax
- *
- *	Model for X_LBR_NFTax
+ *  LBR_NFTax Model
+ *  
+ *  Class that process brazilian fiscal documents taxes (a.k.a Nota Fiscal)
  *
  *	@author Mario Grigioni
- *	@version $Id: MLBRNFTax.java, 18/02/2010 10:06:00 mgrigioni
+ *	@version $Id: MLBRNFLineTax.java, v2.0 15/06/2012 08:50:00 mgrigioni
  */
 public class MLBRNFTax extends X_LBR_NFTax {
 	
 	/**
-	 *
+	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 6542295150876191957L;
 
 	/**************************************************************************
 	 *  Default Constructor

@@ -242,7 +242,7 @@ public class SacredCompUtil{
 			TIP_DOC = NFe;
 
 		String SER              = nf.getSerieNo();
-		String NUM_DOC          = nf.getDocNo(); //DocumentNo without Serie
+		String NUM_DOC          = nf.getDocumentNo(true); //DocumentNo without Serie
 		String HIST             = nf.getDescription();
 		String CFOP             = nfl.getlbr_CFOPName();
 		String COD_LEGAL        = getCOD_LEGAL(nf);

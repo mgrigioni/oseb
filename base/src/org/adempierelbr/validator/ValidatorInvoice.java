@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.DBException;
 import org.adempierelbr.model.MLBRBoleto;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRProductMovementFiller;
 import org.adempierelbr.model.MLBRTax;
-import org.adempierelbr.process.ProcGenerateNF;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TaxesCalculation;
 import org.adempierelbr.wrapper.I_W_C_DocType;
@@ -360,7 +360,6 @@ public class ValidatorInvoice implements ModelValidator
 				MDocType dt = MDocType.get(ctx, invoice.getC_DocTypeTarget_ID());
 				boolean hasOpenItems      = dt.get_ValueAsBoolean("lbr_HasOpenItems");
 				boolean hasFiscalDocument = dt.get_ValueAsBoolean("lbr_HasFiscalDocument");
-				boolean isOwnDocument     = dt.get_ValueAsBoolean("lbr_IsOwnDocument");
 
 				if (!hasOpenItems && !invoice.isReversal())
 				{
@@ -388,23 +387,27 @@ public class ValidatorInvoice implements ModelValidator
 
 				} // don't have Open Items - create automatically allocation
 
-				boolean isSOTrx = true;
-				int LBR_NotaFiscal_ID = 0;
-
 				if (hasFiscalDocument && !invoice.isReversal()) {
-					if (dt.getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo) || dt.getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice)) {
-						isSOTrx = true;
-						isOwnDocument = true;
-					} // documento de venda (saída)
-					else if (dt.getDocBaseType().equals(MDocType.DOCBASETYPE_APInvoice) || dt.getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)) {
-						isSOTrx = false;
-					} // documento de compra (entrada)
-
-					LBR_NotaFiscal_ID = ProcGenerateNF.generate(ctx, invoice, 0, isSOTrx, isOwnDocument, trx);
-					if (LBR_NotaFiscal_ID == 0)
-						return "Erro na geração da Nota Fiscal";
-
-					invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", LBR_NotaFiscal_ID);
+			
+					MLBRNotaFiscal nf = null;
+					try {
+						nf = new MLBRNotaFiscal(ctx,invoice,trx);
+						nf.save(trx);
+						invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", nf.get_ID());
+						
+						if (nf.get_ID() > 0){ //try to complete
+							try {
+								nf.setDocStatus(nf.completeIt());
+								nf.save(trx);
+							} catch (Exception e){
+								log.warning(e.getLocalizedMessage());
+							}
+						}
+					}
+					catch(AdempiereException eAdempiere){
+						return eAdempiere.getLocalizedMessage();
+					}
+					
 				} // geração de Documento Fiscal
 				
 				//FR 3079621 Onhate

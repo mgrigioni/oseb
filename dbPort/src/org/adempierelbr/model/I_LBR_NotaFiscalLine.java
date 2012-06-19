@@ -189,21 +189,6 @@ public interface I_LBR_NotaFiscalLine
 	  */
 	public boolean islbr_IsService();
 
-    /** Column name LBR_LegalMessage_ID */
-    public static final String COLUMNNAME_LBR_LegalMessage_ID = "LBR_LegalMessage_ID";
-
-	/** Set Legal Message.
-	  * Defines the Legal Message
-	  */
-	public void setLBR_LegalMessage_ID (int LBR_LegalMessage_ID);
-
-	/** Get Legal Message.
-	  * Defines the Legal Message
-	  */
-	public int getLBR_LegalMessage_ID();
-
-	public org.adempierelbr.model.I_LBR_LegalMessage getLBR_LegalMessage() throws RuntimeException;
-
     /** Column name lbr_LineTotalCIF */
     public static final String COLUMNNAME_lbr_LineTotalCIF = "lbr_LineTotalCIF";
 

@@ -173,7 +173,7 @@ public class SacredSimpUtil{
 			TIP_DOC = NFe;
 
 		String SER              = nf.getSerieNo();
-		String NUM_DOC          = nf.getDocNo(); //DocumentNo without Serie
+		String NUM_DOC          = nf.getDocumentNo(true); //DocumentNo without Serie
 		BigDecimal VALOR_SAI    = nf.getGrandTotal();
 		BigDecimal PERC_CRDOUT  = Env.ZERO;
 		BigDecimal VALOR_CRDOUT = Env.ZERO;
@@ -231,7 +231,7 @@ public class SacredSimpUtil{
 		custo = custo.add(cost);
 
 		BigDecimal CRED_EST_ICMS = cost.multiply(PER_MED_ICMS.divide(Env.ONEHUNDRED, TaxBR.MCROUND));
-		BigDecimal ICMS_GERA     = CRED_EST_ICMS.subtract(nf.getICMSDebAmt());
+		BigDecimal ICMS_GERA     = CRED_EST_ICMS.subtract(nf.getICMSAmt());
 
 		return new B5R5325(COD_LEGAL,IVA_UTILIZADO,PER_MED_ICMS,CRED_EST_ICMS,ICMS_GERA);
 	} //createR5325
@@ -239,7 +239,7 @@ public class SacredSimpUtil{
 	public static B5R5330 createR5330(MLBRNotaFiscal nf){
 
 		BigDecimal VALOR_BC = nf.getICMSBase();
-		BigDecimal ICMS_DEB = nf.getICMSDebAmt();
+		BigDecimal ICMS_DEB = nf.getICMSAmt();
 
 		return new B5R5330(VALOR_BC,ICMS_DEB);
 	} //createR5330
@@ -255,7 +255,7 @@ public class SacredSimpUtil{
 	public static B5R5350 createR5350(MLBRNotaFiscal nf){
 
 		BigDecimal VALOR_BC = nf.getICMSBase();
-		BigDecimal ICMS_DEB = nf.getICMSDebAmt();
+		BigDecimal ICMS_DEB = nf.getICMSAmt();
 
 		return new B5R5350(VALOR_BC,ICMS_DEB,"");
 	} //createR5350

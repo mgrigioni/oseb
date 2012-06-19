@@ -172,9 +172,9 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		CounterSped.clear();
 				
 		//Notas Fiscais Período
-		MLBRNotaFiscal[] nfs = MLBRNotaFiscal.get(dateFrom,dateTo,p_AD_Org_ID,get_TrxName());
+		List<MLBRNotaFiscal> nfs = MLBRNotaFiscal.get(dateFrom,dateTo,p_AD_Org_ID,get_TrxName());
 		
-		int count = nfs.length;
+		int count = nfs.size();
 		int aux   = 1;
 		for (MLBRNotaFiscal nf : nfs){
 			
@@ -206,7 +206,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			if (nf.isCancelled()) //NF Cancelada não precisa de registros detalhados
 				continue;
 			
-			MLBRNotaFiscalLine[] nfLines = nf.getLines("Line");
+			List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 			for (MLBRNotaFiscalLine nfLine : nfLines){
 				
 				//UDM

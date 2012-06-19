@@ -32,7 +32,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20120618L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -234,34 +234,6 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 			return "Y".equals(oo);
 		}
 		return false;
-	}
-
-	public org.adempierelbr.model.I_LBR_LegalMessage getLBR_LegalMessage() throws RuntimeException
-    {
-		return (org.adempierelbr.model.I_LBR_LegalMessage)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_LegalMessage.Table_Name)
-			.getPO(getLBR_LegalMessage_ID(), get_TrxName());	}
-
-	/** Set Legal Message.
-		@param LBR_LegalMessage_ID 
-		Defines the Legal Message
-	  */
-	public void setLBR_LegalMessage_ID (int LBR_LegalMessage_ID)
-	{
-		if (LBR_LegalMessage_ID < 1) 
-			set_Value (COLUMNNAME_LBR_LegalMessage_ID, null);
-		else 
-			set_Value (COLUMNNAME_LBR_LegalMessage_ID, Integer.valueOf(LBR_LegalMessage_ID));
-	}
-
-	/** Get Legal Message.
-		@return Defines the Legal Message
-	  */
-	public int getLBR_LegalMessage_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_LBR_LegalMessage_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
 	}
 
 	/** Set Line Total CIF.

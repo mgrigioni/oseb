@@ -465,7 +465,7 @@ public class EFDUtil{
 		String IND_OPER   = nf.isSOTrx() ? "1" : "0"; //0 = Entrada, 1 = Saída
 		String COD_SIT    = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER        = nf.getSerieNo();
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		String CHV_NFE    = nf.getlbr_NFeID();
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_E_S  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
@@ -548,7 +548,7 @@ public class EFDUtil{
 			String UNID, int line){
 		
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),nfLine.getLBR_NotaFiscal_ID(),get_TrxName());
-		String NUM_DOC   = nf.getDocNo();
+		String NUM_DOC   = nf.getDocumentNo(true);
 		Timestamp DT_DOC = nf.getDateDoc();
 		
 		String DESCR_COMPL = nfLine.getDescription();
@@ -652,7 +652,7 @@ public class EFDUtil{
 		String SER        = nf.getSerieNo();
 		String SUB        = ""; //TODO ???
 		String COD_CONS   = ""; //Opcional - Só informa na saída
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_E_S  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal();	
@@ -680,7 +680,7 @@ public class EFDUtil{
 	public static RC510 createRC510(MLBRNotaFiscalLine nfLine, String COD_ITEM, String UNID, int line){
 		
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),nfLine.getLBR_NotaFiscal_ID(),get_TrxName());
-		String NUM_DOC   = nf.getDocNo();
+		String NUM_DOC   = nf.getDocumentNo(true);
 		Timestamp DT_DOC = nf.getDateDoc();
 		
 		String COD_CLASS = ""; //TODO ??? (para saída apenas)
@@ -744,7 +744,7 @@ public class EFDUtil{
 		String COD_SIT     = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER         = nf.getSerieNo();
 		String SUB         = ""; //TODO ???
-		String NUM_DOC     = nf.getDocNo();
+		String NUM_DOC     = nf.getDocumentNo(true);
 		String CHV_CTE     = (IND_EMIT.equals("0")) ? nf.getlbr_NFeID() : "";
 		Timestamp DT_DOC   = nf.getDateDoc();
 		Timestamp DT_A_P   = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
@@ -767,7 +767,7 @@ public class EFDUtil{
 	public static RD110 createRD110(MLBRNotaFiscalLine nfLine, String COD_ITEM, int line){
 		
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),nfLine.getLBR_NotaFiscal_ID(),get_TrxName());
-		String NUM_DOC   = nf.getDocNo();
+		String NUM_DOC   = nf.getDocumentNo(true);
 		Timestamp DT_DOC = nf.getDateDoc();
 		
 		BigDecimal VL_SERV = nfLine.getLineTotalAmt();
@@ -819,7 +819,7 @@ public class EFDUtil{
 		String COD_SIT    = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
 		String SER        = nf.getSerieNo();
 		String SUB        = ""; //TODO ???
-		String NUM_DOC    = nf.getDocNo();
+		String NUM_DOC    = nf.getDocumentNo(true);
 		Timestamp DT_DOC  = nf.getDateDoc();
 		Timestamp DT_A_P  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal();	
@@ -844,7 +844,7 @@ public class EFDUtil{
 	public static RD510 createRD510(MLBRNotaFiscalLine nfLine, String COD_ITEM, String UNID, int line){
 		
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),nfLine.getLBR_NotaFiscal_ID(),get_TrxName());
-		String NUM_DOC   = nf.getDocNo();
+		String NUM_DOC   = nf.getDocumentNo(true);
 		Timestamp DT_DOC = nf.getDateDoc();
 		
 		String COD_CLASS = ""; //TODO ??? (para saída apenas)
@@ -1242,7 +1242,7 @@ public class EFDUtil{
 		}
 		String COD_MOD     = nf.getlbr_NFModel().isEmpty() ? "01" : nf.getlbr_NFModel();
 		String SER         = nf.getSerieNo();
-		String NUM_DOC     = nf.getDocNo();
+		String NUM_DOC     = nf.getDocumentNo(true);
 		String CHV_NFE_CTE = nf.getlbr_NFeID();
 		Timestamp DT_DOC   = nf.getDateDoc();
 		

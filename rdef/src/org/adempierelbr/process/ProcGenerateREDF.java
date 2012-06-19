@@ -162,17 +162,17 @@ public class ProcGenerateREDF extends SvrProcess
 			Registro20 r20 = new Registro20 (funcReg, "", 		//	FIXME:	Criar justificativa do cancelamento
 					NF.getlbr_CFOPNote(), serieNo(NF.getDocumentNo()), docNo(NF.getDocumentNo()),
 					NF.getDateDoc(), NF.getlbr_DateInOut(), emitente, NF.getCFOP(), "", "",
-					NF.getlbr_BPInvoiceCNPJ(), NF.getBPName(), NF.getlbr_BPInvoiceAddress1(),
-					NF.getlbr_BPInvoiceAddress2(), NF.getlbr_BPInvoiceAddress4(), NF.getlbr_BPInvoiceAddress3(),
-					NF.getlbr_BPInvoiceCity(), NF.getlbr_BPInvoiceRegion(), NF.getlbr_BPInvoicePostal(),
-					"Brasil", NF.getlbr_BPPhone(), NF.getlbr_BPInvoiceIE());
+					NF.getlbr_BPCNPJ(), NF.getBPName(), NF.getlbr_BPAddress1(),
+					NF.getlbr_BPAddress2(), NF.getlbr_BPAddress4(), NF.getlbr_BPAddress3(),
+					NF.getlbr_BPCity(), NF.getlbr_BPRegion(), NF.getlbr_BPPostal(),
+					"Brasil", NF.getlbr_BPPhone(), NF.getlbr_BPIE());
 			result.append(r20.format());
 			count20++;
 			//
 			if (NF.isCancelled())
 				continue;
 			//
-			for (MLBRNotaFiscalLine line : NF.getLines("Line"))
+			for (MLBRNotaFiscalLine line : NF.getLines())
 			{
 				Registro30 r30 = new Registro30 (line.getProductValue(), line.getProductName(),
 						line.getlbr_NCMName(), line.getlbr_UOMName(), line.getQty(), line.getPrice().add(line.getICMSAmt().divide(line.getQty(), 12, RoundingMode.HALF_UP)),

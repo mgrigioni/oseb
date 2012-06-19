@@ -127,7 +127,7 @@ public class RD190 extends RegSped implements Comparable<Object> {
 			if (CFOP.length() == 4){
 				CFOP = CFOP.subSequence(0, 1) + "." + CFOP.substring(1);
 				MLBRCFOP cfop = MLBRCFOP.getCFOP(Env.getCtx(), CFOP, null);
-				return cfop.isDevol();	
+				return cfop.isDevolution();	
 			}
 			
 			return false;

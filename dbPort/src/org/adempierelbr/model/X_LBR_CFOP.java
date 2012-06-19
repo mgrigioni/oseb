@@ -30,7 +30,7 @@ public class X_LBR_CFOP extends PO implements I_LBR_CFOP, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20120618L;
 
     /** Standard Constructor */
     public X_LBR_CFOP (Properties ctx, int LBR_CFOP_ID, String trxName)
@@ -39,10 +39,6 @@ public class X_LBR_CFOP extends PO implements I_LBR_CFOP, I_Persistent
       /** if (LBR_CFOP_ID == 0)
         {
 			setLBR_CFOP_ID (0);
-			setlbr_IsRevenue (false);
-// N
-			setlbr_IsService (false);
-// N
 			setValue (null);
         } */
     }
@@ -113,51 +109,6 @@ public class X_LBR_CFOP extends PO implements I_LBR_CFOP, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
-	}
-
-	/** Set Is Revenue.
-		@param lbr_IsRevenue Is Revenue	  */
-	public void setlbr_IsRevenue (boolean lbr_IsRevenue)
-	{
-		set_Value (COLUMNNAME_lbr_IsRevenue, Boolean.valueOf(lbr_IsRevenue));
-	}
-
-	/** Get Is Revenue.
-		@return Is Revenue	  */
-	public boolean islbr_IsRevenue () 
-	{
-		Object oo = get_Value(COLUMNNAME_lbr_IsRevenue);
-		if (oo != null) 
-		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
-			return "Y".equals(oo);
-		}
-		return false;
-	}
-
-	/** Set Is Service.
-		@param lbr_IsService 
-		Defines if the lines is a Service
-	  */
-	public void setlbr_IsService (boolean lbr_IsService)
-	{
-		set_Value (COLUMNNAME_lbr_IsService, Boolean.valueOf(lbr_IsService));
-	}
-
-	/** Get Is Service.
-		@return Defines if the lines is a Service
-	  */
-	public boolean islbr_IsService () 
-	{
-		Object oo = get_Value(COLUMNNAME_lbr_IsService);
-		if (oo != null) 
-		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
-			return "Y".equals(oo);
-		}
-		return false;
 	}
 
 	/** Set Search Key.

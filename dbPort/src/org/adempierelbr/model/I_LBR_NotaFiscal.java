@@ -63,21 +63,6 @@ public interface I_LBR_NotaFiscal
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name Bill_Location_ID */
-    public static final String COLUMNNAME_Bill_Location_ID = "Bill_Location_ID";
-
-	/** Set Invoice Location.
-	  * Business Partner Location for invoicing
-	  */
-	public void setBill_Location_ID (int Bill_Location_ID);
-
-	/** Get Invoice Location.
-	  * Business Partner Location for invoicing
-	  */
-	public int getBill_Location_ID();
-
-	public I_C_BPartner_Location getBill_Location() throws RuntimeException;
-
     /** Column name BPName */
     public static final String COLUMNNAME_BPName = "BPName";
 
@@ -259,6 +244,32 @@ public interface I_LBR_NotaFiscal
 	  * Calculated amount of discount
 	  */
 	public BigDecimal getDiscountAmt();
+
+    /** Column name DocAction */
+    public static final String COLUMNNAME_DocAction = "DocAction";
+
+	/** Set Document Action.
+	  * The targeted status of the document
+	  */
+	public void setDocAction (String DocAction);
+
+	/** Get Document Action.
+	  * The targeted status of the document
+	  */
+	public String getDocAction();
+
+    /** Column name DocStatus */
+    public static final String COLUMNNAME_DocStatus = "DocStatus";
+
+	/** Set Document Status.
+	  * The current status of the document
+	  */
+	public void setDocStatus (String DocStatus);
+
+	/** Get Document Status.
+	  * The current status of the document
+	  */
+	public String getDocStatus();
 
     /** Column name DocumentNo */
     public static final String COLUMNNAME_DocumentNo = "DocumentNo";
@@ -650,136 +661,6 @@ public interface I_LBR_NotaFiscal
 	  */
 	public String getlbr_BPIE();
 
-    /** Column name lbr_BPInvoiceAddress1 */
-    public static final String COLUMNNAME_lbr_BPInvoiceAddress1 = "lbr_BPInvoiceAddress1";
-
-	/** Set BP Invoice Address 1.
-	  * BP Invoice Address 1 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress1 (String lbr_BPInvoiceAddress1);
-
-	/** Get BP Invoice Address 1.
-	  * BP Invoice Address 1 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress1();
-
-    /** Column name lbr_BPInvoiceAddress2 */
-    public static final String COLUMNNAME_lbr_BPInvoiceAddress2 = "lbr_BPInvoiceAddress2";
-
-	/** Set BP Invoice Address 2.
-	  * BP Invoice Address 2 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress2 (String lbr_BPInvoiceAddress2);
-
-	/** Get BP Invoice Address 2.
-	  * BP Invoice Address 2 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress2();
-
-    /** Column name lbr_BPInvoiceAddress3 */
-    public static final String COLUMNNAME_lbr_BPInvoiceAddress3 = "lbr_BPInvoiceAddress3";
-
-	/** Set BP Invoice Address 3.
-	  * BP Invoice Address 3 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress3 (String lbr_BPInvoiceAddress3);
-
-	/** Get BP Invoice Address 3.
-	  * BP Invoice Address 3 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress3();
-
-    /** Column name lbr_BPInvoiceAddress4 */
-    public static final String COLUMNNAME_lbr_BPInvoiceAddress4 = "lbr_BPInvoiceAddress4";
-
-	/** Set BP Invoice Address 4.
-	  * BP Invoice Address 4 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceAddress4 (String lbr_BPInvoiceAddress4);
-
-	/** Get BP Invoice Address 4.
-	  * BP Invoice Address 4 - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceAddress4();
-
-    /** Column name lbr_BPInvoiceCity */
-    public static final String COLUMNNAME_lbr_BPInvoiceCity = "lbr_BPInvoiceCity";
-
-	/** Set BP Invoice City.
-	  * BP Invoice City - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceCity (String lbr_BPInvoiceCity);
-
-	/** Get BP Invoice City.
-	  * BP Invoice City - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceCity();
-
-    /** Column name lbr_BPInvoiceCNPJ */
-    public static final String COLUMNNAME_lbr_BPInvoiceCNPJ = "lbr_BPInvoiceCNPJ";
-
-	/** Set BP Invoice CNPJ.
-	  * BP Invoice CNPJ - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceCNPJ (String lbr_BPInvoiceCNPJ);
-
-	/** Get BP Invoice CNPJ.
-	  * BP Invoice CNPJ - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceCNPJ();
-
-    /** Column name lbr_BPInvoiceCountry */
-    public static final String COLUMNNAME_lbr_BPInvoiceCountry = "lbr_BPInvoiceCountry";
-
-	/** Set BP Invoice Country.
-	  * BP Invoice Country - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceCountry (String lbr_BPInvoiceCountry);
-
-	/** Get BP Invoice Country.
-	  * BP Invoice Country - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceCountry();
-
-    /** Column name lbr_BPInvoiceIE */
-    public static final String COLUMNNAME_lbr_BPInvoiceIE = "lbr_BPInvoiceIE";
-
-	/** Set BP Invoice IE.
-	  * BP Invoice IE - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceIE (String lbr_BPInvoiceIE);
-
-	/** Get BP Invoice IE.
-	  * BP Invoice IE - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceIE();
-
-    /** Column name lbr_BPInvoicePostal */
-    public static final String COLUMNNAME_lbr_BPInvoicePostal = "lbr_BPInvoicePostal";
-
-	/** Set BP Invoice Postal.
-	  * BP Invoice Postal - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoicePostal (String lbr_BPInvoicePostal);
-
-	/** Get BP Invoice Postal.
-	  * BP Invoice Postal - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoicePostal();
-
-    /** Column name lbr_BPInvoiceRegion */
-    public static final String COLUMNNAME_lbr_BPInvoiceRegion = "lbr_BPInvoiceRegion";
-
-	/** Set BP InvoiceRegion.
-	  * BP InvoiceRegion - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public void setlbr_BPInvoiceRegion (String lbr_BPInvoiceRegion);
-
-	/** Get BP InvoiceRegion.
-	  * BP InvoiceRegion - Copied from the BP Location into Brazilan Legal and Tax Books
-	  */
-	public String getlbr_BPInvoiceRegion();
-
     /** Column name lbr_BPPhone */
     public static final String COLUMNNAME_lbr_BPPhone = "lbr_BPPhone";
 
@@ -1110,15 +991,6 @@ public interface I_LBR_NotaFiscal
 	  */
 	public String getlbr_FiscalOBS();
 
-    /** Column name lbr_GenerateNFeXML */
-    public static final String COLUMNNAME_lbr_GenerateNFeXML = "lbr_GenerateNFeXML";
-
-	/** Set Generate NFe XML	  */
-	public void setlbr_GenerateNFeXML (String lbr_GenerateNFeXML);
-
-	/** Get Generate NFe XML	  */
-	public String getlbr_GenerateNFeXML();
-
     /** Column name lbr_GrossWeight */
     public static final String COLUMNNAME_lbr_GrossWeight = "lbr_GrossWeight";
 
@@ -1193,19 +1065,6 @@ public interface I_LBR_NotaFiscal
 	/** Get Motivo contingência	  */
 	public String getlbr_MotivoScan();
 
-    /** Column name lbr_NCMReference */
-    public static final String COLUMNNAME_lbr_NCMReference = "lbr_NCMReference";
-
-	/** Set NCM Reference.
-	  * Defines the NCM Reference
-	  */
-	public void setlbr_NCMReference (String lbr_NCMReference);
-
-	/** Get NCM Reference.
-	  * Defines the NCM Reference
-	  */
-	public String getlbr_NCMReference();
-
     /** Column name lbr_NetWeight */
     public static final String COLUMNNAME_lbr_NetWeight = "lbr_NetWeight";
 
@@ -1255,15 +1114,6 @@ public interface I_LBR_NotaFiscal
 	public int getLBR_NFeLot_ID();
 
 	public org.adempierelbr.model.I_LBR_NFeLot getLBR_NFeLot() throws RuntimeException;
-
-    /** Column name lbr_NFENo */
-    public static final String COLUMNNAME_lbr_NFENo = "lbr_NFENo";
-
-	/** Set NFe No	  */
-	public void setlbr_NFENo (String lbr_NFENo);
-
-	/** Get NFe No	  */
-	public String getlbr_NFENo();
 
     /** Column name lbr_NFeProt */
     public static final String COLUMNNAME_lbr_NFeProt = "lbr_NFeProt";
@@ -1497,19 +1347,6 @@ public interface I_LBR_NotaFiscal
 	  */
 	public String getlbr_PackingType();
 
-    /** Column name lbr_ProcCancelNF */
-    public static final String COLUMNNAME_lbr_ProcCancelNF = "lbr_ProcCancelNF";
-
-	/** Set Process Cancel Nota Fiscal.
-	  * Process to Cancel Nota Fiscal
-	  */
-	public void setlbr_ProcCancelNF (String lbr_ProcCancelNF);
-
-	/** Get Process Cancel Nota Fiscal.
-	  * Process to Cancel Nota Fiscal
-	  */
-	public String getlbr_ProcCancelNF();
-
     /** Column name LBR_RefNotaFiscal_ID */
     public static final String COLUMNNAME_LBR_RefNotaFiscal_ID = "LBR_RefNotaFiscal_ID";
 
@@ -1682,37 +1519,6 @@ public interface I_LBR_NotaFiscal
 	  * The document has been processed
 	  */
 	public boolean isProcessed();
-
-    /** Column name Processing */
-    public static final String COLUMNNAME_Processing = "Processing";
-
-	/** Set Process Now	  */
-	public void setProcessing (boolean Processing);
-
-	/** Get Process Now	  */
-	public boolean isProcessing();
-
-    /** Column name Processing2 */
-    public static final String COLUMNNAME_Processing2 = "Processing2";
-
-	/** Set Process Now	  */
-	public void setProcessing2 (String Processing2);
-
-	/** Get Process Now	  */
-	public String getProcessing2();
-
-    /** Column name ProcReactivateNF */
-    public static final String COLUMNNAME_ProcReactivateNF = "ProcReactivateNF";
-
-	/** Set Reactivate Nota Fiscal.
-	  * This Process Reactivates the Nota Fiscal Document
-	  */
-	public void setProcReactivateNF (String ProcReactivateNF);
-
-	/** Get Reactivate Nota Fiscal.
-	  * This Process Reactivates the Nota Fiscal Document
-	  */
-	public String getProcReactivateNF();
 
     /** Column name TotalLines */
     public static final String COLUMNNAME_TotalLines = "TotalLines";

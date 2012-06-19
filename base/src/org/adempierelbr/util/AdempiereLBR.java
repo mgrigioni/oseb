@@ -25,10 +25,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.Adempiere;
 import org.compiere.model.MAssetGroupAcct;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MLocator;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MPeriod;
@@ -57,6 +59,7 @@ public abstract class AdempiereLBR{
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(AdempiereLBR.class);
 
+	public static final String VERSION     = "oseb - " + Adempiere.MAIN_VERSION;
 	public static final String AD_LANGUAGE = "pt_BR";
 	public static final int    BRASIL      = 139;
 	
@@ -249,6 +252,48 @@ public abstract class AdempiereLBR{
 	public static int[] getMMReceipt(){
 		return getDocumentType("MMR");
 	}	//	getMRReceipt
+	
+	/**
+	 * Retorna o tipo de documento Nota Fiscal Brasil, conforme parâmetros abaixo
+	 * @param AD_Org_ID
+	 * @param isSOTrx
+	 * @param isSCAN
+	 * @return MDocType
+	 */
+	public static MDocType getNFBDocType(int AD_Org_ID, boolean isSOTrx, boolean isSCAN) {
+
+		String whereClause = "DocBaseType = ? AND AD_Org_ID IN (0,?)" +
+				             "AND IsSOTrx = ? AND lbr_TpEmi = ?";
+		
+		MTable table = MTable.get(Env.getCtx(), MDocType.Table_Name);
+		Query q =  new Query(Env.getCtx(), table, whereClause, null);
+			  q.setClient_ID();
+		      q.setParameters(new Object[]{"NFB",AD_Org_ID,isSOTrx, isSCAN ? "3" : "1"});
+		      q.setOrderBy("C_DocType_ID, AD_Org_ID DESC");
+		return q.first();
+	}	//	getNFBDocType
+	
+	/**
+	 * Retorna o tipo de documento Nota Fiscal Brasil, conforme parâmetros abaixo
+	 * Se for informada uma fatura e não estiver habilitado o SCAN, busca a informação
+	 * do tipo de documento da fatura
+	 * @param invoice
+	 * @param AD_Org_ID
+	 * @param isSOTrx
+	 * @param isSCAN
+	 * @return MDocType
+	 */
+	public static MDocType getNFBDocType(MInvoice invoice, int AD_Org_ID, boolean isSOTrx, boolean isSCAN){
+		
+		if (invoice != null && !isSCAN){
+			MDocType docType = new MDocType(invoice.getCtx(), invoice.getC_DocTypeTarget_ID(), invoice.get_TrxName());
+			int C_DocType_ID = docType.get_ValueAsInt("LBR_DocTypeNF_ID"); //DocumentNF da Fatura
+			if (C_DocType_ID > 0)
+				return new MDocType(invoice.getCtx(),C_DocType_ID,invoice.get_TrxName());
+		}
+		
+		return getNFBDocType(AD_Org_ID,isSOTrx,isSCAN);
+	} //	getNFBDocType
 	
 	public static int[] getDocumentType(String DocBaseType){
 		
