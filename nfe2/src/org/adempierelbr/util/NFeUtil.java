@@ -467,11 +467,10 @@ public abstract class NFeUtil
 				return error;
 			}
 
-			if (nf.getlbr_NFeStatus() != null && nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //
+			if (nf.isNFeProcessed()){ //
 				log.fine("NF já processada. " + nf.getDocumentNo());
 				return error;
 			}
-
 
 	        nf.appendNFeDesc("["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n");
 	        nf.setlbr_DigestValue(digVal);
@@ -497,9 +496,7 @@ public abstract class NFeUtil
 				if (!NFeUtil.updateAttach(nf, NFeUtil.generateDistribution(nf)))
 					error = "Problemas ao atualizar o XML para o padrão de distribuição";
 
-				if (error == null &&
-				   (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
-				    nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado))){
+				if (error == null && nf.isNFeProcessed()){
 					NFeEmail.sendMail(nf);
 				}
 

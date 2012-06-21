@@ -340,11 +340,32 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		if (m_processMsg != null)
 			return DocAction.STATUS_Invalid;
 		
+		//Criada NF na mão
+		if (getlbr_OrgName() == null || getlbr_OrgName().isEmpty()){
+			setInvoice(new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName()));
+		}
+		
 		//	Std Period open?
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
 		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 			return DocAction.STATUS_Invalid;
+		}
+				
+		//Validação Tipo de Nota Fiscal (terceiros)
+		if (!islbr_IsOwnDocument()){
+			if (getlbr_NFeID() == null || getlbr_NFeID().isEmpty()){
+				if (isNFe()){
+					m_processMsg = "Tipo de nota fiscal inválido. NFe é necessário preencher NFe ID";
+					return DocAction.STATUS_Invalid;
+				}
+			}
+			else{
+				if (!isNFe()){
+					m_processMsg = "Tipo de nota fiscal inválido. NFe ID deve ser preenchido apenas para NFe ou CTe";
+					return DocAction.STATUS_Invalid;
+				}
+			}	
 		}
 
 		//RATEIO VALORES DE FRETE E SISCOMEX
@@ -497,6 +518,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
 		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
+			return false;
 		}
 		
 		// Before reActivate
@@ -505,7 +527,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			return false;
 
 		//NFe já processada, não deixa reativar
-		if (getlbr_NFeProt() == null || getlbr_NFeProt().isEmpty()){
+		if (getlbr_NFeProt() != null && !getlbr_NFeProt().isEmpty()){
 			m_processMsg = "Não é possível reativar uma NFe processada";
 			return false;
 		}
@@ -576,6 +598,14 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 *	@return true if it can be sabed
 	 */
 	protected boolean beforeSave (boolean newRecord) {
+		
+		int oldC_Invoice_ID = get_ValueOldAsInt("C_Invoice_ID");
+		
+		if (oldC_Invoice_ID > 0 && oldC_Invoice_ID != getC_Invoice_ID()){
+			m_processMsg = "Não é possível alterar a fatura de uma nota fiscal";
+			return false;
+		}
+			
 		if (getC_DocType_ID() != getC_DocTypeTarget_ID())
 			setC_DocType_ID(getC_DocTypeTarget_ID()); 	//	Define que o C_DocType_ID = C_DocTypeTarget_ID
 		return true;
@@ -635,7 +665,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 */
 	private String processNFe(){
 		
-		if (!isNFe())
+		if (!isNFe() || isNFeProcessed())
 			return null;
 		
 		if (!islbr_IsOwnDocument()){
@@ -1074,6 +1104,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			MLocation location = new MLocation(getCtx(),transpLocation.getC_Location_ID(),get_TrxName());
 			I_C_Country country = location.getC_Country();
 			//
+			setlbr_Ship_Location_ID(transpLocation.get_ID());
 			setlbr_BPShipperCNPJ(BPartnerUtil.getCNPJ(transp,transpLocation));
 			setlbr_BPShipperIE(BPartnerUtil.getIE(transp,transpLocation));
 			//
@@ -1134,7 +1165,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//Informações do Documento
 		setIsSOTrx(invoice.isCreditMemo() ? !invoice.isSOTrx() : invoice.isSOTrx());
-		setlbr_IsOwnDocument(isSOTrx() ? true : (iW.getlbr_TransactionType().equals("IMP") ? true : false));
+		setlbr_IsOwnDocument((isSOTrx() || (iW.getlbr_TransactionType().equals("IMP")) ? true : invoice.isCreditMemo())); //Pode haver problemas com NF Entrada (pequeno produtor)
 		setlbr_TransactionType(iW.getlbr_TransactionType());
 		setlbr_NFModel(iW.getlbr_NFModel());
 		setDateDoc(invoice.getDateInvoiced());
@@ -1276,7 +1307,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		             "WHERE LBR_NotaFiscal_ID = ? " +
 		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
 		//
-		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
 		return result == null ? Env.ZERO : result;
 	} //getTaxAmt
 	
@@ -1294,7 +1325,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		             "WHERE LBR_NotaFiscal_ID = ? " +
 		             "AND LBR_TaxGroup_ID IN (SELECT LBR_TaxGroup_ID FROM LBR_TaxGroup WHERE UPPER(Name)=?)";
 		//
-		BigDecimal result = DB.getSQLValueBD(null, sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
+		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscal_ID(),taxIndicator.toUpperCase()});
 		return result == null ? Env.ZERO : result;
 	} //getTaxAmt
 	
@@ -1491,13 +1522,13 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 *
 	 * @return CFOP
 	 */
-	public String getCFOP()
+	public MLBRCFOP getLBR_CFOP()
 	{
-		String sql = "SELECT lbr_CFOPName " +
+		String sql = "SELECT LBR_CFOP_ID " +
 					 "FROM LBR_NotaFiscalLine " +
 					 "WHERE LBR_NotaFiscal_ID=? ORDER BY LineTotalAmt DESC";
 
-		return DB.getSQLValueString(null, sql, getLBR_NotaFiscal_ID());
+		return new MLBRCFOP(getCtx(),DB.getSQLValue(get_TrxName(), sql, get_ID()),get_TrxName());
 	}
 	
 	public String getCFOPNote() {
@@ -1650,6 +1681,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	} //isNFe
 	
 	public boolean isNFeProcessed(){
+		
+		if (getlbr_NFeStatus() == null || getlbr_NFeStatus().isEmpty())
+			return false;
 		
 		if (getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
 			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado))

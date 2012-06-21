@@ -263,7 +263,7 @@ public abstract class AdempiereLBR{
 	public static MDocType getNFBDocType(int AD_Org_ID, boolean isSOTrx, boolean isSCAN) {
 
 		String whereClause = "DocBaseType = ? AND AD_Org_ID IN (0,?)" +
-				             "AND IsSOTrx = ? AND lbr_TpEmi = ?";
+				             "AND IsSOTrx = ? AND lbr_NFeTpEmi = ?";
 		
 		MTable table = MTable.get(Env.getCtx(), MDocType.Table_Name);
 		Query q =  new Query(Env.getCtx(), table, whereClause, null);

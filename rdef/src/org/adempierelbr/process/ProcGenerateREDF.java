@@ -154,25 +154,25 @@ public class ProcGenerateREDF extends SvrProcess
 		Registro10 r10 = new Registro10 ((String) oi.get_Value("lbr_CNPJ"), p_DateFrom, p_DateTo);
 		result.append(r10.format());
 		//
-		for (MLBRNotaFiscal NF : list)
+		for (MLBRNotaFiscal nf : list)
 		{
-			String emitente = NF.isSOTrx() ? "1" : "0";
+			String emitente = nf.isSOTrx() ? "1" : "0";
 			//
-			String funcReg = NF.isCancelled() ? "C" : "I";		//	TODO: 	Criar estado de R-Retificação
+			String funcReg = nf.isCancelled() ? "C" : "I";		//	TODO: 	Criar estado de R-Retificação
 			Registro20 r20 = new Registro20 (funcReg, "", 		//	FIXME:	Criar justificativa do cancelamento
-					NF.getlbr_CFOPNote(), serieNo(NF.getDocumentNo()), docNo(NF.getDocumentNo()),
-					NF.getDateDoc(), NF.getlbr_DateInOut(), emitente, NF.getCFOP(), "", "",
-					NF.getlbr_BPCNPJ(), NF.getBPName(), NF.getlbr_BPAddress1(),
-					NF.getlbr_BPAddress2(), NF.getlbr_BPAddress4(), NF.getlbr_BPAddress3(),
-					NF.getlbr_BPCity(), NF.getlbr_BPRegion(), NF.getlbr_BPPostal(),
-					"Brasil", NF.getlbr_BPPhone(), NF.getlbr_BPIE());
+					nf.getlbr_CFOPNote(), serieNo(nf.getDocumentNo()), docNo(nf.getDocumentNo()),
+					nf.getDateDoc(), nf.getlbr_DateInOut(), emitente, nf.getLBR_CFOP().getValue(), "", "",
+					nf.getlbr_BPCNPJ(), nf.getBPName(), nf.getlbr_BPAddress1(),
+					nf.getlbr_BPAddress2(), nf.getlbr_BPAddress4(), nf.getlbr_BPAddress3(),
+					nf.getlbr_BPCity(), nf.getlbr_BPRegion(), nf.getlbr_BPPostal(),
+					"Brasil", nf.getlbr_BPPhone(), nf.getlbr_BPIE());
 			result.append(r20.format());
 			count20++;
 			//
-			if (NF.isCancelled())
+			if (nf.isCancelled())
 				continue;
 			//
-			for (MLBRNotaFiscalLine line : NF.getLines())
+			for (MLBRNotaFiscalLine line : nf.getLines())
 			{
 				Registro30 r30 = new Registro30 (line.getProductValue(), line.getProductName(),
 						line.getlbr_NCMName(), line.getlbr_UOMName(), line.getQty(), line.getPrice().add(line.getICMSAmt().divide(line.getQty(), 12, RoundingMode.HALF_UP)),
@@ -183,23 +183,23 @@ public class ProcGenerateREDF extends SvrProcess
 			}
 			//
 			//	FIXME	Desconto, Outras Despesas, ISS
-			Registro40 r40 = new Registro40 (NF.getICMSBase(), NF.getICMSAmt(), NF.getICMSSTBase(),
-					NF.getICMSSTAmt(), NF.getTotalLines().add(NF.getICMSAmt()), NF.getFreightAmt(), NF.getlbr_InsuranceAmt(),
-					Env.ZERO, NF.getIPIAmt(), Env.ZERO, NF.getGrandTotal(), Env.ZERO, Env.ZERO, Env.ZERO);
+			Registro40 r40 = new Registro40 (nf.getICMSBase(), nf.getICMSAmt(), nf.getICMSSTBase(),
+					nf.getICMSSTAmt(), nf.getTotalLines().add(nf.getICMSAmt()), nf.getFreightAmt(), nf.getlbr_InsuranceAmt(),
+					Env.ZERO, nf.getIPIAmt(), Env.ZERO, nf.getGrandTotal(), Env.ZERO, Env.ZERO, Env.ZERO);
 			result.append(r40.format());
 			count40++;
 			//
 			//	FIXME	Placa, UF da Placa, Marca dos Volumes, Numeração dos Volumes
-			String frete = NF.getFreightCostRule() == "I" ? "0" : "1";
-			String end = NF.getlbr_BPShipperAddress1() + ", " + NF.getlbr_BPShipperAddress2() +
-				" - " + NF.getlbr_BPShipperAddress4() + " - " + NF.getlbr_BPShipperAddress3();
+			String frete = nf.getFreightCostRule() == "I" ? "0" : "1";
+			String end = nf.getlbr_BPShipperAddress1() + ", " + nf.getlbr_BPShipperAddress2() +
+				" - " + nf.getlbr_BPShipperAddress4() + " - " + nf.getlbr_BPShipperAddress3();
 			end = end.replace(" - null", "").replace(" null", "").replace("null,", "");
 			if (end == "" || end.length() < 5)
 				end = null;
-			Registro50 r50 = new Registro50 (frete, NF.getlbr_BPShipperCNPJ(), NF.getlbr_BPShipperName(),
-					NF.getlbr_BPShipperIE(), end, NF.getlbr_BPShipperCity(), NF.getlbr_BPShipperRegion(),
-					"", "", NF.getNoPackages(), NF.getlbr_PackingType(), "", "", NF.getlbr_GrossWeight(),
-					NF.getlbr_GrossWeight());
+			Registro50 r50 = new Registro50 (frete, nf.getlbr_BPShipperCNPJ(), nf.getlbr_BPShipperName(),
+					nf.getlbr_BPShipperIE(), end, nf.getlbr_BPShipperCity(), nf.getlbr_BPShipperRegion(),
+					"", "", nf.getNoPackages(), nf.getlbr_PackingType(), "", "", nf.getlbr_GrossWeight(),
+					nf.getlbr_GrossWeight());
 			result.append(r50.format());
 			count50++;
 			//
