@@ -35,7 +35,7 @@ public class TcValores {
 	private String ValorInss;
 	private String ValorIr;
 	private String ValorCsll;
-	private String IssRetido = "1"; //SIM
+	private String IssRetido = "2"; //NAO
 	private String ValorIss;
 	private String OutrasRetencoes;
 	private String BaseCalculo;
@@ -107,7 +107,7 @@ public class TcValores {
 	public String getIssRetido() {
 		return IssRetido;
 	}
-	public void setIssRetido(boolean issRetido) {
+	private void setIssRetido(boolean issRetido) {
 		if (issRetido)
 			IssRetido = "1"; //SIM
 		else
@@ -118,7 +118,12 @@ public class TcValores {
 		return ValorIss;
 	}
 	public void setValorIss(BigDecimal valorIss) {
-		ValorIss = TextUtil.bigdecimalToString(valorIss);
+		if (valorIss.signum() >= 0)
+			ValorIss = TextUtil.bigdecimalToString(valorIss);
+		else{
+			setValorIssRetido(valorIss.abs());
+			setIssRetido(true);
+		}
 	}
 	
 	public String getOutrasRetencoes() {
@@ -164,7 +169,7 @@ public class TcValores {
 	public String getValorIssRetido() {
 		return ValorIssRetido;
 	}
-	public void setValorIssRetido(BigDecimal valorIssRetido) {
+	private void setValorIssRetido(BigDecimal valorIssRetido) {
 		ValorIssRetido = TextUtil.bigdecimalToString(valorIssRetido);
 	}
 	

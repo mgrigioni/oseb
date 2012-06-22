@@ -109,7 +109,7 @@ public class ProcGenerateRpsXml extends SvrProcess
 		TcDadosTomador tomador = new TcDadosTomador(identificacaoTomador, nf.getBPName(), enderecoTomador, null);
 				
 		TcRps rps = new TcRps(orgInfo, nf, new TcInfRps(nf.getDocumentNo(true), identificacaoRps, 
-				nf.getUpdated(), false, false, servico, prestador, tomador));
+				nf.getDateDoc(), false, false, servico, prestador, tomador));
 		
 		rps.toXML();
 		
@@ -118,25 +118,25 @@ public class ProcGenerateRpsXml extends SvrProcess
 	
 	private static TcValores createTcValores(MLBRNotaFiscalLine nfLine){
 		
-		BigDecimal VL_PIS      = nfLine.getTaxAmt("PIS").abs();
-		BigDecimal VL_COFINS   = nfLine.getTaxAmt("COFINS").abs();
-		BigDecimal VL_INSS     = nfLine.getTaxAmt("INSS").abs();
-		BigDecimal VL_IRRF     = nfLine.getTaxAmt("IR").abs();
-		BigDecimal VL_CSLL     = nfLine.getTaxAmt("CSLL").abs();
+		BigDecimal VL_PIS      = nfLine.getTaxAmt("PIS");
+		BigDecimal VL_COFINS   = nfLine.getTaxAmt("COFINS");
+		BigDecimal VL_INSS     = nfLine.getTaxAmt("INSS");
+		BigDecimal VL_IRRF     = nfLine.getTaxAmt("IR");
+		BigDecimal VL_CSLL     = nfLine.getTaxAmt("CSLL");
 		//
-		BigDecimal VL_BC_ISSQN = nfLine.getTaxBaseAmt("ISS").abs();
-		BigDecimal ALIQ_ISSQN  = nfLine.getTaxRate("ISS").abs();
-		BigDecimal VL_ISSQN    = nfLine.getTaxAmt("ISS").abs();
+		BigDecimal VL_BC_ISSQN = nfLine.getTaxBaseAmt("ISS");
+		BigDecimal ALIQ_ISSQN  = nfLine.getTaxRate("ISS");
+		BigDecimal VL_ISSQN    = nfLine.getTaxAmt("ISS");
 		
 		TcValores valores = new TcValores(nfLine.getLineTotalAmt());
-		valores.setValorPis(VL_PIS);
-		valores.setValorCofins(VL_COFINS);
-		valores.setValorInss(VL_INSS);
-		valores.setValorIr(VL_IRRF);
-		valores.setValorCsll(VL_CSLL);
-		valores.setBaseCalculo(VL_BC_ISSQN);
-		valores.setAliquota(ALIQ_ISSQN);
-		valores.setValorIssRetido(VL_ISSQN);
+		valores.setValorPis(VL_PIS.signum() >= 0 ? Env.ZERO : VL_PIS.abs());
+		valores.setValorCofins(VL_COFINS.signum() >= 0 ? Env.ZERO : VL_COFINS.abs());
+		valores.setValorInss(VL_INSS.signum() >= 0 ? Env.ZERO : VL_INSS.abs());
+		valores.setValorIr(VL_IRRF.signum() >= 0 ? Env.ZERO : VL_IRRF.abs());
+		valores.setValorCsll(VL_CSLL.signum() >= 0 ? Env.ZERO : VL_CSLL.abs());
+		valores.setBaseCalculo(VL_ISSQN.signum() >= 0 ? VL_BC_ISSQN : Env.ZERO);
+		valores.setAliquota(VL_ISSQN.signum() >= 0 ? ALIQ_ISSQN : Env.ZERO);
+		valores.setValorIss(VL_ISSQN);
 		valores.setValorLiquidoNfse();
 		
 		return valores;
