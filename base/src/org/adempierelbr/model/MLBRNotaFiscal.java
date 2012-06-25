@@ -63,6 +63,7 @@ import org.compiere.model.MPaymentTerm;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MProduct;
 import org.compiere.model.MShipper;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTable;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
@@ -347,7 +348,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//	Std Period open?
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
-		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
+		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 			return DocAction.STATUS_Invalid;
 		}
@@ -442,7 +443,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//	Std Period open?
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
-		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
+		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 		}
 		
@@ -516,7 +517,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//	Std Period open?
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
-		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateDoc(), dt.getDocBaseType(), getAD_Org_ID())){
+		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 			return false;
 		}
@@ -528,8 +529,10 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 
 		//NFe já processada, não deixa reativar
 		if (getlbr_NFeProt() != null && !getlbr_NFeProt().isEmpty()){
-			m_processMsg = "Não é possível reativar uma NFe processada";
-			return false;
+			if (!MSysConfig.getBooleanValue("LBR_ALLOW_REACTIVATE_NFE_PROCESSED", false, getAD_Client_ID())){
+				m_processMsg = "Não é possível reativar uma NFe processada";
+				return false;
+			}
 		}
 		
 		// After reActivate
@@ -744,7 +747,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		}
 		
 		try{
-			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsulta(oiW.getlbr_NFeEnv(), getlbr_NFeID())));
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaProtocolo(oiW.getlbr_NFeEnv(), getlbr_NFeID())));
 
 			NfeConsulta2Stub.NfeDadosMsg dadosMsg = NfeConsulta2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta(bpLoc.getC_Region_ID());
@@ -1615,6 +1618,14 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			serieNo = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
 		}
 		return serieNo;
+	}
+	
+	/**
+	 * Retorna a data utilizada para contabilização
+	 * @return Data de Entrada/Saída ou Data Documento
+	 */
+	public Timestamp getDateAcct(){
+		return getlbr_DateInOut() == null ? getDateDoc() : getlbr_DateInOut();
 	}
 	
 	/**
