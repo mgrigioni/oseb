@@ -14,11 +14,15 @@ package org.adempierelbr.nfe.beans;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 public class ICMSBean {
 
 	// ICMS - Definir Coluna ICMS de acordo com a Situa��o Tributaria
 
+	@XStreamAsAttribute
 	private ICMSGrupoBean ICMS;
+	
 	private ICMSGrupoBean ICMS00;
 	private ICMSGrupoBean ICMS10;
 	private ICMSGrupoBean ICMS20;

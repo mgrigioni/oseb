@@ -14,6 +14,10 @@ package org.adempierelbr.nfe.beans;
 
 import org.adempierelbr.util.RemoverAcentos;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias ("det")
 public class DetailsNFEBean
 {
 
@@ -21,6 +25,8 @@ public class DetailsNFEBean
 	public ProdutosNFEBean prod;
 	public TributosInciBean imposto;
 	public String infAdProd;
+	
+	@XStreamAsAttribute
 	public int nItem;
 
 	/**

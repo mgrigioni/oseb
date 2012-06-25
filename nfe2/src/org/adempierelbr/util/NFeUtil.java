@@ -33,6 +33,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.nfe.InutilizacaoNF;
 import org.adempierelbr.nfe.beans.ChaveNFE;
+import org.adempierelbr.nfe.beans.ConsCad;
+import org.adempierelbr.nfe.beans.ConsSitNFe;
+import org.adempierelbr.nfe.beans.ConsStatServ;
+import org.adempierelbr.nfe.beans.InfProt;
+import org.adempierelbr.nfe.beans.NFeDadosMsg;
+import org.adempierelbr.nfe.beans.ProtNFe;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
@@ -84,6 +90,62 @@ public abstract class NFeUtil
 	/** Namespace padrão da NF-e */
 	public static final String NAMESPACE_NFE = "xmlns=\"http://www.portalfiscal.inf.br/nfe\"";
 
+	/**
+	 * Método para gerar dados para consulta da NFe
+	 * @param tpAmb
+	 * @param chNFe
+	 * @return msg
+	 */
+	public static String geraMsgConsultaProtocolo(String tpAmb, String chNFe){
+
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new NFeDadosMsg(new ConsSitNFe(VERSAO,tpAmb,chNFe)), 
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	} //geraMsgConsultaProtocolo
+	
+	/**
+	 * Método para gerar dados para consulta status serviço
+	 * @param tpAmb
+	 * @param C_Region_ID
+	 * @return msg
+	 */
+	public static String geraMsgStatusServico(String tpAmb, int C_Region_ID){
+
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new NFeDadosMsg(new ConsStatServ(VERSAO,tpAmb,
+				BPartnerUtil.getRegionCode(C_Region_ID))), 
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	} //geraMsgStatusServico
+	
+	/**
+	 * Método para gerar dados para consulta cadastro
+	 * @param regionName
+	 * @param CNPJ ou CPF
+	 * @return msg
+	 */
+	public static String geraMsgConsultaCadastro(String regionName, String CNPJ){
+
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		
+		xstream.marshal (new NFeDadosMsg(new ConsCad(VERSAO,regionName,CNPJ)),
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	} //geraMsgConsultaCadastro
+	
 	/**
 	 * Gera o cabeçalho da NFe
 	 *
@@ -145,20 +207,18 @@ public abstract class NFeUtil
 	 * @param xMotivo
 	 * @return XML
 	 */
-	public static String geraRodapDistribuicao (String chNFe, String nProt, String tpAmb, String dhRecbto,
-			                                    String digVal, String cStat, String xMotivo)
-	{
-		String dados = 	"<protNFe " + NAMESPACE_NFE + " versao=\"" + VERSAO + "\"><infProt>" +
-				        "<tpAmb>"+tpAmb+"</tpAmb>" +
-				        "<verAplic>"+VERSAO_APP+"</verAplic>" +
-				        "<chNFe>"+chNFe+"</chNFe>" +
-				        "<dhRecbto>"+dhRecbto+"</dhRecbto>" +
-				        "<nProt>"+nProt+"</nProt>" +
-				        "<digVal>"+digVal+"</digVal>" +
-				        "<cStat>"+cStat+"</cStat>" +
-				        "<xMotivo>"+xMotivo+"</xMotivo></infProt></protNFe></nfeProc>";
-
-		return dados;
+	public static String geraRodapDistribuicao (String chNFe, String nProt, String tpAmb, 
+			Timestamp dhRecbto, String digVal, String cStat, String xMotivo) {
+			
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new ProtNFe(VERSAO,
+				new InfProt(tpAmb,VERSAO_APP,chNFe,dhRecbto,nProt,digVal,cStat,xMotivo)), 
+				new CompactWriter (sw));
+		
+		return sw.toString() + "</nfeProc>";
 	}	//	RodapDistribuicao
 	
 	/**
@@ -178,35 +238,17 @@ public abstract class NFeUtil
 		return cabecMsgE;
 	} //geraCabecConsulta
 	
-	/**
-	 * Método para gerar dados para consulta da NFe
-	 * @param envType
-	 * @param region
-	 * @return msg
-	 */
-	public static String geraMsgConsulta(String envType, String chNFe){
 
-		String msg =
-			"<nfeDadosMsg>" +
-		    	"<consSitNFe versao=\"" + VERSAO + "\" " + NAMESPACE_NFE + ">" +
-		        	"<tpAmb>"+envType+"</tpAmb>" +
-		        	"<xServ>CONSULTAR</xServ>" +
-		        	"<chNFe>"+chNFe+"</chNFe>"+
-		        "</consSitNFe>" +
-		    "</nfeDadosMsg>";
-
-		return msg;
-	} //geraMsgConsulta
 
 	/**
 	 * Método para gerar cabeçalho status serviço NF 2.00
 	 * @param region
 	 * @return NfeStatusServico2Stub.NfeCabecMsgE
 	 */
-	public static NfeStatusServico2Stub.NfeCabecMsgE geraCabecStatusServico(String region){
+	public static NfeStatusServico2Stub.NfeCabecMsgE geraCabecStatusServico(int C_Region_ID){
 
 		NfeStatusServico2Stub.NfeCabecMsg cabecMsg = new NfeStatusServico2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
 		cabecMsg.setVersaoDados(VERSAO);
 
 		NfeStatusServico2Stub.NfeCabecMsgE cabecMsgE = new NfeStatusServico2Stub.NfeCabecMsgE();
@@ -215,25 +257,7 @@ public abstract class NFeUtil
 		return cabecMsgE;
 	} //geraCabecStatusServico
 
-	/**
-	 * Método para gerar dados para consulta status serviço NF 2.00
-	 * @param envType
-	 * @param region
-	 * @return msg
-	 */
-	public static String geraMsgStatusServico(String envType, String region){
 
-		String msg =
-			"<nfeDadosMsg>" +
-		    	"<consStatServ versao=\"" + VERSAO + "\" " + NAMESPACE_NFE + ">" +
-		        	"<tpAmb>"+envType+"</tpAmb>" +
-		        	"<cUF>"+region+"</cUF>" +
-		        	"<xServ>STATUS</xServ>" +
-		        "</consStatServ>" +
-		    "</nfeDadosMsg>";
-
-		return msg;
-	} //geraMsgStatusServico
 
 	/**
 	 * Método para gerar cabeçalho consulta cadastro NF 2.00
@@ -251,43 +275,6 @@ public abstract class NFeUtil
 
 		return cabecMsgE;
 	} //geraCabecConsultaCadastro
-
-	/**
-	 * Método para gerar dados para consulta cadastro NF 2.00
-	 * @param envType
-	 * @param region
-	 * @return msg
-	 */
-	public static String geraMsgConsultaCadastro(String region, String IE, String CNPJ){
-
-		String arg = "";
-
-		if (CNPJ != null && CNPJ.length() == 18){ //CNPJ
-			//if (IE != null && !IE.equalsIgnoreCase("ISENTO")){ //BUG NO WEBSERVICE -- NAO RETORNA CONSULTA DE IE CORRETA
-			//	arg = "<IE>"+TextUtil.toNumeric(IE)+"</IE>";
-			//}
-			//else{
-				arg = "<CNPJ>"+TextUtil.toNumeric(CNPJ)+"</CNPJ>";
-			//}
-		}
-		else{ //CPF
-			arg = "<CPF>"+TextUtil.toNumeric(CNPJ)+"</CPF>";
-		}
-
-		String msg =
-			"<nfeDadosMsg>" +
-				"<ConsCad " + NAMESPACE_NFE + " versao=\"2.00\">" +
-					"<infCons>" +
-		        		"<xServ>CONS-CAD</xServ>" +
-		        		"<UF>"+region+"</UF>" +
-		        		arg +
-		    		"</infCons>" +
-		        "</ConsCad>" +
-		    "</nfeDadosMsg>";
-
-		return msg;
-	} //geraMsgConsultaCadastro
-
 
 	/**
 	 * Gera o cabeçalho do lote
@@ -413,9 +400,8 @@ public abstract class NFeUtil
 	    //
 	    String cabecalho  = geraCabecDistribuicao();
 		//
-	    String rodape 	  = geraRodapDistribuicao(nf.getlbr_NFeID(), nf.getlbr_NFeProt(), getEnvType(nf.getCtx()),
-	        		                                  timeToString(nf.getDateTrx()), nf.getlbr_DigestValue(),
-	        		                                  status,getNFeStatus(status));
+	    String rodape = geraRodapDistribuicao(nf.getlbr_NFeID(), nf.getlbr_NFeProt(), 
+	    		getEnvType(nf.getCtx()), nf.getDateTrx(), nf.getlbr_DigestValue(), status,getNFeStatus(status));
 		//
 		String dadosEmXML = cabecalho + dados + rodape;
 		attach = new File(TextUtil.generateTmpFile(dadosEmXML, nf.getlbr_NFeID() + FILE_EXT));

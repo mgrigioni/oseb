@@ -12,6 +12,9 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias ("dup")
 public class CobrancaGrupoDuplicata {
 
 	private String nDup;

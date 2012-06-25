@@ -15,11 +15,14 @@ package org.adempierelbr.nfe.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 public class Cobranca {
 
 	// Dados da Cobrança
 	private CobrancaGrupoFatura fat;
 
+	@XStreamImplicit(itemFieldName="dup")
 	private List<CobrancaGrupoDuplicata> dups = new ArrayList<CobrancaGrupoDuplicata>();
 
 	public List<CobrancaGrupoDuplicata> getDups() {

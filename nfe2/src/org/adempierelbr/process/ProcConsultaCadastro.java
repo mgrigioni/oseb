@@ -108,7 +108,7 @@ public class ProcConsultaCadastro extends SvrProcess
 		String status = "Erro na verificação de Status";
 
 		try{
-			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaCadastro(bpLoc.getC_Region().getName(),bpIE,bpCNPJ)));
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaCadastro(bpLoc.getC_Region().getName(),bpCNPJ)));
 
 			CadConsultaCadastro2Stub.NfeDadosMsg dadosMsg = CadConsultaCadastro2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			CadConsultaCadastro2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsultaCadastro(region);

@@ -15,6 +15,8 @@ package org.adempierelbr.nfe.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 public class DeclaracaoDI {
 	private String nDI;
 	private String dDI;
@@ -22,6 +24,8 @@ public class DeclaracaoDI {
 	private String UFDesemb;
 	private String dDesemb;
 	private String cExportador;
+	
+	@XStreamImplicit(itemFieldName="adi")
 	private List<AdicoesDI> adi = new ArrayList<AdicoesDI>();
 	
 	public String getnDI() {

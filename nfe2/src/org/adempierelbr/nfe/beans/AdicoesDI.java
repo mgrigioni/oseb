@@ -12,10 +12,17 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
+@XStreamAlias ("adi")
 public class AdicoesDI {
 
 	private String nAdicao;
+	
+	@XStreamOmitField
 	private String nDI;
+	
 	private String nSeqAdic;
 	private String cFabricante;
 	private String vDescDI;

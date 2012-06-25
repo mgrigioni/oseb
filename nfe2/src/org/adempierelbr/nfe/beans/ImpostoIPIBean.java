@@ -12,6 +12,9 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 public class ImpostoIPIBean {
 
 	// Imposto sobre Produtos Industrializados
@@ -21,7 +24,13 @@ public class ImpostoIPIBean {
 	private String cSelo;
 	private String qSelo;
 	private String cEnq;
+	
+	@XStreamAlias("IPITrib")
+	@XStreamAsAttribute
 	private ImpostoIPIGrupoBean IPI ;
+	
+	@XStreamAlias("IPINT")
+	@XStreamAsAttribute
 	private ImpostoIPIGrupoBean IPINT ;
 	
 	public ImpostoIPIGrupoBean getIPI() {

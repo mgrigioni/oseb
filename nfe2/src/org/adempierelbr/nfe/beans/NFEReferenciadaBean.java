@@ -12,6 +12,9 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias ("NFRef")
 public class NFEReferenciadaBean {
 
 	private String refNFe ;

@@ -12,10 +12,12 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 public class PISBean {
 
 	// PIS - Definir Grupo do PIS
-	
+	@XStreamAsAttribute
 	private PISGrupoBean PIS;
 
 	public PISGrupoBean getPIS() {

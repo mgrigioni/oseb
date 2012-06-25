@@ -15,11 +15,20 @@ package org.adempierelbr.nfe.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
+@XStreamAlias ("infNFe")
 public class DadosNFE {
 
 	// Dados da Nota Fiscal Eletronica
+	@XStreamAsAttribute
 	private String versao;
+	
+	@XStreamAsAttribute
 	private String Id;
+	
 	private String pk_nitem;	
 	private IdentNFE ide;
 	private IdentEmit emit;
@@ -27,7 +36,10 @@ public class DadosNFE {
 	private IdentDest dest;
 	private IdentLocRetirada retirada;
 	private IdentLocalEntrega entrega;
+	
+	@XStreamImplicit(itemFieldName="det")
 	private List<DetailsNFEBean> det = new ArrayList<DetailsNFEBean>();
+	
 	private Valores total;
 	private Transporte transp;
 	private Cobranca cobr;

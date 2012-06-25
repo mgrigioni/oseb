@@ -146,6 +146,7 @@ public class NFeXMLGenerator
 		
 		//
 		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
 		
 		DadosNFE dados = new DadosNFE();
 		InformacoesNFEReferenciadaBean inforeferencia = new InformacoesNFEReferenciadaBean();
@@ -179,10 +180,7 @@ public class NFeXMLGenerator
 		ArrayList<AdicoesDI> hAdi = new ArrayList<AdicoesDI>();
 
 		// Dados da NFE
-		xstream.alias("infNFe", DadosNFE.class);
-		xstream.useAttributeFor(DadosNFE.class, "versao");
 		dados.setVersao(NFeUtil.VERSAO);
-		xstream.useAttributeFor(DadosNFE.class, "Id");
 
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx, LBR_NotaFiscal_ID, trxName);
 		if (LBR_NotaFiscal_ID == 0)
@@ -338,7 +336,6 @@ public class NFeXMLGenerator
 		identNFe.setFinNFe(FinNFE);
 		if (FinNFE.equals(X_LBR_NotaFiscal.LBR_FINNFE_NFeComplementar)){
 			NFEReferenciadaBean nfRef = new NFEReferenciadaBean(new MLBRNotaFiscal(ctx,nf.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID());
-			xstream.alias("NFRef", NFEReferenciadaBean.class);
 			identNFe.setNFref(nfRef);
 		}
 		
@@ -633,12 +630,6 @@ public class NFeXMLGenerator
 
 		int linhaNF = 1;
 
-		xstream.addImplicitCollection(Cobranca.class, "dups");
-		xstream.alias("dup", CobrancaGrupoDuplicata.class);
-		xstream.omitField(AdicoesDI.class, "nDI");
-		xstream.alias("adi", AdicoesDI.class);
-		xstream.addImplicitCollection(DeclaracaoDI.class, "adi");
-
 		for (MLBRNotaFiscalLine nfLine : nfLines) {
 			ProdutosNFEBean produtos = new ProdutosNFEBean();
 			DeclaracaoDI declaracao = new DeclaracaoDI();
@@ -740,9 +731,6 @@ public class NFeXMLGenerator
 				dados.add(new DetailsNFEBean(produtos, impostos, linhaNF++));
 			}
 
-			xstream.alias("det", DetailsNFEBean.class);
-			xstream.useAttributeFor(DetailsNFEBean.class, "nItem");
-			xstream.addImplicitCollection(DadosNFE.class, "det");
 			//
 			NFeTaxes[] lineTax = NFeTaxes.getTaxes(nfLine);
 			//
@@ -823,9 +811,7 @@ public class NFeXMLGenerator
 						case 70: icmsnfe.setICMS70(icmsgrupo); break;
 						case 90: icmsnfe.setICMS90(icmsgrupo); break;
 					}
-
 					//
-					xstream.useAttributeFor(ICMSBean.class, "ICMS");
 					impostos.setICMS(icmsnfe);
 				} //ICMS
 
@@ -836,14 +822,12 @@ public class NFeXMLGenerator
 						pisgrupo.setvBC(TextUtil.bigdecimalToString(lt.getvBC()));// vBC - Base de calculo do PIS
 						pisgrupo.setpPIS(TextUtil.bigdecimalToString(lt.getpImposto()));// pPIS - percentual do pis
 						pisnfe.setPIS(pisgrupo);
-						xstream.useAttributeFor(PISBean.class, "PIS");
 						xstream.aliasField("PISAliq", PISBean.class, "PIS");
 						impostos.setPIS(pisnfe);
 					}
 					else {
 						pisgrupo.setCST("04");
 						pisnfe.setPIS(pisgrupo);
-						xstream.useAttributeFor(PISBean.class, "PIS");
 						xstream.aliasField("PISNT", PISBean.class, "PIS");
 						impostos.setPIS(pisnfe);
 					}
@@ -857,14 +841,12 @@ public class NFeXMLGenerator
 						cofinsgrupo.setvBC(TextUtil.bigdecimalToString(lt.getvBC())); // vBC - Valor da Base de calculo
 						cofinsgrupo.setpCOFINS(TextUtil.bigdecimalToString(lt.getpImposto())); // pCofins - Aliquota cofins
 						cofinsnfe.setCOFINS(cofinsgrupo);
-						xstream.useAttributeFor(COFINSBean.class, "COFINS");
 						xstream.aliasField("COFINSAliq", COFINSBean.class, "COFINS");
 						impostos.setCOFINS(cofinsnfe);
 					}
 					else {
 						cofinsgrupo.setCST("04");
 						cofinsnfe.setCOFINS(cofinsgrupo);
-						xstream.useAttributeFor(COFINSBean.class, "COFINS");
 						xstream.aliasField("COFINSNT", COFINSBean.class, "COFINS");
 						impostos.setCOFINS(cofinsnfe);
 					}
@@ -883,8 +865,6 @@ public class NFeXMLGenerator
 						ipigrupo.setpIPI(TextUtil.bigdecimalToString(lt.getpImposto()));
 						ipinfe.setcEnq("999");	//	Deixar 999 até a RBF criar a regra.
 						ipinfe.setIPI(ipigrupo);
-						xstream.useAttributeFor(ImpostoIPIBean.class, "IPI");
-						xstream.aliasField("IPITrib", ImpostoIPIBean.class, "IPI");
 						impostos.setIPI(ipinfe);
 					}
 					else
@@ -892,8 +872,6 @@ public class NFeXMLGenerator
 						ipigrupo.setCST(CST);
 						ipinfe.setcEnq("999");
 						ipinfe.setIPINT(ipigrupo);
-						xstream.useAttributeFor(ImpostoIPIBean.class, "IPINT");
-						xstream.aliasField("IPINT", ImpostoIPIBean.class, "IPINT");
 						impostos.setIPI(ipinfe);
 					}
 				} //IPI

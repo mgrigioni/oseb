@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,23 +13,49 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-public class COFINSBean {
+/**
+ *  ProtNFe
+ *  @author Mario Grigioni
+ *  @version $Id: ProtNFe.java,v 1.0 22/06/2012 14:08:00 mgrigioni Exp $
+ */
+@XStreamAlias ("protNFe")
+public class ProtNFe {
 
-	// COFINS - Definir Grupo de COFINS
+	@XStreamAsAttribute
+	private final String xmlns="http://www.portalfiscal.inf.br/nfe";
 	
 	@XStreamAsAttribute
-	private COFINSGrupoBean COFINS;
-
-	public COFINSGrupoBean getCOFINS() {
-		return COFINS;
+	private String versao;
+	
+	private InfProt infProt;
+	
+	/**
+	 * @param versao
+	 * @param infProt
+	 */
+	public ProtNFe(String versao, InfProt infProt) {
+		super();
+		setVersao(versao);
+		setInfProt(infProt);
+	}
+	
+	public String getVersao() {
+		return versao;
+	}
+	public void setVersao(String versao) {
+		this.versao = versao;
+	}
+	public InfProt getInfProt() {
+		return infProt;
+	}
+	public void setInfProt(InfProt infProt) {
+		this.infProt = infProt;
+	}
+	public String getXmlns() {
+		return xmlns;
 	}
 
-	public void setCOFINS(COFINSGrupoBean cofins) {
-		COFINS = cofins;
-	}
-
-	
-	
-}
+}	// ProtNFe
