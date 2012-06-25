@@ -26,15 +26,12 @@ import java.util.logging.Level;
 
 import org.adempierelbr.util.ServiceTaxes;
 import org.adempierelbr.util.TaxBR;
-import org.adempierelbr.wrapper.I_W_C_Tax;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
-import org.compiere.model.MPaymentTerm;
-import org.compiere.model.MSysConfig;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
@@ -158,6 +155,8 @@ public class MLBRTax extends X_LBR_Tax {
 
 	private static String validateWithhold (MOrder order, MInvoice invoice)
 	{
+		/** O PROCESSO ABAIXO NAO FUNCIONA CORRETAMENTE
+		
 		Boolean hasWhSummary = false, hasLeastThanThreshold = false;
 
 		boolean isOrder = true;
@@ -188,8 +187,6 @@ public class MLBRTax extends X_LBR_Tax {
 		{
 			for (PO doctax : doctaxes)
 			{
-				BigDecimal taxAmount = Env.ZERO;
-
 				Integer C_Tax_ID = (Integer)doctax.get_Value(I_W_C_Tax.COLUMNNAME_C_Tax_ID);
 				if (C_Tax_ID == null || C_Tax_ID.intValue() == 0)
 					continue;
@@ -228,23 +225,12 @@ public class MLBRTax extends X_LBR_Tax {
 				{
 					Integer[] taxLines = getTaxLines(document,isOrder,serviceTax.getLBR_TaxName_ID(),trx);
 
-					if (isOrder){
-						taxAmount = ((MOrderTax)doctax).getTaxAmt().negate();
-						((MOrderTax)doctax).setTaxAmt(taxAmount);
-					}
-					else{
-						taxAmount = ((MInvoiceTax)doctax).getTaxAmt().negate();
-						((MInvoiceTax)doctax).setTaxAmt(taxAmount);
-					}
-
-					doctax.save(trx);
-
 					boolean retroactive = MSysConfig.getBooleanValue("LBR_ALLOW_RETROACTIVE_SERVICETAX", true, document.getAD_Client_ID());
 
 					//Invoice com retenção própria.
-					if(taxLines.length == 0 || !hasLeastThanThreshold) {
+					if(!isOrder && (taxLines.length == 0 || !hasLeastThanThreshold)) {
+						
 						document.set_ValueOfColumn("LBR_Withhold_Invoice_ID", whDocument);
-						((MInvoice)document).setGrandTotal(((MInvoice)document).getGrandTotal().add(taxAmount));
 						((MInvoice)document).save(trx);
 						
 						continue;
@@ -289,7 +275,7 @@ public class MLBRTax extends X_LBR_Tax {
 							((MInvoice)document).save(trx);
 					} //end if
 				} //limiar atingido
-
+				
 			} //doctax
 
 		} //document
@@ -306,10 +292,13 @@ public class MLBRTax extends X_LBR_Tax {
 
 		if(hasWhSummary)
 			log.warning("Retenções de outras Faturas contidas nesta Fatura.");
-
+		
+		**/
+				
 		return "";
 	} //validateWithhold
 
+	@SuppressWarnings("unused")
 	private static ServiceTaxes[] getServiceTaxes(PO document, boolean isOrder, String trx){
 
 		ArrayList<ServiceTaxes> taxes = new ArrayList<ServiceTaxes>();
@@ -378,6 +367,7 @@ public class MLBRTax extends X_LBR_Tax {
 		return retValue;
 	} //getServiceTaxes
 
+	@SuppressWarnings("unused")
 	private static Integer[] getTaxLines(PO document, boolean isOrder, int LBR_TaxName_ID, String trx){
 
 		ArrayList<Integer> taxLines = new ArrayList<Integer>();
@@ -451,6 +441,7 @@ public class MLBRTax extends X_LBR_Tax {
 		return retValue;
 	} //getTaxLines
 
+	@SuppressWarnings("unused")
 	private static boolean saveDocTax(PO doctax, boolean isOrder, int AD_Org_ID, BigDecimal TaxAmt,
 			BigDecimal TaxBaseAmt, boolean isTaxIncluded, String trx){
 
@@ -470,6 +461,7 @@ public class MLBRTax extends X_LBR_Tax {
 		}
 	} //saveDocTax
 
+	@SuppressWarnings("unused")
 	private static boolean setReferenceDoc(Properties ctx, boolean isOrder, int whDocument, Integer LBR_Tax_ID, String trx){
 
 		int Document_ID = 0;
