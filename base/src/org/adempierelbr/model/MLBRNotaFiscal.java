@@ -347,8 +347,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			setInvoice(invoice);
 			
 			//Atribui LBR_NotaFiscal_ID
-			//invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", get_ID());
-			//invoice.save(get_TrxName());
+			invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", get_ID());
+			invoice.save(get_TrxName());
 		}
 		
 		//	Std Period open?
@@ -657,14 +657,12 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				getlbr_NFeProt() != null && !getlbr_NFeProt().isEmpty())
 			return false;
 		
-		/*
 		if (getC_Invoice_ID() > 0){
 			MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
 			invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", null);
 			if (!invoice.save(get_TrxName()))
 				return false;
 		}
-		*/
 
 		if (!deleteLBR_NFTax()) return false;
 		if (!deleteLBR_NFLineTax()) return false;
