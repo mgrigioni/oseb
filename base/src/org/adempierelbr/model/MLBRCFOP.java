@@ -75,7 +75,8 @@ public class MLBRCFOP extends X_LBR_CFOP {
 		
 		if (getDescription() != null){
 			if((getDescription().toUpperCase()).indexOf("SERVI") != -1){
-				if ((getDescription().toUpperCase()).indexOf("UTILIZA") != -1)
+				if (((getDescription().toUpperCase()).indexOf("UTILIZA") != -1) ||
+					((getDescription().toUpperCase()).indexOf("OUTRA") != -1))
 					return false;
 				return true;
 			}

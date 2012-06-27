@@ -802,10 +802,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		}
 		
 		try{
-			String chNFe  = getlbr_NFeID();
-			String pclNFe = getlbr_NFeProt();
-
-			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(chNFe, pclNFe, oiW.getlbr_NFeEnv(), RemoverAcentos.remover(getlbr_MotivoCancel()));
+			
+			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(oiW.getlbr_NFeEnv(), getlbr_NFeID(), 
+					getlbr_NFeProt(), RemoverAcentos.remover(getlbr_MotivoCancel()));
 
 			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, getDocumentNo()+"-ped-can.xml"));
 			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_CANCELAMENTO_NFE);
@@ -816,9 +815,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	        	return validation;
 			}
 			
-			//
-			nfeCancDadosMsg   = "<nfeDadosMsg>" + nfeCancDadosMsg + "</nfeDadosMsg>";
-
+			nfeCancDadosMsg = "<nfeDadosMsg>" + nfeCancDadosMsg + "</nfeDadosMsg>";
+			
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(nfeCancDadosMsg));
 
 			NfeCancelamento2Stub.NfeDadosMsg dadosMsg = NfeCancelamento2Stub.NfeDadosMsg.Factory.parse(dadosXML);
@@ -1136,6 +1134,29 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 
 	} //setShipper
 	
+	/**
+	  * Código de Barras da NF Modelo 1 ou 1A impressa a Laser
+	  */
+	private void setBarCodeModel1A () {
+		StringBuilder barcode1 = new StringBuilder();
+		barcode1.append("1");
+		barcode1.append(TextUtil.lPad(getDocumentNo(), 6));
+		barcode1.append(TextUtil.lPad(getlbr_CNPJ(), 14));
+		barcode1.append(getlbr_OrgRegion());
+		barcode1.append(TextUtil.timeToString(getDateDoc(), "yyyyMMdd"));
+		barcode1.append("2");
+		//
+		StringBuilder barcode2 = new StringBuilder();
+		barcode2.append("2");
+		barcode2.append(TextUtil.lPad(getlbr_BPCNPJ(), 14));
+		barcode2.append(getlbr_BPRegion());
+		barcode2.append(TextUtil.lPad(getGrandTotal(), 10));
+		barcode2.append(TextUtil.lPad(getICMSAmt(), 10));
+		//
+		setlbr_Barcode1(barcode1.toString());
+		setlbr_Barcode2(barcode2.toString());
+	}	//	setBarCodeModel1A
+
 	public void setInvoice(MInvoice invoice) throws AdempiereException{
 		
 		if (invoice == null)
@@ -1217,6 +1238,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			nfDesc.append("\n" + description);
 
 		setDescription(TextUtil.itrim(nfDesc.toString())); //Observação Nota Fiscal
+		setBarCodeModel1A();
 		save(get_TrxName());
 		//
 		createLines(invoice.getLines());
