@@ -187,7 +187,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		boolean isClientProduct = false;
 		
 		if (M_Product_ID == m_client.getM_ProductFreight_ID()){ //FRETE
-			getParent().setFreightAmt(getParent().getFreightAmt().add(amt));	
+			getParent().setFreightAmt(getParent().getFreightAmt().add(amt));
 			isClientProduct = true;
 		}
 		else if (M_Product_ID == m_client.get_ValueAsInt("Z_ProductInsurance_ID")){ //SEGURO
@@ -199,8 +199,10 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			isClientProduct = true;
 		}
 		
-		if (isClientProduct)
+		if (isClientProduct){
+			getParent().setGrandTotal(getParent().getGrandTotal().add(amt));
 			getParent().save(get_TrxName());
+		}
 		
 		return isClientProduct;
 	} //setClientProduct
@@ -216,17 +218,19 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 		boolean hasPriceList = priceList.signum() != 0;
 		
-		if (!iLine.getParent().isTaxIncluded()) {
-			lineNetAmt = lineNetAmt.add(getTotalTaxAmt());
-			if (hasPriceList)
-				priceList = priceList.add(getTotalTaxAmt().divide(iLine.getQtyEntered(), 5, TaxBR.ROUND));
-		}
+		if (!(getCFOP().startsWith("3") || getCFOP().startsWith("7"))){
+			if (!iLine.getParent().isTaxIncluded()) {
+				lineNetAmt = lineNetAmt.add(getTotalTaxAmt());
+				if (hasPriceList)
+					priceList = priceList.add(getTotalTaxAmt().divide(iLine.getQtyEntered(), 5, TaxBR.ROUND));
+			}
 		
-		BigDecimal excludedTaxes = getIPIAmt().add(getTaxAmt("ICMSST"));
-		lineNetAmt = lineNetAmt.subtract(excludedTaxes);
-		price = lineNetAmt.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND);
-		if (hasPriceList)
-			priceList = priceList.subtract(excludedTaxes.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND));
+			BigDecimal excludedTaxes = getIPIAmt().add(getTaxAmt("ICMSST"));
+			lineNetAmt = lineNetAmt.subtract(excludedTaxes);
+			price = lineNetAmt.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND);
+			if (hasPriceList)
+				priceList = priceList.subtract(excludedTaxes.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND));
+		}
 		
 		setPrice(convertAmt(price)); //Preço
 		setPriceListAmt(convertAmt(priceList)); //Preço de Lista

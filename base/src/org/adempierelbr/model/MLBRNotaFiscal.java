@@ -368,11 +368,36 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				}
 			}	
 		}
-
+		
 		//RATEIO VALORES DE FRETE E SISCOMEX
 		if (!setFreightTax() || !setSiscomexTax())
 			return DocAction.STATUS_Invalid;
-	
+		/*
+		//Verifica se o documento contem linhas
+		if (m_lines.size() == 0){
+			m_processMsg = Msg.getMsg(getCtx(), "NoLines");
+			return DocAction.STATUS_Invalid;
+		}
+		
+		//Validação de Valores
+		BigDecimal sumGrandTotal   = Env.ZERO;
+		BigDecimal sumTotalLines   = Env.ZERO;
+		BigDecimal sumServiceTotal = Env.ZERO;
+		
+		for (MLBRNotaFiscalLine nfLine : m_lines){
+			sumGrandTotal = sumGrandTotal.add(nfLine.getTotalOperationAmt());
+			if (nfLine.islbr_IsService())
+				sumServiceTotal = sumServiceTotal.add(nfLine.getLineTotalAmt());
+			else
+				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
+		}
+		
+		if (sumGrandTotal.compareTo(getGrandTotal()) != 0){
+			m_processMsg = Msg.getMsg(getCtx(), "NoLines");
+			return DocAction.STATUS_Invalid;
+		}
+		*/
+		
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
 		if (m_processMsg != null)
 			return DocAction.STATUS_Invalid;
@@ -957,7 +982,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			}
 
 		} //for lines
-
+		
 		return true;
 	} //setFreightTax
 
