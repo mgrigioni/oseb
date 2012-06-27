@@ -19,12 +19,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  ProtNFe
+ *  CancNFe
  *  @author Mario Grigioni
- *  @version $Id: ProtNFe.java,v 1.0 22/06/2012 14:08:00 mgrigioni Exp $
+ *  @version $Id: CancNFe.java,v 1.0 26/06/2012 10:27:00 mgrigioni Exp $
  */
-@XStreamAlias ("protNFe")
-public class ProtNFe {
+@XStreamAlias ("cancNFe")
+public class CancNFe {
 
 	@XStreamAsAttribute
 	private final String xmlns=NFeUtil.NAMESPACE_NFE;
@@ -32,32 +32,95 @@ public class ProtNFe {
 	@XStreamAsAttribute
 	private String versao;
 	
-	private InfProt infProt;
-	
+	public InfCanc infCanc;
+
 	/**
 	 * @param versao
-	 * @param infProt
+	 * @param uf
+	 * @param id (CNPJ ou CPF)
 	 */
-	public ProtNFe(String versao, InfProt infProt) {
+	public CancNFe(String versao, String tpAmb, String chNFe, String nProt, String xJust) {
 		super();
 		setVersao(versao);
-		setInfProt(infProt);
+		setInfCanc(new InfCanc(tpAmb,chNFe,nProt,xJust));
 	}
-	
+
 	public String getVersao() {
 		return versao;
 	}
 	public void setVersao(String versao) {
 		this.versao = versao;
 	}
-	public InfProt getInfProt() {
-		return infProt;
+	public InfCanc getInfCanc() {
+		return infCanc;
 	}
-	public void setInfProt(InfProt infProt) {
-		this.infProt = infProt;
+	public void setInfCanc(InfCanc infCanc) {
+		this.infCanc = infCanc;
 	}
 	public String getXmlns() {
 		return xmlns;
 	}
+	
+}	// CancNFe
 
-}	// ProtNFe
+@XStreamAlias ("infCanc")
+class InfCanc{
+	
+	@XStreamAsAttribute
+	public String Id;
+
+	public String tpAmb;
+	public final String xServ = "CANCELAR";
+	public String chNFe;
+	public String nProt;
+	public String xJust;
+	
+	/**
+	 * @param tpAmb
+	 * @param chNFe
+	 * @param nProt
+	 * @param xJust
+	 */
+	public InfCanc(String tpAmb, String chNFe, String nProt, String xJust) {
+		super();
+		setId("ID" + chNFe);
+		setTpAmb(tpAmb);
+		setChNFe(chNFe);
+		setnProt(nProt);
+		setxJust(xJust);
+	}
+	public String getId() {
+		return Id;
+	}
+	public void setId(String id) {
+		this.Id = id;
+	}
+	public String getTpAmb() {
+		return tpAmb;
+	}
+	public void setTpAmb(String tpAmb) {
+		this.tpAmb = tpAmb;
+	}
+	public String getChNFe() {
+		return chNFe;
+	}
+	public void setChNFe(String chNFe) {
+		this.chNFe = chNFe;
+	}
+	public String getnProt() {
+		return nProt;
+	}
+	public void setnProt(String nProt) {
+		this.nProt = nProt;
+	}
+	public String getxJust() {
+		return xJust;
+	}
+	public void setxJust(String xJust) {
+		this.xJust = xJust;
+	}
+	public String getxServ() {
+		return xServ;
+	}
+	
+} // InfCanc

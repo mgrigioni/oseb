@@ -13,6 +13,8 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempierelbr.util.NFeUtil;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -25,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class ConsStatServ {
 
 	@XStreamAsAttribute
-	private final String xmlns="http://www.portalfiscal.inf.br/nfe";
+	private final String xmlns=NFeUtil.NAMESPACE_NFE;
 	
 	@XStreamAsAttribute
 	private String versao;

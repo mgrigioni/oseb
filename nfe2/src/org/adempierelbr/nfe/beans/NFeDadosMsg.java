@@ -53,7 +53,7 @@ public class NFeDadosMsg {
 		super();
 		setConsCad(consCad);
 	}
-
+	
 	public ConsSitNFe getConsSitNFe() {
 		return consSitNFe;
 	}

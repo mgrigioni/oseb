@@ -337,7 +337,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			//	Prepara a Transmissão
 			MLBRDigitalCertificate.setCertificate (p_ctx, oi);
 			RecepcaoEventoStub.NfeDadosMsg dadosMsg = RecepcaoEventoStub.NfeDadosMsg.Factory.parse(dadosXML);
-			RecepcaoEventoStub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecEvento (BPartnerUtil.getRegionCode(oi.getC_Location().getC_Region_ID()));
+			RecepcaoEventoStub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecEvento (oi.getC_Location().getC_Region_ID());
 			RecepcaoEventoStub.setAddress(ws);
 			RecepcaoEventoStub stub = new RecepcaoEventoStub();
 

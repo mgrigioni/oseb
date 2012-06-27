@@ -19,29 +19,32 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  ProtNFe
+ *  ConsReciNFe
  *  @author Mario Grigioni
- *  @version $Id: ProtNFe.java,v 1.0 22/06/2012 14:08:00 mgrigioni Exp $
+ *  @version $Id: ConsReciNFe.java,v 1.0 26/06/2012 15:10:00 mgrigioni Exp $
  */
-@XStreamAlias ("protNFe")
-public class ProtNFe {
+@XStreamAlias ("consReciNFe")
+public class ConsReciNFe {
 
 	@XStreamAsAttribute
-	private final String xmlns=NFeUtil.NAMESPACE_NFE;
+	public final String xmlns=NFeUtil.NAMESPACE_NFE;
 	
 	@XStreamAsAttribute
 	private String versao;
 	
-	private InfProt infProt;
+	private String tpAmb;
+	private String nRec;
 	
 	/**
 	 * @param versao
-	 * @param infProt
+	 * @param tpAmb
+	 * @param nRec
 	 */
-	public ProtNFe(String versao, InfProt infProt) {
+	public ConsReciNFe(String versao, String tpAmb, String nRec) {
 		super();
 		setVersao(versao);
-		setInfProt(infProt);
+		setTpAmb(tpAmb);
+		setnRec(nRec);
 	}
 	
 	public String getVersao() {
@@ -50,14 +53,20 @@ public class ProtNFe {
 	public void setVersao(String versao) {
 		this.versao = versao;
 	}
-	public InfProt getInfProt() {
-		return infProt;
+	public String getTpAmb() {
+		return tpAmb;
 	}
-	public void setInfProt(InfProt infProt) {
-		this.infProt = infProt;
+	public void setTpAmb(String tpAmb) {
+		this.tpAmb = tpAmb;
+	}
+	public String getnRec() {
+		return nRec;
+	}
+	public void setnRec(String nRec) {
+		this.nRec = nRec;
 	}
 	public String getXmlns() {
 		return xmlns;
 	}
-
-}	// ProtNFe
+	
+}	// ConsReciNFe

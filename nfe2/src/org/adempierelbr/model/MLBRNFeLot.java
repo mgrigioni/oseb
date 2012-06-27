@@ -222,7 +222,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			
 		try{
 			
-			String nfeConsultaDadosMsg 	= NFeUtil.geraMsgRetRecepcao(getlbr_NFeRecID(), oiW.getlbr_NFeEnv());
+			String nfeConsultaDadosMsg 	= NFeUtil.geraMsgConsultaLote(oiW.getlbr_NFeEnv(),getlbr_NFeRecID());
 
 			//	Validação envio
 			String validation = ValidaXML.validaConsReciNFe(nfeConsultaDadosMsg);

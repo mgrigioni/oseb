@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -31,12 +32,14 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
-import org.adempierelbr.nfe.InutilizacaoNF;
+import org.adempierelbr.nfe.beans.CancNFe;
 import org.adempierelbr.nfe.beans.ChaveNFE;
 import org.adempierelbr.nfe.beans.ConsCad;
+import org.adempierelbr.nfe.beans.ConsReciNFe;
 import org.adempierelbr.nfe.beans.ConsSitNFe;
 import org.adempierelbr.nfe.beans.ConsStatServ;
 import org.adempierelbr.nfe.beans.InfProt;
+import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.nfe.beans.NFeDadosMsg;
 import org.adempierelbr.nfe.beans.ProtNFe;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
@@ -65,30 +68,31 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 /**
- * 	Utilitários para gerar a NFe.
- *
- * @author Ricardo Santana
+ *  Utility class for NFe
+ *  
+ *  @author Mario Grigioni
+ *  @contributor Ricardo Alexsander (old version)
+ *  @version $Id: NFeUtil.java,v 2.0 26/06/2012 13:52:00 mgrigioni Exp $
  */
 public abstract class NFeUtil
 {
 
-	/**	Logger			    */
+	/**	Logger */
 	private static CLogger log = CLogger.getCLogger(NFeUtil.class);
 
-	/** Versão              */
+	/** Versão */
 	public static final String VERSAO_APP  = TextUtil.checkSize(AdempiereLBR.VERSION,20);
 	public static final String VERSAO      = "2.00";
 	public static final String VERSAO_CCE  = "1.00";
 
-	/** XML                 */
-	private static String FILE_EXT      = "-dst.xml";
-	public static final long XML_SIZE   = 500;
+	/** XML */
+	public static final long XML_SIZE = 500;
 
 	/** Reference NFeStatus */
-	public static final int NFeReference   = 1100004;
+	public static final int NFeReference = 1100004;
 	
 	/** Namespace padrão da NF-e */
-	public static final String NAMESPACE_NFE = "xmlns=\"http://www.portalfiscal.inf.br/nfe\"";
+	public static final String NAMESPACE_NFE = "http://www.portalfiscal.inf.br/nfe";
 
 	/**
 	 * Método para gerar dados para consulta da NFe
@@ -147,46 +151,105 @@ public abstract class NFeUtil
 	} //geraMsgConsultaCadastro
 	
 	/**
+	 * Método para gerar dados para cancelamento
+	 * @param tpAmb
+	 * @param chNFe
+	 * @param nProt
+	 * @param xJust
+	 * @return	msg
+	 */
+	public static String geraMsgCancelamento (String tpAmb, String chNFe, 
+			String nProt, String xJust) {
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		
+		xstream.marshal (new CancNFe(VERSAO,tpAmb,chNFe,nProt,xJust),
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	}	// geraMsgCancelamento
+	
+	/**
+	 * Método para gerar dados para inutilizar número nf
+	 * @param inutNFe
+	 * @return msg
+	 */
+	public static String geraMsgInutilizacao(InutNFe inutNFe) {
+		
+		if (!inutNFe.isValid()){
+			return null;
+		}
+		
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (inutNFe,new CompactWriter (sw));
+		
+		return sw.toString();
+	}	//	geraMsgInutilizacao
+	
+	/**
+	 * Método para gerar dados para consulta do lote
+	 * @param tpAmb
+	 * @param nRec
+	 * @return msg
+	 */
+	public static String geraMsgConsultaLote (String tpAmb, String nRec) {
+		
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new ConsReciNFe(VERSAO,tpAmb,nRec),new CompactWriter (sw));
+		
+		return sw.toString();
+	}	//geraMsgRetRecepcao
+
+	/**
 	 * Gera o cabeçalho da NFe
-	 *
 	 * @return cabecalho
 	 */
 	public static String geraCabecNFe(){
-		String cabecalho = "<NFe " + NAMESPACE_NFE + ">";
-		return cabecalho;
+		StringBuilder cabecalho = new StringBuilder("<NFe xmlns=\"").append(NAMESPACE_NFE).append("\">");
+		return cabecalho.toString();
 	} //geraCabecNFe
 
-	/**
-	 * Gera o rodapé da NFe
-	 *
-	 * return rodape
-	 */
-	public static String geraRodapNFe(){
-		String rodape = "</NFe>";
-		return rodape;
-	} //geraRodapNFe
 
 	/**
 	 * Gera o cabeçalho distribuição
-	 *
 	 * @return Cabeçalho distribuição
 	 */
 	public static String geraCabecDistribuicao(){
-		String cabecalho = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-		 "<nfeProc " + NAMESPACE_NFE + " versao=\"" + VERSAO + "\">";
+		StringBuilder cabecalho = new StringBuilder("<?xml version=\"1.0\" encoding=\"utf-8\"?>")
+		 .append("<nfeProc xmlns=\"").append(NAMESPACE_NFE).append("\" versao=\"").append(VERSAO).append("\">");
 
-		return cabecalho;
+		return cabecalho.toString();
 	}
+	
+	/**
+	 * Gera o cabeçalho do lote
+	 * @return Cabeçalho do lote
+	 */
+	public static String geraCabecLoteNFe (String lote){
+		StringBuilder cabecalho = new StringBuilder("<enviNFe xmlns=\"").append(NAMESPACE_NFE)
+				.append("\" versao=\"").append(VERSAO).append("\">")
+				.append("<idLote>").append(lote).append("</idLote>");
+	  
+		return cabecalho.toString();
+	} // geraCabecLoteNFe
 	
 	/**
 	 * Gera o cabeçalho evento
 	 * @param region
-	 * @return
+	 * @return RecepcaoEventoStub.NfeCabecMsgE 
 	 */
-	public static RecepcaoEventoStub.NfeCabecMsgE geraCabecEvento (String region)
+	public static RecepcaoEventoStub.NfeCabecMsgE geraCabecEvento (int C_Region_ID)
 	{
 		RecepcaoEventoStub.NfeCabecMsg cabecMsg = new RecepcaoEventoStub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
 		cabecMsg.setVersaoDados(VERSAO_CCE);
 
 		RecepcaoEventoStub.NfeCabecMsgE cabecMsgE = new RecepcaoEventoStub.NfeCabecMsgE();
@@ -194,7 +257,136 @@ public abstract class NFeUtil
 
 		return cabecMsgE;
 	}	//	geraCabecEvento
+	
+	/**
+	 * Método para gerar cabeçalho status da NFe
+	 * @param region
+	 * @return NfeConsulta2Stub.NfeCabecMsgE
+	 */
+	public static NfeConsulta2Stub.NfeCabecMsgE geraCabecConsulta(int C_Region_ID){
 
+		NfeConsulta2Stub.NfeCabecMsg cabecMsg = new NfeConsulta2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecConsulta
+	
+	/**
+	 * Método para gerar cabeçalho status serviço
+	 * @param region
+	 * @return NfeStatusServico2Stub.NfeCabecMsgE
+	 */
+	public static NfeStatusServico2Stub.NfeCabecMsgE geraCabecStatusServico(int C_Region_ID){
+
+		NfeStatusServico2Stub.NfeCabecMsg cabecMsg = new NfeStatusServico2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		NfeStatusServico2Stub.NfeCabecMsgE cabecMsgE = new NfeStatusServico2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecStatusServico
+
+
+	/**
+	 * Método para gerar cabeçalho consulta cadastro
+	 * @param region
+	 * @return CadConsultaCadastro2Stub.NfeCabecMsgE
+	 */
+	public static CadConsultaCadastro2Stub.NfeCabecMsgE geraCabecConsultaCadastro(int C_Region_ID){
+
+		CadConsultaCadastro2Stub.NfeCabecMsg cabecMsg = new CadConsultaCadastro2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		CadConsultaCadastro2Stub.NfeCabecMsgE cabecMsgE = new CadConsultaCadastro2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecConsultaCadastro
+
+	/**
+	 * Método para gerar cabeçalho envio do lote
+	 * @param region
+	 * @return NfeRecepcao2Stub.NfeCabecMsgE
+	 */
+	public static NfeRecepcao2Stub.NfeCabecMsgE geraCabecRecepcao(int C_Region_ID){
+
+		NfeRecepcao2Stub.NfeCabecMsg cabecMsg = new NfeRecepcao2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		NfeRecepcao2Stub.NfeCabecMsgE cabecMsgE = new NfeRecepcao2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecRecepcao
+
+	/**
+	 * Método para gerar cabeçalho consulta lote
+	 * @param region
+	 * @return NfeRetRecepcao2Stub.NfeCabecMsgE
+	 */
+	public static NfeRetRecepcao2Stub.NfeCabecMsgE geraCabecRetRecepcao(int C_Region_ID){
+
+		NfeRetRecepcao2Stub.NfeCabecMsg cabecMsg = new NfeRetRecepcao2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		NfeRetRecepcao2Stub.NfeCabecMsgE cabecMsgE = new NfeRetRecepcao2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecRetRecepcao
+
+	/**
+	 * Método para gerar cabeçalho cancelamento
+	 * @param region
+	 * @return NfeCancelamento2Stub.NfeCabecMsgE
+	 */
+	public static NfeCancelamento2Stub.NfeCabecMsgE geraCabecCancelamento(int C_Region_ID){
+
+		NfeCancelamento2Stub.NfeCabecMsg cabecMsg = new NfeCancelamento2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = new NfeCancelamento2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecCancelamento
+	
+	/**
+	 * 	Cabeçalho da Inutilização
+	 * 
+	 * @param region
+	 * @return
+	 */
+	public static NfeInutilizacao2Stub.NfeCabecMsgE geraCabecInutilizacao (int C_Region_ID)
+	{
+		NfeInutilizacao2Stub.NfeCabecMsg cabecMsg = new NfeInutilizacao2Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
+
+		NfeInutilizacao2Stub.NfeCabecMsgE cabecMsgE = new NfeInutilizacao2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	}	//	geraCabecInutilizacao
+	
+	/**
+	 * Gera o rodapé da NFe
+	 * return rodape
+	 */
+	public static String geraRodapNFe(){
+		return "</NFe>";
+	} //geraRodapNFe
+	
 	/**
 	 * Rodapé padrão Distribuição
 	 *
@@ -220,161 +412,6 @@ public abstract class NFeUtil
 		
 		return sw.toString() + "</nfeProc>";
 	}	//	RodapDistribuicao
-	
-	/**
-	 * Método para gerar cabeçalho status da NFe
-	 * @param region
-	 * @return NfeConsulta2Stub.NfeCabecMsgE
-	 */
-	public static NfeConsulta2Stub.NfeCabecMsgE geraCabecConsulta(int C_Region_ID){
-
-		NfeConsulta2Stub.NfeCabecMsg cabecMsg = new NfeConsulta2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
-
-		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	} //geraCabecConsulta
-	
-
-
-	/**
-	 * Método para gerar cabeçalho status serviço NF 2.00
-	 * @param region
-	 * @return NfeStatusServico2Stub.NfeCabecMsgE
-	 */
-	public static NfeStatusServico2Stub.NfeCabecMsgE geraCabecStatusServico(int C_Region_ID){
-
-		NfeStatusServico2Stub.NfeCabecMsg cabecMsg = new NfeStatusServico2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
-
-		NfeStatusServico2Stub.NfeCabecMsgE cabecMsgE = new NfeStatusServico2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	} //geraCabecStatusServico
-
-
-
-	/**
-	 * Método para gerar cabeçalho consulta cadastro NF 2.00
-	 * @param region
-	 * @return CadConsultaCadastro2Stub.NfeCabecMsgE
-	 */
-	public static CadConsultaCadastro2Stub.NfeCabecMsgE geraCabecConsultaCadastro(String region){
-
-		CadConsultaCadastro2Stub.NfeCabecMsg cabecMsg = new CadConsultaCadastro2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
-		cabecMsg.setVersaoDados(VERSAO);
-
-		CadConsultaCadastro2Stub.NfeCabecMsgE cabecMsgE = new CadConsultaCadastro2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	} //geraCabecConsultaCadastro
-
-	/**
-	 * Gera o cabeçalho do lote
-	 *
-	 * @return Cabeçalho do lote
-	 */
-	public static String geraCabecLoteNFe (String lote){
-		String cabecalho = "<enviNFe " + NAMESPACE_NFE + " versao=\"2.00\">" +
-	   "<idLote>"+lote+"</idLote>";
-
-		return cabecalho;
-	} // geraCabecLoteNFe
-
-	/**
-	 * Método para gerar cabeçalho envio do lote NF 2.00
-	 * @param region
-	 * @return NfeRecepcao2Stub.NfeCabecMsgE
-	 */
-	public static NfeRecepcao2Stub.NfeCabecMsgE geraCabecRecepcao(int C_Region_ID){
-
-		NfeRecepcao2Stub.NfeCabecMsg cabecMsg = new NfeRecepcao2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
-
-		NfeRecepcao2Stub.NfeCabecMsgE cabecMsgE = new NfeRecepcao2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	} //geraCabecRecepcao
-
-	/**
-	 * Método para gerar cabeçalho consulta lote NF 2.00
-	 * @param region
-	 * @return NfeRetRecepcao2Stub.NfeCabecMsgE
-	 */
-	public static NfeRetRecepcao2Stub.NfeCabecMsgE geraCabecRetRecepcao(int C_Region_ID){
-
-		NfeRetRecepcao2Stub.NfeCabecMsg cabecMsg = new NfeRetRecepcao2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
-
-		NfeRetRecepcao2Stub.NfeCabecMsgE cabecMsgE = new NfeRetRecepcao2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	} //geraCabecRetRecepcao
-
-	/**
-	 * Método para gerar dados para consulta do lote NF 2.00
-	 * @param envType
-	 * @param region
-	 * @return msg
-	 */
-	public static String geraMsgRetRecepcao (String recibo, String envType)
-	{
-		String msg = 	"<consReciNFe " + NAMESPACE_NFE + " versao=\"2.00\">" +
-							"<tpAmb>"+envType+"</tpAmb>" +
-						"<nRec>"+recibo+"</nRec>"+
-						"</consReciNFe>";
-		return msg;
-	}	//geraMsgRetRecepcao
-
-	/**
-	 * Método para gerar cabeçalho cancelamento NF 2.00
-	 * @param region
-	 * @return NfeCancelamento2Stub.NfeCabecMsgE
-	 */
-	public static NfeCancelamento2Stub.NfeCabecMsgE geraCabecCancelamento(int C_Region_ID){
-
-		NfeCancelamento2Stub.NfeCabecMsg cabecMsg = new NfeCancelamento2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
-
-		NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = new NfeCancelamento2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	} //geraCabecCancelamento
-
-	/**
-	 * Método para gerar dados para cancelamento NF 2.00
-	 * @param Chave da NF-e
-	 * @param Protocolo de Autorização
-	 * @param Tipo de Ambiente
-	 * @param Motivo
-	 * @return	XML
-	 */
-	public static String geraMsgCancelamento (String chNFe, String protocolNFe, String envType, String motivo)
-	{
-		String msg = "<cancNFe " + NAMESPACE_NFE + " versao=\"2.00\">" +
-							  "<infCanc Id=\"ID"+chNFe+"\">"+
-						          "<tpAmb>"+envType+"</tpAmb>"+
-						          "<xServ>CANCELAR</xServ>"+
-						          "<chNFe>"+chNFe+"</chNFe>"+
-						          "<nProt>"+protocolNFe+"</nProt>"+
-						          "<xJust>"+motivo+"</xJust>"+
-					          "</infCanc>"+
-					  "</cancNFe>";
-		return msg;
-	}	// geraMsgCancelamento
 
 	public static File generateDistribution(MLBRNotaFiscal nf) throws Exception{
 
@@ -384,16 +421,17 @@ public abstract class NFeUtil
 			return attach;
 
 		String status = nf.getlbr_NFeStatus();
+		String file_ext = ".xml";
 
 		if (status.equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //Autorizado o uso da NF-e
-			FILE_EXT = "-dst.xml";
+			file_ext = "-dst.xml";
 		}
 		else if (status.equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)){ //Cancelamento de NF-e homologado
-			FILE_EXT = "-can.xml";
+			file_ext = "-can.xml";
 		}
 
 		File xml = getAttachmentEntryFile(nf.getAttachment().getEntry(0));
-		if (xml == null || xml.getName().endsWith(FILE_EXT)) //Já está no padrão de distribuição
+		if (xml == null || xml.getName().endsWith(file_ext)) //Já está no padrão de distribuição
 			return attach;
 
 	    String dados = XMLtoString(xml);
@@ -404,7 +442,7 @@ public abstract class NFeUtil
 	    		getEnvType(nf.getCtx()), nf.getDateTrx(), nf.getlbr_DigestValue(), status,getNFeStatus(status));
 		//
 		String dadosEmXML = cabecalho + dados + rodape;
-		attach = new File(TextUtil.generateTmpFile(dadosEmXML, nf.getlbr_NFeID() + FILE_EXT));
+		attach = new File(TextUtil.generateTmpFile(dadosEmXML, nf.getlbr_NFeID() + file_ext));
 
 		nf.getAttachment(true).delete(true); //Exclui anexo anterior. BUG ADempiere
 
@@ -465,16 +503,14 @@ public abstract class NFeUtil
 
 
 	        // BF ID: 3391601
-	        if(cStat != null)
-	        {
+	        if(cStat != null) {
 	        	try {
 	        		nf.setlbr_NFeStatus(cStat);
 				} catch (Exception e) {
 					nf.setlbr_NFeStatus(MLBRNotaFiscal.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção);
 				}
 	        }
-	        
-	        
+	          
 			nf.save(trxName);
 
 			//Atualiza XML para padrão de distribuição
@@ -494,6 +530,31 @@ public abstract class NFeUtil
 
 		return error;
 	} //authorizeNFe
+	
+	public static boolean checkNFeID(String documentNo, String nfeID){
+		
+		if (documentNo == null || nfeID == null)
+			return false;
+		
+		if (documentNo.indexOf('-') != -1){
+			documentNo = TextUtil.toNumeric(documentNo.substring(0, documentNo.indexOf('-')));
+		}
+		
+		if (nfeID.length() != 44)
+			return false;
+		
+		int digito = ChaveNFE.gerarDigito(nfeID.substring(0, 43));
+		if (digito != Integer.parseInt(nfeID.substring(43)))
+			return false;
+		
+		int nfNo  = Integer.parseInt(documentNo);		
+		int nfeNo = Integer.parseInt(nfeID.substring(25, 34));
+		
+		if (nfNo != nfeNo)
+			return false;
+		
+		return true;
+	} //checkNFeID
 
 	public static String XMLtoString(File xml) throws Exception{
 
@@ -521,48 +582,6 @@ public abstract class NFeUtil
 	} //XMLtoString
 	
 	/**
-	 * Get Attachment
-	 *
-	 * @param entry
-	 * @return
-	 */
-	public static File getAttachmentEntryFile(MAttachmentEntry entry)
-	{
-		//BF - Attachment on FileSystem
-		String fileName = entry.toString();
-		if(fileName!=null && fileName.lastIndexOf(File.separator) != -1)
-			fileName = fileName.substring(fileName.lastIndexOf(File.separator)+1);
-		
-		String localFile = System.getProperty("java.io.tmpdir")
-				+ System.getProperty("file.separator") + fileName;
-		String downloadedLocalFile = System.getProperty("java.io.tmpdir")
-				+ System.getProperty("file.separator") + "TMP" + fileName;
-		File attachedFile = new File(localFile);
-		if (attachedFile.exists())
-		{
-			String localMD5hash = DigestOfFile.GetLocalMD5Hash(attachedFile);
-			String entryMD5hash = DigestOfFile.getMD5Hash(entry.getData());
-			if (localMD5hash.equals(entryMD5hash))
-			{
-				log.fine("no need to download: local file is up-to-date");
-			}
-			else
-			{
-				log.fine("file attached is different that local one, download and replace");
-				File downloadedFile = new File(downloadedLocalFile);
-				entry.getFile(downloadedFile);
-				attachedFile.delete();
-				downloadedFile.renameTo(attachedFile);
-			}
-		}
-		else
-		{
-			entry.getFile(attachedFile);
-		}
-		return attachedFile;
-	}	//	getAttachmentEntryFile
-
-	/**
 	 * String para Timestamp
 	 * @param dhRecbto
 	 * @return
@@ -580,31 +599,6 @@ public abstract class NFeUtil
 		return TextUtil.timeToString(dhRecbto, "yyyy-MM-dd HH:mm:ss").replace(' ', 'T');
 	} //DateToString
 	
-	public static boolean checkNFeID(String documentNo, String nfeID){
-		
-		if (documentNo == null || nfeID == null)
-			return false;
-		
-		if (documentNo.indexOf('-') != -1){
-			documentNo = TextUtil.toNumeric(documentNo.substring(0, documentNo.indexOf('-')));
-		}
-		
-		if (nfeID.length() != 44)
-			return false;
-		
-		int digito = ChaveNFE.gerarDigito(nfeID.substring(0, 43));
-		if (digito != Integer.parseInt(nfeID.substring(43)))
-			return false;
-		
-		int nfNo  = Integer.parseInt(documentNo);		
-		int nfeNo = Integer.parseInt(nfeID.substring(25, 34));
-		
-		if (nfNo != nfeNo)
-			return false;
-		
-		return true;
-	} //checkNFeID
-
 	/**
 	 * getEnvType
 	 * @param ctx
@@ -669,6 +663,47 @@ public abstract class NFeUtil
 		return nfeID;
 	}
 
+	/**
+	 * Get Attachment
+	 *
+	 * @param entry
+	 * @return
+	 */
+	public static File getAttachmentEntryFile(MAttachmentEntry entry)
+	{
+		//BF - Attachment on FileSystem
+		String fileName = entry.toString();
+		if(fileName!=null && fileName.lastIndexOf(File.separator) != -1)
+			fileName = fileName.substring(fileName.lastIndexOf(File.separator)+1);
+		
+		String localFile = System.getProperty("java.io.tmpdir")
+				+ System.getProperty("file.separator") + fileName;
+		String downloadedLocalFile = System.getProperty("java.io.tmpdir")
+				+ System.getProperty("file.separator") + "TMP" + fileName;
+		File attachedFile = new File(localFile);
+		if (attachedFile.exists())
+		{
+			String localMD5hash = DigestOfFile.GetLocalMD5Hash(attachedFile);
+			String entryMD5hash = DigestOfFile.getMD5Hash(entry.getData());
+			if (localMD5hash.equals(entryMD5hash))
+			{
+				log.fine("no need to download: local file is up-to-date");
+			}
+			else
+			{
+				log.fine("file attached is different that local one, download and replace");
+				File downloadedFile = new File(downloadedLocalFile);
+				entry.getFile(downloadedFile);
+				attachedFile.delete();
+				downloadedFile.renameTo(attachedFile);
+			}
+		}
+		else
+		{
+			entry.getFile(attachedFile);
+		}
+		return attachedFile;
+	}	//	getAttachmentEntryFile
 
 	/**
 	 * 	Get Value from XML
@@ -747,44 +782,6 @@ public abstract class NFeUtil
         }
         return result;
     }
-	
-	/**
-	 * 	Cabeçalho da Inutilização
-	 * 
-	 * @param region
-	 * @return
-	 */
-	public static NfeInutilizacao2Stub.NfeCabecMsgE geraCabecInutilizacao (String region)
-	{
-		NfeInutilizacao2Stub.NfeCabecMsg cabecMsg = new NfeInutilizacao2Stub.NfeCabecMsg();
-		cabecMsg.setCUF(region);
-		cabecMsg.setVersaoDados(VERSAO);
-
-		NfeInutilizacao2Stub.NfeCabecMsgE cabecMsgE = new NfeInutilizacao2Stub.NfeCabecMsgE();
-		cabecMsgE.setNfeCabecMsg(cabecMsg);
-
-		return cabecMsgE;
-	}	//	geraCabecInutilizacao
-
-	/**
-	 * 	Gera o XML para inutilização da NF
-	 * 
-	 * 	@return cabeçalho de envio
-	 */
-	public static String geraInutilizacao (InutilizacaoNF nf) {
-		XStream xstream = new XStream();
-		xstream.processAnnotations(InutilizacaoNF.class);
-		// 
-		StringWriter sw = new StringWriter ();
-		xstream.marshal (nf,  new CompactWriter (sw));
-		//
-		StringBuilder inut = new StringBuilder();
-		inut.append("<inutNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"2.00\">");
-		inut.append(sw.toString());
-		inut.append("</inutNFe>");
-		//
-		return inut.toString();
-	}	//	geraInutilizacao
 	
 	/**
 	 * 	packageNameOfClass

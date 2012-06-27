@@ -93,10 +93,6 @@ public class ProcConsultaCadastro extends SvrProcess
 		if (orgInfo == null)
 			return null;
 				
-		String region = BPartnerUtil.getRegionCode(bpLoc);
-		if (region.isEmpty())
-			return null;
-
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(ctx, orgInfo);
 		
@@ -108,10 +104,13 @@ public class ProcConsultaCadastro extends SvrProcess
 		String status = "Erro na verificação de Status";
 
 		try{
-			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaCadastro(bpLoc.getC_Region().getName(),bpCNPJ)));
+			
+			String nfeConsultaCadastroMsg = NFeUtil.geraMsgConsultaCadastro(bpLoc.getC_Region().getName(),bpCNPJ);
+						
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(nfeConsultaCadastroMsg));
 
 			CadConsultaCadastro2Stub.NfeDadosMsg dadosMsg = CadConsultaCadastro2Stub.NfeDadosMsg.Factory.parse(dadosXML);
-			CadConsultaCadastro2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsultaCadastro(region);
+			CadConsultaCadastro2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsultaCadastro(bpLoc.getC_Region_ID());
 
 			CadConsultaCadastro2Stub.setAddress(ws);
 			CadConsultaCadastro2Stub stub = new CadConsultaCadastro2Stub();

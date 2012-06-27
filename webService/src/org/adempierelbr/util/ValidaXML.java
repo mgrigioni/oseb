@@ -25,8 +25,10 @@ import javax.xml.validation.Validator;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
-public class ValidaXML {
+public abstract class ValidaXML {
 
+
+	
 	/**
 	 * Validate xml file against xsd schema
 	 * @param XML File
@@ -115,7 +117,7 @@ public class ValidaXML {
 	 * @return validation result
 	 */
 	public static String validaConsSitNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/consSitNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe2/consSitNFe_v2.01.xsd");
 	}
 
 	/**
@@ -124,7 +126,7 @@ public class ValidaXML {
 	 * @return validation result
 	 */
 	public static String validaRetConsSitNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retConsSitNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe2/retConsSitNFe_v2.01.xsd");
 	}
 
 	/**

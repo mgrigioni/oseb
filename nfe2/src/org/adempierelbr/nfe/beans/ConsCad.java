@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -23,11 +24,11 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  *  @author Mario Grigioni
  *  @version $Id: ConsCad.java,v 1.0 25/06/2012 15:37:00 mgrigioni Exp $
  */
-@XStreamAlias ("consCad")
+@XStreamAlias ("ConsCad")
 public class ConsCad {
 
 	@XStreamAsAttribute
-	private final String xmlns="http://www.portalfiscal.inf.br/nfe";
+	private final String xmlns=NFeUtil.NAMESPACE_NFE;
 	
 	@XStreamAsAttribute
 	private String versao;
