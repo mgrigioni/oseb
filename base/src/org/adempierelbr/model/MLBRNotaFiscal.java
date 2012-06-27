@@ -261,7 +261,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	public List<MLBRNotaFiscalLine> getLines(String orderBy,boolean reQuery){
 
 		String   whereClause = "LBR_NotaFiscal_ID = ?";
-		Object[] parameters  = new Object[]{getLBR_NotaFiscal_ID()};
+		Object[] parameters  = new Object[]{get_ID()};
 
 		return getLines(parameters,whereClause,orderBy,reQuery);
 	} //getLines
@@ -343,7 +343,12 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//Criada NF na mão
 		if (getlbr_OrgName() == null || getlbr_OrgName().isEmpty()){
-			setInvoice(new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName()));
+			MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
+			setInvoice(invoice);
+			
+			//Atribui LBR_NotaFiscal_ID
+			//invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", get_ID());
+			//invoice.save(get_TrxName());
 		}
 		
 		//	Std Period open?
@@ -368,36 +373,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				}
 			}	
 		}
-		
-		//RATEIO VALORES DE FRETE E SISCOMEX
-		if (!setFreightTax() || !setSiscomexTax())
-			return DocAction.STATUS_Invalid;
-		/*
-		//Verifica se o documento contem linhas
-		if (m_lines.size() == 0){
-			m_processMsg = Msg.getMsg(getCtx(), "NoLines");
-			return DocAction.STATUS_Invalid;
-		}
-		
-		//Validação de Valores
-		BigDecimal sumGrandTotal   = Env.ZERO;
-		BigDecimal sumTotalLines   = Env.ZERO;
-		BigDecimal sumServiceTotal = Env.ZERO;
-		
-		for (MLBRNotaFiscalLine nfLine : m_lines){
-			sumGrandTotal = sumGrandTotal.add(nfLine.getTotalOperationAmt());
-			if (nfLine.islbr_IsService())
-				sumServiceTotal = sumServiceTotal.add(nfLine.getLineTotalAmt());
-			else
-				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
-		}
-		
-		if (sumGrandTotal.compareTo(getGrandTotal()) != 0){
-			m_processMsg = Msg.getMsg(getCtx(), "NoLines");
-			return DocAction.STATUS_Invalid;
-		}
-		*/
-		
+				
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
 		if (m_processMsg != null)
 			return DocAction.STATUS_Invalid;
@@ -440,6 +416,41 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_COMPLETE);
 		if (m_processMsg != null)
 			return DocAction.STATUS_Invalid;
+		
+		//Verifica se o documento contem linhas
+		getLines(false);
+		if (m_lines.size() == 0){
+			m_processMsg = Msg.getMsg(getCtx(), "NoLines");
+			return DocAction.STATUS_Invalid;
+		}
+		
+		//Validação de Valores
+		BigDecimal sumGrandTotal   = Env.ZERO;
+		BigDecimal sumTotalLines   = Env.ZERO;
+		BigDecimal sumServiceTotal = Env.ZERO;
+		
+		for (MLBRNotaFiscalLine nfLine : m_lines){
+			sumGrandTotal = sumGrandTotal.add(nfLine.getTotalOperationAmt());
+			if (nfLine.islbr_IsService())
+				sumServiceTotal = sumServiceTotal.add(nfLine.getLineTotalAmt());
+			else
+				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
+		}
+		
+		if (getGrandTotal().compareTo(sumGrandTotal) != 0){
+			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + "Total da NF difere da soma dos itens";
+			return DocAction.STATUS_Invalid;
+		}
+		
+		if (getTotalLines().compareTo(sumTotalLines) != 0){
+			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + "Total de Produtos difere da soma dos produtos";
+			return DocAction.STATUS_Invalid;
+		}
+		
+		if (getlbr_ServiceTotalAmt().compareTo(sumServiceTotal) != 0){
+			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + "Total de Serviços difere da soma dos serviços";
+			return DocAction.STATUS_Invalid;
+		}
 		
 		//Processar NFe
 		m_processMsg = processNFe();
@@ -645,13 +656,15 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		if(getlbr_NFModel() != null && getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) && 
 				getlbr_NFeProt() != null && !getlbr_NFeProt().isEmpty())
 			return false;
-
+		
+		/*
 		if (getC_Invoice_ID() > 0){
 			MInvoice invoice = new MInvoice(getCtx(),getC_Invoice_ID(),get_TrxName());
 			invoice.set_ValueOfColumn("LBR_NotaFiscal_ID", null);
 			if (!invoice.save(get_TrxName()))
 				return false;
 		}
+		*/
 
 		if (!deleteLBR_NFTax()) return false;
 		if (!deleteLBR_NFLineTax()) return false;
@@ -1064,7 +1077,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		MBPartnerLocation bpLocation = null;
 		MLocation         location   = null;
 
-		if (io != null && io.get_ID() != 0) {
+		if (io != null && io.get_ID() > 0) {
 			bpLocation = new MBPartnerLocation(getCtx(),io.getC_BPartner_Location_ID(),get_TrxName());
 			location   = new MLocation(getCtx(),bpLocation.getC_Location_ID(),get_TrxName());
 
@@ -1267,6 +1280,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		save(get_TrxName());
 		//
 		createLines(invoice.getLines());
+		//RATEIO VALORES DE FRETE E SISCOMEX
+		setFreightTax();
+		setSiscomexTax();
 	} //setInvoice
 		
 	private void createLines(MInvoiceLine[] iLines) throws AdempiereException{
@@ -1295,6 +1311,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		setDiscountAmt(Env.ZERO); //Total de Descontos
 		setTotalLines(Env.ZERO);  //Total de Produtos
 		setlbr_ServiceTotalAmt(Env.ZERO); //Total de Serviços
+		setFreightAmt(Env.ZERO); //Frete
+		setlbr_InsuranceAmt(Env.ZERO); //Seguro
+		setlbr_TotalSISCOMEX(Env.ZERO); //Siscomex
 		//Entrega
 		setNoPackages(null);
 		setlbr_PackingType(null);
