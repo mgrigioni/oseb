@@ -138,6 +138,7 @@ public class NFeXMLGenerator
 	 * @param trxName Transação
 	 * @return
 	 */
+	@SuppressWarnings("resource")
 	public static String geraCorpoNFe (int LBR_NotaFiscal_ID, String trxName) throws AdempiereException {
 		
 		log.fine("Gerando corpo NF-e");

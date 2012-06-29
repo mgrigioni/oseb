@@ -49,6 +49,7 @@ import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
+import org.compiere.model.MColumn;
 import org.compiere.model.MCost;
 import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
@@ -510,6 +511,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			return false;
 
 		setIsCancelled(true);
+		setProcessed(true);
 		
 		return true;
 	}
@@ -1691,6 +1693,33 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	public Timestamp getDateAcct(){
 		return getlbr_DateInOut() == null ? getDateDoc() : getlbr_DateInOut();
 	}
+	
+	/**
+	 * Retorna o tipo de ambiante da NFe com base no tipo de documento
+	 * @return tpAmb
+	 */
+	public String getlbr_NFeEnv(){
+		I_W_C_DocType dtW = POWrapper.create(MDocType.get(getCtx(), getC_DocType_ID()), 
+				I_W_C_DocType.class);
+		return dtW.getlbr_NFeEnv();
+	}
+	
+	public String getxMotivo() {
+
+		String sql = "SELECT Name FROM AD_Ref_List " +
+				     "WHERE AD_Reference_ID = ? AND Value = ?";
+
+		MColumn column = MColumn.get(getCtx(), 
+				MColumn.getColumn_ID(MLBRNotaFiscal.Table_Name, I_LBR_NotaFiscal.COLUMNNAME_lbr_NFeStatus));
+		
+		String xMotivo = DB.getSQLValueString(null, sql, 
+				new Object[]{column.getAD_Reference_ID(), getlbr_NFeStatus()});
+
+		if (xMotivo != null && xMotivo.length() > 6)
+			xMotivo = xMotivo.substring(6);
+		
+		return xMotivo;
+	}	//getxMotivo
 	
 	/**
 	 * Indicador do tipo de pagamento (Utilizado na NFe e SPED)

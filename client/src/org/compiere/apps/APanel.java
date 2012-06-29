@@ -1911,6 +1911,7 @@ public final class APanel extends CPanel
 	/**
 	 * Show a list to select one or more items to delete.
 	 */
+	@SuppressWarnings({ "rawtypes", "deprecation", "unchecked" })
 	private void cmd_deleteSelection(){
 		if (m_curTab.isReadOnly())
 			return;

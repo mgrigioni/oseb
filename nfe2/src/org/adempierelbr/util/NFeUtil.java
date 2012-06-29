@@ -17,11 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
-import java.util.Properties;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,13 +38,9 @@ import org.adempierelbr.nfe.beans.InfProt;
 import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.nfe.beans.NFeDadosMsg;
 import org.adempierelbr.nfe.beans.ProtNFe;
-import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
-import org.compiere.model.MOrgInfo;
 import org.compiere.util.CLogger;
-import org.compiere.util.DB;
-import org.compiere.util.Env;
 import org.compiere.utils.DigestOfFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -87,9 +79,6 @@ public abstract class NFeUtil
 
 	/** XML */
 	public static final long XML_SIZE = 500;
-
-	/** Reference NFeStatus */
-	public static final int NFeReference = 1100004;
 	
 	/** Namespace padrão da NF-e */
 	public static final String NAMESPACE_NFE = "http://www.portalfiscal.inf.br/nfe";
@@ -399,15 +388,15 @@ public abstract class NFeUtil
 	 * @param xMotivo
 	 * @return XML
 	 */
-	public static String geraRodapDistribuicao (String chNFe, String nProt, String tpAmb, 
-			Timestamp dhRecbto, String digVal, String cStat, String xMotivo) {
+	public static String geraRodapDistribuicao (MLBRNotaFiscal nf) {
 			
 		XStream xstream = new XStream();
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
 		xstream.marshal (new ProtNFe(VERSAO,
-				new InfProt(tpAmb,VERSAO_APP,chNFe,dhRecbto,nProt,digVal,cStat,xMotivo)), 
+				new InfProt(nf.getlbr_NFeEnv(),VERSAO_APP,nf.getlbr_NFeID(),nf.getDateTrx(),nf.getlbr_NFeProt(),
+						nf.getlbr_DigestValue(),nf.getlbr_NFeStatus(),nf.getxMotivo())), 
 				new CompactWriter (sw));
 		
 		return sw.toString() + "</nfeProc>";
@@ -420,13 +409,12 @@ public abstract class NFeUtil
 		if (nf.getlbr_NFeProt() == null || nf.getlbr_NFeProt().equals("")) //Verifica se foi processada
 			return attach;
 
-		String status = nf.getlbr_NFeStatus();
 		String file_ext = ".xml";
 
-		if (status.equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //Autorizado o uso da NF-e
+		if (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //Autorizado o uso da NF-e
 			file_ext = "-dst.xml";
 		}
-		else if (status.equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)){ //Cancelamento de NF-e homologado
+		else if (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)){ //Cancelamento de NF-e homologado
 			file_ext = "-can.xml";
 		}
 
@@ -438,8 +426,7 @@ public abstract class NFeUtil
 	    //
 	    String cabecalho  = geraCabecDistribuicao();
 		//
-	    String rodape = geraRodapDistribuicao(nf.getlbr_NFeID(), nf.getlbr_NFeProt(), 
-	    		getEnvType(nf.getCtx()), nf.getDateTrx(), nf.getlbr_DigestValue(), status,getNFeStatus(status));
+	    String rodape = geraRodapDistribuicao(nf);
 		//
 		String dadosEmXML = cabecalho + dados + rodape;
 		attach = new File(TextUtil.generateTmpFile(dadosEmXML, nf.getlbr_NFeID() + file_ext));
@@ -600,33 +587,6 @@ public abstract class NFeUtil
 	} //DateToString
 	
 	/**
-	 * getEnvType
-	 * @param ctx
-	 * @return envType
-	 */
-	public static String getEnvType(Properties ctx){
-		MOrgInfo oi = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx),null);
-		String envType 	= oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-
-		if (envType == null || envType.equals(""))
-			envType = "2"; //Homologação
-
-		return envType;
-	} //getEnvType
-
-	public static String getNFeStatus(String status)
-	{
-
-		String sql = "SELECT Name FROM AD_Ref_List " +
-				     "WHERE AD_Reference_ID = ? AND Value = ?";
-
-		String NFeStatus = DB.getSQLValueString(null, sql,
-				new Object[]{NFeReference, status});
-
-		return NFeStatus;
-	}	//getNFeStatus
-
-	/**
 	 * Valida tamanho do Arquivo XML
 	 * @param file
 	 * @return error or null
@@ -712,8 +672,7 @@ public abstract class NFeUtil
 	 * @param Tag
 	 * @return
 	 */
-	public static String getValue (Node node, String Tag)
-	{
+	public static String getValue (Node node, String Tag) {
 		if (node == null)
 			return "";
 
@@ -739,8 +698,7 @@ public abstract class NFeUtil
 	 * @param Tag
 	 * @return
 	 */
-	public static String getValue (Document doc, String Tag)
-	{
+	public static String getValue (Document doc, String Tag) {
 		if (doc.getElementsByTagName(Tag) == null)
 			return "";
 
@@ -749,57 +707,5 @@ public abstract class NFeUtil
 
 		return doc.getElementsByTagName(Tag).item(0).getTextContent();
 	}	//	getValue
-
-	/**
-	 * 	Get Resource to include in XSD File
-	 *
-	 * @param clazz
-	 * @param name
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	public static URL getResource(Class clazz, String name)
-	{
-        // Get the URL for the resource using the standard behavior
-        URL result = clazz.getResource(name);
-
-        // Check to see that the URL is not null and that it's a JAR URL.
-        if (result != null && "jar".equalsIgnoreCase(result.getProtocol())) {
-            // Get the URL to the "clazz" itself.  In a JNLP environment, the "getProtectionDomain" call should succeed only with properly signed JARs.
-            URL classSourceLocationURL = clazz.getProtectionDomain().getCodeSource().getLocation();
-            // Create a String which embeds the classSourceLocationURL in a JAR URL referencing the desired resource.
-            String urlString = MessageFormat.format("jar:{0}!/{1}/{2}", classSourceLocationURL.toExternalForm(), packageNameOfClass(clazz).replaceAll("\\.", "/"), name);
-
-            // Check to see that new URL differs.  There's no reason to instantiate a new URL if the external forms are identical (as happens on pre-1.5.0_16 builds of the JDK).
-            if (urlString.equals(result.toExternalForm()) == false) {
-                // The URLs are different, try instantiating the new URL.
-                try {
-                    result = new URL(urlString);
-                } catch (MalformedURLException malformedURLException) {
-                    throw new RuntimeException(malformedURLException);
-                }
-            }
-        }
-        return result;
-    }
-	
-	/**
-	 * 	packageNameOfClass
-	 *
-	 * @param clazz
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	public static String packageNameOfClass(Class clazz)
-    {
-        String result = "";
-        String className = clazz.getName();
-        int lastPeriod = className.lastIndexOf(".");
-
-        if (lastPeriod > -1) {
-            result = className.substring(0, lastPeriod);
-        }
-        return result;
-    }	//	packageNameOfClass
-	
+		
 }	//	NFeUtil

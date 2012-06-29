@@ -508,6 +508,7 @@ public class InfoProduct extends Info implements ActionListener, ChangeListener
 	 *
 	 * @param M_PriceList_ID price list
 	 */
+	@SuppressWarnings("unchecked")
 	private void fillPicks (int M_PriceList_ID)
 	{
 		//	Price List

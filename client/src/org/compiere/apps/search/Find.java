@@ -626,6 +626,7 @@ public final class Find extends CDialog
 	/**
 	 *  Init Find GridController
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initFindAdvanced()
 	{
 		log.config("");
@@ -817,6 +818,7 @@ public final class Find extends CDialog
 	 *	Action Listener
 	 *  @param e ActionEvent
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void actionPerformed (ActionEvent e)
 	{
 		log.info(e.getActionCommand());
@@ -1312,6 +1314,7 @@ public final class Find extends CDialog
 		}
 	}	//	cmd_save
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void refreshUserQueries() 
 	{
 		Object selected = fQueryName.getSelectedItem();

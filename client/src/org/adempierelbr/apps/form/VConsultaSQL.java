@@ -69,6 +69,7 @@ public class VConsultaSQL extends CPanel implements FormPanel, ActionListener,
 	private JButton exportar = new JButton();
 
 
+	@SuppressWarnings("rawtypes")
 	private JComboBox caixaLista = new JComboBox();
 
 	private Vector<String> colunas;
@@ -165,6 +166,7 @@ public class VConsultaSQL extends CPanel implements FormPanel, ActionListener,
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void select(String query) {
 		erroSQL.setText(null);
 		PreparedStatement pstmt = null;
@@ -246,6 +248,7 @@ public class VConsultaSQL extends CPanel implements FormPanel, ActionListener,
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeUpdate(String query) {
 		erroSQL.setText(null);
 

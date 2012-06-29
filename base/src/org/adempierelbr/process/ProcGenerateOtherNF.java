@@ -92,6 +92,7 @@ public class ProcGenerateOtherNF extends SvrProcess
 		return returnMsg.toString();
 	}//doIt
 
+	@SuppressWarnings("resource")
 	private boolean GerarLinhas(MLBROtherNF otherNF,StringBuffer returnMsg)
 	{
 		Properties ctx = getCtx();

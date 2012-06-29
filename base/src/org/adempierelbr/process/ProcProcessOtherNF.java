@@ -195,6 +195,7 @@ public class ProcProcessOtherNF extends SvrProcess
 	}
 	
 	
+	@SuppressWarnings("resource")
 	private boolean precheck(MLBROtherNF otherNF,StringBuffer returnMsg)
 	{
 		boolean returnValue = false;
