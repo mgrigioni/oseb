@@ -22,7 +22,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/rtextpr.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFBox/PDFBox-0.7.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xstream-1.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsh-2.0b4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/httpcore-4.0.jar"/>
@@ -44,6 +43,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/ws/neethi-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/XmlSchema-1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xstream-1.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlpull-1.1.3.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/adempiere_370"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
