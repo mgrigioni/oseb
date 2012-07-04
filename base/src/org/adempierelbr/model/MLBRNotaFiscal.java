@@ -439,17 +439,17 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		}
 		
 		if (getGrandTotal().compareTo(sumGrandTotal) != 0){
-			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + "Total da NF difere da soma dos itens";
+			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total da NF difere da soma dos itens";
 			return DocAction.STATUS_Invalid;
 		}
 		
 		if (getTotalLines().compareTo(sumTotalLines) != 0){
-			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + "Total de Produtos difere da soma dos produtos";
+			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total de Produtos difere da soma dos produtos";
 			return DocAction.STATUS_Invalid;
 		}
 		
 		if (getlbr_ServiceTotalAmt().compareTo(sumServiceTotal) != 0){
-			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + "Total de Serviços difere da soma dos serviços";
+			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total de Serviços difere da soma dos serviços";
 			return DocAction.STATUS_Invalid;
 		}
 		
@@ -669,6 +669,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		if (!deleteLBR_NFTax()) return false;
 		if (!deleteLBR_NFLineTax()) return false;
 		if (!deleteLBR_NotaFiscalLine()) return false;
+		if (!deleteLBR_NFDI()) return false;
 
 		return true;
 	} //beforeDelete
@@ -949,6 +950,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				if (!nfLineTax.save(get_TrxName())){
 					return false;
 				}
+				setGrandTotal(getGrandTotal().add(taxAmt));
 			}
 
 		} //for lines
@@ -992,6 +994,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				if (!nfLineTax.save(get_TrxName())){
 					return false;
 				}
+				setGrandTotal(getGrandTotal().add(taxAmt));
 			}
 
 		} //for lines
@@ -1217,6 +1220,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		 */
 		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo,I_W_AD_OrgInfo.class);
 		I_W_C_Invoice iW   = POWrapper.create(invoice,I_W_C_Invoice.class);
+		I_W_C_DocType dtW  = POWrapper.create(MDocType.get(getCtx(), invoice.getC_DocType_ID()), I_W_C_DocType.class);
 		
 		//Define Ids
 		setAD_Org_ID(invoice.getAD_Org_ID());
@@ -1227,7 +1231,10 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//Informações do Documento
 		setIsSOTrx(invoice.isCreditMemo() ? !invoice.isSOTrx() : invoice.isSOTrx());
-		setlbr_IsOwnDocument((isSOTrx() || (iW.getlbr_TransactionType().equals("IMP")) ? true : invoice.isCreditMemo())); //Pode haver problemas com NF Entrada (pequeno produtor)
+		setlbr_IsOwnDocument((isSOTrx() || (iW.getlbr_TransactionType().equals("IMP")) ? true : invoice.isCreditMemo()));
+		if (!islbr_IsOwnDocument() && dtW.islbr_IsOwnDocument()) //Exceção no tipo de documento
+			setlbr_IsOwnDocument(true);
+		
 		setlbr_TransactionType(iW.getlbr_TransactionType());
 		setlbr_NFModel(iW.getlbr_NFModel());
 		setDateDoc(invoice.getDateInvoiced());
@@ -1283,6 +1290,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		//RATEIO VALORES DE FRETE E SISCOMEX
 		setFreightTax();
 		setSiscomexTax();
+		save(get_TrxName());
 	} //setInvoice
 		
 	private void createLines(MInvoiceLine[] iLines) throws AdempiereException{
@@ -1305,6 +1313,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		if (!deleteLBR_NFTax()) return false;	
 		if (!deleteLBR_NFLineTax()) return false;
 		if (!deleteLBR_NotaFiscalLine()) return false;
+		if (!deleteLBR_NFDI()) return false;
 		
 		//Valores
 		setGrandTotal(Env.ZERO);  //Total NF
@@ -1361,6 +1370,18 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 
 		return true;
 	} //deleteLBR_NFLineTax
+	
+	private boolean deleteLBR_NFDI (){
+		StringBuffer sql = new StringBuffer("DELETE FROM ")
+		   .append(X_LBR_NFDI.Table_Name)
+		   .append(" WHERE LBR_NotaFiscal_ID = ")
+		   .append(get_ID());
+
+		if (DB.executeUpdate(sql.toString(), get_TrxName()) == -1)
+			return false;
+
+		return true;
+	} //deleteLBR_NFDI
 	
 	/**
 	 * retorna o valor do imposto

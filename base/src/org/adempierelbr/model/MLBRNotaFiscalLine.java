@@ -173,6 +173,8 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		//Valores
 		setlbr_ServiceTaxes();
 		setAmounts(iLine);
+		//Valiação Situação Tributária
+		validateCST();
 		save(get_TrxName());
 	} //setInvoiceLine
 	
@@ -328,6 +330,63 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		else
 			setlbr_ServiceTaxes("");
 	} //setlbr_ServiceTaxes
+	
+	/**
+	 * Verifica a Situação Tributária do ICMS e IPI
+	 */
+	private void validateCST(){
+		
+		//CST ICMS
+		String CST_ICMS = getlbr_TaxStatus();
+		
+		if (CST_ICMS == null || CST_ICMS.isEmpty() || CST_ICMS.length() != 3){
+			CST_ICMS = TextUtil.lPad(CST_ICMS, 3);
+		}
+		
+		if (CST_ICMS.endsWith("00") && getICMSAmt().signum() == 0){
+			CST_ICMS = CST_ICMS.substring(0, 1) + "40"; //ISENTO
+		}
+		
+		if (!CST_ICMS.endsWith("10") && getTaxAmt("ICMSST").signum() == 1){
+			CST_ICMS = CST_ICMS.substring(0, 1) + "10"; //ICMSST
+		}
+		
+		if (CST_ICMS != getlbr_TaxStatus()){
+			log.finest(get_ID() + " - CST ICMS alterado para " + CST_ICMS);
+			setlbr_TaxStatus(CST_ICMS);
+		}
+
+		//CST IPI
+		String CST_IPI = getlbr_TaxStatusIPI();
+		
+		if (CST_IPI == null || CST_IPI.isEmpty() || CST_IPI.length() != 2){
+			if (Integer.valueOf(getCFOP().substring(0, 1)).intValue() < 5) //ENTRADA
+				CST_IPI = "00";
+			else
+				CST_IPI = "50";
+		}
+		
+		if (getIPIAmt().signum() == 0){ //ISENTO
+			if (CST_IPI.equals("00"))
+				CST_IPI = "02";
+			else if (CST_IPI.equals("50"))
+				CST_IPI = "52";
+		}
+		
+		int startWith = Integer.valueOf(CST_IPI.substring(0, 1)).intValue();
+		if (startWith >= 5 && getParent().isSOTrx()){
+			CST_IPI = startWith-5 + CST_IPI.substring(1);
+		}
+		else if (startWith < 5 && !getParent().isSOTrx()){
+			CST_IPI = startWith+5 + CST_IPI.substring(1);
+		}
+		
+		if (CST_IPI != getlbr_TaxStatusIPI()){
+			log.finest(get_ID() + " - CST IPI alterado para " + CST_IPI);
+			setlbr_TaxStatusIPI(CST_IPI);
+		}
+		
+	} //checkCST
 			
 	/**************************************************************************
 	 *  retorna todas as linhas de impostos
@@ -617,8 +676,8 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			CST_ICMS = TextUtil.lPad(CST_ICMS, 3);
 		}
 		
-		if (CST_ICMS.equals("000") && getICMSAmt().signum() == 0){
-			CST_ICMS = "040"; //ISENTO
+		if (CST_ICMS.endsWith("00") && getICMSAmt().signum() == 0){
+			CST_ICMS = CST_ICMS.substring(0, 1) + "40"; //ISENTO
 		}
 		
 		return CST_ICMS;
