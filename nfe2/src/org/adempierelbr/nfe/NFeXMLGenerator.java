@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -18,11 +19,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -33,13 +31,12 @@ import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.model.MLBROpenItem;
 import org.adempierelbr.model.X_LBR_NFDI;
 import org.adempierelbr.model.X_LBR_NFTax;
-import org.adempierelbr.model.X_LBR_NotaFiscal;
 import org.adempierelbr.model.X_LBR_TaxFormula;
 import org.adempierelbr.model.X_LBR_TaxGroup;
 import org.adempierelbr.nfe.beans.AdicoesDI;
 import org.adempierelbr.nfe.beans.COFINSBean;
 import org.adempierelbr.nfe.beans.COFINSGrupoBean;
-import org.adempierelbr.nfe.beans.ChaveNFE;
+import org.adempierelbr.nfe.beans.ChaveNFe;
 import org.adempierelbr.nfe.beans.Cobranca;
 import org.adempierelbr.nfe.beans.CobrancaGrupoDuplicata;
 import org.adempierelbr.nfe.beans.CobrancaGrupoFatura;
@@ -47,39 +44,25 @@ import org.adempierelbr.nfe.beans.DadosNFE;
 import org.adempierelbr.nfe.beans.DeclaracaoDI;
 import org.adempierelbr.nfe.beans.DetailsNFEBean;
 import org.adempierelbr.nfe.beans.EnderDest;
-import org.adempierelbr.nfe.beans.EnderEmit;
 import org.adempierelbr.nfe.beans.ICMSBean;
 import org.adempierelbr.nfe.beans.ICMSGrupoBean;
 import org.adempierelbr.nfe.beans.IdentDest;
 import org.adempierelbr.nfe.beans.IdentEmit;
-import org.adempierelbr.nfe.beans.IdentFisco;
-import org.adempierelbr.nfe.beans.IdentLocRetirada;
 import org.adempierelbr.nfe.beans.IdentLocalEntrega;
-import org.adempierelbr.nfe.beans.IdentNFE;
+import org.adempierelbr.nfe.beans.IdentNFe;
 import org.adempierelbr.nfe.beans.ImpostoDIBean;
 import org.adempierelbr.nfe.beans.ImpostoIPIBean;
 import org.adempierelbr.nfe.beans.ImpostoIPIGrupoBean;
 import org.adempierelbr.nfe.beans.InfAdiFisco;
-import org.adempierelbr.nfe.beans.InfAssinatura;
 import org.adempierelbr.nfe.beans.InfComex;
-import org.adempierelbr.nfe.beans.Informacoes;
-import org.adempierelbr.nfe.beans.InformacoesNFEReferenciadaBean;
-import org.adempierelbr.nfe.beans.NFEReferenciadaBean;
 import org.adempierelbr.nfe.beans.PISBean;
 import org.adempierelbr.nfe.beans.PISGrupoBean;
 import org.adempierelbr.nfe.beans.ProdutosNFEBean;
 import org.adempierelbr.nfe.beans.Transporte;
 import org.adempierelbr.nfe.beans.TransporteGrupo;
-import org.adempierelbr.nfe.beans.TransporteGrupoVeiculos;
-import org.adempierelbr.nfe.beans.TransporteLacres;
-import org.adempierelbr.nfe.beans.TransporteReboque;
-import org.adempierelbr.nfe.beans.TransporteRetencao;
-import org.adempierelbr.nfe.beans.TransporteVol;
 import org.adempierelbr.nfe.beans.TributosInciBean;
 import org.adempierelbr.nfe.beans.Valores;
 import org.adempierelbr.nfe.beans.ValoresICMS;
-import org.adempierelbr.nfe.beans.ValoresISSQN;
-import org.adempierelbr.nfe.beans.ValoresRetTrib;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
@@ -90,12 +73,10 @@ import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.validator.ValidatorBPartner;
-import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.adempierelbr.wrapper.I_W_C_City;
 import org.adempierelbr.wrapper.I_W_C_Country;
 import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.compiere.model.MAttachment;
-import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
@@ -115,21 +96,17 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 /**
- * Gera o arquivo XML
- *
- * @contributor Ricardo Santana
- * @contributor Mario Grigioni
- * @contributor Pablo Boff Pigozzo 
- * @version $Id: NFeXMLGenerator.java, 18/12/2009 10:45:00 mgrigioni
+ *  NFeXMLGenerator
+ *  
+ *  @author Mario Grigioni
+ *  @contributor Ricardo Santana (old version)
+ *  @contributor Pablo Boff Pigozzo (old version)
+ *  @version $Id: NFeXMLGenerator.java,v 2.0 04/07/2012 14:16:00 mgrigioni Exp $
  */
-@SuppressWarnings("unused")
 public class NFeXMLGenerator
 {
 	/** Log				*/
 	private static CLogger log = CLogger.getCLogger(NFeXMLGenerator.class);
-
-	/** XML             */
-	private static final String FILE_EXT      = "-nfe.xml";
 	
 	/**
 	 * Gera o corpo da NF
@@ -145,40 +122,21 @@ public class NFeXMLGenerator
 		
 		Properties ctx = Env.getCtx();
 		
-		//
 		XStream xstream = new XStream();
 		xstream.autodetectAnnotations(true);
 		
 		DadosNFE dados = new DadosNFE();
-		InformacoesNFEReferenciadaBean inforeferencia = new InformacoesNFEReferenciadaBean();
-		IdentNFE identNFe = new IdentNFE();
-		IdentEmit emitente = new IdentEmit();
-		EnderEmit enderEmit = new EnderEmit();
 		InfComex exporta = new InfComex();
-		IdentFisco fisco = new IdentFisco();
 		IdentDest destinatario = new IdentDest();
 		EnderDest enderDest = new EnderDest();
-		IdentLocRetirada retirada = new IdentLocRetirada();
 		IdentLocalEntrega entrega = new IdentLocalEntrega();
 		Valores valores = new Valores();
 		ValoresICMS valoresicms = new ValoresICMS();
-		ValoresISSQN valoresissq = new ValoresISSQN();
-		ValoresRetTrib valoresret = new ValoresRetTrib();
 		Transporte transporte = new Transporte();
 		TransporteGrupo transgrupo = new TransporteGrupo();
-		TransporteGrupoVeiculos transpveic = new TransporteGrupoVeiculos();
-		TransporteLacres translacre = new TransporteLacres();
-		TransporteReboque transreboque = new TransporteReboque();
-		TransporteRetencao transretencao = new TransporteRetencao();
-		TransporteVol transvol = new TransporteVol();
 		Cobranca cobr = new Cobranca();
 		CobrancaGrupoFatura cobrfat = null;
 		CobrancaGrupoDuplicata cobrdup = null;
-		InfAssinatura assinatura = new InfAssinatura();
-		ChaveNFE chaveNFE = new ChaveNFE();
-
-		//	Adicoes DI
-		ArrayList<AdicoesDI> hAdi = new ArrayList<AdicoesDI>();
 
 		// Dados da NFE
 		dados.setVersao(NFeUtil.VERSAO);
@@ -194,16 +152,10 @@ public class NFeXMLGenerator
 		MOrg org = new MOrg(ctx, nf.getAD_Org_ID(), trxName);
 		MOrgInfo orgInfo = MOrgInfo.get(ctx, org.get_ID(), trxName);
 
-		//	Tipo de Documento
-		MDocType docType = new MDocType(ctx, nf.getC_DocTypeTarget_ID(), trxName);
-
 		MLocation orgLoc    = new MLocation(ctx, orgInfo.getC_Location_ID(), trxName);
 		MRegion  orgRegion  = new MRegion(ctx, orgLoc.getC_Region_ID(), trxName);
-		MCountry orgCountry = orgLoc.getCountry();
-		X_C_City orgCity = BPartnerUtil.getX_C_City(ctx,orgLoc,trxName);
 
 		// DADOS DO CLIENTE
-		MBPartner bp = new MBPartner(ctx, nf.getC_BPartner_ID(), trxName);
 		MBPartnerLocation bpartLoc = new MBPartnerLocation(ctx, nf.getC_BPartner_Location_ID(), trxName);
 		MLocation bpLoc = bpartLoc.getLocation(false);
 		if(bpLoc.getC_Country_ID() == 0){
@@ -215,175 +167,15 @@ public class NFeXMLGenerator
 
 		// Dados do documento da NF
 
-		// Validar NF-e Model
-		if(nf.getlbr_NFModel() == null || nf.getlbr_NFModel().isEmpty())
-			return "Modelo da Nota Fiscal é inválido! Para NF-e utiliza-se o modelo '55 - Nota Fiscal Eletrônica'";
-		String modNF = nf.getlbr_NFModel();
-
-		
-		String serie = nf.getSerieNo();
-		if (serie.isEmpty())
-			serie = "0";
-
-		/**
-		 * Indicador da forma de pagamento:
-		 * 0 – pagamento à vista
-		 * 1 – pagamento à prazo
-		 * 2 – outros
-		 */
-		String indPag = nf.getIndPag();
-		if (indPag.equals("9")) // 9 é usado no SPED EFD
-			indPag = "2";
-
-		/** Identificação do Ambiente (1 - Produção; 2 - Homologação) */
-		String tpAmb = docType.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_NFeEnv);
-
-		/** Formato de impressão do DANFE (1 - Retrato; 2 - Paisagem) */
-		String tpImp = docType.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_DANFEFormat);
-
-		/**
-		 * Processo de emissão utilizado com a seguinte codificação:
-		 * 0 - emissão de NF-e com aplicativo do contribuinte
-		 * 1 - emissão de NF-e avulsa pelo Fisco
-		 * 2 - emissão de NF-e avulsa, pelo contribuinte com seu certificado digital, através do site do Fisco
-		 * 3 - emissão de NF-e pelo contribuinte com aplicativo fornecido pelo Fisco
-		 */
-		String procEmi = "0";
-
-		/** Versão do aplicativo utilizado no processo de emissão */
-		String verProc = NFeUtil.VERSAO_APP;
-
-		/**
-		 * Forma de emissão da NF-e:
-		 * 1 - Normal
-		 * 2 - Contingência FS
-		 * 3 - Contingência SCAN
-		 * 4 - Contingência DPEC
-		 * 5 - Contingência FSDA
-		 */
-		String tpEmis = docType.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFeTpEmi);
-		if (tpEmis == null)
-			tpEmis = "1";
-		
-		String dhCont = null;
-		String xJust  = null;
-		
-		if (tpEmis.equals("3")){ //SCAN
-			dhCont = NFeUtil.timeToString(nf.getlbr_DateScan());
-			xJust  = nf.getlbr_MotivoScan();
-		}
-
-		/**
-		 * Finalidade da emissão da NF-e:
-		 * 1 - NFe normal
-		 * 2 - NFe complementar
-		 * 3 - NFe de ajuste
-		 */
-		String FinNFE = nf.getlbr_FinNFe();
-
-		/**
-		 * CRT
-		 * 1 – Simples Nacional
-		 * 2 – Simples Nacional – excesso de sublimite de receita bruta;
-		 * 3 – Regime Normal
-		 */
-		String CRT = "3";
-
-		Timestamp datedoc = nf.getDateDoc();
-		String hSaiEnt    = nf.getlbr_TimeInOut();
-		String aamm = TextUtil.timeToString(datedoc, "yyMM");
-		String orgCPNJ = TextUtil.toNumeric(nf.getlbr_CNPJ());
-		//
-		chaveNFE.setAAMM(aamm);
-		chaveNFE.setCUF(BPartnerUtil.getRegionCode(orgLoc));	//UF EMITENTE
-		chaveNFE.setCNPJ(orgCPNJ);
-		chaveNFE.setMod(modNF);
-		chaveNFE.setSerie(TextUtil.lPad(serie, 3));
-		chaveNFE.setTpEmis(tpEmis);
-		chaveNFE.setNNF(TextUtil.lPad(nf.getDocumentNo(), 9));
-
-		// Gera codigo fiscal para nota
-		Random random = new Random();
-		chaveNFE.setCNF(TextUtil.lPad("" + random.nextInt(99999999), 8));
-
-		int digitochave = chaveNFE.gerarDigito();
-		dados.setId("NFe" + chaveNFE.toString() + digitochave);
-
-		String DEmi 	= TextUtil.timeToString(datedoc, "yyyy-MM-dd");
-		String DSaiEnt 	= TextUtil.timeToString(datedoc, "yyyy-MM-dd");
-
 		// Identificação NFE
-		identNFe.setcUF(chaveNFE.getCUF());
-		identNFe.setcNF(chaveNFE.getCNF());
-		identNFe.setNatOp(RemoverAcentos.remover(TextUtil.checkSize(nf.getlbr_CFOPNote(), 1, 60)));
-		identNFe.setIndPag(indPag);
-		identNFe.setMod(chaveNFE.getMod());
-		identNFe.setSerie(serie);
-		identNFe.setnNF(nf.getDocumentNo());
-		identNFe.setdEmi(DEmi);
-		identNFe.setdSaiEnt(DSaiEnt);
-		identNFe.sethSaiEnt(TextUtil.formatTimeString(hSaiEnt));
-		identNFe.setTpNF(nf.isSOTrx() ? "1" : "0");
-		Integer orgCityCode = 0;
-
-		if (orgCity != null  && orgCity.get_Value(I_W_C_City.COLUMNNAME_lbr_CityCode) != null)	//	TODO: Copiar para LBR_NF
-			orgCityCode = (Integer) orgCity.get_Value(I_W_C_City.COLUMNNAME_lbr_CityCode);
-
-		identNFe.setcMunFG(orgCityCode.toString());
-		identNFe.setTpImp(tpImp);
-		identNFe.setTpEmis(tpEmis);
-		identNFe.setcDV("" + digitochave);
-		identNFe.setTpAmb(tpAmb);
-		identNFe.setFinNFe(FinNFE);
-		if (FinNFE.equals(X_LBR_NotaFiscal.LBR_FINNFE_NFeComplementar)){
-			NFEReferenciadaBean nfRef = new NFEReferenciadaBean(new MLBRNotaFiscal(ctx,nf.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID());
-			identNFe.setNFref(nfRef);
-		}
+		ChaveNFe chaveNFe = new ChaveNFe(nf);
+		dados.setId("NFe" + chaveNFe.toString() + chaveNFe.getcDV());
 		
-		identNFe.setProcEmi(procEmi);
-		identNFe.setVerProc(verProc);
-		identNFe.setDhCont(dhCont);
-		identNFe.setXJust(xJust);
-
+		IdentNFe identNFe = new IdentNFe(chaveNFe,nf);
 		dados.setIde(identNFe);
 
-		//	Endereco do Emitente
-		enderEmit.setxLgr(RemoverAcentos.remover(nf.getlbr_OrgAddress1()));
-		enderEmit.setNro(nf.getlbr_OrgAddress2());
-		enderEmit.setxBairro(RemoverAcentos.remover(nf.getlbr_OrgAddress3()));
-		enderEmit.setcMun(orgCityCode.toString());
-		enderEmit.setxMun(RemoverAcentos.remover(nf.getlbr_OrgCity()));
-		enderEmit.setUF(orgRegion.getName());
-		enderEmit.setCEP(TextUtil.toNumeric(orgLoc.getPostal()));
-		enderEmit.setcPais((Integer.parseInt(orgCountry.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode))) + "");
-		enderEmit.setxPais(AdempiereLBR.getCountry_trl(orgCountry));
-
-		// 	Dados do Emitente
-		emitente.setCNPJ(chaveNFE.getCNPJ());
-		String orgNome = RemoverAcentos.remover(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity)); //TODO: Copiar para NF
-		emitente.setxNome(orgNome);
-		String orgXFant = RemoverAcentos.remover(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_Fantasia));  //TODO: Copiar para NF
-		if (orgXFant == null || orgXFant.equals(""))
-			orgXFant = orgNome;
-		emitente.setxFant(orgXFant);
-		//
-		String orgIE = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
-		UF uf = UF.valueOf(orgRegion.getName());
-		// VALIDACAO IE
-		orgIE = ValidatorBPartner.validaIE(orgIE,uf);
-		if ( orgIE == null ){
-			return "IE do Emitente incorreto ";
-		}
-		//
-		emitente.setIE(orgIE);
-		String orgIM = TextUtil.formatStringCodes(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CCM));
-		if (orgIM == null || orgIM.equals(""))
-			orgIM = "EM ANDAMENTO";
-		emitente.setIM(orgIM);
-		String orgCNAE = TextUtil.formatStringCodes(orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNAE));
-		emitente.setCNAE(orgCNAE);
-		emitente.setCRT(CRT);
-		emitente.setEnderEmit(enderEmit);
+		// Dados do Emitente
+		dados.setEmit(new IdentEmit(nf));
 
 		//	Endereco do Destinatario
 		enderDest.setXLgr(RemoverAcentos.remover(nf.getlbr_BPAddress1()));
@@ -422,7 +214,7 @@ public class NFeXMLGenerator
 			enderDest.setUF(nf.getlbr_BPRegion());
 			//
 			if (bpLoc.getPostal() != null)
-				enderDest.setCEP(TextUtil.checkSize(TextUtil.formatStringCodes(nf.getlbr_BPPostal()),8,8,'0'));
+				enderDest.setCEP(TextUtil.checkSize(TextUtil.toNumeric(nf.getlbr_BPPostal()),8,8,'0'));
 			else
 				return "CEP do destinatário inválido";
 		}
@@ -433,11 +225,10 @@ public class NFeXMLGenerator
 		//enderDest.setFone(TextUtil.checkSizeN(nf.getlbr_BPPhone(),6,14));
 		enderDest.setEmail(null); //TODO
 
-		dados.setEmit(emitente);
 		dados.setDest(destinatario);
 		
 		// Identificacao do Destinatario
-		String bpCNPJ = TextUtil.formatStringCodes(nf.getlbr_BPCNPJ());
+		String bpCNPJ = TextUtil.toNumeric(nf.getlbr_BPCNPJ());
 		if (bpCNPJ.length() == 11) {
 			destinatario.setCPF(bpCNPJ);
 		}
@@ -447,7 +238,7 @@ public class NFeXMLGenerator
 		destinatario.setxNome(RemoverAcentos.remover(nf.getBPName()));
 
 		String bpIE = nf.getlbr_BPIE();
-		uf = UF.valueOf(nf.getlbr_BPRegion());
+		UF uf = UF.valueOf(nf.getlbr_BPRegion());
 
 		// VALIDACAO IE
 		bpIE = ValidatorBPartner.validaIE(bpIE,uf); 		// VALIDACAO IE
@@ -459,18 +250,17 @@ public class NFeXMLGenerator
 		destinatario.setIE(bpIE);							
 		
 		// Suframa BF: 3056992
-		String suframa = TextUtil.formatStringCodes(nf.getlbr_BPSuframa());
+		String suframa = TextUtil.toNumeric(nf.getlbr_BPSuframa());
 		if(!suframa.isEmpty())	
 			destinatario.setISUF(suframa);					// Suframa BF: 3056992
 		
 		destinatario.setEnderDest(enderDest);
 		
-
 		/** 
 		 * AMBIENTE DE HOMOLOGACAO 
 		 * regra será aplicada a partir do dia 01/05/2011
 		 **/
-		if (tpAmb.equals("2")){
+		if (identNFe.getTpAmb().equals("2")){
 			if (uf != null){ //DENTRO DO BRASIL
 				destinatario.setCPF(null);
 				destinatario.setCNPJ("99999999000191");
@@ -478,7 +268,6 @@ public class NFeXMLGenerator
 			destinatario.setxNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
 			destinatario.setIE("");
 		}
-		
 
 		// Identificacao do Local de Entrega
 		entrega.setxLgr(RemoverAcentos.remover(nf.getlbr_BPDeliveryAddress1()));
@@ -487,7 +276,7 @@ public class NFeXMLGenerator
 		entrega.setcMun(bpCityCode.toString());
 		
 		// Identificacao do Entrega
-		String entCNPJ = TextUtil.formatStringCodes(nf.getlbr_BPDeliveryCNPJ());
+		String entCNPJ = TextUtil.toNumeric(nf.getlbr_BPDeliveryCNPJ());
 		if (entCNPJ.length() == 11) {
 			entrega.setCPF(entCNPJ);
 		}
@@ -667,10 +456,7 @@ public class NFeXMLGenerator
 			ICMSGrupoBean icmsgrupo = new ICMSGrupoBean(); // Grupo de ICMS
 			ICMSBean.ICMS60Grp icms60 = new ICMSBean.ICMS60Grp();
 			ImpostoIPIBean ipinfe = new ImpostoIPIBean(); // IPI
-			ImpostoIPIGrupoBean ipigrupo = new ImpostoIPIGrupoBean(); // Grupo
-			Informacoes informacoes = new Informacoes();
-			// de
-			// IPI
+			ImpostoIPIGrupoBean ipigrupo = new ImpostoIPIGrupoBean(); // Grupo de IPI
 			ImpostoDIBean impostodi = new ImpostoDIBean(); // DI
 			PISBean pisnfe = new PISBean(); // PIS
 			PISGrupoBean pisgrupo = new PISGrupoBean(); // Grupo de PIS
@@ -698,7 +484,7 @@ public class NFeXMLGenerator
 			if (!cfop.validateCFOP(nf.isSOTrx(), orgLoc, bpLoc, false))
 				return "CFOP Linha: " + nfLine.getLine() + " Inválido";
 
-			produtos.setCFOP(TextUtil.formatStringCodes(cfopName));
+			produtos.setCFOP(TextUtil.toNumeric(cfopName));
 			produtos.setqCom(TextUtil.bigdecimalToString(nfLine.getQty(),4));
 			produtos.setqTrib(TextUtil.bigdecimalToString(nfLine.getQty(),4));
 			produtos.setuCom(RemoverAcentos.remover(nfLine.getlbr_UOMName()));
@@ -908,7 +694,7 @@ public class NFeXMLGenerator
 		xstream.marshal (dados,  new CompactWriter (sw));
 		
 		String nfeID = dados.getId().substring(3);
-		String arquivoXML = nfeID + FILE_EXT;
+		String arquivoXML = nfeID + NFeUtil.EXT_NFE;
 		
 		String NFeEmXML = NFeUtil.geraCabecNFe() + TextUtil.removeEOL(sw.toString()) + NFeUtil.geraRodapNFe();
 		

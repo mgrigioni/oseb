@@ -13,6 +13,8 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempierelbr.nfe.beans.statusServicoNFe.ConsStatServ;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**

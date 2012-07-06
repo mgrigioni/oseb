@@ -36,7 +36,7 @@ public class EnvEvento
 	private final String xmlns="http://www.portalfiscal.inf.br/nfe";
 	
 	@XMLFieldProperties	(minSize=1, maxSize=15, id = "HP03")
-	private String idLote = "Carta de Corre\u00e7\u00e3o";
+	private String idLote = "Carta de Correcao";
 	
 	@XMLFieldProperties	(needsValidation=true, id = "HP04")
 	private Evento evento;

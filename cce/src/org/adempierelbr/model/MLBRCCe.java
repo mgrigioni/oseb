@@ -74,8 +74,6 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private final String header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-
 	/**************************************************************************
 	 *  Default Constructor
 	 *  @param Properties ctx
@@ -252,7 +250,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 		//	Detalhes
 		DetEvento det = new DetEvento ();
 		det.setVersao(NFeUtil.VERSAO_CCE);
-		det.setXCorrecao(getDescription());
+		det.setXCorrecao(TextUtil.itrim(getDescription()));
 		
 		//	Informações do Evento da Carta de Correção
 		InfEvento cce = new InfEvento ();
@@ -290,7 +288,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 		xstream.marshal (evento,  new CompactWriter (sw));
 		
 		StringBuilder xml = new StringBuilder (sw.toString());
-		String xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + "-cce.xml");
+		String xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + NFeUtil.EXT_CCE);
 		
 		try
 		{
@@ -321,7 +319,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			}
 			
 			//	Arquivo para transmitir
-			xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + "-cce.xml");
+			xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + NFeUtil.EXT_CCE);
 			
 			//	Procura os endereços para Transmissão
 			MLBRNFeWebService ws = MLBRNFeWebService.get (oi,MLBRNFeWebService.RECEPCAOEVENTO);
@@ -332,7 +330,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 				return DocAction.STATUS_Invalid;
 			}
 			
-			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(header + "<nfeDadosMsg>" + xml.toString() + "</nfeDadosMsg>"));
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.XML_HEADER + "<nfeDadosMsg>" + xml.toString() + "</nfeDadosMsg>"));
 
 			//	Prepara a Transmissão
 			MLBRDigitalCertificate.setCertificate (p_ctx, oi);
@@ -342,7 +340,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			RecepcaoEventoStub stub = new RecepcaoEventoStub();
 
 			//	Resposta do SEFAZ
-			StringBuilder respLote = new StringBuilder (header + stub.nfeRecepcaoEvento (dadosMsg, cabecMsgE).getExtraElement().toString());
+			StringBuilder respLote = new StringBuilder (NFeUtil.XML_HEADER + stub.nfeRecepcaoEvento (dadosMsg, cabecMsgE).getExtraElement().toString());
 			log.fine (respLote.toString());
 						
 			xstream = new XStream (new DomDriver());
@@ -380,7 +378,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 				xstream.marshal (procEvento,  new CompactWriter (sw));
 				
 				//	Arquivo de resposta final
-				xmlFile = TextUtil.generateTmpFile (header + sw.toString(), cce.getId() + "-cce-dst.xml");
+				xmlFile = TextUtil.generateTmpFile (NFeUtil.XML_HEADER + sw.toString(), cce.getId() + NFeUtil.EXT_DISTRIBUICAO);
 				//
 				MAttachment attachCCe = createAttachment (true);
 				attachCCe.addEntry(new File (xmlFile));

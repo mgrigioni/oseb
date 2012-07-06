@@ -18,6 +18,7 @@ import java.io.StringWriter;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.AssinaturaDigital;
+import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.model.MOrgInfo;
 
@@ -68,7 +69,7 @@ public class TcRps {
 		//
 		StringBuilder rps = new StringBuilder("<Rps>").append(sw.toString()).append("</Rps>");
 		//
-		File attachFile = new File(TextUtil.generateTmpFile(rps.toString(), getInfRps().getId()+"-rps.xml"));
+		File attachFile = new File(TextUtil.generateTmpFile(rps.toString(), getInfRps().getId()+NFeUtil.EXT_RPS));
 		AssinaturaDigital.Assinar(attachFile.toString(), OrgInfo, AssinaturaDigital.DOCTYPE_GINFES_RPS);
 		//	Anexa o XML na NF
 		/*

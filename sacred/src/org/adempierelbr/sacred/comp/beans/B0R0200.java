@@ -44,7 +44,7 @@ public class B0R0200 implements RegSacred{
 			+ PIPE + TextUtil.checkSize(RemoverAcentos.remover(COD_ITEM),0,255)
 			+ PIPE + TextUtil.checkSize(RemoverAcentos.remover(DESCR_ITEM),0,255)
 			+ PIPE + TextUtil.checkSize(RemoverAcentos.remover(UNI),0,255)
-			+ PIPE + TextUtil.lPad(TextUtil.formatStringCodes(COD_GEN),2);
+			+ PIPE + TextUtil.lPad(TextUtil.toNumeric(COD_GEN),2);
 		
 		return TextUtil.removeEOL(format) + EOL;
 	}

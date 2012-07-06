@@ -30,6 +30,7 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.model.MLBRCCe;
 import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.util.NFeUtil;
 import org.apache.commons.io.IOUtils;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
@@ -126,7 +127,7 @@ public class PrintFromXML extends SvrProcess
 		
 		for (MAttachmentEntry entry : entries)
 		{
-			if (entry.getName().endsWith("dst.xml"))
+			if (entry.getName().endsWith(NFeUtil.EXT_DISTRIBUICAO))
 			{
 				xml = entry.getInputStream();
 				break;

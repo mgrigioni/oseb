@@ -11,53 +11,68 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.beans.retRecepcao;
+
+import java.util.List;
 
 import org.adempierelbr.util.NFeUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
- *  ProtNFe
+ *  RetConsReciNFe
  *  @author Mario Grigioni
- *  @version $Id: ProtNFe.java,v 1.0 22/06/2012 14:08:00 mgrigioni Exp $
+ *  @version $Id: RetConsReciNFe.java,v 1.0 04/07/2012 15:32:00 mgrigioni Exp $
  */
-@XStreamAlias ("protNFe")
-public class ProtNFe {
-
-	@XStreamAsAttribute
-	private final String xmlns=NFeUtil.NAMESPACE_NFE;
-	
+@XStreamAlias ("retConsReciNFe")
+public class RetConsReciNFe
+{
 	@XStreamAsAttribute
 	private String versao;
 	
-	private InfProt infProt;
+	@XStreamAsAttribute
+	private final String xmlns=NFeUtil.NAMESPACE_NFE;
 	
-	/**
-	 * @param versao
-	 * @param infProt
-	 */
-	public ProtNFe(String versao, InfProt infProt) {
-		super();
-		setVersao(versao);
-		setInfProt(infProt);
-	}
+	private String tpAmb;
+	private String verAplic;
+	private String nRec;
+	private String cStat;
+	private String xMotivo;
+	private String cUF;
+	private String cMsg;
+	private String xMsg;
 	
-	public String getVersao() {
-		return versao;
+	@XStreamImplicit(itemFieldName="protNFe")
+	private List<ProtNFe> protNFe;
+
+	public String getTpAmb() {
+		return tpAmb;
 	}
-	public void setVersao(String versao) {
-		this.versao = versao;
+	public String getVerAplic() {
+		return verAplic;
 	}
-	public InfProt getInfProt() {
-		return infProt;
+	public String getnRec() {
+		return nRec;
 	}
-	public void setInfProt(InfProt infProt) {
-		this.infProt = infProt;
+	public String getcStat() {
+		return cStat;
 	}
-	public String getXmlns() {
-		return xmlns;
+	public String getxMotivo() {
+		return xMotivo;
+	}
+	public String getcUF() {
+		return cUF;
+	}
+	public String getcMsg() {
+		return cMsg;
+	}
+	public String getxMsg() {
+		return xMsg;
+	}
+	public List<ProtNFe> getProtNFe() {
+		return protNFe;
 	}
 
-}	// ProtNFe
+}	//	RetConsReciNFe

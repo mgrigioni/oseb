@@ -340,19 +340,6 @@ public abstract class TextUtil
 	}
 
 	/**
-	 * formatStringCodes
-	 * @param code
-	 * @return String with onlynumbers
-	 */
-	public static String formatStringCodes (String text)
-	{
-		if (text == null)
-			return "";
-		text = text.replaceAll("[^0-9]*", "");
-		return text;
-	}	//	formatStringCodes
-
-	/**
 	 * Formata e Valida String HH:MM para HH:MM:SS
 	 * @param time
 	 * @return string formata ou null

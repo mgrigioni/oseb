@@ -15,14 +15,13 @@ package org.adempierelbr.process;
 import java.io.StringReader;
 import java.util.logging.Level;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempiere.model.POWrapper;
 import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.model.MLBRNFeWebService;
+import org.adempierelbr.nfe.beans.statusServicoNFe.RetConsStatServ;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MOrgInfo;
@@ -30,10 +29,11 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import br.inf.portalfiscal.www.nfe.wsdl.nfestatusservico2.NfeStatusServico2Stub;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * 	Processo para consultar o Status do Serviço
@@ -98,18 +98,11 @@ public class ProcStatusServico extends SvrProcess
 
 			String respStatus = stub.nfeStatusServicoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
 
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		    Document doc = builder.parse(new InputSource(new StringReader(respStatus)));
-		    //
-		    String tpAmb    = NFeUtil.getValue(doc, "tpAmb");
-		    String verAplic = NFeUtil.getValue(doc, "verAplic");
-		    String cStat    = NFeUtil.getValue(doc, "cStat");
-		    String xMotivo  = NFeUtil.getValue(doc, "xMotivo");
-
-		    status = "<br/>" +
-		    		 "Ambiente: " + tpAmb + "<br/>" +
-		             "Versão:   " + verAplic + "<br/>" +
-		             "Status:   " + cStat + " - " + xMotivo;
+			XStream xstream = new XStream (new DomDriver());
+			xstream.processAnnotations(new Class[]{RetConsStatServ.class});
+			//
+			RetConsStatServ retConsStat = (RetConsStatServ)xstream.fromXML (NFeUtil.XML_HEADER + respStatus);
+			status = retConsStat.toString();
 		}
 		catch (Throwable e1){
 			log.severe(e1.getLocalizedMessage());

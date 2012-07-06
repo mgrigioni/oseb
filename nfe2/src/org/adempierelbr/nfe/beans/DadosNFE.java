@@ -30,7 +30,7 @@ public class DadosNFE {
 	private String Id;
 	
 	private String pk_nitem;	
-	private IdentNFE ide;
+	private IdentNFe ide;
 	private IdentEmit emit;
 	private IdentFisco avulsa;
 	private IdentDest dest;
@@ -59,10 +59,10 @@ public class DadosNFE {
 	public void setPk_nitem(String pk_nitem) {
 		this.pk_nitem = pk_nitem;
 	}
-	public IdentNFE getIde() {
+	public IdentNFe getIde() {
 		return ide;
 	}
-	public void setIde(IdentNFE ide) {
+	public void setIde(IdentNFe ide) {
 		this.ide = ide;
 	}
 	public IdentEmit getEmit() {

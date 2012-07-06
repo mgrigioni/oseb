@@ -11,7 +11,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.beans.statusServicoNFe;
 
 import org.adempierelbr.util.NFeUtil;
 
@@ -19,12 +19,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  CancNFe
+ *  ConsStatServ
  *  @author Mario Grigioni
- *  @version $Id: CancNFe.java,v 1.0 26/06/2012 10:27:00 mgrigioni Exp $
+ *  @version $Id: ConsStatServ.java,v 1.0 25/06/2012 15:29:00 mgrigioni Exp $
  */
-@XStreamAlias ("cancNFe")
-public class CancNFe {
+@XStreamAlias ("consStatServ")
+public class ConsStatServ {
 
 	@XStreamAsAttribute
 	private final String xmlns=NFeUtil.NAMESPACE_NFE;
@@ -32,68 +32,27 @@ public class CancNFe {
 	@XStreamAsAttribute
 	private String versao;
 	
-	public InfCanc infCanc;
-
+	private String tpAmb;
+	private String cUF;
+	private final String xServ = "STATUS";
+	
 	/**
 	 * @param versao
-	 * @param uf
-	 * @param id (CNPJ ou CPF)
+	 * @param tpAmb
+	 * @param cUF
 	 */
-	public CancNFe(String versao, String tpAmb, String chNFe, String nProt, String xJust) {
+	public ConsStatServ(String versao, String tpAmb, String cUF) {
 		super();
 		setVersao(versao);
-		setInfCanc(new InfCanc(tpAmb,chNFe,nProt,xJust));
+		setTpAmb(tpAmb);
+		setcUF(cUF);
 	}
-
+	
 	public String getVersao() {
 		return versao;
 	}
 	public void setVersao(String versao) {
 		this.versao = versao;
-	}
-	public InfCanc getInfCanc() {
-		return infCanc;
-	}
-	public void setInfCanc(InfCanc infCanc) {
-		this.infCanc = infCanc;
-	}
-	public String getXmlns() {
-		return xmlns;
-	}
-	
-}	// CancNFe
-
-@XStreamAlias ("infCanc")
-class InfCanc{
-	
-	@XStreamAsAttribute
-	public String Id;
-
-	public String tpAmb;
-	public final String xServ = "CANCELAR";
-	public String chNFe;
-	public String nProt;
-	public String xJust;
-	
-	/**
-	 * @param tpAmb
-	 * @param chNFe
-	 * @param nProt
-	 * @param xJust
-	 */
-	public InfCanc(String tpAmb, String chNFe, String nProt, String xJust) {
-		super();
-		setId("ID" + chNFe);
-		setTpAmb(tpAmb);
-		setChNFe(chNFe);
-		setnProt(nProt);
-		setxJust(xJust);
-	}
-	public String getId() {
-		return Id;
-	}
-	public void setId(String id) {
-		this.Id = id;
 	}
 	public String getTpAmb() {
 		return tpAmb;
@@ -101,26 +60,17 @@ class InfCanc{
 	public void setTpAmb(String tpAmb) {
 		this.tpAmb = tpAmb;
 	}
-	public String getChNFe() {
-		return chNFe;
+	public String getcUF() {
+		return cUF;
 	}
-	public void setChNFe(String chNFe) {
-		this.chNFe = chNFe;
+	public void setcUF(String cUF) {
+		this.cUF = cUF;
 	}
-	public String getnProt() {
-		return nProt;
-	}
-	public void setnProt(String nProt) {
-		this.nProt = nProt;
-	}
-	public String getxJust() {
-		return xJust;
-	}
-	public void setxJust(String xJust) {
-		this.xJust = xJust;
+	public String getXmlns() {
+		return xmlns;
 	}
 	public String getxServ() {
 		return xServ;
 	}
 	
-} // InfCanc
+}	// ConsStatServ

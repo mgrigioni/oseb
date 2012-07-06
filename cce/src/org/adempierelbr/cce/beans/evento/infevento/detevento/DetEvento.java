@@ -30,18 +30,18 @@ public class DetEvento
 	private String versao;
 	
 	@XMLFieldProperties	(minSize=5, maxSize=60, id = "HP19")
-	private final String descEvento = "Carta de Corre\u00e7\u00e3o";
+	private final String descEvento = "Carta de Correcao";
 	
 	@XMLFieldProperties	(minSize=15, maxSize=1000, id = "HP20")
 	private String xCorrecao;
 	
 	@XMLFieldProperties	(id = "HP20a")
-	private final String xCondUso = "A Carta de Corre\u00E7\u00E3o \u00E9 disciplinada pelo \u00A7 1\u00BA-A do art. 7\u00BA do Conv\u00EAnio S/N, " +
-			"de 15 de dezembro de 1970 e pode ser utilizada para regulariza\u00E7\u00E3o de erro ocorrido na emiss\u00E3o de documento fiscal, " +
-			"desde que o erro n\u00E3o esteja relacionado com: I - as vari\u00E1veis que determinam o valor do imposto tais como: base de c\u00E1lculo, " +
-			"al\u00EDquota, diferen\u00E7a de pre\u00E7o, quantidade, valor da opera\u00E7\u00E3o ou da presta\u00E7\u00E3o; " +
-			"II - a corre\u00E7\u00E3o de dados cadastrais que implique mudan\u00E7a do remetente ou do destinat\u00E1rio; " +
-			"III - a data de emiss\u00E3o ou de sa\u00EDda.";
+	private final String xCondUso = "A Carta de Correcao e disciplinada pelo paragrafo 1o-A do art. 7o do Convenio S/N, " +
+			"de 15 de dezembro de 1970 e pode ser utilizada para regularizacao de erro ocorrido na emissao de documento fiscal, " +
+			"desde que o erro nao esteja relacionado com: I - as variaveis que determinam o valor do imposto tais como: " +
+			"base de calculo, aliquota, diferenca de preco, quantidade, valor da operacao ou da prestacao; " +
+			"II - a correcao de dados cadastrais que implique mudanca do remetente ou do destinatario; " +
+			"III - a data de emissao ou de saida.";
 
 	public String getVersao()
 	{

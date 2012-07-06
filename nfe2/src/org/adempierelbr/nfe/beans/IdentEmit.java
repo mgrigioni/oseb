@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,11 +13,30 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.adempiere.model.POWrapper;
+import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.util.RemoverAcentos;
+import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.validator.ValidatorBPartner;
+import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
+import org.compiere.model.MOrgInfo;
+
+import br.gov.sp.fazenda.dsge.brazilutils.uf.UF;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  C - Identificação do Emitente da Nota Fiscal eletrônica
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: IdentEmit.java,v 2.0 04/07/2012 13:35:00 mgrigioni Exp $
+ */
+@XStreamAlias ("emit")
 public class IdentEmit {
 
 	// Identificação do Emitente da Nota Fiscal
 	
-	private String emit;
 	private String CNPJ;
 	private String CPF;
 	private String xNome;
@@ -27,7 +47,26 @@ public class IdentEmit {
 	private String IEST;
 	private String IM;
 	private String CNAE;
-	private String CRT;
+	private final String CRT = "3"; //Regime Normal //FIXME
+	
+	/**
+	 * Default Constructor
+	 * @param MLBRNotaFiscal nf
+	 */
+	public IdentEmit(MLBRNotaFiscal nf){
+		super();
+		
+		I_W_AD_OrgInfo oiW = 
+				POWrapper.create(MOrgInfo.get(nf.getCtx(), nf.getAD_Org_ID(),null),I_W_AD_OrgInfo.class);
+		
+		setId(nf.getlbr_CNPJ());
+		setxNome(nf.getlbr_OrgName());
+		setxFant(oiW.getlbr_Fantasia());
+		setEnderEmit(new EnderEmit(nf));
+		setIE(ValidatorBPartner.validaIE(nf.getlbr_IE(),UF.valueOf(nf.getlbr_OrgRegion())));
+		setIM(nf.getlbr_OrgCCM());
+		setCNAE(oiW.getlbr_CNAE());
+	} //IdentEmit
 
 	public EnderEmit getEnderEmit() {
 		return enderEmit;
@@ -35,91 +74,79 @@ public class IdentEmit {
 	public void setEnderEmit(EnderEmit enderEmit) {
 		this.enderEmit = enderEmit;
 	}
-	public String getEmit() {
-		return emit;
-	}
-	public void setEmit(String emit) {
-		if (emit != null)
-			emit = emit.trim();
 	
-		this.emit = emit;
+	private void setId(String id){
+		id = TextUtil.toNumeric(id);
+		if (id.length() == 11)
+			setCPF(id);
+		else if (id.length() == 14)
+			setCNPJ(id);	
 	}
+	
 	public String getCNPJ() {
 		return CNPJ;
 	}
-	public void setCNPJ(String cNPJ) {
-		if (cNPJ != null)
-			cNPJ = cNPJ.trim();
-	
+	private void setCNPJ(String cNPJ) {	
 		CNPJ = cNPJ;
 	}
 	public String getCPF() {
 		return CPF;
 	}
-	public void setCPF(String cPF) {
-		if (cPF != null)
-			cPF = cPF.trim();
-	
+	private void setCPF(String cPF) {
 		CPF = cPF;
 	}
+	
 	public String getxNome() {
 		return xNome;
 	}
-	public void setxNome(String xNome) {
-		if (xNome != null)
-			xNome = xNome.trim();
-	
-		this.xNome = xNome;
+	private void setxNome(String xNome) {	
+		this.xNome = TextUtil.checkSizeN(RemoverAcentos.remover(xNome),2,60);
 	}
+	
 	public String getxFant() {
 		return xFant;
 	}
-	public void setxFant(String xFant) {
-		if (xFant != null)
-			xFant = xFant.trim();
-	
-		this.xFant = xFant;
+	private void setxFant(String xFant) {
+		if (xFant != null)	
+			this.xFant = TextUtil.checkSize(RemoverAcentos.remover(xFant), 60);
 	}
 	public String getIE() {
 		return IE;
 	}
-	public void setIE(String iE) {
-		if (iE != null)
-			iE = iE.trim();
-	
-		IE = iE;
+	private void setIE(String iE) {
+		if (iE == null)
+			throw new AdempiereException("IE inválido");
+		else	
+			IE = iE;
 	}
+	
 	public String getIEST() {
 		return IEST;
 	}
 	public void setIEST(String iEST) {
-		if (iEST != null)
-			iEST = iEST.trim();
-	
 		IEST = iEST;
 	}
+	
 	public String getIM() {
 		return IM;
 	}
-	public void setIM(String iM) {
+	private void setIM(String iM) {
 		if (iM != null)
-			iM = iM.trim();
-	
-		IM = iM;
+			IM = TextUtil.toNumeric(iM);
 	}
+	
 	public String getCNAE() {
 		return CNAE;
 	}
-	public void setCNAE(String cNAE) {
-		if (cNAE != null)
-			cNAE = cNAE.trim();
+	private void setCNAE(String cNAE) {
+		if (cNAE == null && getIM() != null)
+			throw new AdempiereException("CNAE Inválido");
 	
-		CNAE = cNAE;
+		CNAE = TextUtil.toNumeric(cNAE);
 	}
+	
 	public String getCRT() {
 		return CRT;
 	}
-	public void setCRT(String cRT) {
-		CRT = cRT;
-	}
-}
+	
+} //IdentEmit

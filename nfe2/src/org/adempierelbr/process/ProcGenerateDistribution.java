@@ -14,8 +14,6 @@ package org.adempierelbr.process;
 
 import java.util.logging.Level;
 
-import org.adempierelbr.model.MLBRNotaFiscal;
-import org.adempierelbr.util.NFeUtil;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
@@ -60,6 +58,7 @@ public class ProcGenerateDistribution extends SvrProcess
 	 */
 	protected String doIt() throws Exception 
 	{		
+		/*
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(), p_LBR_NotaFiscal_ID, null);
 		//
 		boolean success = NFeUtil.updateAttach(nf, NFeUtil.generateDistribution(nf));
@@ -70,6 +69,9 @@ public class ProcGenerateDistribution extends SvrProcess
 			msg = "Erro ao atualizar o Arquivo da NFe";
 		
 		return msg;
+		*/
+		
+		return "";
 	}	//	doIt
 	
 }	//	ProcGenerateDistribution

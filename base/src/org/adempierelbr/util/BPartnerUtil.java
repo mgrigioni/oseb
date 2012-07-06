@@ -336,6 +336,16 @@ public abstract class BPartnerUtil{
 		return suframa;
 	}//getSuframa
 	
+	public static int getC_Country_ID(String countryCode){
+		String sql = "SELECT C_Country_ID " +
+			     "FROM C_Country " +
+			     "WHERE CountryCode = ?";
+	
+		int C_Country_ID = DB.getSQLValue(null, sql, new Object[]{countryCode});
+		
+		return C_Country_ID;
+	}
+	
 	public static int getC_Region_ID(String regionName){
 		String sql = "SELECT C_Region_ID " +
 			     "FROM C_Region " +

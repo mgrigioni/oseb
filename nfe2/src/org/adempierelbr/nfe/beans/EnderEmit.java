@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,6 +13,25 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.util.BPartnerUtil;
+import org.adempierelbr.util.RemoverAcentos;
+import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_C_Country;
+import org.compiere.model.MCountry;
+import org.compiere.model.MLocation;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  Grupo do Endereço do emitente
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: EnderEmit.java,v 2.0 04/07/2012 08:34:00 mgrigioni Exp $
+ */
+@XStreamAlias ("enderEmit")
 public class EnderEmit {
 
 	private String xLgr;
@@ -26,96 +46,122 @@ public class EnderEmit {
 	private String xPais;
 	private String fone;
 	
+	/**
+	 * Default Constructor
+	 * @param MLBRNotaFiscal nf
+	 */
+	public EnderEmit(MLBRNotaFiscal nf){
+		super();
+		setxLgr(nf.getlbr_OrgAddress1());
+		setNro(nf.getlbr_OrgAddress2());
+		setxBairro(nf.getlbr_OrgAddress3());
+		setxCpl(nf.getlbr_OrgAddress4());
+		setcMun(BPartnerUtil.getCityCode(MLocation.get(nf.getCtx(), nf.getOrg_Location_ID(), null)));
+		setxMun(nf.getlbr_OrgCity());
+		setUF(nf.getlbr_OrgRegion());
+		setCEP(nf.getlbr_OrgPostal());
+		
+		MCountry country = new MCountry(nf.getCtx(), BPartnerUtil.getC_Country_ID(nf.getlbr_OrgCountry()),null);
+		setcPais(country.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode));
+		setxPais(AdempiereLBR.getCountry_trl(country));
+	} //EnderEmit
+	
 	public String getxLgr() {
 		return xLgr;
 	}
-	public void setxLgr(String xLgr) {
-		if (xLgr != null)
-			xLgr = xLgr.trim();
-	
-		this.xLgr = xLgr;
+	private void setxLgr(String xLgr) {
+		if (xLgr == null || xLgr.length() < 2)
+			throw new AdempiereException("xLgr = " + xLgr);
+		else
+			this.xLgr = TextUtil.checkSize(RemoverAcentos.remover(xLgr),60);
 	}
+	
 	public String getNro() {
 		return nro;
 	}
-	public void setNro(String nro) {
+	private void setNro(String nro) {
 		if (nro != null)
-			nro = nro.trim();
+			nro = "S/N";
 	
 		this.nro = nro;
 	}
+	
 	public String getxCpl() {
 		return xCpl;
 	}
-	public void setxCpl(String xCpl) {
-		if (xCpl != null)
-			xCpl = xCpl.trim();
-	
-		this.xCpl = xCpl;
+	private void setxCpl(String xCpl) {	
+		if (xCpl != null && !xCpl.isEmpty())
+			this.xCpl = TextUtil.checkSize(RemoverAcentos.remover(xCpl),60);
 	}
+	
 	public String getxBairro() {
 		return xBairro;
 	}
-	public void setxBairro(String xBairro) {
-		if (xBairro != null)
-			xBairro = xBairro.trim();
-	
-		this.xBairro = xBairro;
+	private void setxBairro(String xBairro) {
+		if (xBairro == null || xBairro.length() < 2)
+			throw new AdempiereException("xBairro = " + xBairro);
+		else
+			this.xBairro = TextUtil.checkSize(RemoverAcentos.remover(xBairro),60);
 	}
+	
 	public String getcMun() {
 		return cMun;
 	}
-	public void setcMun(String cMun) {
-		if (cMun != null)
-			cMun = cMun.trim();
-	
-		this.cMun = cMun;
+	private void setcMun(String cMun) {
+		if (cMun == null || cMun.length() != 7)
+			throw new AdempiereException("cMun = " + cMun);
+		else
+			this.cMun = cMun;
 	}
+	
 	public String getxMun() {
 		return xMun;
 	}
-	public void setxMun(String xMun) {
-		if (xMun != null)
-			xMun = xMun.trim();
-	
-		this.xMun = xMun;
+	private void setxMun(String xMun) {
+		if (xMun == null || xMun.length() < 2)
+			throw new AdempiereException("xMun = " + xMun);
+		else
+			this.xMun = TextUtil.checkSize(RemoverAcentos.remover(xMun),60);
 	}
+	
 	public String getUF() {
 		return UF;
 	}
-	public void setUF(String uF) {
-		if (uF != null)
-			uF = uF.trim();
-	
-		UF = uF;
+	private void setUF(String uF) {
+		if (uF == null || uF.length() != 2)
+			throw new AdempiereException("uF = " + uF);
+		else
+			UF = uF;
 	}
+	
 	public String getCEP() {
 		return CEP;
 	}
-	public void setCEP(String cEP) {
-		if (cEP != null)
-			cEP = cEP.trim();
-	
-		CEP = cEP;
+	private void setCEP(String cEP) {
+		cEP = TextUtil.toNumeric(cEP);
+		if (cEP.length() != 8)
+			throw new AdempiereException("cEP" + cEP);
+		else
+			CEP = cEP;
 	}
+	
 	public String getcPais() {
 		return cPais;
 	}
 	public void setcPais(String cPais) {
-		if (cPais != null)
-			cPais = cPais.trim();
-	
-		this.cPais = cPais;
+		if (cPais == null)
+			throw new AdempiereException("cPais = " + cPais);
+		else
+			this.cPais = TextUtil.lPad(cPais,4);
 	}
+	
 	public String getxPais() {
 		return xPais;
 	}
-	public void setxPais(String xPais) {
-		if (xPais != null)
-			xPais = xPais.trim();
-	
+	private void setxPais(String xPais) {
 		this.xPais = xPais;
 	}
+	
 	public String getFone() {
 		return fone;
 	}
@@ -126,4 +172,4 @@ public class EnderEmit {
 		this.fone = fone;
 	}
 	
-}
+} //EnderEmit

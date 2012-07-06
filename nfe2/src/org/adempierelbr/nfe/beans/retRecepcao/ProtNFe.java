@@ -11,66 +11,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.beans.retRecepcao;
 
-import org.adempierelbr.util.NFeUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  ConsStatServ
+ *  ProtNFe
  *  @author Mario Grigioni
- *  @version $Id: ConsStatServ.java,v 1.0 25/06/2012 15:29:00 mgrigioni Exp $
+ *  @version $Id: ProtNFe.java,v 1.0 22/06/2012 14:08:00 mgrigioni Exp $
  */
-@XStreamAlias ("consStatServ")
-public class ConsStatServ {
-
-	@XStreamAsAttribute
-	private final String xmlns=NFeUtil.NAMESPACE_NFE;
+@XStreamAlias ("protNFe")
+public class ProtNFe {
 	
 	@XStreamAsAttribute
 	private String versao;
 	
-	private String tpAmb;
-	private String cUF;
-	private final String xServ = "STATUS";
+	private InfProt infProt;
 	
-	/**
-	 * @param versao
-	 * @param tpAmb
-	 * @param cUF
-	 */
-	public ConsStatServ(String versao, String tpAmb, String cUF) {
-		super();
-		setVersao(versao);
-		setTpAmb(tpAmb);
-		setcUF(cUF);
+	public InfProt getInfProt() {
+		return infProt;
 	}
 	
-	public String getVersao() {
-		return versao;
-	}
-	public void setVersao(String versao) {
-		this.versao = versao;
-	}
-	public String getTpAmb() {
-		return tpAmb;
-	}
-	public void setTpAmb(String tpAmb) {
-		this.tpAmb = tpAmb;
-	}
-	public String getcUF() {
-		return cUF;
-	}
-	public void setcUF(String cUF) {
-		this.cUF = cUF;
-	}
-	public String getXmlns() {
-		return xmlns;
-	}
-	public String getxServ() {
-		return xServ;
-	}
-	
-}	// ConsStatServ
+}	// ProtNFe

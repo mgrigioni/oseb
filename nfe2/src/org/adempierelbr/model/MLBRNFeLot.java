@@ -30,6 +30,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
+import org.adempierelbr.nfe.beans.retRecepcao.InfProt;
+import org.adempierelbr.nfe.beans.retRecepcao.ProtNFe;
+import org.adempierelbr.nfe.beans.retRecepcao.RetConsReciNFe;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
@@ -46,12 +49,13 @@ import org.compiere.process.DocumentEngine;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  LBR_NFeLot Model
@@ -119,8 +123,14 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			return true;
 		}
 		
-		if (isEmpty()){
+		int count = getCount();
+		if (count <= 0){
 			m_processMsg = "Lote vazio";
+			return false;
+		}
+		
+		if (count > 50){
+			m_processMsg = "Limite de Notas Fiscais por Lote = 50";
 			return false;
 		}
 		
@@ -155,7 +165,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			}
 			
 			MAttachment attachLotNFe = createAttachment();
-			File attachFile = new File(TextUtil.generateTmpFile(respLote, getDocumentNo()+"-rec.xml"));
+			File attachFile = new File(TextUtil.generateTmpFile(respLote, getDocumentNo()+NFeUtil.EXT_RECIBO));
 			attachLotNFe.addEntry(attachFile);
 			attachLotNFe.save();
 			
@@ -242,20 +252,23 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			NfeRetRecepcao2Stub stub = new NfeRetRecepcao2Stub();
 
 			String respConsulta = stub.nfeRetRecepcao2(dadosMsg, cabecMsgE).getExtraElement().toString();
+			//	Validação recebimento
+			validation = ValidaXML.validaRetConsReciNFe(respConsulta);
+			if (!validation.isEmpty()){
+				m_processMsg = validation;
+				return false;
+			}
 
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		    Document doc = builder.parse(new InputSource(new StringReader(respConsulta)));
-		    
-		    String cStatL = NFeUtil.getValue(doc, "cStat");
-		    String xMotivoL = NFeUtil.getValue(doc, "xMotivo");
-		    NodeList infProt =  doc.getElementsByTagName("infProt");
-		    
-		    if (cStatL.equals(MLBRNFeLot.LBR_NFESTATUS_104_LoteProcessado) || 
-		    	cStatL.equals(MLBRNFeLot.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção)) {
+			XStream xstream = new XStream (new DomDriver());
+			xstream.processAnnotations(new Class[]{InfProt.class,ProtNFe.class,RetConsReciNFe.class});
+			//
+			RetConsReciNFe retCons = (RetConsReciNFe)xstream.fromXML (NFeUtil.XML_HEADER + respConsulta);
+			
+		    if (retCons.getcStat().equals(MLBRNFeLot.LBR_NFESTATUS_104_LoteProcessado) || 
+		    	retCons.getcStat().equals(MLBRNFeLot.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção)) {
 
-			    for (int i=0; i< infProt.getLength(); i++) {
-		        	Node node = infProt.item(i);
-		        	String error = NFeUtil.authorizeNFe(node,get_TrxName());
+			    for (ProtNFe protNFe : retCons.getProtNFe()) {
+		        	String error = NFeUtil.authorizeNFe(protNFe,get_TrxName());
 		        	if (error != null){
 		        		m_processMsg = error;
 		        		throw new Exception(error);
@@ -266,9 +279,9 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			}	//	if
 		    //
 		    Timestamp now = new Timestamp(new Date().getTime());
-		    String lotDesc = "["+TextUtil.timeToString(now, "yyyy-MM-dd HH:mm:ss")+"] "+xMotivoL+"\n";
+		    String lotDesc = "["+TextUtil.timeToString(now, "yyyy-MM-dd HH:mm:ss")+"] "+retCons.getxMotivo()+"\n";
 		    
-		    setlbr_NFeStatus(cStatL);
+		    setlbr_NFeStatus(retCons.getcStat());
 		    setDateTrx(now);
 		    
 		    if (getDescription() == null)
@@ -314,7 +327,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			throw new AdempiereException(error);
 		}
 		
-		File attachFile = new File(TextUtil.generateTmpFile(xmlLote, getDocumentNo()+"-env-lot.xml"));
+		File attachFile = new File(TextUtil.generateTmpFile(xmlLote, getDocumentNo()+NFeUtil.EXT_ENV_LOTE));
 
 		//Verificação tamanho do Arquivo - Erro 214 / Tamanho Arquivo
 		String error = NFeUtil.validateSize(attachFile);
@@ -334,11 +347,11 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 	 * Check if Lot isEmpty (No Documents)
 	 * @return boolean
 	 */
-	private boolean isEmpty () {
+	private int getCount () {
 		int count = DB.getSQLValue(get_TrxName(),
 				"SELECT COUNT(*) FROM LBR_NotaFiscal WHERE LBR_NFeLot_ID=?", get_ID());
 		
-		return count > 0 ? false : true;
+		return count;
 	} //isEmpty
 
 	/**

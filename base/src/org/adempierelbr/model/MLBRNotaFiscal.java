@@ -32,6 +32,8 @@ import javax.xml.stream.XMLStreamReader;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
 import org.adempierelbr.nfe.NFeXMLGenerator;
+import org.adempierelbr.nfe.beans.retCancNFe.InfCanc;
+import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
@@ -49,7 +51,6 @@ import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
-import org.compiere.model.MColumn;
 import org.compiere.model.MCost;
 import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
@@ -82,6 +83,9 @@ import org.xml.sax.InputSource;
 
 import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  LBR_NotaFiscal Model
@@ -845,7 +849,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(oiW.getlbr_NFeEnv(), getlbr_NFeID(), 
 					getlbr_NFeProt(), RemoverAcentos.remover(getlbr_MotivoCancel()));
 
-			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, getDocumentNo()+"-ped-can.xml"));
+			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, getDocumentNo() + NFeUtil.EXT_PEDIDO_CANC));
 			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_CANCELAMENTO_NFE);
 			nfeCancDadosMsg = NFeUtil.XMLtoString(attachFile);
 
@@ -853,10 +857,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			if (!validation.isEmpty()) {
 	        	return validation;
 			}
-			
-			nfeCancDadosMsg = "<nfeDadosMsg>" + nfeCancDadosMsg + "</nfeDadosMsg>";
-			
-			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(nfeCancDadosMsg));
+						
+			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader("<nfeDadosMsg>" + nfeCancDadosMsg + "</nfeDadosMsg>"));
 
 			NfeCancelamento2Stub.NfeDadosMsg dadosMsg = NfeCancelamento2Stub.NfeDadosMsg.Factory.parse(dadosXML);
 			NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecCancelamento(orgInfo.getC_Location().getC_Region_ID());
@@ -865,34 +867,30 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			NfeCancelamento2Stub stub = new NfeCancelamento2Stub();
 
 			String respCanc = stub.nfeCancelamentoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
-
-			//	Resposta do Envio
+			//	Validação resposta
 			validation = ValidaXML.validaRetCancNFe(respCanc);
 			if (!validation.isEmpty())
 				return validation;
+
+			XStream xstream = new XStream (new DomDriver());
+			xstream.processAnnotations(new Class[]{InfCanc.class,RetCancNFe.class});
 			//
+			RetCancNFe retCancNFe = (RetCancNFe)xstream.fromXML (NFeUtil.XML_HEADER + respCanc);
+			InfCanc infCanc    = retCancNFe.getInfCanc();
 
-	        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	        Document doc = builder.parse(new InputSource(new StringReader(respCanc)));
+	        appendNFeDesc("["+infCanc.getDhRecbto().replace('T', ' ')+"] " + infCanc.getxMotivo() + "\n");
+	        setlbr_NFeStatus(infCanc.getcStat());
 	        //
-	        String cStat = 		NFeUtil.getValue (doc, "cStat");
-	        String xMotivo = 	NFeUtil.getValue (doc, "xMotivo");
-	        String nProt = 		NFeUtil.getValue (doc, "nProt");
-	        String dhRecbto = 	NFeUtil.getValue (doc, "dhRecbto");
-	        //
-	        appendNFeDesc("["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n");
-	        setlbr_NFeStatus(cStat);
-	        //
-	        if (cStat.equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)) {
-		        setlbr_NFeProt(nProt);
-		        setDateTrx(NFeUtil.stringToTime(dhRecbto));
+	        if (infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)) {
+		        setlbr_NFeProt(infCanc.getnProt());
+		        setDateTrx(NFeUtil.stringToTime(infCanc.getDhRecbto()));
 		        
-				//Atualiza XML para padrão de distribuição - Cancelamento
-				try {
-					if (!NFeUtil.updateAttach(this, NFeUtil.generateDistribution(this)))
-						return "Problemas ao atualizar o XML para o padrão de distribuição";
+				//Adiciona arquivo de distribuição - Cancelamento
+		        try {
+					if (!NFeUtil.updateAttach(this, NFeUtil.generateNFeCancFile(nfeCancDadosMsg,retCancNFe)))
+						return Msg.getMsg(Env.getCtx(), "AttachmentNull");
 
-					NFeEmail.sendMail(this);
+					NFeEmail.sendMail(this,true);
 				} catch (Exception e) {
 					log.warning(e.getLocalizedMessage());
 				}
@@ -1714,34 +1712,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	public Timestamp getDateAcct(){
 		return getlbr_DateInOut() == null ? getDateDoc() : getlbr_DateInOut();
 	}
-	
-	/**
-	 * Retorna o tipo de ambiante da NFe com base no tipo de documento
-	 * @return tpAmb
-	 */
-	public String getlbr_NFeEnv(){
-		I_W_C_DocType dtW = POWrapper.create(MDocType.get(getCtx(), getC_DocType_ID()), 
-				I_W_C_DocType.class);
-		return dtW.getlbr_NFeEnv();
-	}
-	
-	public String getxMotivo() {
-
-		String sql = "SELECT Name FROM AD_Ref_List " +
-				     "WHERE AD_Reference_ID = ? AND Value = ?";
-
-		MColumn column = MColumn.get(getCtx(), 
-				MColumn.getColumn_ID(MLBRNotaFiscal.Table_Name, I_LBR_NotaFiscal.COLUMNNAME_lbr_NFeStatus));
 		
-		String xMotivo = DB.getSQLValueString(null, sql, 
-				new Object[]{column.getAD_Reference_ID(), getlbr_NFeStatus()});
-
-		if (xMotivo != null && xMotivo.length() > 6)
-			xMotivo = xMotivo.substring(6);
-		
-		return xMotivo;
-	}	//getxMotivo
-	
 	/**
 	 * Indicador do tipo de pagamento (Utilizado na NFe e SPED)
 	 * 

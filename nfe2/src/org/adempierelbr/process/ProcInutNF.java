@@ -152,7 +152,7 @@ public class ProcInutNF extends SvrProcess
 				return Msg.getMsg(getCtx(), "ProcessFailed");
 			}
 		
-			File attachFile = new File(TextUtil.generateTmpFile(nfeInutMsg, inutNFe.getID()+"-ped-inu.xml"));
+			File attachFile = new File(TextUtil.generateTmpFile(nfeInutMsg, inutNFe.getID()+NFeUtil.EXT_PEDIDO_INUT));
 			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_INUTILIZACAO_NFE);
 			nfeInutMsg = NFeUtil.XMLtoString(attachFile);
 
@@ -191,7 +191,7 @@ public class ProcInutNF extends SvrProcess
 					String xMotivo 	= NFeUtil.getValue (node, "xMotivo");
 					//
 					if (cStat != null && cStat.equals("102")) {
-						new File(TextUtil.generateTmpFile(respLote, inutNFe.getID()+"-inu.xml"));
+						new File(TextUtil.generateTmpFile(respLote, inutNFe.getID()+NFeUtil.EXT_INUTILIZACAO));
 						return Msg.getMsg(getCtx(), "ProcessOK");
 					}
 					else {

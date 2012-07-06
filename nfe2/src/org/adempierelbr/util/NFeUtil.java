@@ -28,19 +28,22 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
-import org.adempierelbr.nfe.beans.CancNFe;
-import org.adempierelbr.nfe.beans.ChaveNFE;
+import org.adempierelbr.nfe.beans.ChaveNFe;
 import org.adempierelbr.nfe.beans.ConsCad;
-import org.adempierelbr.nfe.beans.ConsReciNFe;
 import org.adempierelbr.nfe.beans.ConsSitNFe;
-import org.adempierelbr.nfe.beans.ConsStatServ;
-import org.adempierelbr.nfe.beans.InfProt;
 import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.nfe.beans.NFeDadosMsg;
-import org.adempierelbr.nfe.beans.ProtNFe;
+import org.adempierelbr.nfe.beans.cancNFe.CancNFe;
+import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
+import org.adempierelbr.nfe.beans.retRecepcao.ConsReciNFe;
+import org.adempierelbr.nfe.beans.retRecepcao.InfProt;
+import org.adempierelbr.nfe.beans.retRecepcao.ProtNFe;
+import org.adempierelbr.nfe.beans.statusServicoNFe.ConsStatServ;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.util.CLogger;
+import org.compiere.util.Env;
+import org.compiere.util.Msg;
 import org.compiere.utils.DigestOfFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,15 +76,27 @@ public abstract class NFeUtil
 	private static CLogger log = CLogger.getCLogger(NFeUtil.class);
 
 	/** Versão */
-	public static final String VERSAO_APP  = TextUtil.checkSize(AdempiereLBR.VERSION,20);
 	public static final String VERSAO      = "2.00";
 	public static final String VERSAO_CCE  = "1.00";
 
 	/** XML */
-	public static final long XML_SIZE = 500;
+	public static final long   XML_SIZE = 500;
+	
+	/** Padrões de Extensão */
+	public static final String EXT_NFE          = "-nfe.xml";
+	public static final String EXT_CCE          = "-cce.xml";
+	public static final String EXT_ENV_LOTE     = "-env-lot.xml";
+	public static final String EXT_RECIBO       = "-rec.xml";
+	public static final String EXT_PEDIDO_CANC  = "-ped-can.xml";
+	public static final String EXT_CANCELAMENTO = "-can.xml";
+	public static final String EXT_PEDIDO_INUT  = "-ped-inu.xml";
+	public static final String EXT_INUTILIZACAO = "-inu.xml";
+	public static final String EXT_DISTRIBUICAO = "-dst.xml";
+	public static final String EXT_RPS          = "-rps.xml";
 	
 	/** Namespace padrão da NF-e */
 	public static final String NAMESPACE_NFE = "http://www.portalfiscal.inf.br/nfe";
+	public static final String XML_HEADER    = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
 	/**
 	 * Método para gerar dados para consulta da NFe
@@ -198,8 +213,7 @@ public abstract class NFeUtil
 	}	//geraMsgRetRecepcao
 
 	/**
-	 * Gera o cabeçalho da NFe
-	 * @return cabecalho
+	 * @return cabecalho NFe
 	 */
 	public static String geraCabecNFe(){
 		StringBuilder cabecalho = new StringBuilder("<NFe xmlns=\"").append(NAMESPACE_NFE).append("\">");
@@ -208,18 +222,26 @@ public abstract class NFeUtil
 
 
 	/**
-	 * Gera o cabeçalho distribuição
 	 * @return Cabeçalho distribuição
 	 */
 	public static String geraCabecDistribuicao(){
-		StringBuilder cabecalho = new StringBuilder("<?xml version=\"1.0\" encoding=\"utf-8\"?>")
+		StringBuilder cabecalho = new StringBuilder(XML_HEADER)
 		 .append("<nfeProc xmlns=\"").append(NAMESPACE_NFE).append("\" versao=\"").append(VERSAO).append("\">");
 
 		return cabecalho.toString();
 	}
 	
 	/**
-	 * Gera o cabeçalho do lote
+	 * @return cabeçalho distribuicao cancelamento
+	 */
+	public static String geraCabecCanc(){
+		StringBuilder cabecalho = new StringBuilder(XML_HEADER)
+		 .append("<procCancNFe xmlns=\"").append(NAMESPACE_NFE).append("\" versao=\"").append(VERSAO).append("\">");
+
+		return cabecalho.toString();
+	}
+	
+	/**
 	 * @return Cabeçalho do lote
 	 */
 	public static String geraCabecLoteNFe (String lote){
@@ -377,65 +399,73 @@ public abstract class NFeUtil
 	} //geraRodapNFe
 	
 	/**
-	 * Rodapé padrão Distribuição
-	 *
-	 * @param chNFe
-	 * @param nProt
-	 * @param tpAmb
-	 * @param dhRecbto
-	 * @param digVal
-	 * @param cStat
-	 * @param xMotivo
-	 * @return XML
+	 * Rodapé padrão Distribuicao
+	 * @param protNFe
+	 * @return
 	 */
-	public static String geraRodapDistribuicao (MLBRNotaFiscal nf) {
+	public static String geraRodapDistribuicao (ProtNFe protNFe) {
 			
 		XStream xstream = new XStream();
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
-		xstream.marshal (new ProtNFe(VERSAO,
-				new InfProt(nf.getlbr_NFeEnv(),VERSAO_APP,nf.getlbr_NFeID(),nf.getDateTrx(),nf.getlbr_NFeProt(),
-						nf.getlbr_DigestValue(),nf.getlbr_NFeStatus(),nf.getxMotivo())), 
-				new CompactWriter (sw));
+		xstream.marshal (protNFe, new CompactWriter (sw));
 		
 		return sw.toString() + "</nfeProc>";
-	}	//	RodapDistribuicao
+	}	//	geraRodapDistribuicao
+	
 
-	public static File generateDistribution(MLBRNotaFiscal nf) throws Exception{
+	public static String geraRodapCanc(RetCancNFe retCancNFe) {
+			
+		XStream xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (retCancNFe, new CompactWriter (sw));
+		
+		return sw.toString() + "</procCancNFe>";
+	}	//	geraRodapCanc
+
+	/**
+	 * @param nf
+	 * @param protNFe
+	 * @return XML for distribution
+	 * @throws Exception
+	 */
+	public static File generateNFeDistFile(MLBRNotaFiscal nf, ProtNFe protNFe) throws Exception{
 
 		File attach = null;
 
-		if (nf.getlbr_NFeProt() == null || nf.getlbr_NFeProt().equals("")) //Verifica se foi processada
+		if (!nf.isNFeProcessed()) //Verifica se foi processada
 			return attach;
-
-		String file_ext = ".xml";
-
-		if (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //Autorizado o uso da NF-e
-			file_ext = "-dst.xml";
-		}
-		else if (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)){ //Cancelamento de NF-e homologado
-			file_ext = "-can.xml";
-		}
 
 		File xml = getAttachmentEntryFile(nf.getAttachment().getEntry(0));
-		if (xml == null || xml.getName().endsWith(file_ext)) //Já está no padrão de distribuição
-			return attach;
-
 	    String dados = XMLtoString(xml);
-	    //
-	    String cabecalho  = geraCabecDistribuicao();
+	    if (dados.endsWith("</nfeProc")) // Já está no padrão de distribuicao
+	    	return attach;
+	    
+	    String cabecalho = geraCabecDistribuicao();
+	    String rodape    = geraRodapDistribuicao(protNFe);
 		//
-	    String rodape = geraRodapDistribuicao(nf);
-		//
-		String dadosEmXML = cabecalho + dados + rodape;
-		attach = new File(TextUtil.generateTmpFile(dadosEmXML, nf.getlbr_NFeID() + file_ext));
+		StringBuilder dadosEmXML = new StringBuilder(cabecalho).append(dados).append(rodape);
+		attach = new File(TextUtil.generateTmpFile(dadosEmXML.toString(), nf.getlbr_NFeID() + NFeUtil.EXT_DISTRIBUICAO));
 
 		nf.getAttachment(true).delete(true); //Exclui anexo anterior. BUG ADempiere
 
 		return attach;
-	} //NFeDistribution
-
+	} //generateNFeDistFile
+	
+	public static File generateNFeCancFile(String nfeCancDadosMsg, RetCancNFe retCancNFe){
+		
+		String cabecalho = geraCabecCanc();
+		String rodape    = geraRodapCanc(retCancNFe);
+		
+		StringBuilder dadosEmXML = new StringBuilder(cabecalho).append(nfeCancDadosMsg).append(rodape);
+		File attach = new File(TextUtil.generateTmpFile(dadosEmXML.toString(), retCancNFe.getInfCanc().getChNFe() + NFeUtil.EXT_CANCELAMENTO));
+	
+		return attach;
+	} //generateNFeCancFile
+	
 	/**
 	 * update Attachment
 	 * @param nf
@@ -459,60 +489,41 @@ public abstract class NFeUtil
 	 * return null (success) or error message
 	 * @throws Exception
 	 */
-	public static String authorizeNFe(Node node, String trxName){
+	public static String authorizeNFe(ProtNFe protNFe, String trxName){
 
 		String error = null;
+		InfProt infProt = protNFe.getInfProt();
 
-		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			String chNFe	= NFeUtil.getValue (node, "chNFe");
-			String xMotivo 	= NFeUtil.getValue (node, "xMotivo");
-			String digVal 	= NFeUtil.getValue (node, "digVal");
-			String dhRecbto = NFeUtil.getValue (node, "dhRecbto");
-			String cStat 	= NFeUtil.getValue (node, "cStat");
-			String nProt 	= NFeUtil.getValue (node, "nProt");
-			//
-			MLBRNotaFiscal nf = MLBRNotaFiscal.get(chNFe, trxName);
-			if (nf == null) {
-				error = "NF não encontrada";
-				log.severe(error);
-				return error;
+		MLBRNotaFiscal nf = MLBRNotaFiscal.get(infProt.getChNFe(), trxName);
+		if (nf == null) {
+			error = Msg.getMsg(Env.getCtx(), "NotFound") + " " + infProt.getChNFe();
+			log.severe(error);
+			return error;
+		}
+
+		if (nf.isNFeProcessed()) { //
+			log.fine(Msg.getMsg(Env.getCtx(), "DocProcessed") + " " + nf.getDocumentNo());
+			return error;
+		}
+
+	    nf.appendNFeDesc("["+infProt.getDhRecbto().replace('T', ' ')+"] " + infProt.getxMotivo() + "\n");
+	    nf.setlbr_DigestValue(infProt.getDigVal());
+	    nf.setlbr_NFeProt(infProt.getnProt());
+	    nf.setDateTrx(NFeUtil.stringToTime(infProt.getDhRecbto()));
+	    nf.setlbr_NFeStatus(infProt.getcStat());          
+		nf.save(trxName);
+
+		//Atualiza XML para padrão de distribuição
+		try {
+			if (!NFeUtil.updateAttach(nf, NFeUtil.generateNFeDistFile(nf, protNFe)))
+				error = Msg.getMsg(Env.getCtx(), "AttachmentNull");
+
+			if (error == null && nf.isNFeProcessed()){
+				NFeEmail.sendMail(nf,false);
 			}
 
-			if (nf.isNFeProcessed()){ //
-				log.fine("NF já processada. " + nf.getDocumentNo());
-				return error;
-			}
-
-	        nf.appendNFeDesc("["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n");
-	        nf.setlbr_DigestValue(digVal);
-	        nf.setlbr_NFeProt(nProt);
-	        nf.setDateTrx(NFeUtil.stringToTime(dhRecbto));
-
-
-	        // BF ID: 3391601
-	        if(cStat != null) {
-	        	try {
-	        		nf.setlbr_NFeStatus(cStat);
-				} catch (Exception e) {
-					nf.setlbr_NFeStatus(MLBRNotaFiscal.LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção);
-				}
-	        }
-	          
-			nf.save(trxName);
-
-			//Atualiza XML para padrão de distribuição
-			try {
-				if (!NFeUtil.updateAttach(nf, NFeUtil.generateDistribution(nf)))
-					error = "Problemas ao atualizar o XML para o padrão de distribuição";
-
-				if (error == null && nf.isNFeProcessed()){
-					NFeEmail.sendMail(nf);
-				}
-
-			} catch (Exception e) {
-				log.log(Level.WARNING,"",e);
-			}
-
+		} catch (Exception e) {
+			log.log(Level.WARNING,"",e);
 		}
 
 		return error;
@@ -530,7 +541,7 @@ public abstract class NFeUtil
 		if (nfeID.length() != 44)
 			return false;
 		
-		int digito = ChaveNFE.gerarDigito(nfeID.substring(0, 43));
+		int digito = ChaveNFe.gerarDigito(nfeID.substring(0, 43));
 		if (digito != Integer.parseInt(nfeID.substring(43)))
 			return false;
 		

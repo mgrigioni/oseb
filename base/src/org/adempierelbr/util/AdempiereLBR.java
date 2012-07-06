@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.compiere.Adempiere;
 import org.compiere.model.MAssetGroupAcct;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MCountry;
@@ -59,7 +58,7 @@ public abstract class AdempiereLBR{
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(AdempiereLBR.class);
 
-	public static final String VERSION     = "oseb - " + Adempiere.MAIN_VERSION;
+	public static final String VERSION     = "3.7.0";
 	public static final String AD_LANGUAGE = "pt_BR";
 	public static final int    BRASIL      = 139;
 	

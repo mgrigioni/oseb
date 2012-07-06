@@ -13,12 +13,15 @@
 package org.adempierelbr.util;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
+import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.MClient;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MUser;
@@ -49,7 +52,7 @@ public abstract class NFeEmail {
 	 *            nf
 	 * @return E-mail enviado
 	 * */
-	public static boolean sendMail(final MLBRNotaFiscal nf) {
+	public static boolean sendMail(final MLBRNotaFiscal nf, boolean isCancelled) {
 
 		final Properties ctx = nf.getCtx();
 		final String trx = nf.get_TrxName();
@@ -84,11 +87,13 @@ public abstract class NFeEmail {
 				final String subject = "NFe - " + nf.getlbr_NFeID();
 				final String message = getMessage(nf.getDocumentNo(),
 						nf.getlbr_OrgName(), nf.getlbr_CNPJ(),
-						nf.isCancelled(), nf.getlbr_NFeID());
+						isCancelled, nf.getlbr_NFeID());
 
 				MAttachment attachment = nf.getAttachment(true);
-				final File nfeXML = NFeUtil.getAttachmentEntryFile(attachment
-						.getEntry(0));
+				final Collection<File> files = new ArrayList<File>();
+				for (MAttachmentEntry entry : attachment.getEntries()){
+					files.add(entry.getFile());
+				}
 
 				new Thread() {
 					public void run() {
@@ -101,16 +106,14 @@ public abstract class NFeEmail {
 											"Problems with Client Email");
 
 								for (int i = 0; i < 30; i++) {
-									if (client.sendEMail(from, to, subject,
-											message, nfeXML, false))
+									if (client.sendEMailAttachments(from, to, subject,
+											message, files, false))
 										break;
 
-									Thread.sleep(30000); // wait 30s and try
-															// again
+									Thread.sleep(30000); // wait 30s and try again
 								}
 
-								Thread.sleep(5000); // wait 5s to send to next
-													// contact
+								Thread.sleep(5000); // wait 5s to send to next contact
 							} // all NFeContacts
 						} catch (InterruptedException e) {
 							e.printStackTrace();

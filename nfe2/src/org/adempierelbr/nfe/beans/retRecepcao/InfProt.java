@@ -11,62 +11,50 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
-
-import org.adempierelbr.util.NFeUtil;
+package org.adempierelbr.nfe.beans.retRecepcao;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  ConsReciNFe
+ *  InfProt
  *  @author Mario Grigioni
- *  @version $Id: ConsReciNFe.java,v 1.0 26/06/2012 15:10:00 mgrigioni Exp $
+ *  @version $Id: InfProt.java,v 1.0 22/06/2012 14:01:00 mgrigioni Exp $
  */
-@XStreamAlias ("consReciNFe")
-public class ConsReciNFe {
-
-	@XStreamAsAttribute
-	public final String xmlns=NFeUtil.NAMESPACE_NFE;
-	
-	@XStreamAsAttribute
-	private String versao;
+@XStreamAlias ("infProt")
+public class InfProt {
 	
 	private String tpAmb;
-	private String nRec;
+	private String verAplic;
+	private String chNFe;
+	private String dhRecbto;
+	private String nProt;
+	private String digVal;
+	private String cStat;
+	private String xMotivo;
 	
-	/**
-	 * @param versao
-	 * @param tpAmb
-	 * @param nRec
-	 */
-	public ConsReciNFe(String versao, String tpAmb, String nRec) {
-		super();
-		setVersao(versao);
-		setTpAmb(tpAmb);
-		setnRec(nRec);
-	}
-	
-	public String getVersao() {
-		return versao;
-	}
-	public void setVersao(String versao) {
-		this.versao = versao;
-	}
 	public String getTpAmb() {
 		return tpAmb;
 	}
-	public void setTpAmb(String tpAmb) {
-		this.tpAmb = tpAmb;
+	public String getVerAplic() {
+		return verAplic;
 	}
-	public String getnRec() {
-		return nRec;
+	public String getChNFe() {
+		return chNFe;
 	}
-	public void setnRec(String nRec) {
-		this.nRec = nRec;
+	public String getDhRecbto() {
+		return dhRecbto;
 	}
-	public String getXmlns() {
-		return xmlns;
+	public String getnProt() {
+		return nProt;
 	}
-	
-}	// ConsReciNFe
+	public String getDigVal() {
+		return digVal;
+	}
+	public String getcStat() {
+		return cStat;
+	}
+	public String getxMotivo() {
+		return xMotivo;
+	}
+
+}	// InfProt

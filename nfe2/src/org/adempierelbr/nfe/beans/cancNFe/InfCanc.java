@@ -11,67 +11,53 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
-
-import java.sql.Timestamp;
-
-import org.adempierelbr.util.NFeUtil;
+package org.adempierelbr.nfe.beans.cancNFe;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  InfProt
+ *  InfCanc
  *  @author Mario Grigioni
- *  @version $Id: InfProt.java,v 1.0 22/06/2012 14:01:00 mgrigioni Exp $
+ *  @version $Id: InfCanc.java,v 1.0 26/06/2012 10:27:00 mgrigioni Exp $
  */
-@XStreamAlias ("infProt")
-public class InfProt {
+@XStreamAlias ("infCanc")
+public class InfCanc{
 	
-	private String tpAmb;
-	private String verAplic;
-	private String chNFe;
-	private String dhRecbto;
-	private String nProt;
-	private String digVal;
-	private String cStat;
-	private String xMotivo;
+	@XStreamAsAttribute
+	public String Id;
+
+	public String tpAmb;
+	public final String xServ = "CANCELAR";
+	public String chNFe;
+	public String nProt;
+	public String xJust;
 	
 	/**
-	 * Constructor
 	 * @param tpAmb
-	 * @param verAplic
 	 * @param chNFe
-	 * @param dhRecbto
 	 * @param nProt
-	 * @param digVal
-	 * @param cStat
-	 * @param xMotivo
+	 * @param xJust
 	 */
-	public InfProt(String tpAmb, String verAplic, String chNFe,
-			Timestamp dhRecbto, String nProt, String digVal, String cStat,
-			String xMotivo) {
+	public InfCanc(String tpAmb, String chNFe, String nProt, String xJust) {
 		super();
+		setId("ID" + chNFe);
 		setTpAmb(tpAmb);
-		setVerAplic(verAplic);
 		setChNFe(chNFe);
-		setDhRecbto(dhRecbto);
 		setnProt(nProt);
-		setDigVal(digVal);
-		setcStat(cStat);
-		setxMotivo(xMotivo);
+		setxJust(xJust);
 	}
-	
+	public String getId() {
+		return Id;
+	}
+	public void setId(String id) {
+		this.Id = id;
+	}
 	public String getTpAmb() {
 		return tpAmb;
 	}
 	public void setTpAmb(String tpAmb) {
 		this.tpAmb = tpAmb;
-	}
-	public String getVerAplic() {
-		return verAplic;
-	}
-	public void setVerAplic(String verAplic) {
-		this.verAplic = verAplic;
 	}
 	public String getChNFe() {
 		return chNFe;
@@ -79,35 +65,20 @@ public class InfProt {
 	public void setChNFe(String chNFe) {
 		this.chNFe = chNFe;
 	}
-	public String getDhRecbto() {
-		return dhRecbto;
-	}
-	public void setDhRecbto(Timestamp dhRecbto) {
-		this.dhRecbto = NFeUtil.timeToString(dhRecbto);
-	}
 	public String getnProt() {
 		return nProt;
 	}
 	public void setnProt(String nProt) {
 		this.nProt = nProt;
 	}
-	public String getDigVal() {
-		return digVal;
+	public String getxJust() {
+		return xJust;
 	}
-	public void setDigVal(String digVal) {
-		this.digVal = digVal;
+	public void setxJust(String xJust) {
+		this.xJust = xJust;
 	}
-	public String getcStat() {
-		return cStat;
-	}
-	public void setcStat(String cStat) {
-		this.cStat = cStat;
-	}
-	public String getxMotivo() {
-		return xMotivo;
-	}
-	public void setxMotivo(String xMotivo) {
-		this.xMotivo = xMotivo;
+	public String getxServ() {
+		return xServ;
 	}
 	
-}	// InfProt
+} // InfCanc
