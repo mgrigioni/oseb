@@ -41,6 +41,7 @@ import org.adempierelbr.cce.beans.retevento.RetEvento;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
@@ -250,7 +251,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 		//	Detalhes
 		DetEvento det = new DetEvento ();
 		det.setVersao(NFeUtil.VERSAO_CCE);
-		det.setXCorrecao(TextUtil.itrim(getDescription()));
+		det.setXCorrecao(RemoverAcentos.remover(getDescription()));
 		
 		//	Informações do Evento da Carta de Correção
 		InfEvento cce = new InfEvento ();

@@ -441,7 +441,7 @@ public abstract class NFeUtil
 
 		File xml = getAttachmentEntryFile(nf.getAttachment().getEntry(0));
 	    String dados = XMLtoString(xml);
-	    if (dados.endsWith("</nfeProc")) // Já está no padrão de distribuicao
+	    if (dados.endsWith("</nfeProc>")) // Já está no padrão de distribuicao
 	    	return attach;
 	    
 	    String cabecalho = geraCabecDistribuicao();

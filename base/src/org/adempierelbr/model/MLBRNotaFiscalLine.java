@@ -374,11 +374,11 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		}
 		
 		int startWith = Integer.valueOf(CST_IPI.substring(0, 1)).intValue();
-		if (startWith >= 5 && getParent().isSOTrx()){
-			CST_IPI = startWith-5 + CST_IPI.substring(1);
-		}
-		else if (startWith < 5 && !getParent().isSOTrx()){
+		if (startWith < 5 && getParent().isSOTrx()){
 			CST_IPI = startWith+5 + CST_IPI.substring(1);
+		}
+		else if (startWith >= 5 && !getParent().isSOTrx()){
+			CST_IPI = startWith-5 + CST_IPI.substring(1);
 		}
 		
 		if (CST_IPI != getlbr_TaxStatusIPI()){
