@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,12 +13,26 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.util.BPartnerUtil;
+import org.adempierelbr.util.RemoverAcentos;
+import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_C_City;
+import org.compiere.model.MCountry;
+import org.compiere.model.X_C_City;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  G - Identificação do Local de Entrega
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: IdentLocalEntrega.java,v 2.0 31/07/2012 09:30:00 mgrigioni Exp $
+ */
+@XStreamAlias ("entrega")
 public class IdentLocalEntrega {
 
-	// Identificação do Local de Entrega
-	
-	private String entrega;
 	private String CNPJ;
 	private String CPF;
 	private String xLgr;
@@ -28,95 +43,134 @@ public class IdentLocalEntrega {
 	private String xMun;
 	private String UF;
 	
-	public String getEntrega() {
-		return entrega;
-	}
-	public void setEntrega(String entrega) {
-		if (entrega != null)
-			entrega = entrega.trim();
+	/**
+	 * Default Constructor
+	 * @param MLBRNotaFiscal nf
+	 */
+	public IdentLocalEntrega(MLBRNotaFiscal nf){
+		super();
+		setId(nf.getlbr_BPDeliveryCNPJ());
+		setxLgr(nf.getlbr_BPDeliveryAddress1());
+		setNro(nf.getlbr_BPDeliveryAddress2());
+		setxBairro(nf.getlbr_BPDeliveryAddress3());
+		setxCpl(nf.getlbr_BPDeliveryAddress4());
+		
+		MCountry country = new MCountry(nf.getCtx(), BPartnerUtil.getC_Country_ID(nf.getlbr_BPDeliveryCountry()),null);
 	
-		this.entrega = entrega;
+		if (country.get_ID() == BPartnerUtil.BRASIL) {
+			X_C_City bpCity = BPartnerUtil.getX_C_City(nf.getCtx(),
+					nf.getlbr_BPDeliveryCity(),BPartnerUtil.getC_Region_ID(nf.getlbr_BPDeliveryRegion()),nf.get_TrxName());
+			
+			if (bpCity == null){
+				throw new AdempiereException("Cidade do Parceiro de Negócios não encontrada");
+			}
+			
+			int bpCityCode = bpCity.get_ValueAsInt(I_W_C_City.COLUMNNAME_lbr_CityCode);
+			if (bpCityCode <= 0){
+				throw new AdempiereException("Código do cidade (IBGE) não cadastrado - " + nf.getlbr_BPCity());
+			}
+			
+			setcMun(Integer.toString(bpCityCode));
+			setxMun(nf.getlbr_BPDeliveryCity());
+			setUF(nf.getlbr_BPDeliveryRegion());
+		}
+		else{
+			setcMun(BPartnerUtil.EXTCOD);
+			setxMun(BPartnerUtil.EXTMUN);
+			setUF(BPartnerUtil.EXTREG);
+		}
+		
+	} //IdentLocalEntrega
+	
+	private void setId(String id){
+		id = TextUtil.toNumeric(id);
+		if (id.length() == 11)
+			setCPF(id);
+		else if (id.length() == 14)
+			setCNPJ(id);
+		else
+			setCNPJ(""); //Operacao Comex
 	}
+	
 	public String getCNPJ() {
 		return CNPJ;
 	}
-	public void setCNPJ(String cNPJ) {
-		if (cNPJ != null)
-			cNPJ = cNPJ.trim();
-	
+	private void setCNPJ(String cNPJ) {	
 		CNPJ = cNPJ;
 	}
 	public String getCPF() {
 		return CPF;
 	}
-	public void setCPF(String cPF) {
-		if (cPF != null)
-			cPF = cPF.trim();
-		
+	private void setCPF(String cPF) {
 		CPF = cPF;
 	}
+	
 	public String getxLgr() {
 		return xLgr;
 	}
-	public void setxLgr(String xLgr) {
-		if (xLgr != null)
-			xLgr = xLgr.trim();
-	
-		this.xLgr = xLgr;
+	private void setxLgr(String xLgr) {
+		if (xLgr == null || xLgr.length() < 2)
+			throw new AdempiereException("xLgr = " + xLgr);
+		else
+			this.xLgr = TextUtil.checkSize(RemoverAcentos.remover(xLgr),60);
 	}
+	
 	public String getNro() {
 		return nro;
 	}
-	public void setNro(String nro) {
+	private void setNro(String nro) {
 		if (nro != null)
-			nro = nro.trim();
+			nro = "S/N";
 	
 		this.nro = nro;
 	}
+	
 	public String getxCpl() {
 		return xCpl;
 	}
-	public void setxCpl(String xCpl) {
-		if (xCpl != null)
-			xCpl = xCpl.trim();
-	
-		this.xCpl = xCpl;
+	private void setxCpl(String xCpl) {	
+		if (xCpl != null && !xCpl.isEmpty())
+			this.xCpl = TextUtil.checkSize(RemoverAcentos.remover(xCpl),60);
 	}
+	
 	public String getxBairro() {
 		return xBairro;
 	}
-	public void setxBairro(String xBairro) {
-		if (xBairro != null)
-			xBairro = xBairro.trim();
-	
-		this.xBairro = xBairro;
+	private void setxBairro(String xBairro) {
+		if (xBairro == null || xBairro.length() < 2)
+			throw new AdempiereException("xBairro = " + xBairro);
+		else
+			this.xBairro = TextUtil.checkSize(RemoverAcentos.remover(xBairro),60);
 	}
+	
 	public String getcMun() {
 		return cMun;
 	}
-	public void setcMun(String cMun) {
-		if (cMun != null)
-			cMun = cMun.trim();
-	
-		this.cMun = cMun;
+	private void setcMun(String cMun) {
+		if (cMun == null || cMun.length() != 7)
+			throw new AdempiereException("cMun = " + cMun);
+		else
+			this.cMun = cMun;
 	}
+	
 	public String getxMun() {
 		return xMun;
 	}
-	public void setxMun(String xMun) {
-		if (xMun != null)
-			xMun = xMun.trim();
-	
-		this.xMun = xMun;
+	private void setxMun(String xMun) {
+		if (xMun == null || xMun.length() < 2)
+			throw new AdempiereException("xMun = " + xMun);
+		else
+			this.xMun = TextUtil.checkSize(RemoverAcentos.remover(xMun),60);
 	}
+	
 	public String getUF() {
 		return UF;
 	}
-	public void setUF(String uF) {
-		if (uF != null)
-			uF = uF.trim();
-	
-		UF = uF;
+	private void setUF(String uF) {
+		if (uF == null || uF.length() != 2)
+			throw new AdempiereException("uF = " + uF);
+		else
+			UF = uF;
 	}
-	
-}
+
+} // IdentLocalEntrega

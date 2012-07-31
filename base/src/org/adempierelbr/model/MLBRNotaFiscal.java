@@ -429,6 +429,11 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			return DocAction.STATUS_Invalid;
 		}
 		
+		//Validação CFOP
+		m_processMsg = MLBRCFOP.validateCFOP(this);
+		if (m_processMsg != null)
+			return DocAction.STATUS_Invalid;
+		
 		//Validação de Valores
 		BigDecimal sumGrandTotal   = Env.ZERO;
 		BigDecimal sumTotalLines   = Env.ZERO;
