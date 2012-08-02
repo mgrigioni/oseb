@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -20,9 +21,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 @XStreamAlias ("infNFe")
-public class DadosNFE {
+public class InfNFE {
 
-	// Dados da Nota Fiscal Eletronica
 	@XStreamAsAttribute
 	private String versao;
 	
@@ -38,7 +38,7 @@ public class DadosNFE {
 	private IdentLocalEntrega entrega;
 	
 	@XStreamImplicit(itemFieldName="det")
-	private List<DetailsNFEBean> det = new ArrayList<DetailsNFEBean>();
+	private List<DetalheProduto> det = new ArrayList<DetalheProduto>();
 	
 	private Valores total;
 	private Transporte transp;
@@ -125,11 +125,11 @@ public class DadosNFE {
 	public void setId(String id) {
 		Id = id;
 	}
-	public void add(DetailsNFEBean detailsNFEBean) {
+	public void add(DetalheProduto detailsNFEBean) {
         det.add(detailsNFEBean);
 	}
 
-	public List<DetailsNFEBean> getContent() {
+	public List<DetalheProduto> getContent() {
         return det;
 	}
 	
@@ -147,4 +147,5 @@ public class DadosNFE {
 	public void setExporta(InfComex exporta) {
 		this.exporta = exporta;
 	}
-}
+	
+} // InfNFe

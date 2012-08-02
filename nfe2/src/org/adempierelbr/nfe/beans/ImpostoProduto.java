@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,10 +13,17 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
-public class TributosInciBean {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-	// Tributos Incidentes no Produto ou Serviço
-	
+/**
+ *  M - Tributos incidentes no Produto ou Serviço
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: ImpostoProduto.java,v 2.0 02/08/2012 14:13:00 mgrigioni Exp $
+ */
+@XStreamAlias ("imposto")
+public class ImpostoProduto {
+
 	private ICMSBean ICMS;
 	private ImpostoIPIBean IPI;
 	private ImpostoDIBean II;
@@ -62,5 +70,4 @@ public class TributosInciBean {
 		COFINS = cofins;
 	}
 	
-	
-}
+} //ImpostoProduto

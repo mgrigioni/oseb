@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -38,9 +39,8 @@ import org.adempierelbr.nfe.beans.ChaveNFe;
 import org.adempierelbr.nfe.beans.Cobranca;
 import org.adempierelbr.nfe.beans.CobrancaGrupoDuplicata;
 import org.adempierelbr.nfe.beans.CobrancaGrupoFatura;
-import org.adempierelbr.nfe.beans.DadosNFE;
 import org.adempierelbr.nfe.beans.DeclaracaoDI;
-import org.adempierelbr.nfe.beans.DetailsNFEBean;
+import org.adempierelbr.nfe.beans.DetalheProduto;
 import org.adempierelbr.nfe.beans.ICMSBean;
 import org.adempierelbr.nfe.beans.ICMSGrupoBean;
 import org.adempierelbr.nfe.beans.IdentDest;
@@ -50,22 +50,22 @@ import org.adempierelbr.nfe.beans.IdentNFe;
 import org.adempierelbr.nfe.beans.ImpostoDIBean;
 import org.adempierelbr.nfe.beans.ImpostoIPIBean;
 import org.adempierelbr.nfe.beans.ImpostoIPIGrupoBean;
+import org.adempierelbr.nfe.beans.ImpostoProduto;
 import org.adempierelbr.nfe.beans.InfAdiFisco;
 import org.adempierelbr.nfe.beans.InfComex;
+import org.adempierelbr.nfe.beans.InfNFE;
 import org.adempierelbr.nfe.beans.PISBean;
 import org.adempierelbr.nfe.beans.PISGrupoBean;
-import org.adempierelbr.nfe.beans.ProdutosNFEBean;
+import org.adempierelbr.nfe.beans.ProdutoNFe;
 import org.adempierelbr.nfe.beans.Transporte;
 import org.adempierelbr.nfe.beans.TransporteGrupo;
 import org.adempierelbr.nfe.beans.TransporteVol;
-import org.adempierelbr.nfe.beans.TributosInciBean;
 import org.adempierelbr.nfe.beans.Valores;
 import org.adempierelbr.nfe.beans.ValoresICMS;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.NFeTaxes;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.RemoverAcentos;
-import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_C_DocType;
@@ -73,12 +73,11 @@ import org.compiere.model.MAttachment;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrgInfo;
-import org.compiere.model.MProduct;
 import org.compiere.util.CLogger;
-import org.compiere.util.Env;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  NFeXMLGenerator
@@ -94,36 +93,24 @@ public class NFeXMLGenerator
 	private static CLogger log = CLogger.getCLogger(NFeXMLGenerator.class);
 	
 	/**
-	 * Gera o corpo da NF
-	 * 
-	 * @param LBR_NotaFiscal_ID
-	 * @param trxName Transação
+	 * Gera o arquivo xml no padrão da NFe
+	 * @param nf
 	 * @return
+	 * @throws AdempiereException
 	 */
 	@SuppressWarnings("resource")
-	public static String geraCorpoNFe (int LBR_NotaFiscal_ID, String trxName) throws AdempiereException {
+	public static String geraCorpoNFe (MLBRNotaFiscal nf) throws AdempiereException {
 		
-		log.fine("Gerando corpo NF-e");
+		Properties ctx     = nf.getCtx();
+		String     trxName = nf.get_TrxName();
 		
-		Properties ctx = Env.getCtx();
-		
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		
-		DadosNFE dados = new DadosNFE();
-		Cobranca cobr = new Cobranca();
-		CobrancaGrupoFatura cobrfat = null;
-		CobrancaGrupoDuplicata cobrdup = null;
+		InfNFE dados = new InfNFE();
 
 		// Dados da NFE
 		dados.setVersao(NFeUtil.VERSAO);
-
-		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx, LBR_NotaFiscal_ID, trxName);
-		if (LBR_NotaFiscal_ID == 0)
-			return "Nota fiscal inexistente";
-
-		X_LBR_NFTax[] nfTaxes = nf.getTaxes();
-		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 
 		// DADOS DA ORG DE VENDA/COMPRA
 		MOrgInfo orgInfo = MOrgInfo.get(ctx, nf.getAD_Org_ID(), trxName);
@@ -148,7 +135,7 @@ public class NFeXMLGenerator
 		}
 		
 		// Informações de Comércio Exterior
-		if (nf.getLBR_CFOP().isComex()){
+		if (nf.isSOTrx() && nf.getLBR_CFOP().isComex()){
 			dados.setExporta(new InfComex(nf.getlbr_OrgRegion(),nf.getlbr_OrgCity()));
 		}
 		
@@ -164,7 +151,7 @@ public class NFeXMLGenerator
 		ValoresICMS valoresicms = new ValoresICMS(nf.getGrandTotal(),nf.getTotalLines(),
 				nf.getFreightAmt(),nf.getlbr_InsuranceAmt());
 		
-		for (X_LBR_NFTax nfTax : nfTaxes){
+		for (X_LBR_NFTax nfTax : nf.getTaxes()){
 			valoresicms.setValorImposto(nfTax);
 		}
 		
@@ -174,66 +161,51 @@ public class NFeXMLGenerator
 		if (nf.getC_Invoice_ID() > 0){
 			MInvoice invoice = new MInvoice(ctx,nf.getC_Invoice_ID(),trxName);
 			MDocType dt = MDocType.get(ctx, invoice.getC_DocTypeTarget_ID());
-			boolean HasOpenItems = dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems);
 
-			if (HasOpenItems && nf.isSOTrx()){
+			if (nf.isSOTrx() && dt.get_ValueAsBoolean(I_W_C_DocType.COLUMNNAME_lbr_HasOpenItems)){
+					
+				CobrancaGrupoFatura cobrfat = new CobrancaGrupoFatura(invoice.getDocumentNo(),nf.getGrandTotal());
 				
 				MLBROpenItem[] openItems = MLBROpenItem.getOpenItem(nf.getC_Invoice_ID(), trxName);
+				List<CobrancaGrupoDuplicata> dups = new ArrayList<CobrancaGrupoDuplicata>();
 				
-				cobrfat = new CobrancaGrupoFatura();
-				cobrfat.setnFat(invoice.getDocumentNo()); // Codigo NFE
-				cobrfat.setvOrig(TextUtil.bigdecimalToString(nf.getGrandTotal())); // Valor Bruto
-			    cobrfat.setvLiq(TextUtil.bigdecimalToString(nf.getGrandTotal())); // Valor Liquido
-			    //cobrfat.setvDesc(TextUtil.ZERO_STRING); // Desconto
-			    cobr.setFat(cobrfat);
-
 			    //Adiciona as duplicatas da fatura
 			    for(int i=0; i < openItems.length; i++) {
-					MLBROpenItem openItem = openItems[i];
-					cobrdup = new CobrancaGrupoDuplicata();
-					cobrdup.setdVenc(TextUtil.timeToString(openItem.getDueDate(),"yyyy-MM-dd"));
-					cobrdup.setnDup(cobrfat.getnFat()+"/"+Integer.toString(i+1));
-					cobrdup.setvDup(TextUtil.bigdecimalToString(openItem.getGrandTotal()));
-					cobr.addDup(cobrdup);
+					MLBROpenItem oi = openItems[i];
+					String nDup = cobrfat.getnFat()+"/"+Integer.toString(i+1);
+					dups.add(new CobrancaGrupoDuplicata(nDup,oi.getDueDate(),oi.getGrandTotal()));
 				}
-			    dados.setCobr(cobr);
+			    dados.setCobr(new Cobranca(cobrfat,dups));
 			}
 		}
-
+		
 		int linhaNF = 1;
-
+		
+		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 		for (MLBRNotaFiscalLine nfLine : nfLines) {
-			ProdutosNFEBean produtos = new ProdutosNFEBean();
-			DeclaracaoDI declaracao = new DeclaracaoDI();
-
-			//Importação - nDI Obrigatório
-			if (nfLine.getlbr_CFOPName() != null &&
-					nfLine.getlbr_CFOPName().startsWith("3")){
-				if (nfLine.getLBR_NFDI_ID() == 0)
-					return "Linha: " + nfLine.getLine() + " CFOP Importação. " +
-							"DI Obrigatório!";
+			
+			ProdutoNFe produto = new ProdutoNFe(nfLine);
+			
+			/*
+			 * Detalhes de Importação do Produto
+			 */
+			if (nfLine.getCFOP().startsWith("3")) {
+				if (nfLine.getLBR_NFDI_ID() <= 0)
+					throw new AdempiereException("Linha: " + nfLine.getLine() + " sem DI");
 				
-				//	DI e Adições
-				X_LBR_NFDI di = new X_LBR_NFDI(Env.getCtx(), nfLine.getLBR_NFDI_ID(), null);
-				//
-				declaracao.setcExportador(RemoverAcentos.remover(di.getlbr_CodExportador()));
-				declaracao.setdDesemb(TextUtil.timeToString(di.getlbr_DataDesemb(), "yyyy-MM-dd"));
-				declaracao.setdDI(TextUtil.timeToString(di.getDateTrx(), "yyyy-MM-dd"));
-				declaracao.setnDI(di.getlbr_DI());
-				declaracao.setUFDesemb(di.getlbr_BPRegion());
-				declaracao.setxLocDesemb(RemoverAcentos.remover(di.getlbr_LocDesemb()));
-
-				AdicoesDI adicao = new AdicoesDI();
-				adicao.setcFabricante(RemoverAcentos.remover(nfLine.get_ValueAsString("Manufacturer")));
-				adicao.setnAdicao(nfLine.get_ValueAsString("lbr_NumAdicao"));
-				adicao.setnSeqAdic(nfLine.get_ValueAsString("lbr_NumSeqItem"));
-				//adicao.setVDescDI(Env.ZERO);	//TODO
-				adicao.setnDI(di.getlbr_DI());
-				declaracao.addAdi(adicao);
-				produtos.setDI(declaracao);
-			} //DI
-
-			//
+				List<AdicoesDI> adis = new ArrayList<AdicoesDI>();
+				adis.add(new AdicoesDI(nfLine.get_ValueAsString("lbr_NumAdicao"),
+						nfLine.get_ValueAsString("lbr_NumSeqItem"),
+						nfLine.get_ValueAsString("Manufacturer")));
+				
+				X_LBR_NFDI di = new X_LBR_NFDI(ctx, nfLine.getLBR_NFDI_ID(), trxName);
+				DeclaracaoDI declaracaoDI = new DeclaracaoDI(di.getlbr_DI(),
+						di.getDateTrx(), di.getlbr_LocDesemb(), di.getlbr_BPRegion(),
+						di.getlbr_DataDesemb(),di.getlbr_CodExportador(),adis);
+				
+				produto.setDI(declaracaoDI);
+			}
+			
 			ICMSBean icmsnfe = new ICMSBean(); // ICMS
 			ICMSGrupoBean icmsgrupo = new ICMSGrupoBean(); // Grupo de ICMS
 			ICMSBean.ICMS60Grp icms60 = new ICMSBean.ICMS60Grp();
@@ -244,51 +216,10 @@ public class NFeXMLGenerator
 			PISGrupoBean pisgrupo = new PISGrupoBean(); // Grupo de PIS
 			COFINSBean cofinsnfe = new COFINSBean(); // COFINS
 			COFINSGrupoBean cofinsgrupo = new COFINSGrupoBean(); // Grupo de COFINS
-			TributosInciBean impostos = new TributosInciBean(); // Tributos
-
-			MProduct prdt = new MProduct(ctx, nfLine.getM_Product_ID(), null);
-			produtos.setcProd(RemoverAcentos.remover(nfLine.getProductValue()));
-			produtos.setxProd(RemoverAcentos.remover(nfLine.getProductName()));
-			if (prdt.getUPC() == null || (prdt.getUPC().length() < 12 || prdt.getUPC().length() > 14)) {
-				produtos.setcEAN("");
-			}
-			else
-				produtos.setcEAN(prdt.getUPC());
-
-			produtos.setcEANTrib("");
-			produtos.setCFOP(TextUtil.toNumeric(nfLine.getlbr_CFOPName()));
-			produtos.setqCom(TextUtil.bigdecimalToString(nfLine.getQty(),4));
-			produtos.setqTrib(TextUtil.bigdecimalToString(nfLine.getQty(),4));
-			produtos.setuCom(RemoverAcentos.remover(nfLine.getlbr_UOMName()));
-			produtos.setuTrib(RemoverAcentos.remover(nfLine.getlbr_UOMName()));
-			produtos.setvProd(TextUtil.bigdecimalToString((nfLine.getQty().setScale(4,TaxBR.ROUND)).multiply(nfLine.getPrice().setScale(4, TaxBR.ROUND)))); //BF Rejeição: 629
-			produtos.setvUnCom(TextUtil.bigdecimalToString(nfLine.getPrice(),4));
-			produtos.setvUnTrib(TextUtil.bigdecimalToString(nfLine.getPrice(),4));
-
-			if (nf.getFreightAmt().signum() == 1) //FRETE
-				produtos.setvFrete(TextUtil.bigdecimalToString(nfLine.getFreightAmt()));
-			if (nf.getlbr_InsuranceAmt().signum() == 1) //SEGURO
-				produtos.setvSeg(TextUtil.bigdecimalToString(nfLine.getInsuranceAmt()));
-
-			produtos.setIndTot("1"); //v2.0 = 0 – VL Ñ ENTRA NO TOT 1 - VL ENTRA
-			String ncm = nfLine.getlbr_NCMName();
-
-			if (ncm == null && !nfLine.islbr_IsService())
-				return "NCM Obrigatório. Linha: " + nfLine.getLine();
-
-			if (nfLine.islbr_IsService())
-				ncm = "99"; //SERVICO INFORMAR 99
-
-			produtos.setNCM(TextUtil.toNumeric(ncm));
-			//
+			ImpostoProduto impostos = new ImpostoProduto(); // Tributos
 
 			String desc = RemoverAcentos.remover(TextUtil.removeEOL(nfLine.getDescription()));
-			if (desc != null && !desc.equals("")) {
-				dados.add(new DetailsNFEBean(produtos, impostos, linhaNF++, desc));
-			}
-			else {
-				dados.add(new DetailsNFEBean(produtos, impostos, linhaNF++));
-			}
+			dados.add(new DetalheProduto(linhaNF++, produto, impostos, desc));
 
 			//
 			NFeTaxes[] lineTax = NFeTaxes.getTaxes(nfLine);

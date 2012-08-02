@@ -23,13 +23,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
+import org.adempierelbr.nfe.beans.enviNFe.InfRec;
+import org.adempierelbr.nfe.beans.enviNFe.RetEnviNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.InfProt;
 import org.adempierelbr.nfe.beans.retRecepcao.ProtNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.RetConsReciNFe;
@@ -48,8 +48,6 @@ import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
@@ -162,27 +160,29 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			String validation = ValidaXML.validaRetEnviNFe(respLote);
 			if (!validation.isEmpty()){
 				m_processMsg = validation;
+				return false;
 			}
+			
+			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+			xstream.processAnnotations(new Class[]{InfRec.class,RetEnviNFe.class});
+			//
+			RetEnviNFe retEnviNFe = (RetEnviNFe)xstream.fromXML (NFeUtil.XML_HEADER + respLote);
 			
 			MAttachment attachLotNFe = createAttachment();
 			File attachFile = new File(TextUtil.generateTmpFile(respLote, getDocumentNo()+NFeUtil.EXT_RECIBO));
 			attachLotNFe.addEntry(attachFile);
 			attachLotNFe.save();
 			
-	        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	        Document doc = builder.parse(new InputSource(new StringReader(respLote)));
-	        
-	        String cStat = doc.getElementsByTagName("cStat").item(0).getTextContent();
-	        String xMotivo = doc.getElementsByTagName("xMotivo").item(0).getTextContent();
-	        
+	        String cStat    = retEnviNFe.getcStat();
+	        String xMotivo  = retEnviNFe.getxMotivo();
+	        String dhRecbto = retEnviNFe.getDhRecbto();
+	       
 	        String nRec = null;
-	        if (doc.getElementsByTagName("nRec") != null) //BF - Quando ocorre erro não retorna o nRec
-	        	nRec = NFeUtil.getValue(doc, "nRec");
-
-	        String dhRecbto = null;
-	        if (doc.getElementsByTagName("dhRecbto") != null)
-	        	dhRecbto = NFeUtil.getValue(doc, "dhRecbto");
-	        //
+	        List<InfRec> infRec = retEnviNFe.getInfRec();
+	        if (infRec.size() > 0){
+	        	nRec = infRec.get(0).getnRec();
+	        }
+	        
 	        String lotDesc = "["+dhRecbto.replace('T', ' ')+"] " + xMotivo + "\n";
 	        
 	        setlbr_NFeRecID(nRec);
@@ -259,7 +259,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 				return false;
 			}
 
-			XStream xstream = new XStream (new DomDriver());
+			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations(new Class[]{InfProt.class,ProtNFe.class,RetConsReciNFe.class});
 			//
 			RetConsReciNFe retCons = (RetConsReciNFe)xstream.fromXML (NFeUtil.XML_HEADER + respConsulta);

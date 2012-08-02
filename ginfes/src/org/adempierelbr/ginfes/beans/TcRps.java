@@ -26,6 +26,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  TcRps
@@ -61,7 +62,7 @@ public class TcRps {
 	 * @throws Exception
 	 */
 	public boolean toXML() throws Exception{
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();

@@ -15,7 +15,7 @@ package org.adempierelbr.nfe.beans;
 public class NFEBean {
 	
 	private String NFe;
-	private DadosNFE infNFe;
+	private InfNFE infNFe;
 	public String getNFe() {
 		return NFe;
 	}
@@ -25,10 +25,10 @@ public class NFEBean {
 		
 		NFe = fe;
 	}
-	public DadosNFE getInfNFe() {
+	public InfNFE getInfNFe() {
 		return infNFe;
 	}
-	public void setInfNFe(DadosNFE infNFe) {
+	public void setInfNFe(InfNFE infNFe) {
 		this.infNFe = infNFe;
 	}
 		

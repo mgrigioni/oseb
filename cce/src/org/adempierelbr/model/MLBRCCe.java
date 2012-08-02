@@ -282,7 +282,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 		
-		XStream xstream = new XStream ();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		
 		StringWriter sw = new StringWriter ();
@@ -297,7 +297,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
 			
 			//	Lê o arquivo assinado
-			xstream = new XStream (new DomDriver());
+			xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations (classForAnnotation);
 			evento = (Evento) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
 			
@@ -305,7 +305,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			env.setEvento(evento);
 			
 			sw = new StringWriter ();
-			xstream = new XStream ();
+			xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations (classForAnnotation);
 			xstream.marshal (env,  new CompactWriter (sw));
 			xml =  new StringBuilder (sw.toString());
@@ -344,7 +344,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			StringBuilder respLote = new StringBuilder (NFeUtil.XML_HEADER + stub.nfeRecepcaoEvento (dadosMsg, cabecMsgE).getExtraElement().toString());
 			log.fine (respLote.toString());
 						
-			xstream = new XStream (new DomDriver());
+			xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations (classForAnnotation);
 			//
 			RetEnvEvento retEvent = (RetEnvEvento) xstream.fromXML (respLote.toString());
@@ -373,7 +373,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 				procEvento.setRetEvento(retEvent.getRetEvento());
 				
 				//	Preparando saida
-				xstream = new XStream ();
+				xstream = new XStream (new DomDriver(TextUtil.UTF8));
 				xstream.processAnnotations (classForAnnotation);
 				sw = new StringWriter ();
 				xstream.marshal (procEvento,  new CompactWriter (sw));

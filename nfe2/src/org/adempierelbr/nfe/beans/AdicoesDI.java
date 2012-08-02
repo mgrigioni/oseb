@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,65 +13,94 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import java.math.BigDecimal;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.adempierelbr.util.RemoverAcentos;
+import org.adempierelbr.util.TextUtil;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  Adições
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: AdicoesDI.java,v 2.0 02/08/2012 12:07:00 mgrigioni Exp $
+ */
 @XStreamAlias ("adi")
 public class AdicoesDI {
 
 	private String nAdicao;
-	
-	@XStreamOmitField
-	private String nDI;
-	
 	private String nSeqAdic;
 	private String cFabricante;
 	private String vDescDI;
+	private String xPed;
+	private String nItemPed;
+	
+	/**
+	 * Default Constructor
+	 * @param nAdicao
+	 * @param nSeqAdic
+	 * @param cFabricante
+	 */
+	public AdicoesDI(String nAdicao, String nSeqAdic, String cFabricante) {
+		super();
+		setnAdicao(nAdicao);
+		setnSeqAdic(nSeqAdic);
+		setcFabricante(cFabricante);
+	}
 	
 	public String getnAdicao() {
 		return nAdicao;
 	}
-	public void setnAdicao(String nAdicao) {
-		if (nAdicao != null)
-			nAdicao = nAdicao.trim();
-	
-		this.nAdicao = nAdicao;
+	private void setnAdicao(String nAdicao) {
+		nAdicao = TextUtil.toNumeric(nAdicao);
+		if (nAdicao == null || nAdicao.isEmpty())
+			throw new AdempiereException("nAdicao = " + nAdicao);
+		else	
+			this.nAdicao = nAdicao;
 	}
-	public String getnDI() {
-		return nDI;
-	}
-	public void setnDI(String nDI) {
-		if (nDI != null)
-			nDI = nDI.trim();
-	
-		this.nDI = nDI;
-	}
+
 	public String getnSeqAdic() {
 		return nSeqAdic;
 	}
-	public void setnSeqAdic(String nSeqAdic) {
-		if (nSeqAdic != null)
-			nSeqAdic = nSeqAdic.trim();
-	
-		this.nSeqAdic = nSeqAdic;
+	private void setnSeqAdic(String nSeqAdic) {
+		nSeqAdic = TextUtil.toNumeric(nSeqAdic);
+		if (nSeqAdic == null || nSeqAdic.isEmpty())
+			throw new AdempiereException("nSeqAdic = " + nSeqAdic);
+		else	
+			this.nSeqAdic = nSeqAdic;
 	}
+	
 	public String getcFabricante() {
 		return cFabricante;
 	}
-	public void setcFabricante(String cFabricante) {
-		if (cFabricante != null)
-			cFabricante = cFabricante.trim();
-	
-		this.cFabricante = cFabricante;
+	private void setcFabricante(String cFabricante) {
+		if (cFabricante == null)
+			throw new AdempiereException("cFabricante =" + cFabricante);
+		else	
+			this.cFabricante = TextUtil.checkSize(RemoverAcentos.remover(cFabricante),60);
 	}
 	public String getvDescDI() {
 		return vDescDI;
 	}
-	public void setvDescDI(String vDescDI) {
+	public void setvDescDI(BigDecimal vDescDI) {
 		if (vDescDI != null)
-			vDescDI = vDescDI.trim();
-	
-		this.vDescDI = vDescDI;
+			this.vDescDI = TextUtil.bigdecimalToString(vDescDI);
 	}
 	
-}
+	public String getxPed() {
+		return xPed;
+	}
+	public void setxPed(String xPed) {
+		this.xPed = xPed;
+	}
+	
+	public String getnItemPed() {
+		return nItemPed;
+	}
+	public void setnItemPed(String nItemPed) {
+		this.nItemPed = nItemPed;
+	}
+	
+} //AdicoesDI

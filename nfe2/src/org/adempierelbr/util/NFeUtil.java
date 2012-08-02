@@ -61,6 +61,7 @@ import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  Utility class for NFe
@@ -106,7 +107,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgConsultaProtocolo(String tpAmb, String chNFe){
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -124,7 +125,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgStatusServico(String tpAmb, int C_Region_ID){
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -143,7 +144,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgConsultaCadastro(String regionName, String CNPJ){
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -164,7 +165,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgCancelamento (String tpAmb, String chNFe, 
 			String nProt, String xJust) {
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -186,7 +187,7 @@ public abstract class NFeUtil
 			return null;
 		}
 		
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -203,15 +204,15 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgConsultaLote (String tpAmb, String nRec) {
 		
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
 		xstream.marshal (new ConsReciNFe(VERSAO,tpAmb,nRec),new CompactWriter (sw));
 		
 		return sw.toString();
-	}	//geraMsgRetRecepcao
-
+	}	//geraMsgConsultaLote
+	
 	/**
 	 * @return cabecalho NFe
 	 */
@@ -241,17 +242,16 @@ public abstract class NFeUtil
 		return cabecalho.toString();
 	}
 	
-	/**
-	 * @return Cabeçalho do lote
-	 */
+	/**          
+	 * @return Cabeçalho do lote          
+	 */         
 	public static String geraCabecLoteNFe (String lote){
 		StringBuilder cabecalho = new StringBuilder("<enviNFe xmlns=\"").append(NAMESPACE_NFE)
 				.append("\" versao=\"").append(VERSAO).append("\">")
 				.append("<idLote>").append(lote).append("</idLote>");
-	  
 		return cabecalho.toString();
-	} // geraCabecLoteNFe
-	
+	} // geraCabecLoteNFe 
+		
 	/**
 	 * Gera o cabeçalho evento
 	 * @param region
@@ -405,7 +405,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraRodapDistribuicao (ProtNFe protNFe) {
 			
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -417,7 +417,7 @@ public abstract class NFeUtil
 
 	public static String geraRodapCanc(RetCancNFe retCancNFe) {
 			
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();

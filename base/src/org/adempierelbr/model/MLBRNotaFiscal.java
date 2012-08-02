@@ -755,7 +755,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			}
 		
 			try {
-				return NFeXMLGenerator.geraCorpoNFe(get_ID(),get_TrxName());
+				return NFeXMLGenerator.geraCorpoNFe(this);
 			} catch (AdempiereException e) {
 				e.printStackTrace();
 				return e.getLocalizedMessage();
@@ -877,7 +877,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			if (!validation.isEmpty())
 				return validation;
 
-			XStream xstream = new XStream (new DomDriver());
+			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations(new Class[]{InfCanc.class,RetCancNFe.class});
 			//
 			RetCancNFe retCancNFe = (RetCancNFe)xstream.fromXML (NFeUtil.XML_HEADER + respCanc);

@@ -23,6 +23,7 @@ import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.model.MLBRNFeWebService;
 import org.adempierelbr.nfe.beans.statusServicoNFe.RetConsStatServ;
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MOrgInfo;
 import org.compiere.process.ProcessInfoParameter;
@@ -98,7 +99,7 @@ public class ProcStatusServico extends SvrProcess
 
 			String respStatus = stub.nfeStatusServicoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
 
-			XStream xstream = new XStream (new DomDriver());
+			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations(new Class[]{RetConsStatServ.class});
 			//
 			RetConsStatServ retConsStat = (RetConsStatServ)xstream.fromXML (NFeUtil.XML_HEADER + respStatus);
