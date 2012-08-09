@@ -51,7 +51,7 @@ public class IdentNFe {
 	private String hSaiEnt;
 	private String tpNF;
 	private String cMunFG;
-	private NFEReferenciadaBean NFref;
+	private NFReferenciada NFref;
 	private String tpImp;
 	private String tpEmis;
 	private String cDV;
@@ -89,13 +89,13 @@ public class IdentNFe {
 		setTpAmb(dtW.getlbr_NFeEnv());
 		setTpEmis(dtW.getlbr_NFeTpEmi(),nf.getlbr_DateScan(),nf.getlbr_MotivoScan());
 		if (nf.getLBR_RefNotaFiscal_ID() > 0)
-			setNFref(new NFEReferenciadaBean(new MLBRNotaFiscal(nf.getCtx(),nf.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID()));
+			setNFref(new NFReferenciada(new MLBRNotaFiscal(nf.getCtx(),nf.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID()));
 	} //IdentNFe
 	
-	public NFEReferenciadaBean getNFref() {
+	public NFReferenciada getNFref() {
 		return NFref;
 	}
-	private void setNFref(NFEReferenciadaBean fref) {
+	private void setNFref(NFReferenciada fref) {
 		NFref = fref;
 	}
 	

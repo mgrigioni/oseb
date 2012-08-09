@@ -755,7 +755,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			}
 		
 			try {
-				return NFeXMLGenerator.geraCorpoNFe(this);
+				return NFeXMLGenerator.geraCorpoNFe(getCtx(),get_ID(),get_TrxName());
 			} catch (AdempiereException e) {
 				e.printStackTrace();
 				return e.getLocalizedMessage();

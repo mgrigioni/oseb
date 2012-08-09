@@ -54,7 +54,7 @@ public class TransporteVol {
 		return qVol;
 	}
 	private void setqVol(BigDecimal qVol) {
-		if (qVol != null)
+		if (qVol != null && qVol.signum() == 1)
 			this.qVol = TextUtil.bigdecimalToString(qVol, 0);
 	}
 	

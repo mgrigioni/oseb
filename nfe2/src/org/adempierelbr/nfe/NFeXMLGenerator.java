@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.model.MLBRNCMIVA;
@@ -33,39 +32,38 @@ import org.adempierelbr.model.X_LBR_NFDI;
 import org.adempierelbr.model.X_LBR_NFTax;
 import org.adempierelbr.model.X_LBR_TaxFormula;
 import org.adempierelbr.nfe.beans.AdicoesDI;
-import org.adempierelbr.nfe.beans.COFINSBean;
-import org.adempierelbr.nfe.beans.COFINSGrupoBean;
 import org.adempierelbr.nfe.beans.ChaveNFe;
 import org.adempierelbr.nfe.beans.Cobranca;
 import org.adempierelbr.nfe.beans.CobrancaGrupoDuplicata;
 import org.adempierelbr.nfe.beans.CobrancaGrupoFatura;
 import org.adempierelbr.nfe.beans.DeclaracaoDI;
 import org.adempierelbr.nfe.beans.DetalheProduto;
-import org.adempierelbr.nfe.beans.ICMSBean;
-import org.adempierelbr.nfe.beans.ICMSGrupoBean;
 import org.adempierelbr.nfe.beans.IdentDest;
 import org.adempierelbr.nfe.beans.IdentEmit;
 import org.adempierelbr.nfe.beans.IdentLocalEntrega;
 import org.adempierelbr.nfe.beans.IdentNFe;
-import org.adempierelbr.nfe.beans.ImpostoDIBean;
-import org.adempierelbr.nfe.beans.ImpostoIPIBean;
-import org.adempierelbr.nfe.beans.ImpostoIPIGrupoBean;
 import org.adempierelbr.nfe.beans.ImpostoProduto;
-import org.adempierelbr.nfe.beans.InfAdiFisco;
+import org.adempierelbr.nfe.beans.InfAdic;
 import org.adempierelbr.nfe.beans.InfComex;
 import org.adempierelbr.nfe.beans.InfNFE;
-import org.adempierelbr.nfe.beans.PISBean;
-import org.adempierelbr.nfe.beans.PISGrupoBean;
 import org.adempierelbr.nfe.beans.ProdutoNFe;
 import org.adempierelbr.nfe.beans.Transporte;
 import org.adempierelbr.nfe.beans.TransporteGrupo;
 import org.adempierelbr.nfe.beans.TransporteVol;
 import org.adempierelbr.nfe.beans.Valores;
 import org.adempierelbr.nfe.beans.ValoresICMS;
+import org.adempierelbr.nfe.imposto.COFINSBean;
+import org.adempierelbr.nfe.imposto.COFINSGrupoBean;
+import org.adempierelbr.nfe.imposto.ICMSBean;
+import org.adempierelbr.nfe.imposto.ICMSGrupoBean;
+import org.adempierelbr.nfe.imposto.ImpostoII;
+import org.adempierelbr.nfe.imposto.ImpostoIPIBean;
+import org.adempierelbr.nfe.imposto.ImpostoIPIGrupoBean;
+import org.adempierelbr.nfe.imposto.PISBean;
+import org.adempierelbr.nfe.imposto.PISGrupoBean;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.NFeTaxes;
 import org.adempierelbr.util.NFeUtil;
-import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_C_DocType;
@@ -94,15 +92,19 @@ public class NFeXMLGenerator
 	
 	/**
 	 * Gera o arquivo xml no padrão da NFe
-	 * @param nf
+	 * @param ctx
+	 * @param LBR_NotaFiscal_ID
+	 * @param trxName
 	 * @return
 	 * @throws AdempiereException
 	 */
 	@SuppressWarnings("resource")
-	public static String geraCorpoNFe (MLBRNotaFiscal nf) throws AdempiereException {
+	public static String geraCorpoNFe (Properties ctx, int LBR_NotaFiscal_ID, String trxName) throws AdempiereException {
 		
-		Properties ctx     = nf.getCtx();
-		String     trxName = nf.get_TrxName();
+		if (LBR_NotaFiscal_ID <= 0)
+			throw new AdempiereException("Nota Fiscal inválida");
+		
+		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx,LBR_NotaFiscal_ID,trxName);
 		
 		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
@@ -147,6 +149,9 @@ public class NFeXMLGenerator
 		}
 		dados.setTransp(transporte);
 		
+		// Dados Adicionais
+		dados.setInfAdic(new InfAdic(nf.getDescription()));
+		
 		// Valores Totais
 		ValoresICMS valoresicms = new ValoresICMS(nf.getGrandTotal(),nf.getTotalLines(),
 				nf.getFreightAmt(),nf.getlbr_InsuranceAmt());
@@ -178,7 +183,7 @@ public class NFeXMLGenerator
 			    dados.setCobr(new Cobranca(cobrfat,dups));
 			}
 		}
-		
+				
 		int linhaNF = 1;
 		
 		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
@@ -211,20 +216,16 @@ public class NFeXMLGenerator
 			ICMSBean.ICMS60Grp icms60 = new ICMSBean.ICMS60Grp();
 			ImpostoIPIBean ipinfe = new ImpostoIPIBean(); // IPI
 			ImpostoIPIGrupoBean ipigrupo = new ImpostoIPIGrupoBean(); // Grupo de IPI
-			ImpostoDIBean impostodi = new ImpostoDIBean(); // DI
 			PISBean pisnfe = new PISBean(); // PIS
 			PISGrupoBean pisgrupo = new PISGrupoBean(); // Grupo de PIS
 			COFINSBean cofinsnfe = new COFINSBean(); // COFINS
 			COFINSGrupoBean cofinsgrupo = new COFINSGrupoBean(); // Grupo de COFINS
 			ImpostoProduto impostos = new ImpostoProduto(); // Tributos
 
-			String desc = RemoverAcentos.remover(TextUtil.removeEOL(nfLine.getDescription()));
-			dados.add(new DetalheProduto(linhaNF++, produto, impostos, desc));
+			dados.add(new DetalheProduto(linhaNF++, produto, impostos, nfLine.getDescription()));
 
 			//
-			NFeTaxes[] lineTax = NFeTaxes.getTaxes(nfLine);
-			//
-			for (NFeTaxes lt : lineTax) {
+			for (NFeTaxes lt : NFeTaxes.getTaxes(nfLine)) {
 
 				if (lt.getTaxIndicator().equals("ICMS")) {
 					String taxStatus = nfLine.getlbr_TaxStatus();
@@ -367,31 +368,13 @@ public class NFeXMLGenerator
 				} //IPI
 
 				else if(lt.getTaxIndicator().equals("II")) {
-					impostodi.setvBC(TextUtil.bigdecimalToString(lt.getvBC()));
-					impostodi.setvDespAdu(TextUtil.ZERO_STRING);
-					impostodi.setvII(TextUtil.bigdecimalToString(lt.getvImposto()));
-					impostodi.setvIOF(TextUtil.ZERO_STRING);
+					ImpostoII impostodi = new ImpostoII(lt.getvBC(),lt.getvImposto());
 					impostos.setII(impostodi);
 				} //II
-
-				else if(lt.getTaxIndicator().equals("ISSQN")) {
-					//TNFe.InfNFe.Det.Imposto.ISSQN issqn =
-					//obj.createTNFeInfNFeDetImpostoISSQN();
-					//imposto.setISSQN(issqn);
-				} //ISSQN
 
 			}//Impostos das Linhas
 
 		}//	Linhas da NF
-
-
-		String dadosAdi = RemoverAcentos.remover(TextUtil.removeEOL(nf.getDescription()));
-		if (dadosAdi != null && !dadosAdi.equals(""))
-		{
-			InfAdiFisco infAdi = new InfAdiFisco();
-			infAdi.setInfCpl(dadosAdi);
-			dados.setInfAdic(infAdi);
-		}
 
 		StringWriter sw = new StringWriter ();
 		xstream.marshal (dados,  new CompactWriter (sw));
@@ -401,13 +384,12 @@ public class NFeXMLGenerator
 		
 		String NFeEmXML = NFeUtil.geraCabecNFe() + TextUtil.removeEOL(sw.toString()) + NFeUtil.geraRodapNFe();
 		
-		try
-		{
+		try {
 			log.fine("Assinando NF-e");
 			arquivoXML = TextUtil.generateTmpFile(NFeEmXML, arquivoXML);
 			AssinaturaDigital.Assinar(arquivoXML, orgInfo, AssinaturaDigital.DOCTYPE_RECEPCAO_NFE);
 		}
-		catch (Exception e){
+		catch (Exception e) {
 			log.severe(e.getMessage());
 			System.out.println(e.getMessage());
 		}
@@ -439,21 +421,20 @@ public class NFeXMLGenerator
 			log.severe(e.getMessage());
 		}
 
-		if (!retValidacao.equals("")){
-			log.log(Level.SEVERE, retValidacao);
-			return retValidacao;
-		}
-
-		else{
+		if (retValidacao.equals("")){
 			//	Grava ID
 			nf.setlbr_NFeID(nfeID);
 			nf.save(trxName);
 			//	Anexa o XML na NF
-			MAttachment attachNFe = nf.createAttachment();
+			MAttachment attachNFe = nf.createAttachment(true);
 			attachNFe.addEntry(file);
 			attachNFe.save(trxName);
 			//
 			return "";
+		}
+		else{
+			log.severe(retValidacao);
+			return retValidacao;
 		}
 
 	}	//	geraCorpoNFe

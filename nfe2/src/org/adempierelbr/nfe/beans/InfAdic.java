@@ -13,67 +13,44 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
-import org.adempierelbr.nfe.imposto.COFINSBean;
-import org.adempierelbr.nfe.imposto.ICMSBean;
-import org.adempierelbr.nfe.imposto.ImpostoII;
-import org.adempierelbr.nfe.imposto.ImpostoIPIBean;
-import org.adempierelbr.nfe.imposto.PISBean;
+import org.adempierelbr.util.RemoverAcentos;
+import org.adempierelbr.util.TextUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- *  M - Tributos incidentes no Produto ou Serviço
+ *  Z - Informações Adicionais da NF-e
  *  
  *  @author Mario Grigioni
- *  @version $Id: ImpostoProduto.java,v 2.0 02/08/2012 14:13:00 mgrigioni Exp $
+ *  @version $Id: InfAdic.java,v 2.0 03/08/2012 15:24:00 mgrigioni Exp $
  */
-@XStreamAlias ("imposto")
-public class ImpostoProduto {
-
-	private ICMSBean ICMS;
-	private ImpostoIPIBean IPI;
-	private ImpostoII II;
-	private PISBean PIS;
-	private COFINSBean COFINS;
-
-	public ICMSBean getICMS() {
-		return ICMS;
-	}
-
-	public void setICMS(ICMSBean icms) {
-		ICMS = icms;
-	}
-
-	public ImpostoIPIBean getIPI() {
-		return IPI;
-	}
-
-	public void setIPI(ImpostoIPIBean ipi) {
-		IPI = ipi;
-	}
-
-	public ImpostoII getII() {
-		return II;
-	}
-
-	public void setII(ImpostoII ii) {
-		II = ii;
-	}
-
-	public PISBean getPIS() {
-		return PIS;
-	}
-
-	public void setPIS(PISBean pis) {
-		PIS = pis;
-	}
-
-	public COFINSBean getCOFINS() {
-		return COFINS;
-	}
-
-	public void setCOFINS(COFINSBean cofins) {
-		COFINS = cofins;
+@XStreamAlias ("infAdic")
+public class InfAdic {
+	
+	private String infAdFisco;
+	private String infCpl;
+	
+	public InfAdic(String infCpl) {
+		super();
+		setInfCpl(infCpl);
 	}
 	
-} //ImpostoProduto
+	public String getInfAdFisco() {
+		return infAdFisco;
+	}
+	public void setInfAdFisco(String infAdFisco) {
+		infAdFisco = TextUtil.checkSize(RemoverAcentos.remover(infAdFisco), 2000);
+		if (!infAdFisco.isEmpty())
+			this.infAdFisco = infAdFisco;
+	}
+	
+	public String getInfCpl() {
+		return infCpl;
+	}
+	private void setInfCpl(String infCpl) {
+		infCpl = TextUtil.checkSize(RemoverAcentos.remover(infCpl), 2000);
+		if (!infCpl.isEmpty())
+			this.infCpl = infCpl;
+	}
+	
+}	//	InfAdic

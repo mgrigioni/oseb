@@ -43,7 +43,7 @@ public class InfNFE {
 	private Valores total;
 	private Transporte transp;
 	private Cobranca cobr;
-	private InfAdiFisco infAdic;
+	private InfAdic infAdic;
 	private InfComex exporta;
 	private InfAssinatura Signature;
 	
@@ -133,11 +133,11 @@ public class InfNFE {
         return det;
 	}
 	
-	public InfAdiFisco getInfAdic()
+	public InfAdic getInfAdic()
 	{
 		return infAdic;
 	}
-	public void setInfAdic(InfAdiFisco infAdic)
+	public void setInfAdic(InfAdic infAdic)
 	{
 		this.infAdic = infAdic;
 	}

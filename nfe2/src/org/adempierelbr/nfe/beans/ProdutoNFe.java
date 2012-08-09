@@ -92,15 +92,13 @@ public class ProdutoNFe {
 		return cEAN;
 	}
 	private void setcEAN(String cEAN) {
-		if (cEAN == null || cEAN.isEmpty()){
+		cEAN = TextUtil.toNumeric(cEAN);
+		if (cEAN.length() == 8 || cEAN.length() == 12 ||
+			cEAN.length() == 13 || cEAN.length() == 14) {
+			this.cEAN = cEAN;
+		}
+		else
 			this.cEAN = "";
-		}
-		else{
-			if (cEAN.length() == 8 || cEAN.length() == 12 ||
-				cEAN.length() == 13 || cEAN.length() == 14) {
-				this.cEAN = cEAN;
-			}
-		}
 	}
 
 	public String getxProd() {

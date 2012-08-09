@@ -44,13 +44,7 @@ public class NFeTaxes
 	private String CST;
 
 	/**
-	 * 	Constructor
-	 *
 	 * @param taxIndicator
-	 * @param vBC
-	 * @param vImposto
-	 * @param pImposto
-	 * @param vRedBC
 	 * @param CST
 	 */
 	public NFeTaxes (String taxIndicator, String CST)
@@ -64,28 +58,18 @@ public class NFeTaxes
 	}
 
 	/**
-	 * 	Constructor
-	 *
 	 * @param taxIndicator
 	 * @param vBC
 	 * @param vImposto
 	 * @param pImposto
-	 * @param vRedBC
+	 * @param pRedBC
 	 * @param CST
+	 * @param isST
 	 */
-	public NFeTaxes (String taxIndicator, BigDecimal vBC, BigDecimal vImposto,
-				BigDecimal pImposto, BigDecimal pRedBC, BigDecimal vBCST, BigDecimal vImpostoST,
-				BigDecimal pImpostoST, BigDecimal pRedBCST, String CST)
-	{
+	public NFeTaxes (String taxIndicator, String CST, boolean isST, 
+			BigDecimal vBC, BigDecimal vImposto, BigDecimal pImposto, BigDecimal pRedBC) {
 		this (taxIndicator, CST);
-		setvBC(vBC);
-		setvImposto(vImposto);
-		setpImposto(pImposto);
-		setpRedBC(pRedBC);
-		setvBCST(vBCST);
-		setvImpostoST(vImpostoST);
-		setpImpostoST(pImpostoST);
-		setpRedBCST(pRedBCST);
+		add(isST, vBC,vImposto, pImposto, pRedBC);
 	}
 
 	/**
@@ -102,10 +86,8 @@ public class NFeTaxes
 		//
 		List<MLBRNFLineTax> lineTaxes = nfl.getTaxes();
 		//
-		for (MLBRNFLineTax lt : lineTaxes)
-		{
-			X_LBR_TaxGroup taxGroup =
-				new X_LBR_TaxGroup(Env.getCtx(), lt.getLBR_TaxGroup_ID(), null);
+		for (MLBRNFLineTax lt : lineTaxes) {
+			X_LBR_TaxGroup taxGroup = new X_LBR_TaxGroup(nfl.getCtx(), lt.getLBR_TaxGroup_ID(), nfl.get_TrxName());
 			String taxIndicator = taxGroup.getName();
 			
 			boolean isST = false;
@@ -116,40 +98,29 @@ public class NFeTaxes
 			
 			//
 			NFeTaxes tx = null;
-			if (txs.containsKey(taxIndicator))
-			{
+			if (txs.containsKey(taxIndicator)) {
 				tx = txs.get(taxIndicator);
 				tx.add (isST, lt.getlbr_TaxBaseAmt(), lt.getlbr_TaxAmt(), lt.getlbr_TaxRate(), lt.getlbr_TaxBase());
 			}
-			else
-			{
-				if (!isST){
-					tx = new NFeTaxes (taxIndicator, lt.getlbr_TaxBaseAmt(), lt.getlbr_TaxAmt(),
-							lt.getlbr_TaxRate(),lt.getlbr_TaxBase(), Env.ZERO, Env.ZERO, Env.ZERO,
-							Env.ZERO, nfl.getlbr_TaxStatus());
-				}
-				else {
-					tx = new NFeTaxes (taxIndicator,Env.ZERO, Env.ZERO, Env.ZERO, Env.ZERO, 
-							lt.getlbr_TaxBaseAmt(), lt.getlbr_TaxAmt(), lt.getlbr_TaxRate(), 
-							lt.getlbr_TaxBase(), nfl.getlbr_TaxStatus());
-				}
+			else {
+				tx = new NFeTaxes(taxIndicator, nfl.getlbr_TaxStatus(), isST, lt.getlbr_TaxBaseAmt(), 
+						lt.getlbr_TaxAmt(), lt.getlbr_TaxRate(),lt.getlbr_TaxBase());
 			}
 			//	Inclui os impostos no mapa
 			txs.put(taxIndicator, tx);
 		}
 		//
-		if (!txs.containsKey("PIS"))
-		{
+		if (!txs.containsKey("PIS")) {
 			NFeTaxes tx = new NFeTaxes ("PIS", nfl.getlbr_TaxStatus());
 			txs.put("PIS", tx);
 		}
-		if (!txs.containsKey("COFINS"))
-		{
+		
+		if (!txs.containsKey("COFINS")) {
 			NFeTaxes tx = new NFeTaxes ("COFINS", nfl.getlbr_TaxStatus());
 			txs.put("COFINS", tx);
 		}
-		if (!txs.containsKey("ICMS"))
-		{
+		
+		if (!txs.containsKey("ICMS")) {
 			NFeTaxes tx = new NFeTaxes ("ICMS", nfl.getlbr_TaxStatus());
 			txs.put("ICMS", tx);
 		}
@@ -167,69 +138,57 @@ public class NFeTaxes
 			add(vBC,vImposto,pImposto,pRedBC);
 	}
 	
-	private void add (BigDecimal vBC, BigDecimal vImposto, BigDecimal pImposto, BigDecimal pRedBC)
-	{
-		this.vBC = this.vBC.add(vBC);
-		this.vImposto = this.vImposto.add(vImposto);
+	private void add (BigDecimal vBC, BigDecimal vImposto, BigDecimal pImposto, BigDecimal pRedBC) {
+		this.vBC      = this.vBC == null ? vBC : this.vBC.add(vBC);
+		this.vImposto = this.vImposto == null ? vImposto : this.vImposto.add(vImposto);
 		this.pImposto = pImposto;
-		this.pRedBC = pRedBC;
+		this.pRedBC   = pRedBC;
 	}	//	add
 	
-	private void addST (BigDecimal vBCST, BigDecimal vImpostoST, BigDecimal pImpostoST, BigDecimal pRedBCST)
-	{
-		this.vBCST = this.vBCST.add(vBCST);
-		this.vImpostoST = this.vImpostoST.add(vImpostoST);
+	private void addST (BigDecimal vBCST, BigDecimal vImpostoST, BigDecimal pImpostoST, BigDecimal pRedBCST) {
+		this.vBCST      = this.vBCST == null ? vBCST : this.vBCST.add(vBCST);
+		this.vImpostoST = this.vImpostoST == null ? vImpostoST : this.vImpostoST.add(vImpostoST);
 		this.pImpostoST = pImpostoST;
-		this.pRedBCST = pRedBCST;
+		this.pRedBCST   = pRedBCST;
 	}	//	addST
 
-	public String getTaxIndicator()
-	{
+	public String getTaxIndicator() {
 		return taxIndicator;
 	}
 
-	public void setTaxIndicator(String taxIndicator)
-	{
+	public void setTaxIndicator(String taxIndicator) {
 		this.taxIndicator = taxIndicator;
 	}
 
-	public BigDecimal getvBC()
-	{
+	public BigDecimal getvBC() {
 		return vBC;
 	}
 
-	public void setvBC(BigDecimal vBC)
-	{
+	public void setvBC(BigDecimal vBC) {
 		this.vBC = vBC;
 	}
 
-	public BigDecimal getvImposto()
-	{
+	public BigDecimal getvImposto() {
 		return vImposto;
 	}
 
-	public void setvImposto(BigDecimal vImposto)
-	{
+	public void setvImposto(BigDecimal vImposto) {
 		this.vImposto = vImposto;
 	}
 
-	public BigDecimal getpImposto()
-	{
+	public BigDecimal getpImposto() {
 		return pImposto;
 	}
 
-	public void setpImposto(BigDecimal pImposto)
-	{
+	public void setpImposto(BigDecimal pImposto) {
 		this.pImposto = pImposto;
 	}
 
-	public BigDecimal getpRedBC()
-	{
+	public BigDecimal getpRedBC() {
 		return pRedBC;
 	}
 
-	public void setpRedBC(BigDecimal pRedBC)
-	{
+	public void setpRedBC(BigDecimal pRedBC) {
 		this.pRedBC = pRedBC;
 	}
 	
@@ -265,13 +224,11 @@ public class NFeTaxes
 		this.pRedBCST = pRedBCST;
 	}
 
-	public String getCST()
-	{
+	public String getCST() {
 		return CST;
 	}
 
-	public void setCST(String cST)
-	{
+	public void setCST(String cST) {
 		CST = cST;
 	}
 }	//	NFeTaxes

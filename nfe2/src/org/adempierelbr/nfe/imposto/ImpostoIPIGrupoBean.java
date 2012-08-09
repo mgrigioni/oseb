@@ -10,17 +10,25 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
-public class ImpostoDIBean {
-	
-	// Imposto de Importação
-	
+public class ImpostoIPIGrupoBean {
+	private String CST;
 	private String vBC;
-	private String vDespAdu;
-	private String vII;
-	private String vIOF;
+	private String pIPI;
+	private String vIPI;
+	private String qUnid;
+	private String vUnid;
 	
+	public String getCST() {
+		return CST;
+	}
+	public void setCST(String cST) {
+		if (cST != null)
+			cST = cST.trim();
+	
+		CST = cST;
+	}
 	public String getvBC() {
 		return vBC;
 	}
@@ -30,32 +38,41 @@ public class ImpostoDIBean {
 	
 		this.vBC = vBC;
 	}
-	public String getvDespAdu() {
-		return vDespAdu;
+	public String getpIPI() {
+		return pIPI;
 	}
-	public void setvDespAdu(String vDespAdu) {
-		if (vDespAdu != null)
-			vDespAdu = vDespAdu.trim();
+	public void setpIPI(String pIPI) {
+		if (pIPI != null)
+			pIPI = pIPI.trim();
 	
-		this.vDespAdu = vDespAdu;
+		this.pIPI = pIPI;
 	}
-	public String getvII() {
-		return vII;
+	public String getvIPI() {
+		return vIPI;
 	}
-	public void setvII(String vII) {
-		if (vII != null)
-			vII = vII.trim();
+	public void setvIPI(String vIPI) {
+		if (vIPI != null)
+			vIPI = vIPI.trim();
 	
-		this.vII = vII;
+		this.vIPI = vIPI;
 	}
-	public String getvIOF() {
-		return vIOF;
+	public String getqUnid() {
+		return qUnid;
 	}
-	public void setvIOF(String vIOF) {
-		if (vIOF != null)
-			vIOF = vIOF.trim();
+	public void setqUnid(String qUnid) {
+		if (qUnid != null)
+			qUnid = qUnid.trim();
 	
-		this.vIOF = vIOF;
+		this.qUnid = qUnid;
 	}
-
+	public String getvUnid() {
+		return vUnid;
+	}
+	public void setvUnid(String vUnid) {
+		if (vUnid != null)
+			vUnid = vUnid.trim();
+	
+		this.vUnid = vUnid;
+	}
+		
 }

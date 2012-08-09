@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,26 +13,36 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
-public class NFEBean {
+import org.adempiere.exceptions.AdempiereException;
+import org.adempierelbr.util.TextUtil;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  Grupo de informação das NF/NF-e referenciadas
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: NFReferenciada.java,v 2.0 07/08/2012 09:31:00 mgrigioni Exp $
+ */
+@XStreamAlias ("NFRef")
+public class NFReferenciada {
+
+	private String refNFe ;
+
+	public NFReferenciada(String refNFe){
+		setRefNFe(refNFe);
+	}
 	
-	private String NFe;
-	private InfNFE infNFe;
-	public String getNFe() {
-		return NFe;
+	public String getRefNFe() {
+		return refNFe;
 	}
-	public void setNFe(String fe) {
-		if (fe != null)
-			fe = fe.trim();
+
+	public void setRefNFe(String refNFe) {
+		refNFe = TextUtil.toNumeric(refNFe);
+		if (refNFe.length() != 44)
+			throw new AdempiereException("refNFe = " + refNFe);
 		
-		NFe = fe;
+		this.refNFe = refNFe;
 	}
-	public InfNFE getInfNFe() {
-		return infNFe;
-	}
-	public void setInfNFe(InfNFE infNFe) {
-		this.infNFe = infNFe;
-	}
-		
-			
-	
-}
+
+} //NFReferenciada

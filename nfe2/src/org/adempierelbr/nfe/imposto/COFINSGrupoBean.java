@@ -10,25 +10,50 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+public class COFINSGrupoBean {
 
-public class COFINSBean {
-
-	// COFINS - Definir Grupo de COFINS
+	private String CST;
+	private String vBC;
+	private String pCOFINS;
+	private String vCOFINS;
 	
-	@XStreamAsAttribute
-	private COFINSGrupoBean COFINS;
-
-	public COFINSGrupoBean getCOFINS() {
-		return COFINS;
+	public String getCST() {
+		return CST;
+	}
+	public void setCST(String cST) {
+		if (cST != null)
+			cST = cST.trim();
+	
+		CST = cST;
+	}
+	public String getvBC() {
+		return vBC;
+	}
+	public void setvBC(String vBC) {
+		if (vBC != null)
+			vBC = vBC.trim();
+	
+		this.vBC = vBC;
+	}
+	public String getpCOFINS() {
+		return pCOFINS;
+	}
+	public void setpCOFINS(String pCOFINS) {
+		if (pCOFINS != null)
+			pCOFINS = pCOFINS.trim();
+	
+		this.pCOFINS = pCOFINS;
+	}
+	public String getvCOFINS() {
+		return vCOFINS;
+	}
+	public void setvCOFINS(String vCOFINS) {
+		if (vCOFINS != null)
+			vCOFINS = vCOFINS.trim();
+	
+		this.vCOFINS = vCOFINS;
 	}
 
-	public void setCOFINS(COFINSGrupoBean cofins) {
-		COFINS = cofins;
-	}
-
-	
-	
 }

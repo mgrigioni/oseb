@@ -10,18 +10,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ *  N - ICMS Normal e ST
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: GrupoICMS.java,v 1.0 07/08/2012 09:13:00 mgrigioni Exp $
+ */
+@XStreamAlias ("ICMS")
 public class ICMSBean {
-
-	// ICMS - Definir Coluna ICMS de acordo com a Situa��o Tributaria
-
-	@XStreamAsAttribute
-	private ICMSGrupoBean ICMS;
 	
 	private ICMSGrupoBean ICMS00;
 	private ICMSGrupoBean ICMS10;
@@ -32,15 +34,6 @@ public class ICMSBean {
 	private ICMS60Grp ICMS60;
 	private ICMSGrupoBean ICMS70;
 	private ICMSGrupoBean ICMS90;
-
-
-	public ICMSGrupoBean getICMS() {
-		return ICMS;
-	}
-
-	public void setICMS(ICMSGrupoBean icms) {
-		ICMS = icms;
-	}
 
 	public ICMSGrupoBean getICMS00() {
 		return ICMS00;

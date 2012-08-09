@@ -197,6 +197,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		catch (Throwable e1){
 			log.severe(e1.getLocalizedMessage());
 			e1.printStackTrace();
+			return false;
 		}
 
 		return true;

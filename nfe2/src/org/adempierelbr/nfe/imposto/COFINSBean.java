@@ -10,49 +10,25 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
-public class PISGrupoBean {
-	private String CST;
-	private String vBC;
-	private String pPIS;
-	private String vPIS;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+public class COFINSBean {
+
+	// COFINS - Definir Grupo de COFINS
 	
-	public String getCST() {
-		return CST;
-	}
-	public void setCST(String cST) {
-		if (cST != null)
-			cST = cST.trim();
-	
-		CST = cST;
-	}
-	public String getvBC() {
-		return vBC;
-	}
-	public void setvBC(String vBC) {
-		if (vBC != null)
-			vBC = vBC.trim();
-	
-		this.vBC = vBC;
-	}
-	public String getpPIS() {
-		return pPIS;
-	}
-	public void setpPIS(String pPIS) {
-		if (pPIS != null)
-			pPIS = pPIS.trim();
-	
-		this.pPIS = pPIS;
-	}
-	public String getvPIS() {
-		return vPIS;
-	}
-	public void setvPIS(String vPIS) {
-		if (vPIS != null)
-			vPIS = vPIS.trim();
-	
-		this.vPIS = vPIS;
+	@XStreamAsAttribute
+	private COFINSGrupoBean COFINS;
+
+	public COFINSGrupoBean getCOFINS() {
+		return COFINS;
 	}
 
+	public void setCOFINS(COFINSGrupoBean cofins) {
+		COFINS = cofins;
+	}
+
+	
+	
 }

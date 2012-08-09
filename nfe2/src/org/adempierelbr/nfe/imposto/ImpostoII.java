@@ -11,69 +11,60 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
-import org.adempierelbr.nfe.imposto.COFINSBean;
-import org.adempierelbr.nfe.imposto.ICMSBean;
-import org.adempierelbr.nfe.imposto.ImpostoII;
-import org.adempierelbr.nfe.imposto.ImpostoIPIBean;
-import org.adempierelbr.nfe.imposto.PISBean;
+import java.math.BigDecimal;
+
+import org.adempierelbr.util.TextUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- *  M - Tributos incidentes no Produto ou Serviço
+ *  P - Imposto de Importação
  *  
  *  @author Mario Grigioni
- *  @version $Id: ImpostoProduto.java,v 2.0 02/08/2012 14:13:00 mgrigioni Exp $
+ *  @version $Id: ImpostoII.java,v 1.0 07/08/2012 09:46:00 mgrigioni Exp $
  */
-@XStreamAlias ("imposto")
-public class ImpostoProduto {
-
-	private ICMSBean ICMS;
-	private ImpostoIPIBean IPI;
-	private ImpostoII II;
-	private PISBean PIS;
-	private COFINSBean COFINS;
-
-	public ICMSBean getICMS() {
-		return ICMS;
-	}
-
-	public void setICMS(ICMSBean icms) {
-		ICMS = icms;
-	}
-
-	public ImpostoIPIBean getIPI() {
-		return IPI;
-	}
-
-	public void setIPI(ImpostoIPIBean ipi) {
-		IPI = ipi;
-	}
-
-	public ImpostoII getII() {
-		return II;
-	}
-
-	public void setII(ImpostoII ii) {
-		II = ii;
-	}
-
-	public PISBean getPIS() {
-		return PIS;
-	}
-
-	public void setPIS(PISBean pis) {
-		PIS = pis;
-	}
-
-	public COFINSBean getCOFINS() {
-		return COFINS;
-	}
-
-	public void setCOFINS(COFINSBean cofins) {
-		COFINS = cofins;
+@XStreamAlias ("II")
+public class ImpostoII {
+	
+	private String vBC;
+	private String vDespAdu = TextUtil.ZERO_STRING;
+	private String vII;
+	private String vIOF = TextUtil.ZERO_STRING;
+	
+	public ImpostoII(BigDecimal vBC, BigDecimal vII) {
+		super();
+		setvBC(vBC);
+		setvII(vII);
 	}
 	
-} //ImpostoProduto
+	public String getvBC() {
+		return vBC;
+	}
+	public void setvBC(BigDecimal vBC) {
+		this.vBC = TextUtil.bigdecimalToString(vBC);
+	}
+	
+	public String getvDespAdu() {
+		return vDespAdu;
+	}
+	public void setvDespAdu(BigDecimal vDespAdu) {
+		this.vDespAdu = TextUtil.bigdecimalToString(vDespAdu);
+	}
+	
+	public String getvII() {
+		return vII;
+	}
+	public void setvII(BigDecimal vII) {	
+		this.vII = TextUtil.bigdecimalToString(vII);
+	}
+	
+	public String getvIOF() {
+		return vIOF;
+	}
+	public void setvIOF(BigDecimal vIOF) {
+		this.vIOF = TextUtil.bigdecimalToString(vIOF);
+	}
+
+} // ImpostoII

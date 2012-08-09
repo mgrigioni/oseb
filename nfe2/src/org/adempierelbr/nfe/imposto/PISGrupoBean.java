@@ -10,39 +10,49 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
-@XStreamAlias ("NFRef")
-public class NFEReferenciadaBean {
-
-	private String refNFe ;
-	private InformacoesNFEReferenciadaBean refNF;
-
-	public NFEReferenciadaBean(String refNFe){
-		setRefNFe(refNFe);
-	}
+public class PISGrupoBean {
+	private String CST;
+	private String vBC;
+	private String pPIS;
+	private String vPIS;
 	
-	public String getRefNFe() {
-		return refNFe;
+	public String getCST() {
+		return CST;
+	}
+	public void setCST(String cST) {
+		if (cST != null)
+			cST = cST.trim();
+	
+		CST = cST;
+	}
+	public String getvBC() {
+		return vBC;
+	}
+	public void setvBC(String vBC) {
+		if (vBC != null)
+			vBC = vBC.trim();
+	
+		this.vBC = vBC;
+	}
+	public String getpPIS() {
+		return pPIS;
+	}
+	public void setpPIS(String pPIS) {
+		if (pPIS != null)
+			pPIS = pPIS.trim();
+	
+		this.pPIS = pPIS;
+	}
+	public String getvPIS() {
+		return vPIS;
+	}
+	public void setvPIS(String vPIS) {
+		if (vPIS != null)
+			vPIS = vPIS.trim();
+	
+		this.vPIS = vPIS;
 	}
 
-	public void setRefNFe(String refNFe) {
-		if (refNFe != null)
-			refNFe = refNFe.trim();
-		
-		this.refNFe = refNFe;
-	}
-
-	public InformacoesNFEReferenciadaBean getRefNF() {
-		return refNF;
-	}
-
-	public void setRefNF(InformacoesNFEReferenciadaBean refNF) {
-		this.refNF = refNF;
-	}
-	
-	
-	
 }

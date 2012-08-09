@@ -10,31 +10,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.imposto;
 
-public class InfAdiFisco
-{
-	// Informações Adicionais
-	private String infAdFisco;
-	private String infCpl;
-	
-	public String getInfAdFisco() {
-		return infAdFisco;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+public class PISBean {
+
+	// PIS - Definir Grupo do PIS
+	@XStreamAsAttribute
+	private PISGrupoBean PIS;
+
+	public PISGrupoBean getPIS() {
+		return PIS;
 	}
-	public void setInfAdFisco(String infAdFisco) {
-		if (infAdFisco != null)
-			infAdFisco = infAdFisco.trim();
-	
-		this.infAdFisco = infAdFisco;
+
+	public void setPIS(PISGrupoBean pis) {
+		PIS = pis;
 	}
-	public String getInfCpl() {
-		return infCpl;
-	}
-	public void setInfCpl(String infCpl) {
-		if (infCpl != null)
-			infCpl = infCpl.trim();
+
+
 	
-		this.infCpl = infCpl;
-	}
-	
-}	//	InfAdiFisco
+}
