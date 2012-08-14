@@ -447,7 +447,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
 		}
 		
-		if (((getGrandTotal().subtract(sumGrandTotal)).abs()).compareTo(Env.ONE) <= 0){
+		if (((getGrandTotal().subtract(sumGrandTotal)).abs()).compareTo(Env.ONE) > 0){
 			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total da NF difere da soma dos itens";
 			return DocAction.STATUS_Invalid;
 		}

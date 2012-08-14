@@ -166,7 +166,7 @@ public class ProdutoNFe {
 		return vUnCom;
 	}
 	private void setvUnCom(BigDecimal vUnCom) {
-		this.vUnCom = TextUtil.bigdecimalToString(vUnCom,4);
+		this.vUnCom = TextUtil.bigdecimalToString(vUnCom,5);
 	}
 
 	public String getvProd() {
@@ -174,7 +174,7 @@ public class ProdutoNFe {
 	}
 	private void setvProd(BigDecimal qCom, BigDecimal vUnCom) {
 		qCom = qCom.setScale(4, TaxBR.ROUND);
-		vUnCom = vUnCom.setScale(4,TaxBR.ROUND);
+		vUnCom = vUnCom.setScale(5,TaxBR.ROUND);
 		
 		this.vProd = TextUtil.bigdecimalToString(qCom.multiply(vUnCom));
 	}
@@ -204,7 +204,7 @@ public class ProdutoNFe {
 		return vUnTrib;
 	}
 	private void setvUnTrib(BigDecimal vUnTrib) {
-		this.vUnTrib = TextUtil.bigdecimalToString(vUnTrib,4);
+		this.vUnTrib = TextUtil.bigdecimalToString(vUnTrib,5);
 	}
 	
 	public String getvFrete() {
