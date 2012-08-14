@@ -154,7 +154,7 @@ public class NFeXMLGenerator
 		
 		// Valores Totais
 		ValoresICMS valoresicms = new ValoresICMS(nf.getGrandTotal(),nf.getTotalLines(),
-				nf.getFreightAmt(),nf.getlbr_InsuranceAmt());
+				nf.getFreightAmt(),nf.getlbr_InsuranceAmt(), nf.getChargeAmt());
 		
 		for (X_LBR_NFTax nfTax : nf.getTaxes()){
 			valoresicms.setValorImposto(nfTax);

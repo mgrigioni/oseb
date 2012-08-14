@@ -454,7 +454,7 @@ public class EFDUtil_PC
 		String IND_FRT = nf.getFreightCostRule() == null ? "9" : (nf.getFreightCostRule().equals("E") ? "2" : "1");
 		BigDecimal VL_FRT = nf.getFreightAmt();
 		BigDecimal VL_SEG = nf.getlbr_InsuranceAmt();
-		BigDecimal VL_OUT_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_OUT_DA = nf.getChargeAmt();
 		
 		BigDecimal[] assetAmt = nf.getAssetTaxAmt();
 		BigDecimal VL_BC_ICMS = nf.getICMSBase().subtract(assetAmt[0]);
@@ -703,7 +703,7 @@ public class EFDUtil_PC
 		BigDecimal VL_DESC = nf.getDiscountAmt();
 		BigDecimal VL_SERV = nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt());
 		BigDecimal VL_TERC = Env.ZERO; //TODO ???
-		BigDecimal VL_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_DA = nf.getChargeAmt();
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_PIS = nf.getPISAmt();

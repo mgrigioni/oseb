@@ -51,9 +51,10 @@ public class ValoresICMS {
 	 * @param totalLines
 	 * @param freightAmt
 	 * @param lbr_InsuranceAmt
+	 * @param chargeAmt
 	 */
 	public ValoresICMS(BigDecimal grandTotal, BigDecimal totalLines, BigDecimal freightAmt,
-			BigDecimal lbr_InsuranceAmt){
+			BigDecimal lbr_InsuranceAmt, BigDecimal chargeAmt){
 		setvNF(grandTotal);
 		setvProd(totalLines);
 		setvFrete(freightAmt);
@@ -67,7 +68,7 @@ public class ValoresICMS {
 		setvCOFINS(null);
 		setvIPI(null);
 		setvII(null);
-		setvOutro(null); 
+		setvOutro(chargeAmt); 
 	} //ValoresICMS
 	
 	/**

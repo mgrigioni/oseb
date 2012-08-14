@@ -447,7 +447,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
 		}
 		
-		if (getGrandTotal().compareTo(sumGrandTotal) != 0){
+		if (((getGrandTotal().subtract(sumGrandTotal)).abs()).compareTo(Env.ONE) <= 0){
 			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total da NF difere da soma dos itens";
 			return DocAction.STATUS_Invalid;
 		}
@@ -978,7 +978,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			if (ICMSRate == null || ICMSRate.signum() == 0)
 				continue;
 
-			BigDecimal freightAmt = nfLine.getFreightAmt(TotalLinesAmt, TotalFreightAmt);
+			BigDecimal freightAmt = nfLine.getAvgExpenseAmt(TotalLinesAmt, TotalFreightAmt);
 
 			//frete/(1-(ICMS/100))
 			BigDecimal taxBaseAmt = freightAmt.divide((Env.ONE.subtract(

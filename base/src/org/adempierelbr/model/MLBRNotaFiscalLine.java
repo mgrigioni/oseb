@@ -200,6 +200,10 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			getParent().setlbr_TotalSISCOMEX(getParent().getlbr_TotalSISCOMEX().add(amt));	
 			isClientProduct = true;
 		}
+		else if (M_Product_ID == m_client.get_ValueAsInt("Z_ProductCharge_ID")){ //OUTRAS DESPESAS
+			getParent().setChargeAmt(getParent().getChargeAmt().add(amt));	
+			isClientProduct = true;
+		}
 		
 		if (isClientProduct){
 			getParent().setGrandTotal(getParent().getGrandTotal().add(amt));
@@ -405,54 +409,35 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	
 	public BigDecimal getFreightAmt(){
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
-		return getFreightAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getFreightAmt());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getFreightAmt());
 	}
 
-	protected BigDecimal getFreightAmt(BigDecimal totalLinesAmt, BigDecimal totalFreightAmt){
-
-		if (totalLinesAmt.signum() <= 0 || totalFreightAmt.signum() <= 0)
-			return Env.ZERO;
-		
-		BigDecimal lineAmt = getLineTotalAmt();
-		BigDecimal freightAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
-		           freightAmt = totalFreightAmt.multiply(freightAmt);
-
-		return freightAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getFreightAmt
-	
 	public BigDecimal getInsuranceAmt(){
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
-		return getFreightAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getlbr_InsuranceAmt());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getlbr_InsuranceAmt());
 	}
-
-	protected BigDecimal getInsuranceAmt(BigDecimal totalLinesAmt, BigDecimal totalInsuranceAmt){
-
-		if (totalLinesAmt.signum() <= 0 || totalInsuranceAmt.signum() <= 0)
-			return Env.ZERO;
-		
-		BigDecimal lineAmt = getLineTotalAmt();
-		BigDecimal insuranceAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
-		           insuranceAmt = totalInsuranceAmt.multiply(insuranceAmt);
-
-		return insuranceAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getInsuranceAmt
 	
 	public BigDecimal getDiscountAmt(){
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
-		return getDiscountAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getDiscountAmt());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getDiscountAmt());
+	}
+	
+	public BigDecimal getChargeAmt(){
+		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getChargeAmt());
 	}
 
-	protected BigDecimal getDiscountAmt(BigDecimal totalLinesAmt, BigDecimal totalDiscountAmt){
+	protected BigDecimal getAvgExpenseAmt(BigDecimal totalLinesAmt, BigDecimal totalExpenseAmt){
 
-		if (totalLinesAmt.signum() <= 0 || totalDiscountAmt.signum() <= 0)
+		if (totalLinesAmt.signum() <= 0 || totalExpenseAmt.signum() <= 0)
 			return Env.ZERO;
 		
 		BigDecimal lineAmt = getLineTotalAmt();
-		BigDecimal discountAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
-		           discountAmt = totalDiscountAmt.multiply(discountAmt);
+		BigDecimal expenseAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
+		           expenseAmt = totalExpenseAmt.multiply(expenseAmt);
 
-		return discountAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getDiscountAmt
+		return expenseAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
+	} //getAvgExpensesAmt
 	
 	/**
 	 * Retorna a DIs da Linha
@@ -475,6 +460,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		BigDecimal lineAmt      = getLineTotalAmt();
 		BigDecimal freightAmt   = getFreightAmt();		
 		BigDecimal insuranceAmt = getInsuranceAmt();
+		BigDecimal chargeAmt    = getChargeAmt();
 		BigDecimal discountAmt  = getDiscountAmt().negate();
 		BigDecimal siscomexAmt  = getlbr_LineTotalSISCOMEX();
 		BigDecimal taxAmt       = getIPIAmt().add(getTaxAmt("ICMSST"));
@@ -487,7 +473,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		}
 			
 		//VALOR LINHA + FRETE + SEGURO + SISCOMEX + IPI = VALOR TOTAL DA OPERACAO
-		return (lineAmt.add(freightAmt).add(insuranceAmt).add(siscomexAmt).add
+		return (lineAmt.add(freightAmt).add(insuranceAmt).add(chargeAmt).add(siscomexAmt).add
 			   (taxAmt).add(discountAmt)).setScale(TaxBR.SCALE, TaxBR.ROUND);
 	}
 	

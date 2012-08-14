@@ -50,6 +50,7 @@ public class ProdutoNFe {
 	private String vFrete;
 	private String vSeg;
 	private String vDesc;
+	private String vOutro;
 	private final String indTot = "1"; //v2.0 = 0 – VL Ñ ENTRA NO TOT 1 - VL ENTRA
 	private DeclaracaoDI DI;
 	
@@ -76,6 +77,7 @@ public class ProdutoNFe {
 		
 		setvFrete(nfLine.getFreightAmt());
 		setvSeg(nfLine.getInsuranceAmt());
+		setvOutro(nfLine.getChargeAmt());
 	}
 	
 	public String getcProd() {
@@ -227,6 +229,14 @@ public class ProdutoNFe {
 	public void setvDesc(BigDecimal vDesc) {
 		if (vDesc != null && vDesc.signum() == 1)
 			this.vDesc = TextUtil.bigdecimalToString(vDesc);
+	}
+	
+	public String getvOutro() {
+		return vOutro;
+	}
+	public void setvOutro(BigDecimal vOutro) {
+		if (vOutro != null && vOutro.signum() == 1)
+			this.vOutro = TextUtil.bigdecimalToString(vOutro);
 	}
 	
 	public String getIndTot() {

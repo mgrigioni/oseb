@@ -132,6 +132,19 @@ public interface I_LBR_NotaFiscal
 
 	public I_C_DocType getC_DocTypeTarget() throws RuntimeException;
 
+    /** Column name ChargeAmt */
+    public static final String COLUMNNAME_ChargeAmt = "ChargeAmt";
+
+	/** Set Charge amount.
+	  * Charge Amount
+	  */
+	public void setChargeAmt (BigDecimal ChargeAmt);
+
+	/** Get Charge amount.
+	  * Charge Amount
+	  */
+	public BigDecimal getChargeAmt();
+
     /** Column name C_Invoice_ID */
     public static final String COLUMNNAME_C_Invoice_ID = "C_Invoice_ID";
 
@@ -1149,34 +1162,6 @@ public interface I_LBR_NotaFiscal
 	  * Identifies the model of Nota Fiscal
 	  */
 	public String getlbr_NFModel();
-
-    /** Column name lbr_NFReference */
-    public static final String COLUMNNAME_lbr_NFReference = "lbr_NFReference";
-
-	/** Set NF Reference.
-	  * Reference to other NF
-	  */
-	public void setlbr_NFReference (int lbr_NFReference);
-
-	/** Get NF Reference.
-	  * Reference to other NF
-	  */
-	public int getlbr_NFReference();
-
-	public org.adempierelbr.model.I_LBR_NotaFiscal getlbr_NFRefere() throws RuntimeException;
-
-    /** Column name lbr_NFType */
-    public static final String COLUMNNAME_lbr_NFType = "lbr_NFType";
-
-	/** Set NF Type.
-	  * Nota Fiscal Type
-	  */
-	public void setlbr_NFType (String lbr_NFType);
-
-	/** Get NF Type.
-	  * Nota Fiscal Type
-	  */
-	public String getlbr_NFType();
 
     /** Column name LBR_NotaFiscal_ID */
     public static final String COLUMNNAME_LBR_NotaFiscal_ID = "LBR_NotaFiscal_ID";
