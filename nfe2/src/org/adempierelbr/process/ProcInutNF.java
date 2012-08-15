@@ -1,8 +1,20 @@
+/******************************************************************************
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
+ * This program is free software; you can redistribute it and/or modify it    *
+ * under the terms version 2 of the GNU General Public License as published   *
+ * by the Free Software Foundation. This program is distributed in the hope   *
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied *
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.           *
+ * See the GNU General Public License for more details.                       *
+ * You should have received a copy of the GNU General Public License along    *
+ * with this program; if not, write to the Free Software Foundation, Inc.,    *
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
+ *****************************************************************************/
 package org.adempierelbr.process;
 
 import java.io.File;
 import java.io.StringReader;
-import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -10,81 +22,49 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
 import org.adempierelbr.model.MLBRDigitalCertificate;
+import org.adempierelbr.model.MLBRNFeInut;
 import org.adempierelbr.model.MLBRNFeWebService;
+import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
-import org.adempierelbr.wrapper.I_W_C_DocType;
-import org.compiere.model.MDocType;
+import org.compiere.model.MAttachment;
 import org.compiere.model.MOrgInfo;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
-import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 
 /**
- * 		Inutiliza uma NF ou uma Sequência de NF
- * 
- *  @author Ricardo Santana (Kenos, www.kenos.com.br)
- *	@version $Id: ProcInutNF.java, v1.0 2010/12/01 3:45:29 PM, ralexsander Exp $
+ *  Inutiliza uma NF ou uma Sequência de NF
+ *  
+ *  @author Mario Grigioni
+ *  @contributor Ricardo Santana (old version)
+ *  @version $Id: ProcInutNF.java,v 2.0 14/08/2012 17:06:00 mgrigioni Exp $
  */
-public class ProcInutNF extends SvrProcess 
-{
-	/** Nota Fiscal               	*/
-	private static Integer 	p_AD_Org_ID 	= 0;
-	
-	/** Tipo de Documento         	*/
-	private static Integer 	p_C_DocType_ID 	= 0;
-	
-	/**	Sequência de NF			  	*/
-	private static Integer 	p_nfIni    = 0;
-	private static Integer 	p_nfFin    = 0;
-	
-	/**	Justificativa			  	*/
-	private static String 	p_xJust     = "";
-	
-	/**	Data do Cancelamento	  	*/
-	private static Timestamp p_DateDoc;
-	
+public class ProcInutNF extends SvrProcess {
+
 	/**	Logger						*/
 	private static CLogger log = CLogger.getCLogger(ProcInutNF.class);
 
 	/**
 	 *  Prepare - e.g., get Parameters.
 	 */
-	protected void prepare ()
-	{
+	protected void prepare () {
 		ProcessInfoParameter[] paras = getParameter();
 		for (ProcessInfoParameter para : paras) {
 			String name = para.getParameterName();
 			if (para.getParameter() == null)
 				;
-			else if (name.equals("AD_Org_ID"))
-				p_AD_Org_ID = para.getParameterAsInt();
-			else if (name.equals("C_DocType_ID"))
-				p_C_DocType_ID = para.getParameterAsInt();
-			else if (name.equals("DocumentNo"))
-			{
-				p_nfIni = para.getParameterAsInt();
-				p_nfFin = para.getParameter_ToAsInt();
-			}
-			else if (name.equals("DateDoc"))
-				p_DateDoc = (Timestamp) para.getParameter();
-			else if (name.equals("lbr_MotivoCancel"))
-				p_xJust = (String) para.getParameter();
 			else
 				log.log(Level.SEVERE, "prepare - Unknown Parameter: " + name);
 		}
@@ -93,38 +73,12 @@ public class ProcInutNF extends SvrProcess
 	/**
 	 * 	DoIt
 	 */
-	protected String doIt() throws Exception
-	{
-		if (p_AD_Org_ID <= 0)
-			throw new AdempiereException ("@Mandatory@ @AD_Org_ID@");
-		if (p_C_DocType_ID <= 0)
-			throw new AdempiereException ("@Mandatory@ @C_DocType_ID@");
-		if (p_nfIni == null || p_nfIni.intValue() <= 0)
-			throw new AdempiereException ("@Mandatory@ @DocumentNo@");
-		if (p_nfFin == null || p_nfFin.intValue() <= 0)
-			p_nfFin = p_nfIni;
-		if (p_nfFin < p_nfIni)
-			throw new AdempiereException ("@Mandatory@ @DocumentNo@");
-		//
-		MOrgInfo orgInfo = MOrgInfo.get(Env.getCtx(), p_AD_Org_ID, get_TrxName());
-		MDocType dType = new MDocType(Env.getCtx(), p_C_DocType_ID, get_TrxName());
-
-		return invalidateNF(orgInfo, dType);
-	}	//	doIt
-	
-	/**
-	 * 	Inutiliza a NF
-	 * 
-	 * @param xmlGerado
-	 * @param orgInfo
-	 * @return
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unused")
-	private String invalidateNF (MOrgInfo orgInfo, MDocType dType) throws Exception {
+	protected String doIt() throws Exception {
+		
+		MLBRNFeInut nfeInut = new MLBRNFeInut(getCtx(),getRecord_ID(),get_TrxName());
+		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), nfeInut.getAD_Org_ID(), get_TrxName());
 		
 		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
-		I_W_C_DocType  dtW = POWrapper.create(dType, I_W_C_DocType.class);
 		
 		if (oiW.getlbr_NFeEnv() == null || oiW.getlbr_NFeEnv().isEmpty()){
 			return "Ambiente da NF-e deve ser preenchido.";
@@ -138,26 +92,23 @@ public class ProcInutNF extends SvrProcess
 		}
 		
 		try{
-			
-			String serie = dtW.getlbr_NFSerie();
-			if (serie == null || serie.trim().isEmpty())
-				serie = "0";
-			
+						
 			InutNFe inutNFe = new InutNFe(NFeUtil.VERSAO,oiW,orgInfo.getC_Location().getC_Region_ID(), 
-					p_DateDoc, dtW.getlbr_NFModel(), serie, p_nfIni.toString(), p_nfFin.toString(), p_xJust);
+					nfeInut.getC_Period().getStartDate(), nfeInut.getlbr_NFModel(), nfeInut.getlbr_NFSerie(),
+					nfeInut.getlbr_DocumentNo(), nfeInut.getlbr_DocumentNo_To(), nfeInut.getlbr_MotivoCancel());
+			
+			String validation = inutNFe.isValid();
+			if (validation != null){
+				return validation;
+			}
 			
 			String nfeInutMsg = NFeUtil.geraMsgInutilizacao(inutNFe);
-			
-			if (nfeInutMsg == null){
-				return Msg.getMsg(getCtx(), "ProcessFailed");
-			}
-		
 			File attachFile = new File(TextUtil.generateTmpFile(nfeInutMsg, inutNFe.getID()+NFeUtil.EXT_PEDIDO_INUT));
 			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_INUTILIZACAO_NFE);
 			nfeInutMsg = NFeUtil.XMLtoString(attachFile);
 
 			//	Validação envio
-			String validation = ValidaXML.validaInutNFe(nfeInutMsg);
+			validation = ValidaXML.validaInutNFe(nfeInutMsg);
 			if (!validation.equals(""))
 				return validation;
 
@@ -181,32 +132,32 @@ public class ProcInutNF extends SvrProcess
 			//
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = builder.parse(new InputSource(new StringReader(respLote)));
-			//
-			NodeList infProt =  doc.getElementsByTagName("infInut");
+			
+			String cStat = NFeUtil.getValue(doc, "cStat");
+			String xMotivo 	= NFeUtil.getValue (doc, "xMotivo");
+			
+			if (cStat != null){
+				nfeInut.setlbr_NFeStatus(cStat);
+				nfeInut.setProcessed(true);
+				nfeInut.save(get_TrxName());
 				
-			for (int i=0; i < infProt.getLength(); i++) {
-				Node node = infProt.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					String cStat 	= NFeUtil.getValue (node, "cStat");
-					String xMotivo 	= NFeUtil.getValue (node, "xMotivo");
-					//
-					if (cStat != null && cStat.equals("102")) {
-						new File(TextUtil.generateTmpFile(respLote, inutNFe.getID()+NFeUtil.EXT_INUTILIZACAO));
-						return Msg.getMsg(getCtx(), "ProcessOK");
-					}
-					else {
-						return Msg.getMsg(getCtx(), "ProcessFailed") + " - " + xMotivo;
-					}
+				if (cStat.equals(MLBRNotaFiscal.LBR_NFESTATUS_102_InutilizaçãoDeNúmeroHomologado)){
+					attachFile = new File(TextUtil.generateTmpFile(respLote, inutNFe.getID()+NFeUtil.EXT_INUTILIZACAO));
+					
+					MAttachment attach = nfeInut.createAttachment();
+					attach.addEntry(attachFile);
+					attach.save(get_TrxName());
+					return Msg.getMsg(getCtx(), "ProcessOK");
 				}
-				//
-				return Msg.getMsg(getCtx(), "ProcessFailed");
-			}
+				
+				return Msg.getMsg(getCtx(), "ProcessFailed") + " - " + xMotivo;
+			}	
 		}
 		catch (Exception e) {
 			log.severe(e.getLocalizedMessage());
 		}
 		
-		return Msg.getMsg(getCtx(), "ProcessOK");
-	}	//	invalidateNF
+		return Msg.getMsg(getCtx(), "ProcessFailed");
+	}	//	doIt
 	
 }	//	ProcInutNF

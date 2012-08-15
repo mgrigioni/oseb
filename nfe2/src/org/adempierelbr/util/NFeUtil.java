@@ -182,11 +182,7 @@ public abstract class NFeUtil
 	 * @return msg
 	 */
 	public static String geraMsgInutilizacao(InutNFe inutNFe) {
-		
-		if (!inutNFe.isValid()){
-			return null;
-		}
-		
+				
 		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 

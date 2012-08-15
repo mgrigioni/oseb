@@ -44,13 +44,13 @@ public class InutNFe {
 	public InfInut infInut;
 
 	public InutNFe(String versao, I_W_AD_OrgInfo oiW, int C_Region_ID, Timestamp ano, 
-			String mod, String serie, String nNFIni, String nNFFin, String xJust) {
+			String mod, String serie, int nNFIni, int nNFFin, String xJust) {
 		super();
 		setVersao(versao);
 		setInfInut(new InfInut(oiW,C_Region_ID,ano,mod,serie,nNFIni,nNFFin,xJust));
 	}
 	
-	public boolean isValid(){
+	public String isValid(){
 		return getInfInut().isValid();
 	}
 	
@@ -105,7 +105,7 @@ class InfInut {
 	 * 	Default Constructor
 	 */
 	public InfInut (I_W_AD_OrgInfo oiW, int C_Region_ID, Timestamp ano, String mod,
-			String serie, String nNFIni, String nNFFin, String xJust) {
+			String serie, int nNFIni, int nNFFin, String xJust) {
 		setCNPJ(oiW.getlbr_CNPJ());
 		setTpAmb(oiW.getlbr_NFeEnv());
 		setcUF(BPartnerUtil.getRegionCode(C_Region_ID));
@@ -262,9 +262,9 @@ class InfInut {
 	 * 	Número Inicial da Sequencia a ser inutilizada
 	 * 	@param nNFIni
 	 */
-	public void setnNFIni(String nNFIni)
+	public void setnNFIni(int nNFIni)
 	{
-		this.nNFIni = nNFIni;
+		this.nNFIni = String.valueOf(nNFIni);
 	}	//	setnNFIni
 	
 	/**
@@ -280,9 +280,9 @@ class InfInut {
 	 * 	Número Final da Sequencia a ser inutilizada
 	 * 	@param nNFFin
 	 */
-	public void setnNFFin(String nNFFin)
+	public void setnNFFin(int nNFFin)
 	{
-		this.nNFFin = nNFFin;
+		this.nNFFin = String.valueOf(nNFFin);
 	}	//	setnNFFin
 	
 	/**
@@ -314,58 +314,53 @@ class InfInut {
 	/**
 	 * 	Faz as validações solicitadas no manual de integração
 	 */
-	public boolean isValid() {
+	public String isValid() {
 		
 		if (getTpAmb() == null || getTpAmb().length() != 1){
-			log.severe("Tipo de Ambiente inválido");
-			return false;
+			return "Tipo de Ambiente inválido";
 		}
 		
 		if (getcUF() == null || getcUF().length() != 2){
-			log.severe("Código da UF inválido");
-			return false;
+			return "Código da UF inválido";
 		}
 		
 		if (getAno() == null || getAno().length() != 2){
-			log.severe("O Ano de inutilização é inválido");
-			return false;
+			return "O Ano de inutilização é inválido";
 		}
 		
 		if (getCNPJ() == null || getCNPJ().length() != 14){
-			log.severe("CNPJ inválido");
-			return false;
+			return "CNPJ inválido";
 		}
 		
 		if (getMod() == null || getMod().length() != 2 || !NumberUtils.isNumber(getMod())){
-			log.severe("Modelo da NF inválido");
-			return false;
+			return "Modelo da NF inválido";
 		}
 		
 		if (getSerie() == null || getSerie().length() < 1 || 
 				getSerie().length() > 3 || !NumberUtils.isNumber(getSerie())){
-			log.severe("Série da NF inválida");
-			return false;
+			return "Série da NF inválida";
 		}
 		
 		if (getnNFIni() == null || getnNFIni().length() < 1 || 
 				getnNFIni().length() > 9 || !NumberUtils.isNumber(getnNFIni())){
-			log.severe("Número Inicial da NF para inutilização é inválido");
-			return false;
+			return "Número Inicial da NF para inutilização é inválido";
 		}
 		
 		if (getnNFFin() == null || getnNFFin().length() < 1 || 
 				getnNFFin().length() > 9 || !NumberUtils.isNumber(getnNFFin())){
-			log.severe("Número Final da NF para inutilização é inválido");
-			return false;
+			return "Número Final da NF para inutilização é inválido";
+		}
+				
+		if (getxJust() == null || getxJust().length() < 15){
+			return "Justificativa deve ser maior que 15 caracteres";
 		}
 		
-		if (getxJust() == null || getxJust().length() < 15){
-			log.severe("Justificativa deve ser maior que 15 caracteres");
-			return false;
+		if (Integer.parseInt(getnNFIni()) > Integer.parseInt(getnNFFin())){
+			return "Número Final da NF não pode ser menor que Número Inicial da NF";
 		}
 	
 		setID();
-		return true;
+		return null;
 	}	//	isValid
 	
 } // infInut
