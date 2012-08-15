@@ -278,6 +278,12 @@ public class ProcGenerateEFD extends SvrProcess
 				
 		} //loop Nota Fiscal
 		
+		//BLOCO C: NF Inutilizada
+		List<RC100> listRC100 = EFDUtil.createRC100(p_C_Period_ID);
+		for (RC100 rc100 : listRC100){
+			_RC100.put(rc100.hashCode(), rc100);
+		}
+		
 		//BLOCO G: CIAP
 		createCIAPInfo(dateFrom,dateTo);
 		
@@ -708,7 +714,7 @@ public class ProcGenerateEFD extends SvrProcess
 		StringBuilder BLOCOC = new StringBuilder("");
 	
 		//MONTA BLOCO C
-		BLOCOC.append(new RC001(hasC));
+		BLOCOC.append(new RC001(hasC));		
 		RC100[] arrayRC100 = new RC100[_RC100.size()];
 		_RC100.values().toArray(arrayRC100);
 		Arrays.sort(arrayRC100);
@@ -1021,7 +1027,8 @@ public class ProcGenerateEFD extends SvrProcess
 		StringBuilder BLOCO1 = new StringBuilder("");
 	
 		//MONTA BLOCO 1
-		BLOCO1.append(new R1001(_R1100.size() > 0));
+		BLOCO1.append(new R1001(true));
+		BLOCO1.append(EFDUtil.createR1010());
 		Iterator<R1100> listR1100 = _R1100.keySet().iterator();
 		while(listR1100.hasNext()){
 			R1100 r1100 = listR1100.next();

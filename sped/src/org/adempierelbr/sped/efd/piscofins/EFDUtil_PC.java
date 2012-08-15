@@ -16,11 +16,13 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import org.adempierelbr.model.MLBRNCM;
+import org.adempierelbr.model.MLBRNFeInut;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.model.X_LBR_NFDI;
@@ -472,6 +474,25 @@ public class EFDUtil_PC
 				DT_DOC,DT_E_S,VL_DOC,IND_PAG,VL_DESC,VL_ABAT_NT,VL_MERC,IND_FRT,VL_FRT,
 				VL_SEG,VL_OUT_DA,VL_BC_ICMS,VL_ICMS,VL_BC_ICMS_ST,VL_ICMS_ST,VL_IPI,
 				VL_PIS,VL_COFINS,VL_PIS_ST,VL_COFINS_ST);
+	} //createRC100
+	
+	/**
+	 * Registros NFe Inutilizada
+	 * @param C_Period_ID
+	 */
+	public static List<RC100> createRC100(int C_Period_ID){
+		
+		List<RC100> listRC100 = new ArrayList<RC100>();
+		List<MLBRNFeInut> list = MLBRNFeInut.get(getCtx(), C_Period_ID);
+		for (MLBRNFeInut nfeInut : list){
+			for (int i=nfeInut.getlbr_DocumentNo(); 
+					 i<=nfeInut.getlbr_DocumentNo_To(); i++){
+				listRC100.add(new RC100(nfeInut.getlbr_NFModel(),
+						nfeInut.getlbr_NFSerie(),String.valueOf(i)));
+			}
+		}
+		
+		return listRC100;
 	} //createRC100
 	
 	public static RC120 createRC120(MLBRNotaFiscalLine nfLine){
