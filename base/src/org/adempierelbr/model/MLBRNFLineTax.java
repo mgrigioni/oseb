@@ -82,12 +82,16 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 		if (nfLine.get_ID() == 0)
 			throw new IllegalArgumentException("Parent not saved");
 		
+		BigDecimal withHold = Env.ONE;
+		if (taxLine.getLBR_TaxName().isHasWithHold())
+			withHold = withHold.negate();
+		
 		setLBR_NotaFiscalLine_ID(nfLine.get_ID());
 		setLBR_TaxGroup_ID(LBR_TaxGroup_ID);
 		setClientOrg(nfLine);
 		//values		
 		setlbr_TaxBaseAmt(taxLine == null ? Env.ZERO : taxLine.getlbr_TaxBaseAmt());
-		setlbr_TaxAmt(taxLine == null ? Env.ZERO : taxLine.getlbr_TaxAmt());
+		setlbr_TaxAmt(taxLine == null ? Env.ZERO : (taxLine.getlbr_TaxAmt()).multiply(withHold));
 		setlbr_TaxRate(taxLine == null ? Env.ZERO : taxLine.getlbr_TaxRate());
 		setlbr_TaxBase(taxLine == null ? Env.ZERO : taxLine.getlbr_TaxBase());
 	}

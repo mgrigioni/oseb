@@ -509,7 +509,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	 */
 	public BigDecimal getTotalTaxAmt(){
 		String sql = "SELECT SUM(lbr_TaxAmt) FROM LBR_NFLineTax " +
-                     "WHERE LBR_NotaFiscalLine_ID = ? AND lbr_TaxAmt >= 0 ";
+                     "WHERE LBR_NotaFiscalLine_ID = ?";
 		//
 		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscalLine_ID()});
 		return result == null ? Env.ZERO : result;

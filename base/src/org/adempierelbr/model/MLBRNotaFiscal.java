@@ -1230,7 +1230,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		setC_Invoice_ID(invoice.get_ID());
 		setC_Order_ID(order.get_ID());
 		setM_InOut_ID(io.get_ID());
-		setC_PaymentTerm_ID(invoice.getC_Payment_ID());
+		setC_PaymentTerm_ID(invoice.getC_PaymentTerm_ID());
 		
 		//Informações do Documento
 		setIsSOTrx(invoice.isCreditMemo() ? !invoice.isSOTrx() : invoice.isSOTrx());
@@ -1290,6 +1290,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		save(get_TrxName());
 		//
 		createLines(invoice.getLines());
+		setGrandTotal(getGrandTotal().subtract(getDiscountAmt()));
 		//RATEIO VALORES DE FRETE E SISCOMEX
 		setFreightTax();
 		setSiscomexTax();
