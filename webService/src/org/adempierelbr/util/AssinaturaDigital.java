@@ -21,7 +21,9 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -50,6 +52,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
@@ -86,6 +89,8 @@ public class AssinaturaDigital
 	static KeyPair keyP;
 	
 	private static String certType = "";
+	private static String cfgFile  = "";
+	private static boolean isToken = false;
 	private static String alias = "";
 	private static char[] senha = "".toCharArray();
 	private static InputStream jksData = null;
@@ -113,13 +118,19 @@ public class AssinaturaDigital
 		senha = password.toCharArray();
 		//
 		if (dc.getlbr_CertType() == null)
-			throw new Exception("Certificate Type is NULL");
+			throw new AdempiereException("Certificate Type is NULL");
 		else if (dc.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_PKCS12))
 			certType = "PKCS12";
 		else if (dc.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_JavaKeyStore))
 			certType = "JKS";
+		else if (dc.getlbr_CertType().equals(MLBRDigitalCertificate.LBR_CERTTYPE_PKCS11)){
+			certType = "PKCS11";
+			isToken = true;
+			jksData = null;
+			cfgFile = dc.getConfigurationFile();
+		}
 		else
-			throw new Exception("Unknow Certificate Type or Not implemented yet");
+			throw new AdempiereException("Unknow Certificate Type or Not implemented yet");
 		//
 		AssinaturaDigital.loadKeys();
 		AssinaturaDigital.assinarDocumento(caminhoxml, docType);
@@ -137,6 +148,11 @@ public class AssinaturaDigital
 
 	public static void loadKeys() throws Exception
 	{
+		if (isToken){
+			Provider p = new sun.security.pkcs11.SunPKCS11(cfgFile);
+			Security.addProvider(p);
+		}
+
 		KeyStore keystore = KeyStore.getInstance(certType);
 		keystore.load(jksData, senha);
 		Key key = keystore.getKey(alias, senha);
