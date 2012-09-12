@@ -102,7 +102,17 @@ public class EFDUtil_PC
 	}
 	
 	public static String getCOD_VERSAO(Timestamp dateFrom){
-		return "002"; //ADE Cofis nº 34/2010, atualizado pelo ADE Cofis nº 37/2010
+		
+		if (dateFrom == null){
+			log.severe("DATA INVÁLIDA");
+			return null;
+		}
+		
+		if (dateFrom.before(TextUtil.stringToTime("01/07/2012", "dd/MM/yyyy"))){
+			return "002"; //ADE Cofis nº 34/2010, atualizado pelo ADE Cofis nº 37/2010
+		}
+		else
+			return "003"; 
 	}
 	
 	public static String getNFHeaderReg(String nfModel){
@@ -210,8 +220,9 @@ public class EFDUtil_PC
 		String COD_INC_TRIB  = "1"; //FIXME
 		String IND_APRO_CRED = "2"; //FIXME
 		String COD_TIPO_CONT = "1"; //FIXME
+		String IND_REG_CUM   = "";  //FIXME - SOMENTE QUANDO COD_INC_TRIB = 2
 		
-		return new R0110(COD_INC_TRIB,IND_APRO_CRED,COD_TIPO_CONT);
+		return new R0110(COD_INC_TRIB,IND_APRO_CRED,COD_TIPO_CONT,IND_REG_CUM);
 	} //createR0110
 	
 	public static R0111 createR0111(Map<Integer,Set<RA170>> _RA170, Map<Integer,Set<RC170>> _RC170){
@@ -645,6 +656,9 @@ public class EFDUtil_PC
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_NT.signum() == -1) //Diferença CENTAVOS
+			VL_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 		String COD_CTA = ""; //TODO ???
 		return new RD100(IND_OPER,IND_EMIT,COD_PART,COD_MOD,COD_SIT,SER,SUB,NUM_DOC,
@@ -730,6 +744,9 @@ public class EFDUtil_PC
 		BigDecimal VL_PIS = nf.getPISAmt();
 		BigDecimal VL_COFINS = nf.getCOFINSAmt();
 		BigDecimal VL_SERV_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_SERV_NT.signum() == -1) //Diferença CENTAVOS
+			VL_SERV_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 	
 		return new RD500(IND_OPER,IND_EMIT,COD_PART,COD_MOD,COD_SIT,SER,SUB,NUM_DOC,

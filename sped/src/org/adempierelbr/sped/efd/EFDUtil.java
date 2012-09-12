@@ -866,6 +866,9 @@ public class EFDUtil{
 		BigDecimal VL_PIS = nf.getPISAmt();
 		BigDecimal VL_COFINS = nf.getCOFINSAmt();
 		BigDecimal VL_SERV_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_SERV_NT.signum() == -1) //Diferença CENTAVOS
+			VL_SERV_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 		String COD_CTA = ""; //TODO ???
 		String TP_ASSINANTE = ""; //TODO ???
