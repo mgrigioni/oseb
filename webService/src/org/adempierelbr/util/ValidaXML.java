@@ -22,12 +22,14 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.compiere.util.CLogger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
 public abstract class ValidaXML {
 
-
+	/**	Logger				*/
+	private static CLogger log = CLogger.getCLogger(ValidaXML.class);
 	
 	/**
 	 * Validate xml file against xsd schema
@@ -81,6 +83,7 @@ public abstract class ValidaXML {
 	 * @return validation result
 	 */
 	public static String validaNFe(String stringXml) {
+		log.info("Validando NFe");
 		return ValidaDoc(stringXml, "nfe2/nfe_v2.00.xsd");
 	}
 

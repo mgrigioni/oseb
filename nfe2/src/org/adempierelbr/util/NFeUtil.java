@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
@@ -82,6 +83,9 @@ public abstract class NFeUtil
 
 	/** XML */
 	public static final long   XML_SIZE = 500;
+	
+	/** TOLERANCIA - NT2012/003 */
+	public static final BigDecimal TOLERANCIA = new BigDecimal("0.50");
 	
 	/** Padrões de Extensão */
 	public static final String EXT_NFE          = "-nfe.xml";
@@ -714,5 +718,5 @@ public abstract class NFeUtil
 
 		return doc.getElementsByTagName(Tag).item(0).getTextContent();
 	}	//	getValue
-		
+	
 }	//	NFeUtil

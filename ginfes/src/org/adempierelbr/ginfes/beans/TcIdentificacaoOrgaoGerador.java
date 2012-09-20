@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.ginfes.beans;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.util.CLogger;
 
@@ -55,8 +56,7 @@ public class TcIdentificacaoOrgaoGerador {
 	}
 	private void setUf(String uf) {
 		if (uf == null || uf.length() != 2){
-			log.warning("(UF length <> 2) - " + uf);
-			return;
+			throw new AdempiereException ("(UF length <> 2) - " + uf);
 		}
 		
 		Uf = uf.toUpperCase();

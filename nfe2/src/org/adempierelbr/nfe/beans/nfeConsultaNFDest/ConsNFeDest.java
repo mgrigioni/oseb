@@ -11,39 +11,52 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans;
+package org.adempierelbr.nfe.beans.nfeConsultaNFDest;
 
 import org.adempierelbr.util.NFeUtil;
-import org.adempierelbr.util.TextUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  ConsCad
+ *  ConsNFeDest
  *  @author Mario Grigioni
- *  @version $Id: ConsCad.java,v 1.0 25/06/2012 15:37:00 mgrigioni Exp $
+ *  @version $Id: ConsNFeDest.java,v 1.0 27/08/2012 09:54:00 mgrigioni Exp $
  */
-@XStreamAlias("ConsCad")
-public class ConsCad {
-
-	@XStreamAsAttribute
-	private final String xmlns=NFeUtil.NAMESPACE_NFE;
+@XStreamAlias ("consNFeDest")
+public class ConsNFeDest {
 	
+	@XStreamAsAttribute
+	public final String xmlns=NFeUtil.NAMESPACE_NFE;
+
 	@XStreamAsAttribute
 	private String versao;
 	
-	public InfCons infCons;
-
+	private String tpAmb;
+	private final String xServ = "CONSULTAR NFE DEST";
+	private String CNPJ;
+	private String indNFe;
+	private String indEmi;
+	private String ultNSU;
+	
 	/**
+	 * Default Constructor
 	 * @param versao
-	 * @param uf
-	 * @param id (CNPJ ou CPF)
+	 * @param tpAmb
+	 * @param cNPJ
+	 * @param indNFe
+	 * @param indEmi
+	 * @param ultNSU
 	 */
-	public ConsCad(String versao, String uf, String id) {
+	public ConsNFeDest(String versao, String tpAmb, String cNPJ, String indNFe,
+			String indEmi, String ultNSU) {
 		super();
 		setVersao(versao);
-		setInfCons(new InfCons(uf,id));
+		setTpAmb(tpAmb);
+		setCNPJ(cNPJ);
+		setIndNFe(indNFe);
+		setIndEmi(indEmi);
+		setUltNSU(ultNSU);
 	}
 
 	public String getVersao() {
@@ -52,68 +65,48 @@ public class ConsCad {
 	public void setVersao(String versao) {
 		this.versao = versao;
 	}
-	public InfCons getInfCons() {
-		return infCons;
-	}
-	public void setInfCons(InfCons infCons) {
-		this.infCons = infCons;
-	}
-	public String getXmlns() {
-		return xmlns;
-	}
-	
-}	// ConsCad
 
-@XStreamAlias ("infCons")
-class InfCons{
-	
-	public final String xServ = "CONS-CAD";
-	public String UF;
-	public String IE;
-	public String CNPJ;
-	public String CPF;
-	
-	/**
-	 * @param uf
-	 * @param id (CNPJ ou CPF)
-	 */
-	public InfCons(String uF, String id) {
-		super();
-		setUF(uF);
-		
-		id = TextUtil.toNumeric(id);
-		if (id.length() == 11)
-			setCPF(id);
-		else if (id.length() == 14)
-			setCNPJ(id);
+	public String getTpAmb() {
+		return tpAmb;
+	}
+	public void setTpAmb(String tpAmb) {
+		this.tpAmb = tpAmb;
 	}
 	
-	public String getUF() {
-		return UF;
-	}
-	public void setUF(String uF) {
-		UF = uF;
-	}
-	public String getIE() {
-		return IE;
-	}
-	public void setIE(String iE) {
-		IE = iE;
-	}
 	public String getCNPJ() {
 		return CNPJ;
 	}
 	public void setCNPJ(String cNPJ) {
 		CNPJ = cNPJ;
 	}
-	public String getCPF() {
-		return CPF;
+	
+	public String getIndNFe() {
+		return indNFe;
 	}
-	public void setCPF(String cPF) {
-		CPF = cPF;
+	public void setIndNFe(String indNFe) {
+		this.indNFe = indNFe;
 	}
+	
+	public String getIndEmi() {
+		return indEmi;
+	}
+	public void setIndEmi(String indEmi) {
+		this.indEmi = indEmi;
+	}
+
+	public String getUltNSU() {
+		return ultNSU;
+	}
+	public void setUltNSU(String ultNSU) {
+		this.ultNSU = ultNSU;
+	}
+
+	public String getXmlns() {
+		return xmlns;
+	}
+	
 	public String getxServ() {
 		return xServ;
 	}
-	
-} // InfCons
+
+}	// ConsNFeDest

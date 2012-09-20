@@ -25,8 +25,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias ("nfeDadosMsg")
 public class NFeDadosMsg {
 
+	@XStreamAlias("consSitNFe")
 	public ConsSitNFe   consSitNFe;
+	
+	@XStreamAlias("consStatServ")
 	public ConsStatServ consStatServ;
+	
+	@XStreamAlias("ConsCad")
 	public ConsCad      consCad;
 
 	/**

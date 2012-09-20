@@ -34,6 +34,7 @@ import org.adempiere.model.POWrapper;
 import org.adempierelbr.nfe.NFeXMLGenerator;
 import org.adempierelbr.nfe.beans.retCancNFe.InfCanc;
 import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
+import org.adempierelbr.process.ProcGenerateRpsXml;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
@@ -144,7 +145,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 * @param trx
 	 */
 	public MLBRNotaFiscal(Properties ctx, MInvoice invoice, String trx){
-		this(ctx,0,trx);
+		this(ctx,get_ID(invoice.get_ID(),trx),trx);
 		setInvoice(invoice);
 	}
 	
@@ -214,6 +215,16 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			  q.setClient_ID();
 		      q.setParameters(parameters);
 		return q.first();
+	}
+	
+	private static int get_ID(int C_Invoice_ID, String trxName){
+		MTable table = MTable.get(Env.getCtx(), MLBRNotaFiscal.Table_Name);
+		Query q =  new Query(Env.getCtx(), table, "C_Invoice_ID = ? AND IsCancelled=?", trxName);
+			  q.setClient_ID();
+			  q.setParameters(new Object[]{C_Invoice_ID,false});
+		
+		int id = q.firstId();
+		return id == -1 ? 0 : id;
 	}
 
 	/**************************************************************************
@@ -447,7 +458,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
 		}
 		
-		if (((getGrandTotal().subtract(sumGrandTotal)).abs()).compareTo(Env.ONE) > 0){
+		if (((getGrandTotal().subtract(sumGrandTotal)).abs()).compareTo(NFeUtil.TOLERANCIA) > 0){
 			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total da NF difere da soma dos itens";
 			return DocAction.STATUS_Invalid;
 		}
@@ -716,8 +727,13 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 */
 	private String processNFe(){
 		
-		if (!isNFe() || isNFeProcessed())
+		if (isNFeProcessed()){
 			return null;
+		}
+		
+		if (!isNFe()){
+			return processGinfes();
+		}
 		
 		if (!islbr_IsOwnDocument()){
 			try{
@@ -745,7 +761,6 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				appendNFeDesc("["+TextUtil.timeToString(new Timestamp(System.currentTimeMillis()), "yyyy-MM-dd HH:mm:ss")+"] NF removida do lote anterior\n");
 			}
 				
-				
 			if (getlbr_NFeID() != null && !getlbr_NFeID().isEmpty()){
 				MAttachment attach = getAttachment(true);
 				if (attach != null){
@@ -755,7 +770,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			}
 		
 			try {
-				return NFeXMLGenerator.geraCorpoNFe(getCtx(),get_ID(),get_TrxName());
+				NFeXMLGenerator.geraCorpoNFe(getCtx(),get_ID(),get_TrxName());
 			} catch (AdempiereException e) {
 				e.printStackTrace();
 				return e.getLocalizedMessage();
@@ -763,7 +778,54 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		} //NFe própria
 		
 		return null;
-	} //generateXML
+	} //processNFe
+	
+	/**
+	 * Ginfes Própria = Processo para criar o XML e anexar ao objeto
+	 * @return
+	 */
+	private String processGinfes(){
+		
+		if (!islbr_IsOwnDocument()){
+			return null;
+		}
+		
+		MDocType dt = new MDocType(getCtx(),getC_DocType_ID(),get_TrxName());
+		I_W_C_DocType dtW = POWrapper.create(dt, I_W_C_DocType.class);
+		
+		//Não é Modelo 01 ou não possue ambiente
+		if (!dtW.getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscal) ||
+			dtW.getlbr_NFeEnv() == null){
+			return null;
+		}
+		
+		if (getLBR_NFeLot_ID() > 0) {
+						
+			//Se lote não foi enviado apaga o lote ou processado
+			MLBRNFeLot lot = new MLBRNFeLot(getCtx(),getLBR_NFeLot_ID(),get_TrxName());
+			if (lot.getDocStatus().equals(MLBRNFeLot.DOCSTATUS_InProgress)){
+				return "Lote já enviado. Processar retorno.";
+			}
+					
+			if (lot.getlbr_NFeRecID() == null || lot.getlbr_NFeRecID().isEmpty()){
+				log.fine("Lote excluído: " + lot.getDocumentNo());
+				lot.delete(true); 
+			}
+						
+			// Remove do Lote
+			setLBR_NFeLot_ID(0);
+			appendNFeDesc("["+TextUtil.timeToString(new Timestamp(System.currentTimeMillis()), "yyyy-MM-dd HH:mm:ss")+"] NF removida do lote anterior\n");
+		}
+				
+		try {
+			ProcGenerateRpsXml.generateXML(getCtx(),get_ID(),get_TrxName());
+		} catch (AdempiereException e) {
+			e.printStackTrace();
+			return e.getLocalizedMessage();
+		}
+		
+		return null;
+	} //processGinfes
 	
 	/**
 	 * Verifica o status da NFe junto ao Sefaz
@@ -1234,7 +1296,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//Informações do Documento
 		setIsSOTrx(invoice.isCreditMemo() ? !invoice.isSOTrx() : invoice.isSOTrx());
-		setlbr_IsOwnDocument((isSOTrx() || (iW.getlbr_TransactionType().equals("IMP")) ? true : invoice.isCreditMemo()));
+		setlbr_IsOwnDocument((isSOTrx() || (iW.getlbr_TransactionType().equals("IMP")) ? true : false));
 		if (!islbr_IsOwnDocument() && dtW.islbr_IsOwnDocument()) //Exceção no tipo de documento
 			setlbr_IsOwnDocument(true);
 		
@@ -1775,8 +1837,14 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 */
 	public boolean isNFe(){
 		
-		if (getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) ||
-			getlbr_NFModel().equals(MLBRNotaFiscal.LBR_NFMODEL_ConhecimentoDeTransporteEletrônicoCT_E))
+		String model = getlbr_NFModel();
+		if (model == null){
+			log.severe("Modelo NF = null");
+			return false;
+		}
+		
+		if (model.equals(MLBRNotaFiscal.LBR_NFMODEL_NotaFiscalEletrônica) ||
+			model.equals(MLBRNotaFiscal.LBR_NFMODEL_ConhecimentoDeTransporteEletrônicoCT_E))
 			return true;
 		
 		return false;
@@ -1788,7 +1856,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			return false;
 		
 		if (getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
-			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado))
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado) ||
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_150AutorizadoOUsoDaNF_EAutorizaçãoForaDePrazo) ||
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_151CancelamentoDeNF_EHomologadoForaDePrazo))
 			return true;
 		
 		return false;

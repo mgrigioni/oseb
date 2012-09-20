@@ -99,7 +99,7 @@ public class NFeXMLGenerator
 	 * @throws AdempiereException
 	 */
 	@SuppressWarnings("resource")
-	public static String geraCorpoNFe (Properties ctx, int LBR_NotaFiscal_ID, String trxName) throws AdempiereException {
+	public static void geraCorpoNFe (Properties ctx, int LBR_NotaFiscal_ID, String trxName) throws AdempiereException {
 		
 		if (LBR_NotaFiscal_ID <= 0)
 			throw new AdempiereException("Nota Fiscal inválida");
@@ -399,11 +399,9 @@ public class NFeXMLGenerator
 		File file = new File(arquivoXML);
 
 		try{
-			log.fine("Validando NF-e");
-
 			retValidacao = NFeUtil.validateSize(file);
 			if (retValidacao != null)
-				return retValidacao;
+				throw new AdempiereException(retValidacao);
 
 			FileInputStream stream = new FileInputStream(file);
 			InputStreamReader streamReader = new InputStreamReader(stream);
@@ -429,12 +427,10 @@ public class NFeXMLGenerator
 			MAttachment attachNFe = nf.createAttachment(true);
 			attachNFe.addEntry(file);
 			attachNFe.save(trxName);
-			//
-			return "";
 		}
 		else{
 			log.severe(retValidacao);
-			return retValidacao;
+			throw new AdempiereException(retValidacao);
 		}
 
 	}	//	geraCorpoNFe

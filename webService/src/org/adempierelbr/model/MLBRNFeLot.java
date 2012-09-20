@@ -59,6 +59,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  *  LBR_NFeLot Model
  *  
  *  Class that process/send documents to http://www.nfe.fazenda.gov.br/
+ *  Class that process/send documents to http://www.ginfes.com.br
  *  
  *  @author Mario Grigioni
  *  @contributor Ricardo Alexsander (old version)
@@ -105,7 +106,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 	 * @return boolean success
 	 * @throws Exception
 	 */
-	private boolean sendLot() throws Exception {
+	private boolean sendNFeLot() throws Exception {
 
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
 		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
@@ -142,7 +143,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 
 		try {
 			
-			String nfeLotDadosMsg 	= createXMLFile(oiW.getlbr_NFeEnv());
+			String nfeLotDadosMsg 	= createNFeXMLFile();
 			nfeLotDadosMsg   = "<nfeDadosMsg>" + nfeLotDadosMsg + "</nfeDadosMsg>";
 
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance()
@@ -201,15 +202,14 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		}
 
 		return true;
-	} //sendLot
-	
+	} //sendNFeLot
 	
 	/**
 	 * Process to check NFeLot (MLBRNFeWebService.RETRECEPCAO)
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean checkLot() throws Exception {
+	private boolean checkNFeLot() throws Exception {
 
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
 		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
@@ -296,15 +296,14 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		}
 
 		return true;
-	}	//checkLot
+	}	//checkNFeLot
 	
 	/**
 	 * Create Lot XML File
-	 * @param envType (1=Produção, 2=Homologação)
 	 * @return String (xmlFile)
 	 * @throws Exception
 	 */
-	private String createXMLFile (String envType) throws Exception {
+	private String createNFeXMLFile () throws Exception {
 		
 		MAttachment attach = getAttachment(true);
 		if (attach != null) {
@@ -342,8 +341,8 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		attachLotNFe.save();
 		
 		return xmlLote;
-	} //createXMLFile
-	
+	} //createNFeXMLFile
+
 	/**
 	 * Check if Lot isEmpty (No Documents)
 	 * @return boolean
@@ -470,11 +469,16 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		if (m_processMsg != null)
 			return DocAction.STATUS_Invalid;
 
-		try {
-			if (!sendLot())
-				return DocAction.STATUS_Invalid;
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (getModelNo().equals(MLBRNFeLot.MODELNO_NFe)){
+			try {
+				if (!sendNFeLot())
+					return DocAction.STATUS_Invalid;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else if (getModelNo().equals(MLBRNFeLot.MODELNO_Ginfes)){
+			//TODO
 		}
 		
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
@@ -522,13 +526,18 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		
 		log.info(toString());
 		
-		try {
-			if (!checkLot())
-				return DocAction.STATUS_Invalid;
-			else if (!isProcessed()) //Em processamento na Fazenda
-				return DocAction.STATUS_InProgress;
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (getModelNo().equals(MLBRNFeLot.MODELNO_NFe)){
+			try {
+				if (!checkNFeLot())
+					return DocAction.STATUS_Invalid;
+				else if (!isProcessed()) //Em processamento na Fazenda
+					return DocAction.STATUS_InProgress;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else if (getModelNo().equals(MLBRNFeLot.MODELNO_Ginfes)){
+			//TODO
 		}
 		
 		//	User Validation

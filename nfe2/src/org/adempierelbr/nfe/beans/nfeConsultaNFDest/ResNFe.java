@@ -11,61 +11,70 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans.retCancNFe;
+package org.adempierelbr.nfe.beans.nfeConsultaNFDest;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- *  InfCanc
+ *  ResNFe
  *  @author Mario Grigioni
- *  @version $Id: InfCanc.java,v 1.0 05/07/2012 11:50:00 mgrigioni Exp $
+ *  @version $Id: ResNFe.java,v 1.0 27/08/2012 10:05:00 mgrigioni Exp $
  */
-@XStreamAlias ("infCanc")
-public class InfCanc{
+@XStreamAlias ("resNFe")
+public class ResNFe {
 	
-	@XStreamAsAttribute
-	public String Id;
-
-	public String tpAmb;
-	public String verAplic;
-	public String cStat;
-	public String xMotivo;
-	public String cUF;
-	public String chNFe;
-	public String dhRecbto = "";
-	public String nProt;
-	public String Signature;
+	private String NSU;
+	private String chNFe;
+	private String CNPJ;
+	private String CPF;
+	private String xNome;
+	private String IE;
+	private String dEmi;
+	private String tpNF;
+	private String vNF;
+	private String digVal;
+	private String dhRecbto;
+	private String cSitNFe;
+	private String cSitConf;
 	
-	public String getId() {
-		return Id;
-	}
-	public String getTpAmb() {
-		return tpAmb;
-	}
-	public String getVerAplic() {
-		return verAplic;
-	}
-	public String getcStat() {
-		return cStat;
-	}
-	public String getxMotivo() {
-		return xMotivo;
-	}
-	public String getcUF() {
-		return cUF;
+	public String getNSU() {
+		return NSU;
 	}
 	public String getChNFe() {
 		return chNFe;
 	}
+	public String getCNPJ() {
+		return CNPJ;
+	}
+	public String getCPF() {
+		return CPF;
+	}
+	public String getxNome() {
+		return xNome;
+	}
+	public String getIE() {
+		return IE;
+	}
+	public String getdEmi() {
+		return dEmi;
+	}
+	public String getTpNF() {
+		return tpNF;
+	}
+	public String getvNF() {
+		return vNF;
+	}
+	public String getDigVal() {
+		return digVal;
+	}
 	public String getDhRecbto() {
 		return dhRecbto;
 	}
-	public String getnProt() {
-		return nProt;
+	public String getcSitNFe() {
+		return cSitNFe;
 	}
-	public String getSignature() {
-		return Signature;
+	public String getcSitConf() {
+		return cSitConf;
 	}
 
-} // InfCanc
+}	// ResNFe

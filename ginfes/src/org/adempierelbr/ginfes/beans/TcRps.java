@@ -16,11 +16,15 @@ package org.adempierelbr.ginfes.beans;
 import java.io.File;
 import java.io.StringWriter;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
+import org.compiere.model.MAttachment;
 import org.compiere.model.MOrgInfo;
+import org.compiere.util.CLogger;
+import org.compiere.util.Trx;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -36,6 +40,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 @XStreamAlias ("Rps")
 public class TcRps {
 	
+	@XStreamOmitField
+	private CLogger log = CLogger.getCLogger(TcRps.class);
 	@XStreamOmitField
 	private MLBRNotaFiscal NotaFiscal;
 	@XStreamOmitField
@@ -61,7 +67,7 @@ public class TcRps {
 	 * @return boolean success
 	 * @throws Exception
 	 */
-	public boolean toXML() throws Exception{
+	public boolean toXML() throws AdempiereException{
 		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
@@ -70,19 +76,24 @@ public class TcRps {
 		//
 		StringBuilder rps = new StringBuilder("<Rps>").append(sw.toString()).append("</Rps>");
 		//
-		File attachFile = new File(TextUtil.generateTmpFile(rps.toString(), getInfRps().getId()+NFeUtil.EXT_RPS));
-		AssinaturaDigital.Assinar(attachFile.toString(), OrgInfo, AssinaturaDigital.DOCTYPE_GINFES_RPS);
-		//	Anexa o XML na NF
-		/*
-		MAttachment attachRps = NotaFiscal.getAttachment(true);
-		if (attachRps != null)
-			attachRps.delete(true, NotaFiscal.get_TrxName()); //APAGA ANEXO ANTERIOR
+		String attachFile = TextUtil.generateTmpFile(rps.toString(), getInfRps().getId()+NFeUtil.EXT_RPS);
+		try {
+			AssinaturaDigital.Assinar(attachFile, OrgInfo, AssinaturaDigital.DOCTYPE_GINFES_RPS);
+		} catch (Exception e) {
+			log.severe(e.getLocalizedMessage());
+		}
 		
+		//	Anexa o XML na NF
+		MAttachment attachRps = NotaFiscal.getAttachment(true);
+		if (attachRps != null){
+			Trx localTrx = Trx.get("RpsDel", true);
+			attachRps.delete(true,localTrx.getTrxName()); //APAGA ANEXO ANTERIOR
+			localTrx.commit();
+		}
+
 		attachRps = NotaFiscal.createAttachment(true);
-		attachRps.addEntry(attachFile);
+		attachRps.addEntry(new File(attachFile));
 		return attachRps.save(NotaFiscal.get_TrxName());
-		*/
-		return true;
 	} //toXML
 	
 	public TcInfRps getInfRps() {

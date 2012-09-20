@@ -34,7 +34,7 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120814L;
+	private static final long serialVersionUID = 20120828L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -2140,10 +2140,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_592_RejeiçãoANF_EDeveTerPeloMenosUmItemDeProdutoSujeitoAoICMS = "592";
 	/** 594 - Rejeição: O número de sequencia do evento informado é maior que o permitido = 594 */
 	public static final String LBR_NFESTATUS_594_RejeiçãoONúmeroDeSequenciaDoEventoInformadoÉMaiorQueOPermitido = "594";
-	/** 595 - Rejeição: A versão do leiaute da NF-e utilizada não é mais válida = 595 */
-	public static final String LBR_NFESTATUS_595_RejeiçãoAVersãoDoLeiauteDaNF_EUtilizadaNãoÉMaisVálida = "595";
-	/** 596 - Rejeição: Ambiente de homologação indisponível para recepção de NF-e da versão 1.10. = 596 */
-	public static final String LBR_NFESTATUS_596_RejeiçãoAmbienteDeHomologaçãoIndisponívelParaRecepçãoDeNF_EDaVersão110 = "596";
 	/** 597 - Rejeição: CFOP de Importação e não informado dados de IPI = 597 */
 	public static final String LBR_NFESTATUS_597_RejeiçãoCFOPDeImportaçãoENãoInformadoDadosDeIPI = "597";
 	/** 598 - Rejeição: NF-e emitida em ambiente de homologação com Razão Social do destinatário diferente de NF-E EMITIDA EM AMBIENTE D = 598 */
@@ -2218,6 +2214,38 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_302_UsoDenegadoIrregularidadeFiscalDoDestinatário = "302";
 	/** 999 - Rejeição: Erro não catalogado (informar a mensagem de erro capturado no tratamento da exceção) = 999 */
 	public static final String LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção = "999";
+	/** 150 Autorizado o uso da NF-e, autorização fora de prazo = 150 */
+	public static final String LBR_NFESTATUS_150AutorizadoOUsoDaNF_EAutorizaçãoForaDePrazo = "150";
+	/** 151 Cancelamento de NF-e homologado fora de prazo = 151 */
+	public static final String LBR_NFESTATUS_151CancelamentoDeNF_EHomologadoForaDePrazo = "151";
+	/** 479 Rejeição: Emissor em situação irregular perante o fisco = 479 */
+	public static final String LBR_NFESTATUS_479RejeiçãoEmissorEmSituaçãoIrregularPeranteOFisco = "479";
+	/** 480 Rejeição: CNPJ da Chave de acesso da NF-e informada diverge do CNPJ do emitente = 480 */
+	public static final String LBR_NFESTATUS_480RejeiçãoCNPJDaChaveDeAcessoDaNF_EInformadaDivergeDoCNPJDoEmitente = "480";
+	/** 481 Rejeição: UF da Chave de acesso diverge do código da UF informada = 481 */
+	public static final String LBR_NFESTATUS_481RejeiçãoUFDaChaveDeAcessoDivergeDoCódigoDaUFInformada = "481";
+	/** 482 Rejeição: AA da Chave de acesso inválida = 482 */
+	public static final String LBR_NFESTATUS_482RejeiçãoAADaChaveDeAcessoInválida = "482";
+	/** 483 Rejeição: MM da chave de acesso inválido = 483 */
+	public static final String LBR_NFESTATUS_483RejeiçãoMMDaChaveDeAcessoInválido = "483";
+	/** 484 Rejeição: DPEC com tipo de emissão diferente de “4” (posição 35 da Chave de Acesso) = 484 */
+	public static final String LBR_NFESTATUS_484RejeiçãoDPECComTipoDeEmissãoDiferenteDe4Posição35DaChaveDeAcesso = "484";
+	/** 485 Rejeição: Número de DPEC já existe no cadastro de DPEC = 485 */
+	public static final String LBR_NFESTATUS_485RejeiçãoNúmeroDeDPECJáExisteNoCadastroDeDPEC = "485";
+	/** 486 Rejeição: DPEC não localizada para o número de registro de DPEC informado = 486 */
+	public static final String LBR_NFESTATUS_486RejeiçãoDPECNãoLocalizadaParaONúmeroDeRegistroDeDPECInformado = "486";
+	/** 487 Rejeição: Nenhuma DPEC localizada para a chave de acesso informada = 487 */
+	public static final String LBR_NFESTATUS_487RejeiçãoNenhumaDPECLocalizadaParaAChaveDeAcessoInformada = "487";
+	/** 488 Rejeição: Requisitante de Consulta não tem o mesmo CNPJ base do emissor da DPEC = 488 */
+	public static final String LBR_NFESTATUS_488RejeiçãoRequisitanteDeConsultaNãoTemOMesmoCNPJBaseDoEmissorDaDPEC = "488";
+	/** 656 Rejeição: Consumo indevido = 656 */
+	public static final String LBR_NFESTATUS_656RejeiçãoConsumoIndevido = "656";
+	/** 660 Rejeição: CFOP de Combustível e não informado grupo de combustível da NF-e = 660 */
+	public static final String LBR_NFESTATUS_660RejeiçãoCFOPDeCombustívelENãoInformadoGrupoDeCombustívelDaNF_E = "660";
+	/** 661 Rejeição: NF-e já existente para o número da DPEC informada = 661 */
+	public static final String LBR_NFESTATUS_661RejeiçãoNF_EJáExistenteParaONúmeroDaDPECInformada = "661";
+	/** 662 Rejeição: Numeração da DPEC está inutilizada na Base de Dados da SEFAZ = 662 */
+	public static final String LBR_NFESTATUS_662RejeiçãoNumeraçãoDaDPECEstáInutilizadaNaBaseDeDadosDaSEFAZ = "662";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe

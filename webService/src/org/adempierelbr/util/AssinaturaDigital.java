@@ -75,6 +75,7 @@ public class AssinaturaDigital
 	public static final int DOCTYPE_INUTILIZACAO_NFE	= 3;
 	public static final int DOCTYPE_CARTADECORRECAO_CCE = 4;
 	public static final int DOCTYPE_GINFES_RPS          = 5;
+	public static final int DOCTYPE_GINFES_LOTE_RPS     = 6;
 	
 	/**		Algoritmos		*/
 	public static final String ALGORITIMO = "RSA";
@@ -228,6 +229,7 @@ public class AssinaturaDigital
 			case DOCTYPE_INUTILIZACAO_NFE:    tag = "infInut";   break;
 			case DOCTYPE_CARTADECORRECAO_CCE: tag = "infEvento"; break;
 			case DOCTYPE_GINFES_RPS:          tag = "InfRps";    break;
+			case DOCTYPE_GINFES_LOTE_RPS:     tag = "LoteRps";   break;
 		}
 				
 		NodeList elements = doc.getElementsByTagName(tag);

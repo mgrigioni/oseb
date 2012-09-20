@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.ginfes.beans;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.util.CLogger;
@@ -111,8 +112,7 @@ public class TcEndereco {
 	}
 	private void setUf(String uf) {
 		if (uf == null || uf.length() != 2){
-			log.warning("(UF length <> 2) - " + uf);
-			return;
+			throw new AdempiereException ("(UF length <> 2) - " + uf);
 		}
 		
 		Uf = uf.toUpperCase();
@@ -124,8 +124,7 @@ public class TcEndereco {
 	private void setCep(String cep) {
 		cep = TextUtil.checkSize(TextUtil.toNumeric(cep), 8);
 		if (cep.length() != 8){
-			log.warning("(CEP inválido) - " + cep);
-			return;
+			throw new AdempiereException ("(CEP inválido) - " + cep);
 		}
 		
 		Cep = cep;

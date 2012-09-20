@@ -11,34 +11,47 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.nfe.beans.retCancNFe;
+package org.adempierelbr.nfe.beans.nfeConsultaNFDest;
+
+import java.util.List;
+
+import org.adempierelbr.util.NFeUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
- *  InfCanc
+ *  RetConsNFeDest
  *  @author Mario Grigioni
- *  @version $Id: InfCanc.java,v 1.0 05/07/2012 11:50:00 mgrigioni Exp $
+ *  @version $Id: RetConsNFeDest.java,v 1.0 27/08/2012 10:17:00 mgrigioni Exp $
  */
-@XStreamAlias ("infCanc")
-public class InfCanc{
+@XStreamAlias ("retConsNFeDest")
+public class RetConsNFeDest
+{
+	@XStreamAsAttribute
+	private String versao;
 	
 	@XStreamAsAttribute
-	public String Id;
-
-	public String tpAmb;
-	public String verAplic;
-	public String cStat;
-	public String xMotivo;
-	public String cUF;
-	public String chNFe;
-	public String dhRecbto = "";
-	public String nProt;
-	public String Signature;
+	private final String xmlns=NFeUtil.NAMESPACE_NFE;
 	
-	public String getId() {
-		return Id;
+	private String tpAmb;
+	private String verAplic;
+	private String nRec;
+	private String cStat;
+	private String xMotivo;
+	private String dhResp;
+	private String indCont;
+	private String ultNSU;
+	
+	@XStreamImplicit(itemFieldName="ret")
+	private List<Ret> ret;
+
+	public String getVersao() {
+		return versao;
+	}
+	public String getXmlns() {
+		return xmlns;
 	}
 	public String getTpAmb() {
 		return tpAmb;
@@ -46,26 +59,26 @@ public class InfCanc{
 	public String getVerAplic() {
 		return verAplic;
 	}
+	public String getnRec() {
+		return nRec;
+	}
 	public String getcStat() {
 		return cStat;
 	}
 	public String getxMotivo() {
 		return xMotivo;
 	}
-	public String getcUF() {
-		return cUF;
+	public String getDhResp() {
+		return dhResp;
 	}
-	public String getChNFe() {
-		return chNFe;
+	public String getIndCont() {
+		return indCont;
 	}
-	public String getDhRecbto() {
-		return dhRecbto;
+	public String getUltNSU() {
+		return ultNSU;
 	}
-	public String getnProt() {
-		return nProt;
+	public List<Ret> getRet() {
+		return ret;
 	}
-	public String getSignature() {
-		return Signature;
-	}
-
-} // InfCanc
+	
+}	//	RetConsNFeDest
