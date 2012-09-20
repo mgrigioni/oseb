@@ -184,8 +184,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			return DocAction.STATUS_Invalid;
 
 		MLBRNotaFiscal nf = new MLBRNotaFiscal (Env.getCtx(), getLBR_NotaFiscal_ID(), null);
-		if (!MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E.equals(nf.getlbr_NFeStatus()))
-		{
+		if (!nf.isNFeProcessed() || nf.isCancelled()) {
 			m_processMsg = "@Invalid@ @LBR_NotaFiscal_ID@";
 			return DocAction.STATUS_Invalid;
 		}
