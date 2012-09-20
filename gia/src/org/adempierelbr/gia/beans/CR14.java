@@ -33,6 +33,8 @@ public class CR14 extends RegGIA implements Comparable<Object>{
 	private BigDecimal ISENTAS        = Env.ZERO;
 	private BigDecimal OUTROSIMPOSTOS = Env.ZERO;
 	
+	private BigDecimal IMPSUBSST      = Env.ZERO; //USADO NO CR=10
+	
 	private int Q18 = 0; //Quantidade CR=18
 
 	/**
@@ -47,7 +49,7 @@ public class CR14 extends RegGIA implements Comparable<Object>{
 	 */
 	public CR14(String CFOP, String UF, BigDecimal VALOR_CONT_1, BigDecimal BASE_CALC_1, 
 			BigDecimal VALOR_CONT_2, BigDecimal BASE_CALC_2, BigDecimal IMPOSTO, BigDecimal OUTRAS,
-			BigDecimal ISENTAS, BigDecimal OUTROSIMPOSTOS) {
+			BigDecimal ISENTAS, BigDecimal OUTROSIMPOSTOS, BigDecimal IMPSUBSST) {
 		
 		super("14" + CFOP);
 		this.UF = UF;
@@ -59,6 +61,7 @@ public class CR14 extends RegGIA implements Comparable<Object>{
 		this.OUTRAS = OUTRAS;
 		this.ISENTAS = ISENTAS;
 		this.OUTROSIMPOSTOS = OUTROSIMPOSTOS;
+		this.IMPSUBSST = IMPSUBSST;
 		this.CODIGO = TextUtil.toNumeric(CFOP) + TextUtil.toNumeric(UF);
 		
 		checkVALORCONTABIL();
@@ -109,6 +112,10 @@ public class CR14 extends RegGIA implements Comparable<Object>{
 
 	public BigDecimal getOUTROSIMPOSTOS() {
 		return OUTROSIMPOSTOS == null ? Env.ZERO : OUTROSIMPOSTOS;
+	}
+	
+	public BigDecimal getIMPSUBSST() {
+		return IMPSUBSST == null ? Env.ZERO : IMPSUBSST; 
 	}
 
 	public String toString(){
