@@ -2505,8 +2505,8 @@ public class GridTable extends AbstractTableModel
 					
 					//AdempiereLBR
 					|| columnName.equals("lbr_BPTypeBRIsValid")
+					|| columnName.equals("LBR_Tax_ID")
 					|| columnName.equals("QtyInvoiced") || columnName.equals("QtyDelivered") 
-					
 				)
 				{
 					rowData[i] = field.getDefault();
