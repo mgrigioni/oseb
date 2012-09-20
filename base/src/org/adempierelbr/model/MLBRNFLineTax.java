@@ -83,7 +83,7 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 			throw new IllegalArgumentException("Parent not saved");
 		
 		BigDecimal withHold = Env.ONE;
-		if (taxLine.getLBR_TaxName().isHasWithHold())
+		if (taxLine != null && taxLine.getLBR_TaxName().isHasWithHold())
 			withHold = withHold.negate();
 		
 		setLBR_NotaFiscalLine_ID(nfLine.get_ID());
