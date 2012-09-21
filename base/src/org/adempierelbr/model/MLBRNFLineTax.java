@@ -181,8 +181,8 @@ public class MLBRNFLineTax extends X_LBR_NFLineTax {
 				nfTax = new MLBRNFTax(getCtx(),0,get_TrxName());
 			
 			if (rs.next ()){
-				/* SE A SOMA FOR = 0, APAGA O REGISTRO */
-				if (rs.getBigDecimal(2).signum() == 0 && nfTax.get_ID() > 0){ 
+				/* SE A SOMA DA BASE E IMPOSTO FOR = 0, APAGA O REGISTRO */
+				if (rs.getBigDecimal(2).signum() == 0 && rs.getBigDecimal(3).signum() == 0 && nfTax.get_ID() > 0){ 
 					nfTax.delete(true, get_TrxName());
 				}
 				else{
