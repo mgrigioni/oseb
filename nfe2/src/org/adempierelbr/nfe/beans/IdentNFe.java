@@ -271,7 +271,7 @@ public class IdentNFe {
 		return dhCont;
 	}
 	private void setDhCont(Timestamp dhCont) {
-		if (dhCont != null && getTpEmis().equals(3))
+		if (dhCont != null && getTpEmis().equals("3"))
 			this.dhCont = NFeUtil.timeToString(dhCont);
 	}
 	
@@ -279,7 +279,7 @@ public class IdentNFe {
 		return xJust;
 	}
 	private void setxJust(String xJust) {
-		if (xJust != null && getTpEmis().equals(3))
+		if (xJust != null && getTpEmis().equals("3"))
 			this.xJust = TextUtil.itrim(xJust);
 	}
 
