@@ -35,6 +35,7 @@ import org.adempierelbr.nfe.beans.ConsSitNFe;
 import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.nfe.beans.NFeDadosMsg;
 import org.adempierelbr.nfe.beans.cancNFe.CancNFe;
+import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ConsNFeDest;
 import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.ConsReciNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.InfProt;
@@ -54,6 +55,7 @@ import org.w3c.dom.NodeList;
 import br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2.CadConsultaCadastro2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfeconsultadest.NFeConsultaDestStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
@@ -115,7 +117,7 @@ public abstract class NFeUtil
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
-		xstream.marshal (new NFeDadosMsg(new ConsSitNFe(VERSAO,tpAmb,chNFe)), 
+		xstream.marshal (new NFeDadosMsg(new ConsSitNFe("2.01",tpAmb,chNFe)), 
 				new CompactWriter (sw));
 		
 		return sw.toString();
@@ -179,6 +181,22 @@ public abstract class NFeUtil
 		
 		return sw.toString();
 	}	// geraMsgCancelamento
+	
+	/**
+	 * Método para gerar dados para consulta destinatário
+	 * @return msg
+	 */
+	public static String geraMsgConsultaDest(String tpAmb, String CNPJ) {
+				
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new NFeDadosMsg(new ConsNFeDest(VERSAO,tpAmb,CNPJ,"0")),
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	}	//	geraMsgConsultaDest
 	
 	/**
 	 * Método para gerar dados para inutilizar número nf
@@ -278,7 +296,7 @@ public abstract class NFeUtil
 
 		NfeConsulta2Stub.NfeCabecMsg cabecMsg = new NfeConsulta2Stub.NfeCabecMsg();
 		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
+		cabecMsg.setVersaoDados("2.01");
 
 		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
 		cabecMsgE.setNfeCabecMsg(cabecMsg);
@@ -303,7 +321,23 @@ public abstract class NFeUtil
 		return cabecMsgE;
 	} //geraCabecStatusServico
 
+	/**
+	 * Método para gerar cabeçalho consulta destinatário
+	 * @param region
+	 * @return NFeConsultaDestStub.NfeCabecMsgE
+	 */
+	public static NFeConsultaDestStub.NfeCabecMsgE geraCabecConsultaDest(int C_Region_ID){
+		
+		NFeConsultaDestStub.NfeCabecMsg cabecMsg = new NFeConsultaDestStub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO);
 
+		NFeConsultaDestStub.NfeCabecMsgE cabecMsgE = new NFeConsultaDestStub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecConsultaDest
+	
 	/**
 	 * Método para gerar cabeçalho consulta cadastro
 	 * @param region
