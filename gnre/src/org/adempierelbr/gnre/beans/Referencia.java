@@ -32,15 +32,23 @@ public class Referencia {
 	private String ano;
 	private String parcela;
 	
-	public Referencia(Timestamp dateDoc) {
+	public Referencia(String uf, Timestamp dateDoc) {
 		super();
+		setPeriodo(uf);
 		setMes(TextUtil.timeToString(dateDoc, "MM"));
 		setAno(TextUtil.timeToString(dateDoc, "yyyy"));
 	}
 	public String getPeriodo() {
 		return periodo;
 	}
-	public void setPeriodo(String periodo) {
+	public void setPeriodo(String uf) {
+		String periodo = null;
+		if (uf != null){
+				if (uf.equals("MG") || uf.equals("SE")){
+					periodo = "0"; //mensal
+				}
+		}
+		
 		this.periodo = periodo;
 	}
 	public String getMes() {

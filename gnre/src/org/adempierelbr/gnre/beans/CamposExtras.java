@@ -30,16 +30,20 @@ public class CamposExtras {
 	@XStreamImplicit(itemFieldName="campoExtra")
 	private List<CampoExtra> campoExtra = new ArrayList<CampoExtra>();
 
-	public CamposExtras(List<CampoExtra> campoExtra) {
+	public CamposExtras(String codigo, String tipo, String valor) {
 		super();
-		setCampoExtra(campoExtra);
+		addCampoExtra(codigo,tipo,valor);
+	}
+	
+	public void addCampoExtra(String codigo, String tipo, String valor){
+		if (campoExtra == null)
+			campoExtra = new ArrayList<CampoExtra>();
+		
+		campoExtra.add(new CampoExtra(codigo,tipo,valor));
 	}
 	
 	public List<CampoExtra> getCampoExtra() {
 		return campoExtra;
-	}
-	public void setCampoExtra(List<CampoExtra> campoExtra) {
-		this.campoExtra = campoExtra;
 	}
 
 } //CamposExtras
@@ -50,6 +54,13 @@ class CampoExtra{
 	private String codigo;
 	private String tipo;
 	private String valor;
+	
+	public CampoExtra(String codigo, String tipo, String valor) {
+		super();
+		setCodigo(codigo);
+		setTipo(tipo);
+		setValor(valor);
+	}
 	
 	public String getCodigo() {
 		return codigo;

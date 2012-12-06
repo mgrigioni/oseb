@@ -98,7 +98,9 @@ public class DadosGNRE {
 		}
 		
 		this.setC33_dataPagamento(dueDate);
-		this.setC05_referencia(new Referencia(nf.getDateDoc()));
+		this.setC05_referencia(new Referencia(nf.getlbr_BPRegion(),nf.getDateDoc()));
+		this.setC39_camposExtras(nf.getlbr_NFeID());
+		
 	} //DadosGNRE
 	
 	/**
@@ -319,7 +321,16 @@ public class DadosGNRE {
 	public CamposExtras getC39_camposExtras() {
 		return c39_camposExtras;
 	}
-	public void setC39_camposExtras(CamposExtras c39_camposExtras) {
+	public void setC39_camposExtras(String nfeID) {
+		CamposExtras c39_camposExtras = null;
+		
+		String uf = getC01_UfFavorecida();
+		if (uf != null){
+			if (uf.equals("AP")){
+				c39_camposExtras = new CamposExtras("47","T",nfeID);
+			}
+		}
+		
 		this.c39_camposExtras = c39_camposExtras;
 	}
 	
