@@ -236,6 +236,25 @@ public abstract class AdempiereLBR{
 		
 		return qtyOnHand == null ? Env.ZERO : qtyOnHand;
 	}
+	
+	public static BigDecimal getQtyOnDate(int M_Product_ID, int M_Locator_ID, Timestamp movementDate, String trx){
+		
+		String sql = "SELECT SUM(t.MovementQty)" +
+				     "FROM M_Transaction t " +
+				     "INNER JOIN M_Locator l ON t.M_Locator_ID = l.M_Locator_ID " +
+				     "INNER JOIN M_Warehouse w ON l.M_Warehouse_ID=w.M_Warehouse_ID " +
+				     "INNER JOIN M_Product p ON t.M_Product_ID = p.M_Product_ID " +
+				     "WHERE p.IsStocked = 'Y' AND TRUNC(t.MovementDate, 'DD') > TRUNC(?, 'DD') " +
+				     "AND p.M_Product_ID=? AND l.M_Locator_ID=?";
+		
+		BigDecimal movementQty = DB.getSQLValueBD(trx, sql, new Object[]{movementDate, M_Product_ID,M_Locator_ID});
+		if (movementQty == null)
+			movementQty = Env.ZERO;
+		
+		BigDecimal qtyOnHand = getQtyOnHand(M_Product_ID,M_Locator_ID,trx);
+		
+		return qtyOnHand.subtract(movementQty);
+	}
 
 	public static int getARReceipt(){
 
@@ -607,11 +626,24 @@ public abstract class AdempiereLBR{
 
 		System.setProperty("user.dir", tmpDir);
 	}
-
-
+	
 	/**
 	 * Date Utils
 	 */
+	public static Timestamp getToday(){
+		
+		Timestamp day = new Timestamp(System.currentTimeMillis());
+		//
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(day);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		
+		return new Timestamp(cal.getTimeInMillis());
+	}
+	
 	public static Timestamp addDays (Timestamp day, int offset)
 	{
 		if (day == null)
