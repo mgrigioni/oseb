@@ -137,10 +137,11 @@ public class PrintFromXML extends SvrProcess
 		if (xml == null)
 			return "Arquivo XML n\u00E3o encontrado para impress\u00E3o";
 		
-		Map<String, InputStream> files = getReportFile ();
+		Map<String, Object> files = getReportFile ();
 		//
 		JRXmlDataSource dataSource = new JRXmlDataSource (xml);
-		JasperReport jasperReport = (JasperReport) JRLoader.loadObject (files.remove (reportName));
+		JasperReport jasperReport = (JasperReport) JRLoader.loadObject ((InputStream)files.remove (reportName));
+
 		JasperPrint jasperPrint = JasperFillManager.fillReport (jasperReport, files, dataSource);
 
 		JasperViewer.viewReport (jasperPrint, "Impress\u00E7\u00E3o de Documento");
@@ -155,11 +156,11 @@ public class PrintFromXML extends SvrProcess
 	 * 	@throws AdempiereException
 	 * 	@throws IOException 
 	 */
-	private Map<String, InputStream> getReportFile () throws AdempiereException, IOException
+	private Map<String, Object> getReportFile () throws AdempiereException, IOException
 	{
 		//	Procura o relatório anexado no processo
 		MAttachment att = process.getAttachment (true);
-		Map<String, InputStream> map = new HashMap<String, InputStream>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		boolean found = false;
 		
 		//	Anexa o relatório padrão caso não haja nenhum
