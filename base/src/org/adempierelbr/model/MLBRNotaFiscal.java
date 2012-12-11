@@ -948,7 +948,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	        appendNFeDesc("["+infCanc.getDhRecbto().replace('T', ' ')+"] " + infCanc.getxMotivo() + "\n");
 	        setlbr_NFeStatus(infCanc.getcStat());
 	        //
-	        if (infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado)) {
+	        if (infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado) ||
+	        	infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_151CancelamentoDeNF_EHomologadoForaDePrazo)) {
 		        setlbr_NFeProt(infCanc.getnProt());
 		        setDateTrx(NFeUtil.stringToTime(infCanc.getDhRecbto()));
 		        
