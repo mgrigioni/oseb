@@ -237,7 +237,7 @@ public abstract class AdempiereLBR{
 		return qtyOnHand == null ? Env.ZERO : qtyOnHand;
 	}
 	
-	public static BigDecimal getQtyOnDate(int M_Product_ID, int M_Locator_ID, Timestamp movementDate, String trx){
+	public static BigDecimal getQtyOnDate(int M_Product_ID, int M_Locator_ID, Timestamp movementDate){
 		
 		String sql = "SELECT SUM(t.MovementQty)" +
 				     "FROM M_Transaction t " +
@@ -247,11 +247,11 @@ public abstract class AdempiereLBR{
 				     "WHERE p.IsStocked = 'Y' AND TRUNC(t.MovementDate, 'DD') > TRUNC(?, 'DD') " +
 				     "AND p.M_Product_ID=? AND l.M_Locator_ID=?";
 		
-		BigDecimal movementQty = DB.getSQLValueBD(trx, sql, new Object[]{movementDate, M_Product_ID,M_Locator_ID});
+		BigDecimal movementQty = DB.getSQLValueBD(null, sql, new Object[]{movementDate, M_Product_ID,M_Locator_ID});
 		if (movementQty == null)
 			movementQty = Env.ZERO;
 		
-		BigDecimal qtyOnHand = getQtyOnHand(M_Product_ID,M_Locator_ID,trx);
+		BigDecimal qtyOnHand = getQtyOnHand(M_Product_ID,M_Locator_ID,null);
 		
 		return qtyOnHand.subtract(movementQty);
 	}

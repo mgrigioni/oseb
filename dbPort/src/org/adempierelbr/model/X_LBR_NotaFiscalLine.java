@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 
 /** Generated Model for LBR_NotaFiscalLine
  *  @author ADempiereLBR (generated) 
@@ -32,7 +33,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120618L;
+	private static final long serialVersionUID = 20121218L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -42,6 +43,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
         {
 			setlbr_IsService (false);
 // 'N'
+			setLBR_NotaFiscal_ID (0);
 			setLBR_NotaFiscalLine_ID (0);
         } */
     }
@@ -212,6 +214,31 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 		return (String)get_Value(COLUMNNAME_lbr_CFOPName);
 	}
 
+	public org.adempierelbr.model.I_LBR_DE getLBR_DE() throws RuntimeException
+    {
+		return (org.adempierelbr.model.I_LBR_DE)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_DE.Table_Name)
+			.getPO(getLBR_DE_ID(), get_TrxName());	}
+
+	/** Set DE.
+		@param LBR_DE_ID DE	  */
+	public void setLBR_DE_ID (int LBR_DE_ID)
+	{
+		if (LBR_DE_ID < 1) 
+			set_Value (COLUMNNAME_LBR_DE_ID, null);
+		else 
+			set_Value (COLUMNNAME_LBR_DE_ID, Integer.valueOf(LBR_DE_ID));
+	}
+
+	/** Get DE.
+		@return DE	  */
+	public int getLBR_DE_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_LBR_DE_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Is Service.
 		@param lbr_IsService 
 		Defines if the lines is a Service
@@ -358,9 +385,9 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	public void setLBR_NotaFiscal_ID (int LBR_NotaFiscal_ID)
 	{
 		if (LBR_NotaFiscal_ID < 1) 
-			set_Value (COLUMNNAME_LBR_NotaFiscal_ID, null);
+			set_ValueNoCheck (COLUMNNAME_LBR_NotaFiscal_ID, null);
 		else 
-			set_Value (COLUMNNAME_LBR_NotaFiscal_ID, Integer.valueOf(LBR_NotaFiscal_ID));
+			set_ValueNoCheck (COLUMNNAME_LBR_NotaFiscal_ID, Integer.valueOf(LBR_NotaFiscal_ID));
 	}
 
 	/** Get Nota Fiscal.
@@ -721,6 +748,14 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 			 return 0;
 		return ii.intValue();
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), String.valueOf(getLine()));
+    }
 
 	/** Set Line Total.
 		@param LineTotalAmt 

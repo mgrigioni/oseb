@@ -94,20 +94,20 @@ public class MLBRDE extends X_LBR_DE {
 	
 	/**
 	 * Retorna Notas Fiscais atribuídas a Declaração de Exportação
-	 * @return MLBRNotaFiscal[]
+	 * @return MLBRNotaFiscalLine[]
 	 */
-	public MLBRNotaFiscal[] getMLBRNotaFiscal(){
+	public MLBRNotaFiscalLine[] getMLBRNotaFiscalLine(){
 		
 		String whereClause = "LBR_DE_ID = ?";
 
-		MTable table = MTable.get(Env.getCtx(), MLBRNotaFiscal.Table_Name);
+		MTable table = MTable.get(Env.getCtx(), MLBRNotaFiscalLine.Table_Name);
 		Query q =  new Query(Env.getCtx(), table, whereClause.toString(), get_TrxName());
-              q.setOrderBy("DocumentNo");
+              q.setOrderBy("Line");
               q.setParameters(new Object[]{get_ID()});
 
-        List<MLBRNotaFiscal> list = q.list();
-        MLBRNotaFiscal[] nfs = new MLBRNotaFiscal[list.size()];
+        List<MLBRNotaFiscalLine> list = q.list();
+        MLBRNotaFiscalLine[] nfs = new MLBRNotaFiscalLine[list.size()];
         return list.toArray(nfs);
-	} //getMLBRNotaFiscal
+	} //getMLBRNotaFiscalLine
 			
 } //MLBRDE

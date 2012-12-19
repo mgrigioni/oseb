@@ -943,17 +943,6 @@ public interface I_LBR_NotaFiscal
 	/** Get Data contingência	  */
 	public Timestamp getlbr_DateScan();
 
-    /** Column name LBR_DE_ID */
-    public static final String COLUMNNAME_LBR_DE_ID = "LBR_DE_ID";
-
-	/** Set DE	  */
-	public void setLBR_DE_ID (int LBR_DE_ID);
-
-	/** Get DE	  */
-	public int getLBR_DE_ID();
-
-	public org.adempierelbr.model.I_LBR_DE getLBR_DE() throws RuntimeException;
-
     /** Column name lbr_Delivery_Location_ID */
     public static final String COLUMNNAME_lbr_Delivery_Location_ID = "lbr_Delivery_Location_ID";
 

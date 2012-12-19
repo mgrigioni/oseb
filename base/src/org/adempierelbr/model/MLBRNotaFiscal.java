@@ -118,6 +118,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	/**	Just Prepared Flag			*/
 	private boolean		m_justPrepared = false;
 	
+	/** Prim Line					*/
+	private Integer		m_primaryLBR_NotaFiscalLine_ID = null;
+	
 	/**************************************************************************
 	 *  Default Constructor
 	 *  @param Properties ctx
@@ -281,6 +284,24 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 
 		return getLines(parameters,whereClause,orderBy,reQuery);
 	} //getLines
+	
+	/**
+	 * 	Get Primary LBR_NotaFiscalLine_ID
+	 *	@return LBR_NotaFiscalLine_ID
+	 */
+	public int getPrimaryLBR_NotaFiscalLine_ID()
+	{
+		if (m_primaryLBR_NotaFiscalLine_ID == null)
+		{
+			List<MLBRNotaFiscalLine> lines = getLines(false);
+			if (m_primaryLBR_NotaFiscalLine_ID == null && lines.size() > 0)
+				m_primaryLBR_NotaFiscalLine_ID = (lines.get(0).get_ID()); 
+		}
+		if (m_primaryLBR_NotaFiscalLine_ID == null)
+			return 0;
+		
+		return m_primaryLBR_NotaFiscalLine_ID.intValue();
+	}	//	getPrimaryLBR_NotaFiscalLine_ID
 	
 	/**
 	 * 	Get Document Info

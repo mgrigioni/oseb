@@ -15,6 +15,7 @@ package org.adempierelbr.callout;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -45,6 +46,8 @@ import org.compiere.util.Ini;
  */
 public class CalloutNF extends CalloutEngine
 {
+
+	private long H24 = 86400000;
 	
 	/**	Debug Steps			*/
 	//private boolean steps = false;
@@ -98,6 +101,36 @@ public class CalloutNF extends CalloutEngine
 		
 		return "";
 	}	// setNCM
+	
+	/**
+	 *  Aviso para cancelamento após 24h
+	 *
+	 *  @param ctx      Context
+	 *  @param WindowNo current Window No
+	 *  @param mTab     Model Tab
+	 *  @param mField   Model Field
+	 *  @param value    The new value
+	 *  @return Error message or ""
+	 *  
+	 *  Table - LBR_NotaFiscal / Column lbr_MotivoCancel
+	 * 
+	 */
+	public String warningCancel (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+	{
+		String motivoCancel = (String)mField.getValue();
+		if (motivoCancel == null || motivoCancel.trim().isEmpty() || motivoCancel.trim().length() < 15)
+			return "";
+		
+		Timestamp dateTrx = (Timestamp)mTab.getValue("DateTrx");
+		if (dateTrx == null)
+			return "";
+		
+		if (System.currentTimeMillis() > dateTrx.getTime()+H24 ){
+			mTab.fireDataStatusEEvent ("Warning", "Cancelamento fora do prazo", false);
+		}
+		
+		return "";
+	}	// warningCancel
 	
 	/**
 	 *	Nota Fiscal Header Change - DocType.

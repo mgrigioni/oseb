@@ -489,36 +489,35 @@ public class ProcGenerateEFD extends SvrProcess
 			
 			Set<R1105> setR1105 = new LinkedHashSet<R1105>();
 			
-			MLBRNotaFiscal[] exps = de.getMLBRNotaFiscal();
+			MLBRNotaFiscalLine[] nfLines = de.getMLBRNotaFiscalLine();
 			
-			for (MLBRNotaFiscal exp : exps){
+			for (MLBRNotaFiscalLine nfLine : nfLines){
 				
-				List<MLBRNotaFiscalLine> nfLines = exp.getLines();
-				for (MLBRNotaFiscalLine nfLine : nfLines){
+				MLBRNotaFiscal nf = new MLBRNotaFiscal(nfLine.getCtx(),nfLine.getLBR_NotaFiscal_ID(),nfLine.get_TrxName());
+				
+				R0190 r0190 = EFDUtil.createR0190(nfLine);
+				if (_R0190.contains(r0190))
+					r0190.subtractCounter();
+				else
+					_R0190.add(r0190);
 					
-					R0190 r0190 = EFDUtil.createR0190(nfLine);
-					if (_R0190.contains(r0190))
-						r0190.subtractCounter();
-					else
-						_R0190.add(r0190);
+				R0200 r0200 = EFDUtil.createR0200(nfLine);
+				if (_R0200.contains(r0200))
+					r0200.subtractCounter();
+				else
+					_R0200.add(r0200);
 					
-					R0200 r0200 = EFDUtil.createR0200(nfLine);
-					if (_R0200.contains(r0200))
-						r0200.subtractCounter();
-					else
-						_R0200.add(r0200);
+				R1105 r1105 = new R1105(nf.getlbr_NFModel(),nf.getSerieNo(),
+						nf.getDocumentNo(true),nf.getlbr_NFeID(),nf.getDateDoc(),
+						r0200.getCOD_ITEM());
 					
-					R1105 r1105 = new R1105(exp.getlbr_NFModel(),exp.getSerieNo(),
-							exp.getDocumentNo(true),exp.getlbr_NFeID(),exp.getDateDoc(),
-							r0200.getCOD_ITEM());
-					
-					if (setR1105.contains(r1105))
-						r1105.subtractCounter();
-					else{
-						setR1105.add(r1105);
-					}
-				} //loop linhas
-			} //loop nf
+				if (setR1105.contains(r1105))
+					r1105.subtractCounter();
+				else{
+					setR1105.add(r1105);
+				}
+
+			} //loop nfLine
 			
 			R1100 r1100 = EFDUtil.createR1100(de);
 			_R1100.put(r1100, setR1105);
