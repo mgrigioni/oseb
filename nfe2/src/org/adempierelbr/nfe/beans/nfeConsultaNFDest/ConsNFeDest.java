@@ -14,6 +14,7 @@
 package org.adempierelbr.nfe.beans.nfeConsultaNFDest;
 
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.util.TextUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -35,8 +36,8 @@ public class ConsNFeDest {
 	private String tpAmb;
 	private final String xServ = "CONSULTAR NFE DEST";
 	private String CNPJ;
-	private String indNFe;
-	private String indEmi;
+	private String indNFe = "2";
+	private String indEmi = "1";
 	private String ultNSU;
 	
 	/**
@@ -48,36 +49,33 @@ public class ConsNFeDest {
 	 * @param indEmi
 	 * @param ultNSU
 	 */
-	public ConsNFeDest(String versao, String tpAmb, String cNPJ, String indNFe,
-			String indEmi, String ultNSU) {
+	public ConsNFeDest(String versao, String tpAmb, String cNPJ, String ultNSU) {
 		super();
 		setVersao(versao);
 		setTpAmb(tpAmb);
 		setCNPJ(cNPJ);
-		setIndNFe(indNFe);
-		setIndEmi(indEmi);
 		setUltNSU(ultNSU);
 	}
 
 	public String getVersao() {
 		return versao;
 	}
-	public void setVersao(String versao) {
+	private void setVersao(String versao) {
 		this.versao = versao;
 	}
 
 	public String getTpAmb() {
 		return tpAmb;
 	}
-	public void setTpAmb(String tpAmb) {
+	private void setTpAmb(String tpAmb) {
 		this.tpAmb = tpAmb;
 	}
 	
 	public String getCNPJ() {
 		return CNPJ;
 	}
-	public void setCNPJ(String cNPJ) {
-		CNPJ = cNPJ;
+	private void setCNPJ(String cNPJ) {
+		CNPJ = TextUtil.toNumeric(cNPJ);
 	}
 	
 	public String getIndNFe() {
@@ -97,7 +95,7 @@ public class ConsNFeDest {
 	public String getUltNSU() {
 		return ultNSU;
 	}
-	public void setUltNSU(String ultNSU) {
+	private void setUltNSU(String ultNSU) {
 		this.ultNSU = ultNSU;
 	}
 

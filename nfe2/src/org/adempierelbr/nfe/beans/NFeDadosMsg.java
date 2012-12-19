@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ConsNFeDest;
 import org.adempierelbr.nfe.beans.statusServicoNFe.ConsStatServ;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -33,6 +34,9 @@ public class NFeDadosMsg {
 	
 	@XStreamAlias("ConsCad")
 	public ConsCad      consCad;
+	
+	@XStreamAlias("consNFeDest")
+	public ConsNFeDest  consNFeDest;
 
 	/**
 	 * Consulta Protocolo
@@ -54,6 +58,15 @@ public class NFeDadosMsg {
 	
 	/**
 	 * Consulta Cadastro de Parceiro
+	 * @param consNFeDest
+	 */
+	public NFeDadosMsg(ConsNFeDest consNFeDest) {
+		super();
+		setConsNFeDest(consNFeDest);
+	}
+	
+	/**
+	 * Consulta Destinatário
 	 * @param consCad
 	 */
 	public NFeDadosMsg(ConsCad consCad) {
@@ -78,6 +91,12 @@ public class NFeDadosMsg {
 	}
 	public void setConsCad(ConsCad consCad) {
 		this.consCad = consCad;
+	}
+	public ConsNFeDest getConsNFeDest() {
+		return consNFeDest;
+	}
+	public void setConsNFeDest(ConsNFeDest consNFeDest) {
+		this.consNFeDest = consNFeDest;
 	}
 	
 }	// NFeDadosMsg
