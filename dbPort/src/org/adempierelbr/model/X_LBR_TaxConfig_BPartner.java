@@ -30,7 +30,7 @@ public class X_LBR_TaxConfig_BPartner extends PO implements I_LBR_TaxConfig_BPar
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_TaxConfig_BPartner (Properties ctx, int LBR_TaxConfig_BPartner_ID, String trxName)

@@ -31,7 +31,7 @@ public class X_LBR_DigitalCertificate extends PO implements I_LBR_DigitalCertifi
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_DigitalCertificate (Properties ctx, int LBR_DigitalCertificate_ID, String trxName)
@@ -114,12 +114,12 @@ public class X_LBR_DigitalCertificate extends PO implements I_LBR_DigitalCertifi
 	public static final int LBR_CERTTYPE_AD_Reference_ID=1100000;
 	/** Java Key Store = JKS */
 	public static final String LBR_CERTTYPE_JavaKeyStore = "JKS";
-	/** PKCS#11 = P11 */
-	public static final String LBR_CERTTYPE_PKCS11 = "P11";
 	/** PKCS#12 = P12 */
 	public static final String LBR_CERTTYPE_PKCS12 = "P12";
 	/** ICP TrustStore (JKS) = ICP */
 	public static final String LBR_CERTTYPE_ICPTrustStoreJKS = "ICP";
+	/** PKCS#11 = P11 */
+	public static final String LBR_CERTTYPE_PKCS11 = "P11";
 	/** Set Certificate Type.
 		@param lbr_CertType 
 		Define the type of Digital Certificate

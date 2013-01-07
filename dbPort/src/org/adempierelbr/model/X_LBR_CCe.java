@@ -31,7 +31,7 @@ public class X_LBR_CCe extends PO implements I_LBR_CCe, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120828L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_CCe (Properties ctx, int LBR_CCe_ID, String trxName)
@@ -880,6 +880,8 @@ public class X_LBR_CCe extends PO implements I_LBR_CCe, I_Persistent
 	public static final String LBR_NFESTATUS_661RejeiçãoNF_EJáExistenteParaONúmeroDaDPECInformada = "661";
 	/** 662 Rejeição: Numeração da DPEC está inutilizada na Base de Dados da SEFAZ = 662 */
 	public static final String LBR_NFESTATUS_662RejeiçãoNumeraçãoDaDPECEstáInutilizadaNaBaseDeDadosDaSEFAZ = "662";
+	/** 663 - Alíquota do ICMS com valor superior a 4 por cento na operação de saída interestadual com produtos importados = 663 */
+	public static final String LBR_NFESTATUS_663_AlíquotaDoICMSComValorSuperiorA4PorCentoNaOperaçãoDeSaídaInterestadualComProdutosImportados = "663";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe

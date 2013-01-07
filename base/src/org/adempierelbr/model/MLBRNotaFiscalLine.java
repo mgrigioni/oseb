@@ -237,10 +237,12 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			//Problemas com arredondamento de impostos
 			//Comparar com a base de cálculo do ICMS para definir o valor da linha
 			//BaseICMS * (1+(RedBase/100) - Adiciona o isento/outros a base
-			BigDecimal icmsTaxBase = getICMSBaseAmt().multiply(Env.ONE.add(getICMSBaseReduction().divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
-			BigDecimal decimalCheck = icmsTaxBase.subtract(lineNetAmt);
-			if (decimalCheck.abs().compareTo(Env.ONE) < 0)
-				lineNetAmt = icmsTaxBase;
+			if (getParent().getlbr_TransactionType().equals(MLBRNotaFiscal.LBR_TRANSACTIONTYPE_Manufacturing)){
+				BigDecimal icmsTaxBase = getICMSBaseAmt().multiply(Env.ONE.add(getICMSBaseReduction().divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
+				BigDecimal decimalCheck = icmsTaxBase.subtract(lineNetAmt);
+				if (decimalCheck.abs().compareTo(Env.ONE) < 0)
+					lineNetAmt = icmsTaxBase;
+			}
 			
 			price = lineNetAmt.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND);
 			if (hasPriceList)
