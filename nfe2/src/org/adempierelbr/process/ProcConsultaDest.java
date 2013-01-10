@@ -13,6 +13,7 @@
 package org.adempierelbr.process;
 
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.logging.Level;
 
 import javax.xml.stream.XMLInputFactory;
@@ -39,6 +40,7 @@ import org.compiere.util.Msg;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsultadest.NFeConsultaDestStub;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
@@ -104,7 +106,11 @@ public class ProcConsultaDest extends SvrProcess
 					ResNFe.class,ResCanc.class,ResCCe.class});
 			//
 			RetConsNFeDest retConsDest = (RetConsNFeDest)xstream.fromXML (NFeUtil.XML_HEADER + respStatus);
-			TextUtil.generateTmpFile(retConsDest.toString(), "retConsDest.txt");
+			
+			StringWriter sw = new StringWriter ();
+			xstream.marshal (retConsDest,new CompactWriter (sw));
+			
+			TextUtil.generateTmpFile(sw.toString(), "retConsDest.xml");
 		}
 		catch (Throwable e1){
 			log.severe(e1.getLocalizedMessage());

@@ -192,7 +192,7 @@ public abstract class NFeUtil
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
-		xstream.marshal (new NFeDadosMsg(new ConsNFeDest(VERSAO,tpAmb,CNPJ,"0")),
+		xstream.marshal (new NFeDadosMsg(new ConsNFeDest("1.01",tpAmb,CNPJ,"6038534762")),
 				new CompactWriter (sw));
 		
 		return sw.toString();
@@ -330,7 +330,7 @@ public abstract class NFeUtil
 		
 		NFeConsultaDestStub.NfeCabecMsg cabecMsg = new NFeConsultaDestStub.NfeCabecMsg();
 		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
+		cabecMsg.setVersaoDados("1.01");
 
 		NFeConsultaDestStub.NfeCabecMsgE cabecMsgE = new NFeConsultaDestStub.NfeCabecMsgE();
 		cabecMsgE.setNfeCabecMsg(cabecMsg);

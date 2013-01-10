@@ -44,6 +44,8 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(MLBRNFeWebService.class);
 	
+	private static final String URLNFEAN           = "www.nfe.fazenda.gov.br";
+	
 	public static final String CADCONSULTACADASTRO = "NfeConsultaCadastro";
 	public static final String STATUSSERVICO       = "NfeStatusServico";
 	public static final String CONSULTA            = "NfeConsultaProtocolo";
@@ -140,6 +142,13 @@ public class MLBRNFeWebService extends X_LBR_NFeWebService
 			   if (!list.contains(url))
 				   list.add(url);
 			}
+			
+			//SERVICOS AMBIENTE NACIONAL
+			if (envType.equals(MLBRNFeWebService.LBR_NFEENV_Production)){
+				if (!list.contains(URLNFEAN))
+					list.add(URLNFEAN);
+			}
+			
 		}
 		catch (Exception e)
 		{

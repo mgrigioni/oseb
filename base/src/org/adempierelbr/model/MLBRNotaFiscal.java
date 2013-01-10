@@ -970,7 +970,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	        setlbr_NFeStatus(infCanc.getcStat());
 	        //
 	        if (infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado) ||
-	        	infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_151CancelamentoDeNF_EHomologadoForaDePrazo)) {
+	        	infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_151_CancelamentoDeNF_EHomologadoForaDePrazo)) {
 		        setlbr_NFeProt(infCanc.getnProt());
 		        setDateTrx(NFeUtil.stringToTime(infCanc.getDhRecbto()));
 		        
@@ -1879,8 +1879,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		if (getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
 			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado) ||
-			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_150AutorizadoOUsoDaNF_EAutorizaçãoForaDePrazo) ||
-			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_151CancelamentoDeNF_EHomologadoForaDePrazo))
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_150_AutorizadoOUsoDaNF_EAutorizaçãoForaDePrazo) ||
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_151_CancelamentoDeNF_EHomologadoForaDePrazo))
 			return true;
 		
 		return false;

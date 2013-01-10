@@ -36,7 +36,7 @@ public class ConsNFeDest {
 	private String tpAmb;
 	private final String xServ = "CONSULTAR NFE DEST";
 	private String CNPJ;
-	private String indNFe = "2";
+	private String indNFe = "0";
 	private String indEmi = "1";
 	private String ultNSU;
 	
