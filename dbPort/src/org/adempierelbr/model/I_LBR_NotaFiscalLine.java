@@ -311,6 +311,19 @@ public interface I_LBR_NotaFiscalLine
 	/** Get Núm. Seq. Item	  */
 	public int getlbr_NumSeqItem();
 
+    /** Column name lbr_ProductSource */
+    public static final String COLUMNNAME_lbr_ProductSource = "lbr_ProductSource";
+
+	/** Set Product Source.
+	  * Defines the Product Source
+	  */
+	public void setlbr_ProductSource (String lbr_ProductSource);
+
+	/** Get Product Source.
+	  * Defines the Product Source
+	  */
+	public String getlbr_ProductSource();
+
     /** Column name lbr_ServiceTaxes */
     public static final String COLUMNNAME_lbr_ServiceTaxes = "lbr_ServiceTaxes";
 

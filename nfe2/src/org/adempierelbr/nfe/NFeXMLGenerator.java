@@ -228,9 +228,7 @@ public class NFeXMLGenerator
 			for (NFeTaxes lt : NFeTaxes.getTaxes(nfLine)) {
 
 				if (lt.getTaxIndicator().equals("ICMS")) {
-					String taxStatus = nfLine.getlbr_TaxStatus();
-					if (taxStatus == null)
-						taxStatus = "000";
+					String taxStatus = nfLine.getCST_ICMS();
 
 					// Modalidade de determinação da BC do ICMS:
 					// 0 - Margem Valor Agregado (%);

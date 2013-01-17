@@ -163,6 +163,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		setlbr_UOMName(AdempiereLBR.getUOM_trl(uom));
 		setQty(iLine.getQtyEntered());
 		//
+		setlbr_ProductSource(proW.getlbr_ProductSource());
 		setlbr_TaxStatus(iLineW.getlbr_TaxStatus());
 		setlbr_TaxStatusIPI(iLineW.getlbr_TaxStatusIPI());
 		setlbr_TaxStatusPIS(iLineW.getlbr_TaxStatusPIS()); 
@@ -354,16 +355,16 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		//CST ICMS
 		String CST_ICMS = getlbr_TaxStatus();
 		
-		if (CST_ICMS == null || CST_ICMS.isEmpty() || CST_ICMS.length() != 3){
-			CST_ICMS = TextUtil.lPad(CST_ICMS, 3);
+		if (CST_ICMS == null || CST_ICMS.isEmpty()){
+			CST_ICMS = TextUtil.lPad(CST_ICMS, 2);
 		}
 		
-		if (CST_ICMS.endsWith("00") && getICMSAmt().signum() == 0){
-			CST_ICMS = CST_ICMS.substring(0, 1) + "40"; //ISENTO
+		if (CST_ICMS.equals("00") && getICMSAmt().signum() == 0){
+			CST_ICMS = "40"; //ISENTO
 		}
 		
-		if (!CST_ICMS.endsWith("10") && getTaxAmt("ICMSST").signum() == 1){
-			CST_ICMS = CST_ICMS.substring(0, 1) + "10"; //ICMSST
+		if (!CST_ICMS.equals("10") && getTaxAmt("ICMSST").signum() == 1){
+			CST_ICMS = "10"; //ICMSST
 		}
 		
 		if (CST_ICMS != getlbr_TaxStatus()){
@@ -667,17 +668,22 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	 * @return Formata e retorna a Situação Tributária do ICMS
 	 */
 	public String getCST_ICMS(){
+		
 		String CST_ICMS = getlbr_TaxStatus();
-		
-		if (CST_ICMS == null || CST_ICMS.isEmpty() || CST_ICMS.length() != 3){
-			CST_ICMS = TextUtil.lPad(CST_ICMS, 3);
+		if (CST_ICMS == null || CST_ICMS.isEmpty()){
+			CST_ICMS = TextUtil.lPad(CST_ICMS, 2);
 		}
 		
-		if (CST_ICMS.endsWith("00") && getICMSAmt().signum() == 0){
-			CST_ICMS = CST_ICMS.substring(0, 1) + "40"; //ISENTO
+		if (CST_ICMS.equals("00") && getICMSAmt().signum() == 0){
+			CST_ICMS = "40"; //ISENTO
 		}
 		
-		return CST_ICMS;
+		String prodSource = getlbr_ProductSource();
+		if (prodSource == null || prodSource.isEmpty()){
+			prodSource = "0";
+		}
+		
+		return prodSource + CST_ICMS;
 	} //getCST_ICMS
 	
 	/**

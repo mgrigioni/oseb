@@ -33,7 +33,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130107L;
+	private static final long serialVersionUID = 20130117L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -456,6 +456,42 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** lbr_ProductSource AD_Reference_ID=1000031 */
+	public static final int LBR_PRODUCTSOURCE_AD_Reference_ID=1000031;
+	/** 0 - Domestic = 0 */
+	public static final String LBR_PRODUCTSOURCE_0_Domestic = "0";
+	/** 1 - Imported = 1 */
+	public static final String LBR_PRODUCTSOURCE_1_Imported = "1";
+	/** 2 - Imported - Acquired from a domestic distributor = 2 */
+	public static final String LBR_PRODUCTSOURCE_2_Imported_AcquiredFromADomesticDistributor = "2";
+	/** 3 - Domestic with more than 40 percent Imported = 3 */
+	public static final String LBR_PRODUCTSOURCE_3_DomesticWithMoreThan40PercentImported = "3";
+	/** 4 - Product acquired from Manaus = 4 */
+	public static final String LBR_PRODUCTSOURCE_4_ProductAcquiredFromManaus = "4";
+	/** 5 - Domestic until 40 percent Imported = 5 */
+	public static final String LBR_PRODUCTSOURCE_5_DomesticUntil40PercentImported = "5";
+	/** 6 - Foreign - Direct import no similar national = 6 */
+	public static final String LBR_PRODUCTSOURCE_6_Foreign_DirectImportNoSimilarNational = "6";
+	/** 7 - Foreign - Acquired from a domestic distributor no similar national = 7 */
+	public static final String LBR_PRODUCTSOURCE_7_Foreign_AcquiredFromADomesticDistributorNoSimilarNational = "7";
+	/** Set Product Source.
+		@param lbr_ProductSource 
+		Defines the Product Source
+	  */
+	public void setlbr_ProductSource (String lbr_ProductSource)
+	{
+
+		set_Value (COLUMNNAME_lbr_ProductSource, lbr_ProductSource);
+	}
+
+	/** Get Product Source.
+		@return Defines the Product Source
+	  */
+	public String getlbr_ProductSource () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_ProductSource);
 	}
 
 	/** Set Service Taxes.

@@ -103,7 +103,7 @@ public class NFeTaxes
 				tx.add (isST, lt.getlbr_TaxBaseAmt(), lt.getlbr_TaxAmt(), lt.getlbr_TaxRate(), lt.getlbr_TaxBase());
 			}
 			else {
-				tx = new NFeTaxes(taxIndicator, nfl.getlbr_TaxStatus(), isST, lt.getlbr_TaxBaseAmt(), 
+				tx = new NFeTaxes(taxIndicator, nfl.getCST_ICMS(), isST, lt.getlbr_TaxBaseAmt(), 
 						lt.getlbr_TaxAmt(), lt.getlbr_TaxRate(),lt.getlbr_TaxBase());
 			}
 			//	Inclui os impostos no mapa
@@ -111,17 +111,17 @@ public class NFeTaxes
 		}
 		//
 		if (!txs.containsKey("PIS")) {
-			NFeTaxes tx = new NFeTaxes ("PIS", nfl.getlbr_TaxStatus());
+			NFeTaxes tx = new NFeTaxes ("PIS", nfl.getCST_PIS());
 			txs.put("PIS", tx);
 		}
 		
 		if (!txs.containsKey("COFINS")) {
-			NFeTaxes tx = new NFeTaxes ("COFINS", nfl.getlbr_TaxStatus());
+			NFeTaxes tx = new NFeTaxes ("COFINS", nfl.getCST_COFINS());
 			txs.put("COFINS", tx);
 		}
 		
 		if (!txs.containsKey("ICMS")) {
-			NFeTaxes tx = new NFeTaxes ("ICMS", nfl.getlbr_TaxStatus());
+			NFeTaxes tx = new NFeTaxes ("ICMS", nfl.getCST_ICMS());
 			txs.put("ICMS", tx);
 		}
 		//
