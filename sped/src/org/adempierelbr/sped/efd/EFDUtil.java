@@ -136,8 +136,11 @@ public class EFDUtil{
 		else if (dateFrom.before(TextUtil.stringToTime("01/07/2012", "dd/MM/yyyy"))){
 			return "005"; //ANTES DE JUL/2012 - VERSAO 005
 		}
-		else{
+		else if (dateFrom.before(TextUtil.stringToTime("01/01/2013", "dd/MM/yyyy"))){
 			return "006"; //A PARTIR DE JUL/2012 - VERSAO 006
+		}
+		else{
+			return "007"; //A PARTIR DE JAN/2013 - VERSAO 007
 		}
 	}
 	

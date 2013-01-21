@@ -390,7 +390,10 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//	Std Period open?
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
-		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
+		if (dt.get_ID() == 0) //NF terceiros, pega período documento próprio
+			dt = AdempiereLBR.getNFBDocType(getAD_Org_ID(), isSOTrx(), false);
+			
+		if (dt != null && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 			return DocAction.STATUS_Invalid;
 		}
@@ -596,7 +599,10 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		//	Std Period open?
 		MDocType dt = MDocType.get(getCtx(), getC_DocTypeTarget_ID());
-		if (dt.get_ID() > 0 && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
+		if (dt.get_ID() == 0) //NF terceiros, pega período documento próprio
+			dt = AdempiereLBR.getNFBDocType(getAD_Org_ID(), isSOTrx(), false);
+		
+		if (dt != null && !MPeriod.isOpen(getCtx(), getDateAcct(), dt.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 			return false;
 		}
