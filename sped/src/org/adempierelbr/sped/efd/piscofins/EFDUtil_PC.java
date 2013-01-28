@@ -458,8 +458,8 @@ public class EFDUtil_PC
 		Timestamp DT_E_S  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal().subtract(nf.getlbr_ServiceTotalAmt());
 		String IND_PAG    = nf.getIndPag();
-		if (IND_PAG.equals("2")) // 2 é usado na NFe
-			IND_PAG = "1";
+		if (IND_PAG.equals("9")) // 9 é usado na NFe
+			IND_PAG = "2";
 		
 		BigDecimal VL_DESC = nf.getDiscountAmt(nf.getTotalLines());
 		BigDecimal VL_ABAT_NT  = Env.ZERO; //TODO ???
