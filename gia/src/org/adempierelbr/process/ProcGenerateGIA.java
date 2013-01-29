@@ -133,6 +133,7 @@ public class ProcGenerateGIA extends SvrProcess
 		}
 
 		if (_CR20 != null){
+			Arrays.sort(_CR20);
 			for(CR20 ocorrencia : _CR20){
 				result.append(ocorrencia);
 			}

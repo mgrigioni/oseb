@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
@@ -34,6 +35,7 @@ import org.adempierelbr.nfe.beans.ConsSitNFe;
 import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.nfe.beans.NFeDadosMsg;
 import org.adempierelbr.nfe.beans.cancNFe.CancNFe;
+import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ConsNFeDest;
 import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.ConsReciNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.InfProt;
@@ -53,6 +55,7 @@ import org.w3c.dom.NodeList;
 import br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2.CadConsultaCadastro2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfeconsultadest.NFeConsultaDestStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
@@ -61,6 +64,7 @@ import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  Utility class for NFe
@@ -81,6 +85,9 @@ public abstract class NFeUtil
 
 	/** XML */
 	public static final long   XML_SIZE = 500;
+	
+	/** TOLERANCIA - NT2012/003 */
+	public static final BigDecimal TOLERANCIA = new BigDecimal("0.50");
 	
 	/** Padrões de Extensão */
 	public static final String EXT_NFE          = "-nfe.xml";
@@ -106,11 +113,11 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgConsultaProtocolo(String tpAmb, String chNFe){
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
-		xstream.marshal (new NFeDadosMsg(new ConsSitNFe(VERSAO,tpAmb,chNFe)), 
+		xstream.marshal (new NFeDadosMsg(new ConsSitNFe("2.01",tpAmb,chNFe)), 
 				new CompactWriter (sw));
 		
 		return sw.toString();
@@ -124,7 +131,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgStatusServico(String tpAmb, int C_Region_ID){
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -143,7 +150,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgConsultaCadastro(String regionName, String CNPJ){
 
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -164,7 +171,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgCancelamento (String tpAmb, String chNFe, 
 			String nProt, String xJust) {
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -176,17 +183,29 @@ public abstract class NFeUtil
 	}	// geraMsgCancelamento
 	
 	/**
+	 * Método para gerar dados para consulta destinatário
+	 * @return msg
+	 */
+	public static String geraMsgConsultaDest(String tpAmb, String CNPJ) {
+				
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new NFeDadosMsg(new ConsNFeDest("1.01",tpAmb,CNPJ,"6038534762")),
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	}	//	geraMsgConsultaDest
+	
+	/**
 	 * Método para gerar dados para inutilizar número nf
 	 * @param inutNFe
 	 * @return msg
 	 */
 	public static String geraMsgInutilizacao(InutNFe inutNFe) {
-		
-		if (!inutNFe.isValid()){
-			return null;
-		}
-		
-		XStream xstream = new XStream();
+				
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -203,15 +222,15 @@ public abstract class NFeUtil
 	 */
 	public static String geraMsgConsultaLote (String tpAmb, String nRec) {
 		
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
 		xstream.marshal (new ConsReciNFe(VERSAO,tpAmb,nRec),new CompactWriter (sw));
 		
 		return sw.toString();
-	}	//geraMsgRetRecepcao
-
+	}	//geraMsgConsultaLote
+	
 	/**
 	 * @return cabecalho NFe
 	 */
@@ -241,17 +260,16 @@ public abstract class NFeUtil
 		return cabecalho.toString();
 	}
 	
-	/**
-	 * @return Cabeçalho do lote
-	 */
+	/**          
+	 * @return Cabeçalho do lote          
+	 */         
 	public static String geraCabecLoteNFe (String lote){
 		StringBuilder cabecalho = new StringBuilder("<enviNFe xmlns=\"").append(NAMESPACE_NFE)
 				.append("\" versao=\"").append(VERSAO).append("\">")
 				.append("<idLote>").append(lote).append("</idLote>");
-	  
 		return cabecalho.toString();
-	} // geraCabecLoteNFe
-	
+	} // geraCabecLoteNFe 
+		
 	/**
 	 * Gera o cabeçalho evento
 	 * @param region
@@ -278,7 +296,7 @@ public abstract class NFeUtil
 
 		NfeConsulta2Stub.NfeCabecMsg cabecMsg = new NfeConsulta2Stub.NfeCabecMsg();
 		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados(VERSAO);
+		cabecMsg.setVersaoDados("2.01");
 
 		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
 		cabecMsgE.setNfeCabecMsg(cabecMsg);
@@ -303,7 +321,23 @@ public abstract class NFeUtil
 		return cabecMsgE;
 	} //geraCabecStatusServico
 
+	/**
+	 * Método para gerar cabeçalho consulta destinatário
+	 * @param region
+	 * @return NFeConsultaDestStub.NfeCabecMsgE
+	 */
+	public static NFeConsultaDestStub.NfeCabecMsgE geraCabecConsultaDest(int C_Region_ID){
+		
+		NFeConsultaDestStub.NfeCabecMsg cabecMsg = new NFeConsultaDestStub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados("1.01");
 
+		NFeConsultaDestStub.NfeCabecMsgE cabecMsgE = new NFeConsultaDestStub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecConsultaDest
+	
 	/**
 	 * Método para gerar cabeçalho consulta cadastro
 	 * @param region
@@ -405,7 +439,7 @@ public abstract class NFeUtil
 	 */
 	public static String geraRodapDistribuicao (ProtNFe protNFe) {
 			
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -417,7 +451,7 @@ public abstract class NFeUtil
 
 	public static String geraRodapCanc(RetCancNFe retCancNFe) {
 			
-		XStream xstream = new XStream();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
@@ -441,7 +475,7 @@ public abstract class NFeUtil
 
 		File xml = getAttachmentEntryFile(nf.getAttachment().getEntry(0));
 	    String dados = XMLtoString(xml);
-	    if (dados.endsWith("</nfeProc")) // Já está no padrão de distribuicao
+	    if (dados.endsWith("</nfeProc>")) // Já está no padrão de distribuicao
 	    	return attach;
 	    
 	    String cabecalho = geraCabecDistribuicao();
@@ -718,5 +752,5 @@ public abstract class NFeUtil
 
 		return doc.getElementsByTagName(Tag).item(0).getTextContent();
 	}	//	getValue
-		
+	
 }	//	NFeUtil

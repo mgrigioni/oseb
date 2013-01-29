@@ -80,7 +80,8 @@ public class EnderEmit {
 		return nro;
 	}
 	private void setNro(String nro) {
-		if (nro != null)
+		nro = TextUtil.toNumeric(nro);
+		if (nro.isEmpty())
 			nro = "S/N";
 	
 		this.nro = nro;

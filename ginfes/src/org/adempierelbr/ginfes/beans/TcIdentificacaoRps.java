@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.ginfes.beans;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.util.CLogger;
 
@@ -70,7 +71,7 @@ public class TcIdentificacaoRps {
 	public void setTipo(String tipo) {
 		tipo = TextUtil.toNumeric(tipo);
 		if("123".indexOf(tipo) == -1){
-			log.warning("(Tipo de documento inválido) - " + tipo);
+			throw new AdempiereException ("(Tipo de documento inválido) - " + tipo);
 		}
 		
 		Tipo = tipo;

@@ -530,7 +530,7 @@ public class ValidatorBPartner implements ModelValidator
 		if (uf == null)
 			ie = "";
 
-		return ie;
+		return (ie.trim()).toUpperCase();
 	} //validaIE
 
 

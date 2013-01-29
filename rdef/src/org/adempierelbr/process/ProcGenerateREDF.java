@@ -176,7 +176,7 @@ public class ProcGenerateREDF extends SvrProcess
 			{
 				Registro30 r30 = new Registro30 (line.getProductValue(), line.getProductName(),
 						line.getlbr_NCMName(), line.getlbr_UOMName(), line.getQty(), line.getPrice().add(line.getICMSAmt().divide(line.getQty(), 12, RoundingMode.HALF_UP)),
-						line.getLineTotalAmt().add(line.getICMSAmt()), line.getlbr_TaxStatus(), line.getICMSRate(), line.getIPIRate(),
+						line.getLineTotalAmt().add(line.getICMSAmt()), line.getCST_ICMS(), line.getICMSRate(), line.getIPIRate(),
 						line.getIPIAmt());
 				result.append(r30.format());
 				count30++;

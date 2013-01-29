@@ -30,7 +30,7 @@ public class X_LBR_OtherNF extends PO implements I_LBR_OtherNF, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_OtherNF (Properties ctx, int LBR_OtherNF_ID, String trxName)

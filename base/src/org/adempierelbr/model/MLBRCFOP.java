@@ -14,6 +14,7 @@
 package org.adempierelbr.model;
 
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Properties;
 
 import org.adempierelbr.util.TextUtil;
@@ -115,6 +116,19 @@ public class MLBRCFOP extends X_LBR_CFOP {
 		return false;
 	} //isRevenue
 	
+	/**
+	 * @return true se for uma operação de comércio exterior
+	 */
+	public boolean isComex(){
+		
+		String value = TextUtil.lPad(TextUtil.toNumeric(getValue()),4);
+		if (Integer.valueOf(value.substring(0, 1)).intValue() == 3 ||
+			Integer.valueOf(value.substring(0, 1)).intValue() == 7	){
+			return true;
+		}
+		
+		return false;
+	}
 	
 	/**
 	 *  Load Constructor
@@ -137,6 +151,36 @@ public class MLBRCFOP extends X_LBR_CFOP {
 			return new MLBRCFOP(ctx,LBR_CFOP_ID,trxName);
 		}
 		
+		return null;
+	}
+	
+	public static String validateCFOP(MLBRNotaFiscal nf){
+		
+		Properties ctx = nf.getCtx();
+		String     trx = nf.get_TrxName();
+
+		//Organização
+		MOrgInfo orgInfo = MOrgInfo.get(ctx, nf.getAD_Org_ID(), trx);
+		MLocation orgLocation = new MLocation(ctx,orgInfo.getC_Location_ID(),trx);
+
+		//Parceiro de Negócios
+		MBPartnerLocation bpLocation = new MBPartnerLocation(ctx,nf.getC_BPartner_Location_ID(),trx);
+		MLocation         location   = bpLocation.getLocation(false);
+		
+		boolean isSOTrx = nf.isSOTrx();
+
+		List<MLBRNotaFiscalLine> lines = nf.getLines();
+		for(MLBRNotaFiscalLine line : lines){
+			
+			String erro = "CFOP inválido. Linha: " + line.getLine();
+			
+			if (line.getlbr_CFOPName() == null || line.getlbr_CFOPName().trim().isEmpty())
+				return erro;
+			
+			if (!MLBRCFOP.validateCFOP(line.getLBR_CFOP_ID(), isSOTrx, orgLocation, location,false))
+				return erro;
+		}
+
 		return null;
 	}
 

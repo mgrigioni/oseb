@@ -24,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  *  @author Mario Grigioni
  *  @version $Id: ConsCad.java,v 1.0 25/06/2012 15:37:00 mgrigioni Exp $
  */
-@XStreamAlias ("ConsCad")
+@XStreamAlias("ConsCad")
 public class ConsCad {
 
 	@XStreamAsAttribute

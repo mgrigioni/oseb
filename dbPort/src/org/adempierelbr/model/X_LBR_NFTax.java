@@ -32,7 +32,7 @@ public class X_LBR_NFTax extends PO implements I_LBR_NFTax, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_NFTax (Properties ctx, int LBR_NFTax_ID, String trxName)
@@ -111,9 +111,9 @@ public class X_LBR_NFTax extends PO implements I_LBR_NFTax, I_Persistent
 	public void setLBR_NotaFiscal_ID (int LBR_NotaFiscal_ID)
 	{
 		if (LBR_NotaFiscal_ID < 1) 
-			set_Value (COLUMNNAME_LBR_NotaFiscal_ID, null);
+			set_ValueNoCheck (COLUMNNAME_LBR_NotaFiscal_ID, null);
 		else 
-			set_Value (COLUMNNAME_LBR_NotaFiscal_ID, Integer.valueOf(LBR_NotaFiscal_ID));
+			set_ValueNoCheck (COLUMNNAME_LBR_NotaFiscal_ID, Integer.valueOf(LBR_NotaFiscal_ID));
 	}
 
 	/** Get Nota Fiscal.

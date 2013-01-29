@@ -425,14 +425,8 @@ public class CalloutTax extends CalloutEngine
 
 		}
 
-		String productSource = product.get_ValueAsString(I_W_M_Product.COLUMNNAME_lbr_ProductSource);
-		if (productSource == null || productSource.equals(""))
-			productSource = "0";
-
 		if (lbr_TaxStatus == null || lbr_TaxStatus.equals(""))
 			lbr_TaxStatus = "00";
-
-		lbr_TaxStatus = productSource + lbr_TaxStatus;
 
 		if (LBR_LegalMessage_ID != null && LBR_LegalMessage_ID.intValue() == 0)
 			LBR_LegalMessage_ID = null;

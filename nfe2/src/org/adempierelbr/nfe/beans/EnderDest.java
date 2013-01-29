@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,7 +13,28 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.util.BPartnerUtil;
+import org.adempierelbr.util.RemoverAcentos;
+import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_C_City;
+import org.adempierelbr.wrapper.I_W_C_Country;
+import org.compiere.model.MCountry;
+import org.compiere.model.X_C_City;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  Grupo do Endereço do destinatário
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: EnderDest.java,v 2.0 30/07/2012 16:36:00 mgrigioni Exp $
+ */
+@XStreamAlias ("enderDest")
 public class EnderDest {
+	
 	private String xLgr;
 	private String nro;
 	private String xCpl;
@@ -23,105 +45,153 @@ public class EnderDest {
 	private String CEP;
 	private String cPais;
 	private String xPais;
-	//private String fone;
-	private String email;
-
-	public String getXLgr() {
+	private String fone;
+	
+	/**
+	 * Default Constructor
+	 * @param MLBRNotaFiscal nf
+	 */
+	public EnderDest(MLBRNotaFiscal nf){
+		super();
+		setxLgr(nf.getlbr_BPAddress1());
+		setNro(nf.getlbr_BPAddress2());
+		setxBairro(nf.getlbr_BPAddress3());
+		setxCpl(nf.getlbr_BPAddress4());
+		
+		MCountry country = new MCountry(nf.getCtx(), BPartnerUtil.getC_Country_ID(nf.getlbr_BPCountry()),null);
+		setcPais(country.get_ValueAsString(I_W_C_Country.COLUMNNAME_lbr_CountryCode));
+		setxPais(AdempiereLBR.getCountry_trl(country));
+		
+		if (country.get_ID() == BPartnerUtil.BRASIL) {
+			X_C_City bpCity = BPartnerUtil.getX_C_City(nf.getCtx(),
+					nf.getlbr_BPCity(),BPartnerUtil.getC_Region_ID(nf.getlbr_BPRegion()),nf.get_TrxName());
+			
+			if (bpCity == null){
+				throw new AdempiereException("Cidade do Parceiro de Negócios não encontrada");
+			}
+			
+			int bpCityCode = bpCity.get_ValueAsInt(I_W_C_City.COLUMNNAME_lbr_CityCode);
+			if (bpCityCode <= 0){
+				throw new AdempiereException("Código do cidade (IBGE) não cadastrado - " + nf.getlbr_BPCity());
+			}
+			
+			setcMun(Integer.toString(bpCityCode));
+			setxMun(nf.getlbr_BPCity());
+			setUF(nf.getlbr_BPRegion());
+			setCEP(nf.getlbr_BPPostal());
+		}
+		else{
+			setcMun(BPartnerUtil.EXTCOD);
+			setxMun(BPartnerUtil.EXTMUN);
+			setUF(BPartnerUtil.EXTREG);
+		}
+		
+	} //EnderEmit
+	
+	public String getxLgr() {
 		return xLgr;
 	}
-	public void setXLgr(String lgr) {
-		xLgr = lgr;
+	private void setxLgr(String xLgr) {
+		if (xLgr == null || xLgr.length() < 2)
+			throw new AdempiereException("xLgr = " + xLgr);
+		else
+			this.xLgr = TextUtil.checkSize(RemoverAcentos.remover(xLgr),60);
 	}
+	
 	public String getNro() {
 		return nro;
 	}
-	public void setNro(String nro) {
+	private void setNro(String nro) {
+		if (nro != null)
+			nro = "S/N";
+	
 		this.nro = nro;
 	}
-	public String getXCpl() {
+	
+	public String getxCpl() {
 		return xCpl;
 	}
-	public void setXCpl(String cpl) {
-		xCpl = cpl;
+	private void setxCpl(String xCpl) {	
+		if (xCpl != null && !xCpl.isEmpty())
+			this.xCpl = TextUtil.checkSize(RemoverAcentos.remover(xCpl),60);
 	}
-	public String getXBairro() {
+	
+	public String getxBairro() {
 		return xBairro;
 	}
-	public void setXBairro(String bairro) {
-		xBairro = bairro;
+	private void setxBairro(String xBairro) {
+		if (xBairro == null || xBairro.length() < 2)
+			throw new AdempiereException("xBairro = " + xBairro);
+		else
+			this.xBairro = TextUtil.checkSize(RemoverAcentos.remover(xBairro),60);
 	}
-	public String getCMun() {
+	
+	public String getcMun() {
 		return cMun;
 	}
-	public void setCMun(String mun) {
-		if (mun != null)
-			mun = mun.trim();
-
-		cMun = mun;
+	private void setcMun(String cMun) {
+		if (cMun == null || cMun.length() != 7)
+			throw new AdempiereException("cMun = " + cMun);
+		else
+			this.cMun = cMun;
 	}
-	public String getXMun() {
+	
+	public String getxMun() {
 		return xMun;
 	}
-	public void setXMun(String mun) {
-		if (mun != null)
-			mun = mun.trim();
-
-		xMun = mun;
+	private void setxMun(String xMun) {
+		if (xMun == null || xMun.length() < 2)
+			throw new AdempiereException("xMun = " + xMun);
+		else
+			this.xMun = TextUtil.checkSize(RemoverAcentos.remover(xMun),60);
 	}
+	
 	public String getUF() {
 		return UF;
 	}
-	public void setUF(String uf) {
-		if (uf != null)
-			uf = uf.trim();
-
-		UF = uf;
+	private void setUF(String uF) {
+		if (uF == null || uF.length() != 2)
+			throw new AdempiereException("uF = " + uF);
+		else
+			UF = uF;
 	}
+	
 	public String getCEP() {
 		return CEP;
 	}
-	public void setCEP(String cep) {
-		if (cep != null)
-			cep = cep.trim();
-
-		CEP = cep;
+	private void setCEP(String cEP) {
+		cEP = TextUtil.toNumeric(cEP);
+		if (cEP.length() != 8)
+			throw new AdempiereException("cEP" + cEP);
+		else
+			CEP = cEP;
 	}
-	public String getCPais() {
+	
+	public String getcPais() {
 		return cPais;
 	}
-	public void setCPais(String pais) {
-		if (pais != null)
-			pais = pais.trim();
-
-		cPais = pais;
+	public void setcPais(String cPais) {
+		if (cPais == null)
+			throw new AdempiereException("cPais = " + cPais);
+		else
+			this.cPais = TextUtil.lPad(cPais,4);
 	}
-	public String getXPais() {
+	
+	public String getxPais() {
 		return xPais;
 	}
-	public void setXPais(String pais) {
-		if (pais != null)
-			pais = pais.trim();
-
-		xPais = pais;
+	private void setxPais(String xPais) {
+		this.xPais = xPais;
 	}
-	/*
+	
 	public String getFone() {
 		return fone;
 	}
 	public void setFone(String fone) {
 		if (fone != null)
 			fone = fone.trim();
-
+	
 		this.fone = fone;
 	}
-	*/
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		if (email != null)
-			email = email.trim();
-
-		this.email = email;
-	}
-}
+	
+} //EnderDest

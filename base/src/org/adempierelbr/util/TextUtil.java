@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -101,14 +102,15 @@ public abstract class TextUtil
 	
 	/**
 	 * readFile
-	 *  Reads a file and return the lines into a string array
-	 *  @param  File
-	 *  @return String dados
+	 * Reads a file and return the lines into a string
+	 * @param  File
+	 * @return String dados
 	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException 
 	 */
-	public static String readFile(File file) throws FileNotFoundException{
+	public static String readFile(File file, String encoding) throws FileNotFoundException, UnsupportedEncodingException{
 		
-		String[] array = readFile(file.toString());
+		String[] array = readFile(file.toString(),encoding);
 		StringBuilder dados = new StringBuilder();
 		for(int i=0;i<array.length;i++){
 			dados.append(array[i]);
@@ -117,19 +119,27 @@ public abstract class TextUtil
 		return dados.toString();
 	} //readFile
 	
-	/**
-	 *  readFile
-	 *  Reads a file and return the lines into a string array
-	 *  @param  String FileName (FilePath)
-	 *  @return String[] lines
-	 *  @throws FileNotFoundException
+	/*
+	 * readFile - default encoding = UTF8
 	 */
-	public static String[] readFile (String FileName) throws FileNotFoundException{
+	public static String readFile(File file) throws FileNotFoundException, UnsupportedEncodingException{
+		return readFile(file,UTF8);
+	}
+	
+	/**
+	 * readFile
+	 * Reads a file and return the lines into a string array
+	 * @param  String FileName (FilePath)
+	 * @return String[] lines
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException 
+	 */
+	public static String[] readFile(String FileName, String encoding) throws FileNotFoundException, UnsupportedEncodingException{
 
 		ArrayList<String> list = new ArrayList<String> ();
 
 		FileInputStream stream = new FileInputStream(FileName);
-		InputStreamReader streamReader = new InputStreamReader(stream);
+		InputStreamReader streamReader = new InputStreamReader(stream,encoding);
 		BufferedReader reader = new BufferedReader(streamReader);
 
 		// Neste while lemos o arquivo linha a linha
@@ -153,6 +163,13 @@ public abstract class TextUtil
 		list.toArray (lines);
 		return lines;
 	} //readFile
+	
+	/*
+	 * readFile - default encoding = UTF8
+	 */
+	public static String[] readFile(String FileName) throws FileNotFoundException, UnsupportedEncodingException{
+		return readFile(FileName,UTF8);
+	}
 
 	/**
 	 * generateFile (DEFAULT ENCODING UTF-8)

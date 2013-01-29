@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 
 /** Generated Model for LBR_NotaFiscalLine
  *  @author ADempiereLBR (generated) 
@@ -32,7 +33,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120618L;
+	private static final long serialVersionUID = 20130117L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -42,6 +43,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
         {
 			setlbr_IsService (false);
 // 'N'
+			setLBR_NotaFiscal_ID (0);
 			setLBR_NotaFiscalLine_ID (0);
         } */
     }
@@ -212,6 +214,31 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 		return (String)get_Value(COLUMNNAME_lbr_CFOPName);
 	}
 
+	public org.adempierelbr.model.I_LBR_DE getLBR_DE() throws RuntimeException
+    {
+		return (org.adempierelbr.model.I_LBR_DE)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_DE.Table_Name)
+			.getPO(getLBR_DE_ID(), get_TrxName());	}
+
+	/** Set DE.
+		@param LBR_DE_ID DE	  */
+	public void setLBR_DE_ID (int LBR_DE_ID)
+	{
+		if (LBR_DE_ID < 1) 
+			set_Value (COLUMNNAME_LBR_DE_ID, null);
+		else 
+			set_Value (COLUMNNAME_LBR_DE_ID, Integer.valueOf(LBR_DE_ID));
+	}
+
+	/** Get DE.
+		@return DE	  */
+	public int getLBR_DE_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_LBR_DE_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Is Service.
 		@param lbr_IsService 
 		Defines if the lines is a Service
@@ -358,9 +385,9 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	public void setLBR_NotaFiscal_ID (int LBR_NotaFiscal_ID)
 	{
 		if (LBR_NotaFiscal_ID < 1) 
-			set_Value (COLUMNNAME_LBR_NotaFiscal_ID, null);
+			set_ValueNoCheck (COLUMNNAME_LBR_NotaFiscal_ID, null);
 		else 
-			set_Value (COLUMNNAME_LBR_NotaFiscal_ID, Integer.valueOf(LBR_NotaFiscal_ID));
+			set_ValueNoCheck (COLUMNNAME_LBR_NotaFiscal_ID, Integer.valueOf(LBR_NotaFiscal_ID));
 	}
 
 	/** Get Nota Fiscal.
@@ -429,6 +456,42 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** lbr_ProductSource AD_Reference_ID=1000031 */
+	public static final int LBR_PRODUCTSOURCE_AD_Reference_ID=1000031;
+	/** 0 - Domestic = 0 */
+	public static final String LBR_PRODUCTSOURCE_0_Domestic = "0";
+	/** 1 - Imported = 1 */
+	public static final String LBR_PRODUCTSOURCE_1_Imported = "1";
+	/** 2 - Imported - Acquired from a domestic distributor = 2 */
+	public static final String LBR_PRODUCTSOURCE_2_Imported_AcquiredFromADomesticDistributor = "2";
+	/** 3 - Domestic with more than 40 percent Imported = 3 */
+	public static final String LBR_PRODUCTSOURCE_3_DomesticWithMoreThan40PercentImported = "3";
+	/** 4 - Product acquired from Manaus = 4 */
+	public static final String LBR_PRODUCTSOURCE_4_ProductAcquiredFromManaus = "4";
+	/** 5 - Domestic until 40 percent Imported = 5 */
+	public static final String LBR_PRODUCTSOURCE_5_DomesticUntil40PercentImported = "5";
+	/** 6 - Foreign - Direct import no similar national = 6 */
+	public static final String LBR_PRODUCTSOURCE_6_Foreign_DirectImportNoSimilarNational = "6";
+	/** 7 - Foreign - Acquired from a domestic distributor no similar national = 7 */
+	public static final String LBR_PRODUCTSOURCE_7_Foreign_AcquiredFromADomesticDistributorNoSimilarNational = "7";
+	/** Set Product Source.
+		@param lbr_ProductSource 
+		Defines the Product Source
+	  */
+	public void setlbr_ProductSource (String lbr_ProductSource)
+	{
+
+		set_Value (COLUMNNAME_lbr_ProductSource, lbr_ProductSource);
+	}
+
+	/** Get Product Source.
+		@return Defines the Product Source
+	  */
+	public String getlbr_ProductSource () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_ProductSource);
 	}
 
 	/** Set Service Taxes.
@@ -721,6 +784,14 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 			 return 0;
 		return ii.intValue();
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), String.valueOf(getLine()));
+    }
 
 	/** Set Line Total.
 		@param LineTotalAmt 

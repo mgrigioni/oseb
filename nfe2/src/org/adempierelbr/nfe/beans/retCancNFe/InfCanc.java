@@ -33,7 +33,7 @@ public class InfCanc{
 	public String xMotivo;
 	public String cUF;
 	public String chNFe;
-	public String dhRecbto;
+	public String dhRecbto = "";
 	public String nProt;
 	public String Signature;
 	

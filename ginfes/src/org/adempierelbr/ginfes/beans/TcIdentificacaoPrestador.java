@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.ginfes.beans;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.util.CLogger;
 
@@ -49,7 +50,7 @@ public class TcIdentificacaoPrestador {
 	private void setCnpj(String cnpj) {
 		cnpj = TextUtil.toNumeric(cnpj);
 		if (cnpj.length() != 14)
-			log.warning("(CNPJ Inválido) - " + cnpj);
+			throw new AdempiereException ("(CNPJ Inválido) - " + cnpj);
 		
 		Cnpj = cnpj;
 	}

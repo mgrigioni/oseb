@@ -41,6 +41,7 @@ import org.adempierelbr.cce.beans.retevento.RetEvento;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
+import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
@@ -183,8 +184,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			return DocAction.STATUS_Invalid;
 
 		MLBRNotaFiscal nf = new MLBRNotaFiscal (Env.getCtx(), getLBR_NotaFiscal_ID(), null);
-		if (!MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E.equals(nf.getlbr_NFeStatus()))
-		{
+		if (!nf.isNFeProcessed() || nf.isCancelled()) {
 			m_processMsg = "@Invalid@ @LBR_NotaFiscal_ID@";
 			return DocAction.STATUS_Invalid;
 		}
@@ -250,7 +250,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 		//	Detalhes
 		DetEvento det = new DetEvento ();
 		det.setVersao(NFeUtil.VERSAO_CCE);
-		det.setXCorrecao(TextUtil.itrim(getDescription()));
+		det.setXCorrecao(RemoverAcentos.remover(getDescription()));
 		
 		//	Informações do Evento da Carta de Correção
 		InfEvento cce = new InfEvento ();
@@ -281,7 +281,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 		
-		XStream xstream = new XStream ();
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 		xstream.autodetectAnnotations(true);
 		
 		StringWriter sw = new StringWriter ();
@@ -296,7 +296,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
 			
 			//	Lê o arquivo assinado
-			xstream = new XStream (new DomDriver());
+			xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations (classForAnnotation);
 			evento = (Evento) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
 			
@@ -304,7 +304,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			env.setEvento(evento);
 			
 			sw = new StringWriter ();
-			xstream = new XStream ();
+			xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations (classForAnnotation);
 			xstream.marshal (env,  new CompactWriter (sw));
 			xml =  new StringBuilder (sw.toString());
@@ -343,7 +343,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 			StringBuilder respLote = new StringBuilder (NFeUtil.XML_HEADER + stub.nfeRecepcaoEvento (dadosMsg, cabecMsgE).getExtraElement().toString());
 			log.fine (respLote.toString());
 						
-			xstream = new XStream (new DomDriver());
+			xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations (classForAnnotation);
 			//
 			RetEnvEvento retEvent = (RetEnvEvento) xstream.fromXML (respLote.toString());
@@ -372,7 +372,7 @@ public class MLBRCCe extends X_LBR_CCe implements DocAction
 				procEvento.setRetEvento(retEvent.getRetEvento());
 				
 				//	Preparando saida
-				xstream = new XStream ();
+				xstream = new XStream (new DomDriver(TextUtil.UTF8));
 				xstream.processAnnotations (classForAnnotation);
 				sw = new StringWriter ();
 				xstream.marshal (procEvento,  new CompactWriter (sw));
