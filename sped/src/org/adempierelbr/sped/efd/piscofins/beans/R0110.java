@@ -24,19 +24,22 @@ public class R0110 extends RegSped {
 	private String COD_INC_TRIB;
 	private String IND_APRO_CRED;
 	private String COD_TIPO_CONT;
-
+	private String IND_REG_CUM;
+	
 	/**
 	 * Constructor
 	 * @param COD_INC_TRIB
 	 * @param IND_APRO_CRED
 	 * @param COD_TIPO_CONT
+	 * @param IND_REG_CUM
 	 */
-	public R0110(String COD_INC_TRIB, String IND_APRO_CRED, String COD_TIPO_CONT)
+	public R0110(String COD_INC_TRIB, String IND_APRO_CRED, String COD_TIPO_CONT, String IND_REG_CUM)
 	{
 		super();
 		this.COD_INC_TRIB = COD_INC_TRIB;
 		this.IND_APRO_CRED = IND_APRO_CRED;
 		this.COD_TIPO_CONT = COD_TIPO_CONT;
+		this.IND_REG_CUM = IND_REG_CUM;
 	}	//	R0110
 
 	/**
@@ -51,6 +54,7 @@ public class R0110 extends RegSped {
             .append(PIPE).append(COD_INC_TRIB)
             .append(PIPE).append(IND_APRO_CRED)
             .append(PIPE).append(COD_TIPO_CONT)
+            .append(PIPE).append(IND_REG_CUM)
             .append(PIPE).append(EOL);
 
 		return format.toString();

@@ -31,7 +31,7 @@ public class X_LBR_CNAB extends PO implements I_LBR_CNAB, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_CNAB (Properties ctx, int LBR_CNAB_ID, String trxName)

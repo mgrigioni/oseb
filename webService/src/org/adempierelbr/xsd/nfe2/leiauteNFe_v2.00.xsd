@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--  PL_006j_semAncora - 26/10/11 - versao emergencial sem ancora no pattern da placa -->
+<!--  PL_006j - 20/10/11 - alteracao no formato da placa do veiculo para aceitar AAA999, AAA9999, AA9999 e AAAA999  // NT2011/005 -->
+<!--  PL_006i - 03/07/11 - acrescimo do item 6/7 tpEmis  // NT2011/004 -->
+<!--  PL_006i - 10/06/11 - acrescimo do item 8 - Venda a Orgao Publico no motDesoICMS  // NT2011/004 -->
+<!--  PL_006i - 13/05/11 - correções da NT 2011/004  // v2.0-->
 <!--  PL_006g versao com inclusão de novos CFOP e CST do PIS/COFINS 24/06/2010-->
 <!--  PL_006f versao com alteração do NCM para aceitar zeros, CST do ICMSST, vTodDed do grupo da cana 09/05/2010 -->
 <!--  PL_006f correção da definição e da lista de valores válidos para alguns campos - vide NT 2010/003 para maiores detalhes - 31/05/2010 -->
@@ -9,6 +14,11 @@
 <!--  PL_006 versao com correcoes 08/12/2009 -->
 <!--  versao com alteracoes do tipo token, valida a partir de 03/11/08- PL_005b-->
 <!--  versao com atualizacao na UFCons e cPais emi - 21/12/2008-->
+<!-- PL_006m - 01/09/2012 - correções da NT 2012/003 -->
+<!-- PL_006n - 01/09/2012 -  inclusão do codANP 810201001  -->
+<!-- PL_006p - 29/10/2012 -  inclusão da tabela completa codANP  -->
+<!-- PL_006p - 29/10/2012 -  restabelecidas as restrições para qVol  -->
+<!-- PL_006q - 20/11/2012 -  Origem mercadoria de acordo com NT 2012/005 -->
 <xs:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.portalfiscal.inf.br/nfe" targetNamespace="http://www.portalfiscal.inf.br/nfe" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema_v1.01.xsd"/>
 	<xs:include schemaLocation="tiposBasico_v1.03.xsd"/>
@@ -320,7 +330,9 @@ Preencher com "2B", quando se tratar de Cupom Fiscal emitido por máquina regist
 2 - Contingência FS
 3 - Contingência SCAN
 4 - Contingência DPEC
-5 - Contingência FSDA</xs:documentation>
+5 - Contingência FSDA
+6 - Contingência SVC - AN
+7 - Contingência SVC - RS</xs:documentation>
 										</xs:annotation>
 										<xs:simpleType>
 											<xs:restriction base="xs:string">
@@ -330,6 +342,8 @@ Preencher com "2B", quando se tratar de Cupom Fiscal emitido por máquina regist
 												<xs:enumeration value="3"/>
 												<xs:enumeration value="4"/>
 												<xs:enumeration value="5"/>
+												<xs:enumeration value="6"/>
+												<xs:enumeration value="7"/>
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:element>
@@ -775,7 +789,7 @@ Formato ”CFOP9999”.</xs:documentation>
 														</xs:restriction>
 													</xs:simpleType>
 												</xs:element>
-												<xs:element name="qCom" type="TDec_1504">
+												<xs:element name="qCom" type="TDec_1104v">
 													<xs:annotation>
 														<xs:documentation>Quantidade Comercial  do produto, alterado para aceitar de 0 a 4 casas decimais e 11 inteiros. (v2.0)</xs:documentation>
 													</xs:annotation>
@@ -812,7 +826,7 @@ Formato ”CFOP9999”.</xs:documentation>
 														</xs:restriction>
 													</xs:simpleType>
 												</xs:element>
-												<xs:element name="qTrib" type="TDec_1504">
+												<xs:element name="qTrib" type="TDec_1104v">
 													<xs:annotation>
 														<xs:documentation>Quantidade Tributável - alterado para aceitar de 0 a 4 casas decimais e 11 inteiros (v2.0)</xs:documentation>
 													</xs:annotation>
@@ -868,7 +882,7 @@ Formato ”CFOP9999”.</xs:documentation>
 																<xs:simpleType>
 																	<xs:restriction base="TString">
 																		<xs:minLength value="1"/>
-																		<xs:maxLength value="10"/>
+																		<xs:maxLength value="12"/>
 																	</xs:restriction>
 																</xs:simpleType>
 															</xs:element>
@@ -1867,6 +1881,7 @@ Informar o motivo da desoneração:
 5 – Diplomático/Consular;
 6 – Utilitários e Motocicletas da Amazônia Ocidental e Áreas de Livre Comércio (Resolução 714/88 e 790/94 – CONTRAN e suas alterações);
 7 – SUFRAMA;
+8 - Venda a órgão Público;
 9 – outros. (v2.0)</xs:documentation>
 																						</xs:annotation>
 																						<xs:simpleType>
@@ -1879,6 +1894,7 @@ Informar o motivo da desoneração:
 																								<xs:enumeration value="5"/>
 																								<xs:enumeration value="6"/>
 																								<xs:enumeration value="7"/>
+																								<xs:enumeration value="8"/>
 																								<xs:enumeration value="9"/>
 																							</xs:restriction>
 																						</xs:simpleType>
@@ -3116,7 +3132,7 @@ I – ISENTA. (v.2.0)
 																				<xs:documentation>Quantidade Vendida </xs:documentation>
 																			</xs:annotation>
 																		</xs:element>
-																		<xs:element name="vAliqProd" type="TDec_1104">
+																		<xs:element name="vAliqProd" type="TDec_1104v">
 																			<xs:annotation>
 																				<xs:documentation>Alíquota do PIS (em reais)</xs:documentation>
 																			</xs:annotation>
@@ -3224,7 +3240,7 @@ I – ISENTA. (v.2.0)
 																						<xs:documentation>Quantidade Vendida </xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
-																				<xs:element name="vAliqProd" type="TDec_1104">
+																				<xs:element name="vAliqProd" type="TDec_1104v">
 																					<xs:annotation>
 																						<xs:documentation>Alíquota do PIS (em reais)</xs:documentation>
 																					</xs:annotation>
@@ -3351,7 +3367,7 @@ I – ISENTA. (v.2.0)
 																				<xs:documentation>Quantidade Vendida </xs:documentation>
 																			</xs:annotation>
 																		</xs:element>
-																		<xs:element name="vAliqProd" type="TDec_1104">
+																		<xs:element name="vAliqProd" type="TDec_1104v">
 																			<xs:annotation>
 																				<xs:documentation>Alíquota do COFINS (em reais)</xs:documentation>
 																			</xs:annotation>
@@ -3505,7 +3521,7 @@ I – ISENTA. (v.2.0)
 																						<xs:documentation>Quantidade Vendida </xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
-																				<xs:element name="vAliqProd" type="TDec_1104">
+																				<xs:element name="vAliqProd" type="TDec_1104v">
 																					<xs:annotation>
 																						<xs:documentation>Alíquota do COFINS (em reais)</xs:documentation>
 																					</xs:annotation>
@@ -4242,7 +4258,7 @@ concessório</xs:documentation>
 										<xs:simpleType>
 											<xs:restriction base="TString">
 												<xs:minLength value="1"/>
-												<xs:maxLength value="17"/>
+												<xs:maxLength value="22"/>
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:element>
@@ -4607,7 +4623,7 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
 							<xs:whiteSpace value="preserve"/>
-							<xs:pattern value="[0-9]{4}"/>
+							<xs:pattern value="[0-9]{1,4}"/>
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:element>
@@ -5007,6 +5023,7 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 			<xs:enumeration value="1124"/>
 			<xs:enumeration value="1125"/>
 			<xs:enumeration value="1126"/>
+			<xs:enumeration value="1128"/>
 			<xs:enumeration value="1151"/>
 			<xs:enumeration value="1152"/>
 			<xs:enumeration value="1153"/>
@@ -5123,6 +5140,7 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 			<xs:enumeration value="2124"/>
 			<xs:enumeration value="2125"/>
 			<xs:enumeration value="2126"/>
+			<xs:enumeration value="2128"/>
 			<xs:enumeration value="2151"/>
 			<xs:enumeration value="2152"/>
 			<xs:enumeration value="2153"/>
@@ -5222,6 +5240,7 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 			<xs:enumeration value="3102"/>
 			<xs:enumeration value="3126"/>
 			<xs:enumeration value="3127"/>
+			<xs:enumeration value="3128"/>
 			<xs:enumeration value="3201"/>
 			<xs:enumeration value="3202"/>
 			<xs:enumeration value="3205"/>
@@ -5513,7 +5532,9 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 	</xs:simpleType>
 	<xs:simpleType name="TCfopTransp">
 		<xs:annotation>
-			<xs:documentation>Tipo CFOP - Transportes - uso exclusivo na retenção - 31/05/2010</xs:documentation>
+			<xs:documentation>Tipo CFOP - Transportes - uso exclusivo na retenção - 31/05/2010
+			Acrescimo dos CFOP de 5931/5932/6931/6932 no CFOP de retTransp
+</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:whiteSpace value="preserve"/>
@@ -5526,6 +5547,8 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 			<xs:enumeration value="5357"/>
 			<xs:enumeration value="5359"/>
 			<xs:enumeration value="5360"/>
+			<xs:enumeration value="5931"/>
+			<xs:enumeration value="5932"/>
 			<xs:enumeration value="6351"/>
 			<xs:enumeration value="6352"/>
 			<xs:enumeration value="6353"/>
@@ -5535,18 +5558,28 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 			<xs:enumeration value="6357"/>
 			<xs:enumeration value="6359"/>
 			<xs:enumeration value="6360"/>
+			<xs:enumeration value="6931"/>
+			<xs:enumeration value="6932"/>
 			<xs:enumeration value="7358"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="Torig">
 		<xs:annotation>
-			<xs:documentation>Tipo Origem da mercadoria CST ICMS</xs:documentation>
+			<xs:documentation>Tipo Origem da mercadoria CST ICMS. origem da mercadoria: 0-Nacional 
+1-Estrangeira - Importação direta; 2-Estrangeira - Adquirida no mercado interno; 3-Nacional, conteudo superior 40%; 4-Nacional, processos produtivos 
+básicos; 5-Nacional, conteudo inferior 40%; 6-Estrangeira - Importação direta, com similar nacional, lista CAMEX; 7-Estrangeira - mercado interno, sem simular,
+lista CAMEX. </xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:whiteSpace value="preserve"/>
 			<xs:enumeration value="0"/>
 			<xs:enumeration value="1"/>
 			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+			<xs:enumeration value="4"/>
+			<xs:enumeration value="5"/>
+			<xs:enumeration value="6"/>
+			<xs:enumeration value="7"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="TFinNFe">

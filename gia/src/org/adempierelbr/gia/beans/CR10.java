@@ -68,6 +68,10 @@ public class CR10 extends RegGIA implements Comparable<Object>{
 		return OUTRAS == null ? Env.ZERO : OUTRAS;
 	}
 
+	public BigDecimal getIMPSUBSST() {
+		return IMPSUBSST == null ? Env.ZERO : IMPSUBSST;
+	}
+	
 	public BigDecimal getOUTROSIMPOSTOS() {
 		return OUTROSIMPOSTOS == null ? Env.ZERO : OUTROSIMPOSTOS;
 	}
@@ -78,6 +82,7 @@ public class CR10 extends RegGIA implements Comparable<Object>{
 		this.IMPOSTO        = getIMPOSTO().add(cr14.getIMPOSTO());
 		this.ISENTAS        = getISENTAS().add(cr14.getISENTAS());
 		this.OUTRAS         = getOUTRAS().add(cr14.getOUTRAS());
+		this.IMPSUBSST      = getIMPSUBSST().add(cr14.getIMPSUBSST());
 		this.OUTROSIMPOSTOS = getOUTROSIMPOSTOS().add(cr14.getOUTROSIMPOSTOS());
 	} //addValues
 		

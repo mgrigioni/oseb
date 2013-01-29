@@ -229,6 +229,24 @@ public class TaxesCalculation{
 
 		return true;
 	} //updateHeaderValues
+	
+	private boolean updatePriceEnteredBRValues(int Line_ID, BigDecimal PriceEnteredBR){
+
+		String sql = "SET lbr_PriceEnteredBR = ?";
+
+		if (m_isOrder){
+			sql = "UPDATE C_OrderLine " + sql + " WHERE C_OrderLine_ID = ?";
+		}
+		else{
+			return true;
+		}
+
+
+		if (DB.executeUpdate(sql, new Object[]{PriceEnteredBR,Line_ID}, false, trx) == -1)
+			return false;
+
+		return true;
+	} //updatePriceEnteredBRValues
 
 	public void modelChange() throws EvalError{
 		modelChange(true);
@@ -264,6 +282,9 @@ public class TaxesCalculation{
 			for (PO line : lines)
 			{
 				int LBR_Tax_ID = line.get_ValueAsInt(I_W_C_OrderLine.COLUMNNAME_LBR_Tax_ID);
+				
+				BigDecimal taxBRAmt = Env.ZERO;
+				
 				if (LBR_Tax_ID > 0){
 
 					Map<Integer,X_LBR_TaxLine> lTaxes = MLBRTax.getLines(ctx, LBR_Tax_ID, trx);
@@ -283,6 +304,11 @@ public class TaxesCalculation{
 
 							if(taxName.isHasWithHold())
 								taxLineAmt = taxLineAmt.negate();
+							
+							//TaxBR Amt
+							if(taxName.getName().trim().indexOf("IPI") == -1
+							   && !taxName.isHasWithHold() && !taxName.getlbr_TaxType().equals(X_LBR_TaxName.LBR_TAXTYPE_Substitution))
+								taxBRAmt = taxBRAmt.add(taxLine.getlbr_TaxAmt());
 
 							//START POST TAX
 							Taxes aux = new Taxes(C_Tax_ID,Env.ZERO,Env.ZERO);
@@ -311,6 +337,16 @@ public class TaxesCalculation{
 
 				} //LBR_Tax_ID not null
 
+				BigDecimal priceEnteredBR = (BigDecimal)line.get_Value("lbr_PriceEnteredBR");
+				if ((priceEnteredBR == null || priceEnteredBR.signum()==0) && taxBRAmt.signum()!=0){
+					BigDecimal qtyEntered = (BigDecimal)line.get_Value("QtyEntered");
+					if (qtyEntered == null)
+						qtyEntered = Env.ONE;
+			
+					updatePriceEnteredBRValues(line.get_ID(),
+							((BigDecimal)line.get_Value("PriceEntered")).add(taxBRAmt.divide(qtyEntered, TaxBR.ROUND)));
+				}
+				
 			} //end for order lines
 
 			//Precisão

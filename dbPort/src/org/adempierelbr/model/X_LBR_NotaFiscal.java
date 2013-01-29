@@ -34,7 +34,7 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120618L;
+	private static final long serialVersionUID = 20130110L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -215,6 +215,26 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Charge amount.
+		@param ChargeAmt 
+		Charge Amount
+	  */
+	public void setChargeAmt (BigDecimal ChargeAmt)
+	{
+		set_Value (COLUMNNAME_ChargeAmt, ChargeAmt);
+	}
+
+	/** Get Charge amount.
+		@return Charge Amount
+	  */
+	public BigDecimal getChargeAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ChargeAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	public I_C_Invoice getC_Invoice() throws RuntimeException
@@ -480,6 +500,14 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	{
 		return (String)get_Value(COLUMNNAME_DocumentNo);
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), getDocumentNo());
+    }
 
 	/** Set Document Note.
 		@param DocumentNote 
@@ -1351,31 +1379,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		return (Timestamp)get_Value(COLUMNNAME_lbr_DateScan);
 	}
 
-	public org.adempierelbr.model.I_LBR_DE getLBR_DE() throws RuntimeException
-    {
-		return (org.adempierelbr.model.I_LBR_DE)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_DE.Table_Name)
-			.getPO(getLBR_DE_ID(), get_TrxName());	}
-
-	/** Set DE.
-		@param LBR_DE_ID DE	  */
-	public void setLBR_DE_ID (int LBR_DE_ID)
-	{
-		if (LBR_DE_ID < 1) 
-			set_Value (COLUMNNAME_LBR_DE_ID, null);
-		else 
-			set_Value (COLUMNNAME_LBR_DE_ID, Integer.valueOf(LBR_DE_ID));
-	}
-
-	/** Get DE.
-		@return DE	  */
-	public int getLBR_DE_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_LBR_DE_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	public I_C_BPartner_Location getlbr_Delivery_Location() throws RuntimeException
     {
 		return (I_C_BPartner_Location)MTable.get(getCtx(), I_C_BPartner_Location.Table_Name)
@@ -2112,10 +2115,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_592_RejeiçãoANF_EDeveTerPeloMenosUmItemDeProdutoSujeitoAoICMS = "592";
 	/** 594 - Rejeição: O número de sequencia do evento informado é maior que o permitido = 594 */
 	public static final String LBR_NFESTATUS_594_RejeiçãoONúmeroDeSequenciaDoEventoInformadoÉMaiorQueOPermitido = "594";
-	/** 595 - Rejeição: A versão do leiaute da NF-e utilizada não é mais válida = 595 */
-	public static final String LBR_NFESTATUS_595_RejeiçãoAVersãoDoLeiauteDaNF_EUtilizadaNãoÉMaisVálida = "595";
-	/** 596 - Rejeição: Ambiente de homologação indisponível para recepção de NF-e da versão 1.10. = 596 */
-	public static final String LBR_NFESTATUS_596_RejeiçãoAmbienteDeHomologaçãoIndisponívelParaRecepçãoDeNF_EDaVersão110 = "596";
 	/** 597 - Rejeição: CFOP de Importação e não informado dados de IPI = 597 */
 	public static final String LBR_NFESTATUS_597_RejeiçãoCFOPDeImportaçãoENãoInformadoDadosDeIPI = "597";
 	/** 598 - Rejeição: NF-e emitida em ambiente de homologação com Razão Social do destinatário diferente de NF-E EMITIDA EM AMBIENTE D = 598 */
@@ -2190,6 +2189,78 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_302_UsoDenegadoIrregularidadeFiscalDoDestinatário = "302";
 	/** 999 - Rejeição: Erro não catalogado (informar a mensagem de erro capturado no tratamento da exceção) = 999 */
 	public static final String LBR_NFESTATUS_999_RejeiçãoErroNãoCatalogadoInformarAMensagemDeErroCapturadoNoTratamentoDaExceção = "999";
+	/** 150 - Autorizado o uso da NF-e, autorização fora de prazo = 150 */
+	public static final String LBR_NFESTATUS_150_AutorizadoOUsoDaNF_EAutorizaçãoForaDePrazo = "150";
+	/** 151 - Cancelamento de NF-e homologado fora de prazo = 151 */
+	public static final String LBR_NFESTATUS_151_CancelamentoDeNF_EHomologadoForaDePrazo = "151";
+	/** 479 - Rejeição: Emissor em situação irregular perante o fisco = 479 */
+	public static final String LBR_NFESTATUS_479_RejeiçãoEmissorEmSituaçãoIrregularPeranteOFisco = "479";
+	/** 480 - Rejeição: CNPJ da Chave de acesso da NF-e informada diverge do CNPJ do emitente = 480 */
+	public static final String LBR_NFESTATUS_480_RejeiçãoCNPJDaChaveDeAcessoDaNF_EInformadaDivergeDoCNPJDoEmitente = "480";
+	/** 481 - Rejeição: UF da Chave de acesso diverge do código da UF informada = 481 */
+	public static final String LBR_NFESTATUS_481_RejeiçãoUFDaChaveDeAcessoDivergeDoCódigoDaUFInformada = "481";
+	/** 482 - Rejeição: AA da Chave de acesso inválida = 482 */
+	public static final String LBR_NFESTATUS_482_RejeiçãoAADaChaveDeAcessoInválida = "482";
+	/** 483 - Rejeição: MM da chave de acesso inválido = 483 */
+	public static final String LBR_NFESTATUS_483_RejeiçãoMMDaChaveDeAcessoInválido = "483";
+	/** 484 - Rejeição: DPEC com tipo de emissão diferente de “4” (posição 35 da Chave de Acesso) = 484 */
+	public static final String LBR_NFESTATUS_484_RejeiçãoDPECComTipoDeEmissãoDiferenteDe4Posição35DaChaveDeAcesso = "484";
+	/** 485 - Rejeição: Número de DPEC já existe no cadastro de DPEC = 485 */
+	public static final String LBR_NFESTATUS_485_RejeiçãoNúmeroDeDPECJáExisteNoCadastroDeDPEC = "485";
+	/** 486 - Rejeição: DPEC não localizada para o número de registro de DPEC informado = 486 */
+	public static final String LBR_NFESTATUS_486_RejeiçãoDPECNãoLocalizadaParaONúmeroDeRegistroDeDPECInformado = "486";
+	/** 487 - Rejeição: Nenhuma DPEC localizada para a chave de acesso informada = 487 */
+	public static final String LBR_NFESTATUS_487_RejeiçãoNenhumaDPECLocalizadaParaAChaveDeAcessoInformada = "487";
+	/** 488 - Rejeição: Requisitante de Consulta não tem o mesmo CNPJ base do emissor da DPEC = 488 */
+	public static final String LBR_NFESTATUS_488_RejeiçãoRequisitanteDeConsultaNãoTemOMesmoCNPJBaseDoEmissorDaDPEC = "488";
+	/** 656 - Rejeição: Consumo indevido = 656 */
+	public static final String LBR_NFESTATUS_656_RejeiçãoConsumoIndevido = "656";
+	/** 660 - Rejeição: CFOP de Combustível e não informado grupo de combustível da NF-e = 660 */
+	public static final String LBR_NFESTATUS_660_RejeiçãoCFOPDeCombustívelENãoInformadoGrupoDeCombustívelDaNF_E = "660";
+	/** 661 - Rejeição: NF-e já existente para o número da DPEC informada = 661 */
+	public static final String LBR_NFESTATUS_661_RejeiçãoNF_EJáExistenteParaONúmeroDaDPECInformada = "661";
+	/** 662 - Rejeição: Numeração da DPEC está inutilizada na Base de Dados da SEFAZ = 662 */
+	public static final String LBR_NFESTATUS_662_RejeiçãoNumeraçãoDaDPECEstáInutilizadaNaBaseDeDadosDaSEFAZ = "662";
+	/** 663 - Alíquota do ICMS com valor superior a 4 por cento na operação de saída interestadual com produtos importados = 663 */
+	public static final String LBR_NFESTATUS_663_AlíquotaDoICMSComValorSuperiorA4PorCentoNaOperaçãoDeSaídaInterestadualComProdutosImportados = "663";
+	/** 137 - Nenhum documento localizado para o Destinatário = 137 */
+	public static final String LBR_NFESTATUS_137_NenhumDocumentoLocalizadoParaODestinatário = "137";
+	/** 138 - Documento localizado para o Destinatário  = 138 */
+	public static final String LBR_NFESTATUS_138_DocumentoLocalizadoParaODestinatário = "138";
+	/** 139 - Pedido de Download processado = 139 */
+	public static final String LBR_NFESTATUS_139_PedidoDeDownloadProcessado = "139";
+	/** 140 - Download disponibilizado = 140 */
+	public static final String LBR_NFESTATUS_140_DownloadDisponibilizado = "140";
+	/** 589 - Rejeição: Número do NSU informado superior ao maior NSU da base de dados da SEFAZ = 589 */
+	public static final String LBR_NFESTATUS_589_RejeiçãoNúmeroDoNSUInformadoSuperiorAoMaiorNSUDaBaseDeDadosDaSEFAZ = "589";
+	/** 593 - Rejeição: CNPJ-Base consultado difere do CNPJ-Base do Certificado Digital = 593 */
+	public static final String LBR_NFESTATUS_593_RejeiçãoCNPJ_BaseConsultadoDifereDoCNPJ_BaseDoCertificadoDigital = "593";
+	/** 595 - Rejeição: Obrigatória a informação da justificativa do evento = 595 */
+	public static final String LBR_NFESTATUS_595_RejeiçãoObrigatóriaAInformaçãoDaJustificativaDoEvento = "595";
+	/** 596 - Rejeição: Evento apresentado fora do prazo: [prazo vigente] = 596 */
+	public static final String LBR_NFESTATUS_596_RejeiçãoEventoApresentadoForaDoPrazoPrazoVigente = "596";
+	/** 631 - Rejeição: CNPJ-Base do Destinatário difere do CNPJ-Base do Certificado Digital = 631 */
+	public static final String LBR_NFESTATUS_631_RejeiçãoCNPJ_BaseDoDestinatárioDifereDoCNPJ_BaseDoCertificadoDigital = "631";
+	/** 632 - Rejeição: Solicitação fora de prazo, a NF-e não está mais disponível para download = 632 */
+	public static final String LBR_NFESTATUS_632_RejeiçãoSolicitaçãoForaDePrazoANF_ENãoEstáMaisDisponívelParaDownload = "632";
+	/** 633 - Rejeição: NF-e indisponível para download devido a ausência de Manifestação do Destinatário = 633 */
+	public static final String LBR_NFESTATUS_633_RejeiçãoNF_EIndisponívelParaDownloadDevidoAAusênciaDeManifestaçãoDoDestinatário = "633";
+	/** 634 - Rejeição: Destinatário da NF-e não tem o mesmo CNPJ raiz do solicitante do download = 634 */
+	public static final String LBR_NFESTATUS_634_RejeiçãoDestinatárioDaNF_ENãoTemOMesmoCNPJRaizDoSolicitanteDoDownload = "634";
+	/** 640 - Rejeição: Evento de "Ciência da Operação" não pode ser informado após a manifestação final do destinatário = 640 */
+	public static final String LBR_NFESTATUS_640_RejeiçãoEventoDeCiênciaDaOperaçãoNãoPodeSerInformadoApósAManifestaçãoFinalDoDestinatário = "640";
+	/** 641 - Rejeição: Consumo Indevido = 641 */
+	public static final String LBR_NFESTATUS_641_RejeiçãoConsumoIndevido = "641";
+	/** 645 - Rejeição: CNPJ do Certificado Digital não é emitente de NF-e = 645 */
+	public static final String LBR_NFESTATUS_645_RejeiçãoCNPJDoCertificadoDigitalNãoÉEmitenteDeNF_E = "645";
+	/** 646 - Rejeição: NF-e Cancelada, arquivo indisponível para download = 646 */
+	public static final String LBR_NFESTATUS_646_RejeiçãoNF_ECanceladaArquivoIndisponívelParaDownload = "646";
+	/** 647 - Rejeição: NF-e Denegada, arquivo indisponível para download = 647 */
+	public static final String LBR_NFESTATUS_647_RejeiçãoNF_EDenegadaArquivoIndisponívelParaDownload = "647";
+	/** 650 - Rejeição: Evento de "Ciência da Operação" para NF-e Cancelada ou Denegada = 650 */
+	public static final String LBR_NFESTATUS_650_RejeiçãoEventoDeCiênciaDaOperaçãoParaNF_ECanceladaOuDenegada = "650";
+	/** 651 - Rejeição: Evento de "Desconhecimento da Operação" para NF-e Cancelada ou Denegada = 651 */
+	public static final String LBR_NFESTATUS_651_RejeiçãoEventoDeDesconhecimentoDaOperaçãoParaNF_ECanceladaOuDenegada = "651";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe
@@ -2292,133 +2363,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 		return (String)get_Value(COLUMNNAME_lbr_NFModel);
 	}
 
-	public org.adempierelbr.model.I_LBR_NotaFiscal getlbr_NFRefere() throws RuntimeException
-    {
-		return (org.adempierelbr.model.I_LBR_NotaFiscal)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_NotaFiscal.Table_Name)
-			.getPO(getlbr_NFReference(), get_TrxName());	}
-
-	/** Set NF Reference.
-		@param lbr_NFReference 
-		Reference to other NF
-	  */
-	public void setlbr_NFReference (int lbr_NFReference)
-	{
-		set_Value (COLUMNNAME_lbr_NFReference, Integer.valueOf(lbr_NFReference));
-	}
-
-	/** Get NF Reference.
-		@return Reference to other NF
-	  */
-	public int getlbr_NFReference () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_lbr_NFReference);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-	/** lbr_NFType AD_Reference_ID=1000044 */
-	public static final int LBR_NFTYPE_AD_Reference_ID=1000044;
-	/** 001_ACT-Autorização de Carregamento de Transporte = 001 */
-	public static final String LBR_NFTYPE_001_ACT_AutorizaçãoDeCarregamentoDeTransporte = "001";
-	/** 002_AIMR-Atestado de Intervenção em Máquina = 002 */
-	public static final String LBR_NFTYPE_002_AIMR_AtestadoDeIntervençãoEmMáquina = "002";
-	/** 003_AIPDV-Atestado de Intervenção em PDV = 003 */
-	public static final String LBR_NFTYPE_003_AIPDV_AtestadoDeIntervençãoEmPDV = "003";
-	/** 004_BPA-Bilhete de Passagem Aquaviário = 004 */
-	public static final String LBR_NFTYPE_004_BPA_BilheteDePassagemAquaviário = "004";
-	/** 005_BPF-Bilhete de Passagem Ferroviário = 005 */
-	public static final String LBR_NFTYPE_005_BPF_BilheteDePassagemFerroviário = "005";
-	/** 006_BPNB-Bilhete de Passagem e Nota de Bagagem = 006 */
-	public static final String LBR_NFTYPE_006_BPNB_BilheteDePassagemENotaDeBagagem = "006";
-	/** 007_BPR-Bilhete de Passagem Rodoviário = 007 */
-	public static final String LBR_NFTYPE_007_BPR_BilheteDePassagemRodoviário = "007";
-	/** 008_CA-Conhecimento Aéreo = 008 */
-	public static final String LBR_NFTYPE_008_CA_ConhecimentoAéreo = "008";
-	/** 009_CTA-Conhecimento de Transporte Avulso = 009 */
-	public static final String LBR_NFTYPE_009_CTA_ConhecimentoDeTransporteAvulso = "009";
-	/** 010_CTAC-Conhecimento de Transporte Aquaviário de Cargas = 010 */
-	public static final String LBR_NFTYPE_010_CTAC_ConhecimentoDeTransporteAquaviárioDeCargas = "010";
-	/** 011_CTFC-Conhecimento de Transporte Ferroviário de Cargas = 011 */
-	public static final String LBR_NFTYPE_011_CTFC_ConhecimentoDeTransporteFerroviárioDeCargas = "011";
-	/** 012_CTRC-Conhecimento de Transporte Rodoviário de Cargas = 012 */
-	public static final String LBR_NFTYPE_012_CTRC_ConhecimentoDeTransporteRodoviárioDeCargas = "012";
-	/** 013_DAICMS-Demons. de Apuração do ICMS-DAICMS = 013 */
-	public static final String LBR_NFTYPE_013_DAICMS_DemonsDeApuraçãoDoICMS_DAICMS = "013";
-	/** 014_DCICMS-Demons. de Apuração do Compl. do ICMS-DCICMS = 014 */
-	public static final String LBR_NFTYPE_014_DCICMS_DemonsDeApuraçãoDoComplDoICMS_DCICMS = "014";
-	/** 015_DCL-Despacho de Cargas em Lotação = 015 */
-	public static final String LBR_NFTYPE_015_DCL_DespachoDeCargasEmLotação = "015";
-	/** 016_DCMS-Despacho de Cargas Modelo Simplificado = 016 */
-	public static final String LBR_NFTYPE_016_DCMS_DespachoDeCargasModeloSimplificado = "016";
-	/** 017_DEB-Documento de Excesso de Bagagem = 017 */
-	public static final String LBR_NFTYPE_017_DEB_DocumentoDeExcessoDeBagagem = "017";
-	/** 018_DSEP-Documento Simplificado de Embarque de Passageiro = 018 */
-	public static final String LBR_NFTYPE_018_DSEP_DocumentoSimplificadoDeEmbarqueDePassageiro = "018";
-	/** 019_DSICMS-Demons. de Contrib. Substituto do ICMS-DSICMS = 019 */
-	public static final String LBR_NFTYPE_019_DSICMS_DemonsDeContribSubstitutoDoICMS_DSICMS = "019";
-	/** 020_DT-Despacho de Transporte = 020 */
-	public static final String LBR_NFTYPE_020_DT_DespachoDeTransporte = "020";
-	/** 021_EF-Extrato de Faturamento = 021 */
-	public static final String LBR_NFTYPE_021_EF_ExtratoDeFaturamento = "021";
-	/** 022_GNR-Guia Nacional de Recolhimento de Tributos Estaduais = 022 */
-	public static final String LBR_NFTYPE_022_GNR_GuiaNacionalDeRecolhimentoDeTributosEstaduais = "022";
-	/** 023_MC-Manifesto de Carga = 023 */
-	public static final String LBR_NFTYPE_023_MC_ManifestoDeCarga = "023";
-	/** 024_NF-Nota Fiscal = 024 */
-	public static final String LBR_NFTYPE_024_NF_NotaFiscal = "024";
-	/** 025_NFA-Nota Fiscal Avulsa = 025 */
-	public static final String LBR_NFTYPE_025_NFA_NotaFiscalAvulsa = "025";
-	/** 026_NFCEE-Nota Fiscal/Conta de Energia Elétrica = 026 */
-	public static final String LBR_NFTYPE_026_NFCEE_NotaFiscalContaDeEnergiaElétrica = "026";
-	/** 027_NFCFA-Nota Fiscal/Conta de Fornecimento de Água = 027 */
-	public static final String LBR_NFTYPE_027_NFCFA_NotaFiscalContaDeFornecimentoDeÁgua = "027";
-	/** 028_NFE-Nota Fiscal de Entrada = 028 */
-	public static final String LBR_NFTYPE_028_NFE_NotaFiscalDeEntrada = "028";
-	/** 029_NFF-NFF = 029 */
-	public static final String LBR_NFTYPE_029_NFF_NFF = "029";
-	/** 030_NFME-Nota Fiscal Microempresa = 030 */
-	public static final String LBR_NFTYPE_030_NFME_NotaFiscalMicroempresa = "030";
-	/** 031_NFP-Nota Fiscal de Produtor = 031 */
-	public static final String LBR_NFTYPE_031_NFP_NotaFiscalDeProdutor = "031";
-	/** 032_NFS-Nota Fiscal Simplificada = 032 */
-	public static final String LBR_NFTYPE_032_NFS_NotaFiscalSimplificada = "032";
-	/** 033_NFSC-Nota Fiscal e Serviço de Comunicação = 033 */
-	public static final String LBR_NFTYPE_033_NFSC_NotaFiscalEServiçoDeComunicação = "033";
-	/** 034_NFSTC-Nota Fiscal de Serviço de Telecomunicações = 034 */
-	public static final String LBR_NFTYPE_034_NFSTC_NotaFiscalDeServiçoDeTelecomunicações = "034";
-	/** 035_NFSTR-Nota Fiscal de Serviço de Transporte = 035 */
-	public static final String LBR_NFTYPE_035_NFSTR_NotaFiscalDeServiçoDeTransporte = "035";
-	/** 036_NFVC-Nota Fiscal de Venda a Consumidor = 036 */
-	public static final String LBR_NFTYPE_036_NFVC_NotaFiscalDeVendaAConsumidor = "036";
-	/** 037_OCC-Ordem de Coleta de Carga = 037 */
-	public static final String LBR_NFTYPE_037_OCC_OrdemDeColetaDeCarga = "037";
-	/** 038_RD-Relação de Despachos = 038 */
-	public static final String LBR_NFTYPE_038_RD_RelaçãoDeDespachos = "038";
-	/** 039_RECA-Relatório de Emissão de Conhecimento Aéreos = 039 */
-	public static final String LBR_NFTYPE_039_RECA_RelatórioDeEmissãoDeConhecimentoAéreos = "039";
-	/** 040_REP-Relatório de Embarque de Passageiros = 040 */
-	public static final String LBR_NFTYPE_040_REP_RelatórioDeEmbarqueDePassageiros = "040";
-	/** 041_RMD-Resumo de Movimento Diário = 041 */
-	public static final String LBR_NFTYPE_041_RMD_ResumoDeMovimentoDiário = "041";
-	/** Set NF Type.
-		@param lbr_NFType 
-		Nota Fiscal Type
-	  */
-	public void setlbr_NFType (String lbr_NFType)
-	{
-
-		set_Value (COLUMNNAME_lbr_NFType, lbr_NFType);
-	}
-
-	/** Get NF Type.
-		@return Nota Fiscal Type
-	  */
-	public String getlbr_NFType () 
-	{
-		return (String)get_Value(COLUMNNAME_lbr_NFType);
-	}
-
 	/** Set Nota Fiscal.
 		@param LBR_NotaFiscal_ID 
 		Primary key table LBR_NotaFiscal
@@ -2441,14 +2385,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 			 return 0;
 		return ii.intValue();
 	}
-
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getLBR_NotaFiscal_ID()));
-    }
 
 	/** Set Organization Address 1.
 		@param lbr_OrgAddress1 

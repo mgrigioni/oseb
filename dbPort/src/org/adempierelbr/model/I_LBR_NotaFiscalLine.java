@@ -176,6 +176,17 @@ public interface I_LBR_NotaFiscalLine
 	  */
 	public String getlbr_CFOPName();
 
+    /** Column name LBR_DE_ID */
+    public static final String COLUMNNAME_LBR_DE_ID = "LBR_DE_ID";
+
+	/** Set DE	  */
+	public void setLBR_DE_ID (int LBR_DE_ID);
+
+	/** Get DE	  */
+	public int getLBR_DE_ID();
+
+	public org.adempierelbr.model.I_LBR_DE getLBR_DE() throws RuntimeException;
+
     /** Column name lbr_IsService */
     public static final String COLUMNNAME_lbr_IsService = "lbr_IsService";
 
@@ -299,6 +310,19 @@ public interface I_LBR_NotaFiscalLine
 
 	/** Get Núm. Seq. Item	  */
 	public int getlbr_NumSeqItem();
+
+    /** Column name lbr_ProductSource */
+    public static final String COLUMNNAME_lbr_ProductSource = "lbr_ProductSource";
+
+	/** Set Product Source.
+	  * Defines the Product Source
+	  */
+	public void setlbr_ProductSource (String lbr_ProductSource);
+
+	/** Get Product Source.
+	  * Defines the Product Source
+	  */
+	public String getlbr_ProductSource();
 
     /** Column name lbr_ServiceTaxes */
     public static final String COLUMNNAME_lbr_ServiceTaxes = "lbr_ServiceTaxes";

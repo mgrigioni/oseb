@@ -201,6 +201,15 @@ public interface I_LBR_NFeLot
 	  */
 	public String getlbr_NFeStatus();
 
+    /** Column name ModelNo */
+    public static final String COLUMNNAME_ModelNo = "ModelNo";
+
+	/** Set ModelNo	  */
+	public void setModelNo (String ModelNo);
+
+	/** Get ModelNo	  */
+	public String getModelNo();
+
     /** Column name Processed */
     public static final String COLUMNNAME_Processed = "Processed";
 

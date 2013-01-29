@@ -163,6 +163,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		setlbr_UOMName(AdempiereLBR.getUOM_trl(uom));
 		setQty(iLine.getQtyEntered());
 		//
+		setlbr_ProductSource(proW.getlbr_ProductSource());
 		setlbr_TaxStatus(iLineW.getlbr_TaxStatus());
 		setlbr_TaxStatusIPI(iLineW.getlbr_TaxStatusIPI());
 		setlbr_TaxStatusPIS(iLineW.getlbr_TaxStatusPIS()); 
@@ -200,6 +201,10 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			getParent().setlbr_TotalSISCOMEX(getParent().getlbr_TotalSISCOMEX().add(amt));	
 			isClientProduct = true;
 		}
+		else if (M_Product_ID == m_client.get_ValueAsInt("Z_ProductCharge_ID")){ //OUTRAS DESPESAS
+			getParent().setChargeAmt(getParent().getChargeAmt().add(amt));	
+			isClientProduct = true;
+		}
 		
 		if (isClientProduct){
 			getParent().setGrandTotal(getParent().getGrandTotal().add(amt));
@@ -229,6 +234,17 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 			BigDecimal excludedTaxes = getIPIAmt().add(getTaxAmt("ICMSST"));
 			lineNetAmt = lineNetAmt.subtract(excludedTaxes);
+			
+			//Problemas com arredondamento de impostos
+			//Comparar com a base de cálculo do ICMS para definir o valor da linha
+			//BaseICMS * (1+(RedBase/100) - Adiciona o isento/outros a base
+			if (getParent().getlbr_TransactionType().equals(MLBRNotaFiscal.LBR_TRANSACTIONTYPE_Manufacturing)){
+				BigDecimal icmsTaxBase = getICMSBaseAmt().multiply(Env.ONE.add(getICMSBaseReduction().divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
+				BigDecimal decimalCheck = icmsTaxBase.subtract(lineNetAmt);
+				if (decimalCheck.abs().compareTo(Env.ONE) < 0)
+					lineNetAmt = icmsTaxBase;
+			}
+			
 			price = lineNetAmt.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND);
 			if (hasPriceList)
 				priceList = priceList.subtract(excludedTaxes.divide(iLine.getQtyEntered(), 5, TaxBR.ROUND));
@@ -339,16 +355,16 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		//CST ICMS
 		String CST_ICMS = getlbr_TaxStatus();
 		
-		if (CST_ICMS == null || CST_ICMS.isEmpty() || CST_ICMS.length() != 3){
-			CST_ICMS = TextUtil.lPad(CST_ICMS, 3);
+		if (CST_ICMS == null || CST_ICMS.isEmpty()){
+			CST_ICMS = TextUtil.lPad(CST_ICMS, 2);
 		}
 		
-		if (CST_ICMS.endsWith("00") && getICMSAmt().signum() == 0){
-			CST_ICMS = CST_ICMS.substring(0, 1) + "40"; //ISENTO
+		if (CST_ICMS.equals("00") && getICMSAmt().signum() == 0){
+			CST_ICMS = "40"; //ISENTO
 		}
 		
-		if (!CST_ICMS.endsWith("10") && getTaxAmt("ICMSST").signum() == 1){
-			CST_ICMS = CST_ICMS.substring(0, 1) + "10"; //ICMSST
+		if (!CST_ICMS.equals("10") && getTaxAmt("ICMSST").signum() == 1){
+			CST_ICMS = "10"; //ICMSST
 		}
 		
 		if (CST_ICMS != getlbr_TaxStatus()){
@@ -374,11 +390,11 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		}
 		
 		int startWith = Integer.valueOf(CST_IPI.substring(0, 1)).intValue();
-		if (startWith >= 5 && getParent().isSOTrx()){
-			CST_IPI = startWith-5 + CST_IPI.substring(1);
-		}
-		else if (startWith < 5 && !getParent().isSOTrx()){
+		if (startWith < 5 && getParent().isSOTrx()){
 			CST_IPI = startWith+5 + CST_IPI.substring(1);
+		}
+		else if (startWith >= 5 && !getParent().isSOTrx()){
+			CST_IPI = startWith-5 + CST_IPI.substring(1);
 		}
 		
 		if (CST_IPI != getlbr_TaxStatusIPI()){
@@ -405,54 +421,35 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	
 	public BigDecimal getFreightAmt(){
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
-		return getFreightAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getFreightAmt());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getFreightAmt());
 	}
 
-	protected BigDecimal getFreightAmt(BigDecimal totalLinesAmt, BigDecimal totalFreightAmt){
-
-		if (totalLinesAmt.signum() <= 0 || totalFreightAmt.signum() <= 0)
-			return Env.ZERO;
-		
-		BigDecimal lineAmt = getLineTotalAmt();
-		BigDecimal freightAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
-		           freightAmt = totalFreightAmt.multiply(freightAmt);
-
-		return freightAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getFreightAmt
-	
 	public BigDecimal getInsuranceAmt(){
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
-		return getFreightAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getlbr_InsuranceAmt());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getlbr_InsuranceAmt());
 	}
-
-	protected BigDecimal getInsuranceAmt(BigDecimal totalLinesAmt, BigDecimal totalInsuranceAmt){
-
-		if (totalLinesAmt.signum() <= 0 || totalInsuranceAmt.signum() <= 0)
-			return Env.ZERO;
-		
-		BigDecimal lineAmt = getLineTotalAmt();
-		BigDecimal insuranceAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
-		           insuranceAmt = totalInsuranceAmt.multiply(insuranceAmt);
-
-		return insuranceAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getInsuranceAmt
 	
 	public BigDecimal getDiscountAmt(){
 		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
-		return getDiscountAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getDiscountAmt());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getDiscountAmt());
+	}
+	
+	public BigDecimal getChargeAmt(){
+		MLBRNotaFiscal nf = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
+		return getAvgExpenseAmt(nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt()),nf.getChargeAmt());
 	}
 
-	protected BigDecimal getDiscountAmt(BigDecimal totalLinesAmt, BigDecimal totalDiscountAmt){
+	protected BigDecimal getAvgExpenseAmt(BigDecimal totalLinesAmt, BigDecimal totalExpenseAmt){
 
-		if (totalLinesAmt.signum() <= 0 || totalDiscountAmt.signum() <= 0)
+		if (totalLinesAmt.signum() <= 0 || totalExpenseAmt.signum() <= 0)
 			return Env.ZERO;
 		
 		BigDecimal lineAmt = getLineTotalAmt();
-		BigDecimal discountAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
-		           discountAmt = totalDiscountAmt.multiply(discountAmt);
+		BigDecimal expenseAmt = lineAmt.divide(totalLinesAmt, TaxBR.MCROUND);
+		           expenseAmt = totalExpenseAmt.multiply(expenseAmt);
 
-		return discountAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
-	} //getDiscountAmt
+		return expenseAmt.setScale(TaxBR.SCALE, TaxBR.ROUND);
+	} //getAvgExpensesAmt
 	
 	/**
 	 * Retorna a DIs da Linha
@@ -475,6 +472,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		BigDecimal lineAmt      = getLineTotalAmt();
 		BigDecimal freightAmt   = getFreightAmt();		
 		BigDecimal insuranceAmt = getInsuranceAmt();
+		BigDecimal chargeAmt    = getChargeAmt();
 		BigDecimal discountAmt  = getDiscountAmt().negate();
 		BigDecimal siscomexAmt  = getlbr_LineTotalSISCOMEX();
 		BigDecimal taxAmt       = getIPIAmt().add(getTaxAmt("ICMSST"));
@@ -487,7 +485,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		}
 			
 		//VALOR LINHA + FRETE + SEGURO + SISCOMEX + IPI = VALOR TOTAL DA OPERACAO
-		return (lineAmt.add(freightAmt).add(insuranceAmt).add(siscomexAmt).add
+		return (lineAmt.add(freightAmt).add(insuranceAmt).add(chargeAmt).add(siscomexAmt).add
 			   (taxAmt).add(discountAmt)).setScale(TaxBR.SCALE, TaxBR.ROUND);
 	}
 	
@@ -523,7 +521,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	 */
 	public BigDecimal getTotalTaxAmt(){
 		String sql = "SELECT SUM(lbr_TaxAmt) FROM LBR_NFLineTax " +
-                     "WHERE LBR_NotaFiscalLine_ID = ? AND lbr_TaxAmt >= 0 ";
+                     "WHERE LBR_NotaFiscalLine_ID = ?";
 		//
 		BigDecimal result = DB.getSQLValueBD(get_TrxName(), sql, new Object[]{getLBR_NotaFiscalLine_ID()});
 		return result == null ? Env.ZERO : result;
@@ -670,17 +668,22 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	 * @return Formata e retorna a Situação Tributária do ICMS
 	 */
 	public String getCST_ICMS(){
+		
 		String CST_ICMS = getlbr_TaxStatus();
-		
-		if (CST_ICMS == null || CST_ICMS.isEmpty() || CST_ICMS.length() != 3){
-			CST_ICMS = TextUtil.lPad(CST_ICMS, 3);
+		if (CST_ICMS == null || CST_ICMS.isEmpty()){
+			CST_ICMS = TextUtil.lPad(CST_ICMS, 2);
 		}
 		
-		if (CST_ICMS.endsWith("00") && getICMSAmt().signum() == 0){
-			CST_ICMS = CST_ICMS.substring(0, 1) + "40"; //ISENTO
+		if (CST_ICMS.equals("00") && getICMSAmt().signum() == 0){
+			CST_ICMS = "40"; //ISENTO
 		}
 		
-		return CST_ICMS;
+		String prodSource = getlbr_ProductSource();
+		if (prodSource == null || prodSource.isEmpty()){
+			prodSource = "0";
+		}
+		
+		return prodSource + CST_ICMS;
 	} //getCST_ICMS
 	
 	/**

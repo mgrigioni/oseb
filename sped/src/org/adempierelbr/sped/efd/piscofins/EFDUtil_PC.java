@@ -16,11 +16,13 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import org.adempierelbr.model.MLBRNCM;
+import org.adempierelbr.model.MLBRNFeInut;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.model.X_LBR_NFDI;
@@ -100,7 +102,17 @@ public class EFDUtil_PC
 	}
 	
 	public static String getCOD_VERSAO(Timestamp dateFrom){
-		return "002"; //ADE Cofis nº 34/2010, atualizado pelo ADE Cofis nº 37/2010
+		
+		if (dateFrom == null){
+			log.severe("DATA INVÁLIDA");
+			return null;
+		}
+		
+		if (dateFrom.before(TextUtil.stringToTime("01/07/2012", "dd/MM/yyyy"))){
+			return "002"; //ADE Cofis nº 34/2010, atualizado pelo ADE Cofis nº 37/2010
+		}
+		else
+			return "003"; 
 	}
 	
 	public static String getNFHeaderReg(String nfModel){
@@ -208,8 +220,9 @@ public class EFDUtil_PC
 		String COD_INC_TRIB  = "1"; //FIXME
 		String IND_APRO_CRED = "2"; //FIXME
 		String COD_TIPO_CONT = "1"; //FIXME
+		String IND_REG_CUM   = "";  //FIXME - SOMENTE QUANDO COD_INC_TRIB = 2
 		
-		return new R0110(COD_INC_TRIB,IND_APRO_CRED,COD_TIPO_CONT);
+		return new R0110(COD_INC_TRIB,IND_APRO_CRED,COD_TIPO_CONT,IND_REG_CUM);
 	} //createR0110
 	
 	public static R0111 createR0111(Map<Integer,Set<RA170>> _RA170, Map<Integer,Set<RC170>> _RC170){
@@ -445,8 +458,8 @@ public class EFDUtil_PC
 		Timestamp DT_E_S  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal().subtract(nf.getlbr_ServiceTotalAmt());
 		String IND_PAG    = nf.getIndPag();
-		if (IND_PAG.equals("2")) // 2 é usado na NFe
-			IND_PAG = "1";
+		if (IND_PAG.equals("9")) // 9 é usado na NFe
+			IND_PAG = "2";
 		
 		BigDecimal VL_DESC = nf.getDiscountAmt(nf.getTotalLines());
 		BigDecimal VL_ABAT_NT  = Env.ZERO; //TODO ???
@@ -454,7 +467,7 @@ public class EFDUtil_PC
 		String IND_FRT = nf.getFreightCostRule() == null ? "9" : (nf.getFreightCostRule().equals("E") ? "2" : "1");
 		BigDecimal VL_FRT = nf.getFreightAmt();
 		BigDecimal VL_SEG = nf.getlbr_InsuranceAmt();
-		BigDecimal VL_OUT_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_OUT_DA = nf.getChargeAmt();
 		
 		BigDecimal[] assetAmt = nf.getAssetTaxAmt();
 		BigDecimal VL_BC_ICMS = nf.getICMSBase().subtract(assetAmt[0]);
@@ -472,6 +485,25 @@ public class EFDUtil_PC
 				DT_DOC,DT_E_S,VL_DOC,IND_PAG,VL_DESC,VL_ABAT_NT,VL_MERC,IND_FRT,VL_FRT,
 				VL_SEG,VL_OUT_DA,VL_BC_ICMS,VL_ICMS,VL_BC_ICMS_ST,VL_ICMS_ST,VL_IPI,
 				VL_PIS,VL_COFINS,VL_PIS_ST,VL_COFINS_ST);
+	} //createRC100
+	
+	/**
+	 * Registros NFe Inutilizada
+	 * @param C_Period_ID
+	 */
+	public static List<RC100> createRC100(int C_Period_ID){
+		
+		List<RC100> listRC100 = new ArrayList<RC100>();
+		List<MLBRNFeInut> list = MLBRNFeInut.get(getCtx(), C_Period_ID);
+		for (MLBRNFeInut nfeInut : list){
+			for (int i=nfeInut.getlbr_DocumentNo(); 
+					 i<=nfeInut.getlbr_DocumentNo_To(); i++){
+				listRC100.add(new RC100(nfeInut.getlbr_NFModel(),
+						nfeInut.getlbr_NFSerie(),String.valueOf(i)));
+			}
+		}
+		
+		return listRC100;
 	} //createRC100
 	
 	public static RC120 createRC120(MLBRNotaFiscalLine nfLine){
@@ -624,6 +656,9 @@ public class EFDUtil_PC
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_NT.signum() == -1) //Diferença CENTAVOS
+			VL_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 		String COD_CTA = ""; //TODO ???
 		return new RD100(IND_OPER,IND_EMIT,COD_PART,COD_MOD,COD_SIT,SER,SUB,NUM_DOC,
@@ -703,12 +738,15 @@ public class EFDUtil_PC
 		BigDecimal VL_DESC = nf.getDiscountAmt();
 		BigDecimal VL_SERV = nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt());
 		BigDecimal VL_TERC = Env.ZERO; //TODO ???
-		BigDecimal VL_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_DA = nf.getChargeAmt();
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_PIS = nf.getPISAmt();
 		BigDecimal VL_COFINS = nf.getCOFINSAmt();
 		BigDecimal VL_SERV_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_SERV_NT.signum() == -1) //Diferença CENTAVOS
+			VL_SERV_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 	
 		return new RD500(IND_OPER,IND_EMIT,COD_PART,COD_MOD,COD_SIT,SER,SUB,NUM_DOC,

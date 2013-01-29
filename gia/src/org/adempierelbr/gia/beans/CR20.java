@@ -13,7 +13,7 @@ import org.compiere.util.Env;
  * @author Mario Grigioni
  * @version $Id: CR20.java, 17/06/2010, 15:36, mgrigioni
  */
-public class CR20 extends RegGIA{
+public class CR20 extends RegGIA implements Comparable<Object>{
 
 	private String CODSUBITEM = "";
 	private String PROPOUST   = "0";
@@ -63,6 +63,40 @@ public class CR20 extends RegGIA{
 			+ TextUtil.lPad(Q28,4);
 		
 		return format + EOL;
+	}
+	
+	/**
+	 * 	Comparador para Collection
+	 * 
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
+	public int compare (Object o1, Object o2) {
+		if (o1 == null)									//	Depois
+			return 1;
+		else if (o2 == null)
+			return -1;									//	Antes
+		else if (o1 instanceof CR20
+				&& o2 instanceof CR20)
+		{
+			CR20 e1 = (CR20) o1;
+			CR20 e2 = (CR20) o2;
+			//
+			if (e1.CODSUBITEM == null)						//	Depois
+				return 1;
+			else if (e2.CODSUBITEM == null)					// 	Antes
+				return -1;
+			else
+				return e1.CODSUBITEM.compareTo(e2.CODSUBITEM);	//	Comparar
+		}
+		else
+			return 0;									//	Não é EstadoBR
+	}
+
+	/**
+	 * 	Comparador para Collection
+	 */
+	public int compareTo (Object o) {
+		return compare (this, o);
 	}
 
 } //CR20

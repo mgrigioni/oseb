@@ -100,7 +100,7 @@ public class IdentEmit {
 		return xNome;
 	}
 	private void setxNome(String xNome) {	
-		this.xNome = TextUtil.checkSizeN(RemoverAcentos.remover(xNome),2,60);
+		this.xNome = TextUtil.checkSize(RemoverAcentos.remover(xNome),2,60);
 	}
 	
 	public String getxFant() {

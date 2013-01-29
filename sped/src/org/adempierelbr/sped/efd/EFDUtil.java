@@ -15,6 +15,7 @@ import org.adempierelbr.model.MLBRApuracaoICMS;
 import org.adempierelbr.model.MLBRApuracaoIPI;
 import org.adempierelbr.model.MLBRDE;
 import org.adempierelbr.model.MLBRNCM;
+import org.adempierelbr.model.MLBRNFeInut;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.model.X_LBR_ApuracaoICMSLine;
@@ -33,6 +34,7 @@ import org.adempierelbr.sped.efd.beans.R0300;
 import org.adempierelbr.sped.efd.beans.R0305;
 import org.adempierelbr.sped.efd.beans.R0500;
 import org.adempierelbr.sped.efd.beans.R0600;
+import org.adempierelbr.sped.efd.beans.R1010;
 import org.adempierelbr.sped.efd.beans.R1100;
 import org.adempierelbr.sped.efd.beans.R9900;
 import org.adempierelbr.sped.efd.beans.RC100;
@@ -129,10 +131,16 @@ public class EFDUtil{
 			return "003"; //ANTES DE 2011 - VERSAO 003
 		}
 		else if (dateFrom.before(TextUtil.stringToTime("01/01/2012", "dd/MM/yyyy"))){
-			return "004"; //ANTES DE 2012 - VERSAO 003
+			return "004"; //ANTES DE 2012 - VERSAO 004
+		}
+		else if (dateFrom.before(TextUtil.stringToTime("01/07/2012", "dd/MM/yyyy"))){
+			return "005"; //ANTES DE JUL/2012 - VERSAO 005
+		}
+		else if (dateFrom.before(TextUtil.stringToTime("01/01/2013", "dd/MM/yyyy"))){
+			return "006"; //A PARTIR DE JUL/2012 - VERSAO 006
 		}
 		else{
-			return "005"; //A PARTIR DE 2012 - VERSAO 005
+			return "007"; //A PARTIR DE JAN/2013 - VERSAO 007
 		}
 	}
 	
@@ -471,8 +479,8 @@ public class EFDUtil{
 		Timestamp DT_E_S  = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal();
 		String IND_PAG    = nf.getIndPag();
-		if (IND_PAG.equals("2")) // 2 é usado na NFe
-			IND_PAG = "1";
+		if (IND_PAG.equals("9"))
+			IND_PAG = "2";
 		
 		BigDecimal VL_DESC = nf.getDiscountAmt();
 		BigDecimal VL_ABAT_NT  = Env.ZERO; //TODO ???
@@ -480,7 +488,7 @@ public class EFDUtil{
 		String IND_FRT = nf.getFreightCostRule() == null ? "9" : (nf.getFreightCostRule().equals("E") ? "2" : "1");
 		BigDecimal VL_FRT = nf.getFreightAmt();
 		BigDecimal VL_SEG = nf.getlbr_InsuranceAmt();
-		BigDecimal VL_OUT_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_OUT_DA = nf.getChargeAmt();
 		
 		//BF: Para ativos fixo, lançar o crédito no bloco G
 		BigDecimal[] assetAmt = nf.getAssetTaxAmt();
@@ -499,6 +507,32 @@ public class EFDUtil{
 				DT_DOC,DT_E_S,VL_DOC,IND_PAG,VL_DESC,VL_ABAT_NT,VL_MERC,IND_FRT,VL_FRT,
 				VL_SEG,VL_OUT_DA,VL_BC_ICMS,VL_ICMS,VL_BC_ICMS_ST,VL_ICMS_ST,VL_IPI,
 				VL_PIS,VL_COFINS,VL_PIS_ST,VL_COFINS_ST);
+	} //createRC100
+	
+	/**
+	 * Registros NFe Inutilizada
+	 * @param C_Period_ID
+	 */
+	public static List<RC100> createRC100(int C_Period_ID){
+		
+		List<RC100> listRC100 = new ArrayList<RC100>();
+		List<MLBRNFeInut> list = MLBRNFeInut.get(getCtx(), C_Period_ID);
+		if (list.size() > 0){
+			
+			MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
+			MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(), get_TrxName());
+			String UF = orgLoc.getC_Region().getName();
+			
+			for (MLBRNFeInut nfeInut : list){
+				for (int i=nfeInut.getlbr_DocumentNo(); 
+						 i<=nfeInut.getlbr_DocumentNo_To(); i++){
+					listRC100.add(new RC100(UF,nfeInut.getlbr_NFModel(),
+							nfeInut.getlbr_NFSerie(),String.valueOf(i)));
+				}
+			}			
+		}
+		
+		return listRC100;
 	} //createRC100
 	
 	public static RC120 createRC120(MLBRNotaFiscalLine nfLine){
@@ -659,7 +693,7 @@ public class EFDUtil{
 		BigDecimal VL_DESC = nf.getDiscountAmt();
 		BigDecimal VL_FORN = nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt());
 		BigDecimal VL_TERC = Env.ZERO; //TODO ???
-		BigDecimal VL_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_DA = nf.getChargeAmt();
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_BC_ICMS_ST = nf.getTaxBaseAmt("ICMSST");
@@ -757,6 +791,9 @@ public class EFDUtil{
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_NT.signum() == -1) //Diferença CENTAVOS
+			VL_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 		String COD_CTA = ""; //TODO ???
 		return new RD100(UF, IND_OPER,IND_EMIT,COD_PART,COD_MOD,COD_SIT,SER,SUB,NUM_DOC,
@@ -826,12 +863,15 @@ public class EFDUtil{
 		BigDecimal VL_DESC = nf.getDiscountAmt();
 		BigDecimal VL_SERV = nf.getTotalLines().add(nf.getlbr_ServiceTotalAmt());
 		BigDecimal VL_TERC = Env.ZERO; //TODO ???
-		BigDecimal VL_DA = Env.ZERO; //TODO ???
+		BigDecimal VL_DA = nf.getChargeAmt();
 		BigDecimal VL_BC_ICMS = nf.getICMSBase();
 		BigDecimal VL_ICMS = nf.getICMSAmt();
 		BigDecimal VL_PIS = nf.getPISAmt();
 		BigDecimal VL_COFINS = nf.getCOFINSAmt();
 		BigDecimal VL_SERV_NT = VL_SERV.subtract(VL_BC_ICMS);
+		if (VL_SERV_NT.signum() == -1) //Diferença CENTAVOS
+			VL_SERV_NT = Env.ZERO;
+		
 		String COD_INF = ""; //TODO ???
 		String COD_CTA = ""; //TODO ???
 		String TP_ASSINANTE = ""; //TODO ???
@@ -1255,6 +1295,21 @@ public class EFDUtil{
 		
 		return listReg;
 	} //createRG130_RG140
+	
+	public static R1010 createR1010(){
+		boolean IND_EXP   = CounterSped.getCounter("1100") > 0;
+		boolean IND_CCRF  = CounterSped.getCounter("1200") > 0;
+		boolean IND_COMB  = CounterSped.getCounter("1300") > 0;
+		boolean IND_USINA = CounterSped.getCounter("1390") > 0;
+		boolean IND_VA    = CounterSped.getCounter("1400") > 0;
+		boolean IND_EE    = CounterSped.getCounter("1500") > 0;
+		boolean IND_CART  = CounterSped.getCounter("1600") > 0;
+		boolean IND_FORM  = CounterSped.getCounter("1700") > 0;
+		boolean IND_AER   = CounterSped.getCounter("1800") > 0;
+		
+		return new R1010(IND_EXP,IND_CCRF,IND_COMB,IND_USINA,IND_VA,IND_EE,
+				IND_CART,IND_FORM,IND_AER);
+	} //createR1010
 		
 	public static R1100 createR1100(MLBRDE de){
 		

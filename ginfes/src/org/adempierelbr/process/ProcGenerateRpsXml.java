@@ -15,8 +15,10 @@ package org.adempierelbr.process;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.ginfes.beans.TcCpfCnpj;
 import org.adempierelbr.ginfes.beans.TcDadosServico;
 import org.adempierelbr.ginfes.beans.TcDadosTomador;
@@ -31,12 +33,10 @@ import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
-import org.compiere.Adempiere;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
-import org.compiere.util.CLogMgt;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -72,19 +72,20 @@ public class ProcGenerateRpsXml extends SvrProcess
 	 * 	DoIt
 	 */
 	protected String doIt() throws Exception {
-		return generateXML(new MLBRNotaFiscal(getCtx(),getRecord_ID(),get_TrxName()));
+		generateXML(getCtx(),getRecord_ID(),get_TrxName());
+		return Msg.getMsg(Env.getAD_Language(getCtx()), "ProcessOK", true);
 	}	//	doIt
 	
-
-	public static String generateXML(MLBRNotaFiscal nf) throws Exception{
+	public static void generateXML(Properties ctx, int LBR_NotaFiscal_ID, String trxName) throws AdempiereException{
 		
-		if (nf.get_ID() <= 0)
-			return  Msg.getMsg(Env.getAD_Language(nf.getCtx()), "ProcessFailed", true);
+		if (LBR_NotaFiscal_ID <= 0)
+			throw new AdempiereException("Nota Fiscal inválida");
+		
+		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx,LBR_NotaFiscal_ID,trxName);
 		
 		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 		if (nfLines.size() != 1){
-			log.severe("RPS só pode conter um serviço");
-			return  Msg.getMsg(Env.getAD_Language(nf.getCtx()), "ProcessFailed", true);
+			throw new AdempiereException("RPS só pode conter um serviço");
 		}
 		
 		MLBRNotaFiscalLine nfLine = nfLines.iterator().next();
@@ -112,9 +113,7 @@ public class ProcGenerateRpsXml extends SvrProcess
 				nf.getDateDoc(), false, false, servico, prestador, tomador));
 		
 		rps.toXML();
-		
-		return Msg.getMsg(Env.getAD_Language(nf.getCtx()), "ProcessOK", true);
-	}
+	} //generateXML
 	
 	private static TcValores createTcValores(MLBRNotaFiscalLine nfLine){
 		
@@ -141,28 +140,5 @@ public class ProcGenerateRpsXml extends SvrProcess
 		
 		return valores;
 	} //createTcValores
-	
-	/**
-	 * Main Test
-	 * @param args
-	 */
-	public static void main (String[] args) 
-	{
-		Adempiere.startupEnvironment(false);
-		CLogMgt.setLevel(Level.FINE);
-		CLogMgt.enable(true);
-		System.out.println("Ginfes XML Test");
-		System.out.println("-----------------------");
-		
-		try
-		{
-			System.out.println(generateXML (new MLBRNotaFiscal(Env.getCtx(),2097471,null)));
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-	}	//	main
 	
 }	//	ProcGenerateRpsXml

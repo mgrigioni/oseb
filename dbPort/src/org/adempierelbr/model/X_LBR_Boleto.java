@@ -33,7 +33,7 @@ public class X_LBR_Boleto extends PO implements I_LBR_Boleto, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_Boleto (Properties ctx, int LBR_Boleto_ID, String trxName)

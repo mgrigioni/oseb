@@ -434,7 +434,7 @@ public class ProcGenerateSINTEGRA extends SvrProcess
 							registro54(nf.getlbr_BPCNPJ(), nf.getlbr_BPRegion(),
 							modeloNF,nf.getSerieNo(),nf.getDocumentNo(true),
 							nfLine.getlbr_CFOPName(),
-							nfLine.getlbr_TaxStatus(),"" + line,
+							nfLine.getCST_ICMS(),"" + line,
 							nfLine.getProductValue(),
 							nfLine.getQty(),
 							nfLine.getLineTotalAmt(),

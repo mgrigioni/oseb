@@ -141,6 +141,24 @@ public class RC100 extends RegSped implements Comparable<Object>{
 		}
 	}//	RC100
 	
+	/**
+	 * Constructor for NFe Inutilizada
+	 * @param UF
+	 * @param COD_MOD
+	 * @param SER
+	 * @param NUM_DOC
+	 */
+	public RC100 (String UF, String COD_MOD, String SER, String NUM_DOC){
+		super();
+		this.UF = UF;
+		this.IND_OPER 	= "1"; //SAIDA
+		this.IND_EMIT 	= "0"; //NF PROPRIA
+		setCOD_MOD(COD_MOD);
+		setCOD_SIT("05"); //NF INUTILIZADA
+		setSER(SER);
+		setNUM_DOC(NUM_DOC);
+	} //RC100
+	
 	public void addValues(RC100 otherC100){
 		this.VL_DOC        = getVL_DOC().add(otherC100.getVL_DOC());
 		this.VL_DESC       = getVL_DESC().add(otherC100.getVL_DESC());
@@ -399,12 +417,21 @@ public class RC100 extends RegSped implements Comparable<Object>{
 			RC100 e1 = (RC100) o1;
 			RC100 e2 = (RC100) o2;
 			//
-			if (e1.DT_E_S == null)						//	Depois
+			Timestamp dtE1 = e1.DT_E_S;
+			Timestamp dtE2 = e2.DT_E_S;
+			
+			//NF Cancelada e Inutilizada fica para o final
+			if (dtE1 == null && dtE2 == null){
+				dtE1 = TextUtil.stringToTime("31/12/9999", "dd/MM/yyyy");
+				dtE2 = TextUtil.stringToTime("31/12/9999", "dd/MM/yyyy");
+			}
+			
+			if (dtE1 == null)						//	Depois
 				return 1;
-			else if (e2.DT_E_S == null)					// 	Antes
+			else if (dtE2 == null)					// 	Antes
 				return -1;
 			
-			int compare = e1.DT_E_S.compareTo(e2.DT_E_S);
+			int compare = dtE1.compareTo(dtE2);
 			
 			if (compare == 0)
 				return e1.NUM_DOC.compareTo(e2.NUM_DOC);	//	Comparar

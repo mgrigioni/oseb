@@ -195,6 +195,19 @@ public interface I_LBR_NFDI
 
 	public org.adempierelbr.model.I_LBR_NotaFiscal getLBR_NotaFiscal() throws RuntimeException;
 
+    /** Column name Manufacturer */
+    public static final String COLUMNNAME_Manufacturer = "Manufacturer";
+
+	/** Set Manufacturer.
+	  * Manufacturer of the Product
+	  */
+	public void setManufacturer (String Manufacturer);
+
+	/** Get Manufacturer.
+	  * Manufacturer of the Product
+	  */
+	public String getManufacturer();
+
     /** Column name Type */
     public static final String COLUMNNAME_Type = "Type";
 

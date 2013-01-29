@@ -292,9 +292,9 @@ public class SacredCompUtil{
 	public static B5R5335 createR5335(int LBR_NotaFiscalLine_ID){
 
 		MLBRNotaFiscalLine nfl = new MLBRNotaFiscalLine(ctx,LBR_NotaFiscalLine_ID,trx);
-		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx,nfl.getLBR_NotaFiscal_ID(),trx);
+		//MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx,nfl.getLBR_NotaFiscal_ID(),trx);
 		
-		String NUM_DECL_EXP = nf.getLBR_DE().getlbr_DE();
+		String NUM_DECL_EXP = nfl.getLBR_DE().getlbr_DE();
 		String COMP_OPER    = "0";
 		BigDecimal SERV_COMUN = Env.ZERO;
 

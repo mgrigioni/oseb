@@ -15,6 +15,7 @@ package org.adempierelbr.ginfes.beans;
 
 import java.sql.Timestamp;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.util.CLogger;
@@ -103,7 +104,7 @@ public class TcInfRps {
 	public void setNaturezaOperacao(String naturezaOperacao) {
 		naturezaOperacao = TextUtil.toNumeric(naturezaOperacao);
 		if("123456".indexOf(naturezaOperacao) == -1){
-			log.warning("(Natureza da Operação inválida) - " + naturezaOperacao);
+			throw new AdempiereException ("(Natureza da Operação inválida) - " + naturezaOperacao);
 		}
 		
 		NaturezaOperacao = naturezaOperacao;

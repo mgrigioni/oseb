@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 import java.util.Vector;
 import java.util.logging.Level;
 
-import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.model.X_LBR_DE;
 import org.compiere.grid.CreateFrom;
 import org.compiere.minigrid.IMiniTable;
@@ -58,17 +58,20 @@ public class CreateFromDE extends CreateFrom {
 		/**
 		 *  Selected        - 0
 		 *  Documentno      - 1
-		 *  DateTrx    		- 2
-		 *  BPName     		- 3
-		 *  País            - 4
+		 *  Line            - 2
+		 *  ProductValue    - 3
+		 *  DateTrx    		- 4
+		 *  BPName     		- 5
+		 *  País            - 6
 		 */
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-		String sql = "SELECT nf.LBR_NotaFiscal_ID, nf.Documentno, nf.DateDoc," +
-				     "nf.BPName, nf.lbr_BPCountry  " +
+		String sql = "SELECT nfl.LBR_NotaFiscalLine_ID, nf.Documentno, nfl.Line, nfl.ProductValue, " +
+			         "nf.DateDoc, nf.BPName, nf.lbr_BPCountry  " +
 			         "FROM LBR_NotaFiscal nf " +
+			         "INNER JOIN LBR_NotaFiscalLine nfl ON (nf.LBR_NotaFiscal_ID = nfl.LBR_NotaFiscal_ID) " +
 			         "WHERE nf.IsCancelled = 'N' " +
 			         "AND nf.IsSOTrx = 'Y' AND nf.lbr_BPCountry = ? " +
-			         "AND nf.LBR_DE_ID IS NULL  " +
+			         "AND nfl.LBR_DE_ID IS NULL  " +
 			         "ORDER BY 3";
 		
 		PreparedStatement pstmt = null;
@@ -85,15 +88,17 @@ public class CreateFromDE extends CreateFrom {
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{
-				Vector<Object> line = new Vector<Object>(5);
+				Vector<Object> line = new Vector<Object>(7);
 				line.add(new Boolean(false));       //  0-Selection
 				//
 				KeyNamePair kp = new KeyNamePair(rs.getInt(1), rs.getString(2));
 				//
 				line.add(kp);						//	1-DocumentNo
-				line.add(rs.getTimestamp(3));       //  2-DateTrx
-				line.add(rs.getString(4));			//	3-BPName
-				line.add(rs.getString(5));			//	4-Country
+				line.add(rs.getString(3));          //  2-Line
+				line.add(rs.getString(4));          //  3-ProductValue
+				line.add(rs.getTimestamp(5));       //  4-DateTrx
+				line.add(rs.getString(6));			//	5-BPName
+				line.add(rs.getString(7));			//	6-Country
 				data.add(line);
 			}
 			rs.close();
@@ -120,9 +125,11 @@ public class CreateFromDE extends CreateFrom {
 	{
 		miniTable.setColumnClass(0, Boolean.class, false);      //  0-Selection
 		miniTable.setColumnClass(1, String.class, true);   		//  1-DocumentNo
-		miniTable.setColumnClass(2, Timestamp.class, true);     //  2-TrxDate
-		miniTable.setColumnClass(3, String.class, true);        //  3-BPName
-		miniTable.setColumnClass(4, String.class, true);    	//  4-BPCountry
+		miniTable.setColumnClass(2, String.class, true);   		//  2-Line
+		miniTable.setColumnClass(3, String.class, true);   		//  3-ProductValue
+		miniTable.setColumnClass(4, Timestamp.class, true);     //  4-TrxDate
+		miniTable.setColumnClass(5, String.class, true);        //  5-BPName
+		miniTable.setColumnClass(6, String.class, true);    	//  6-BPCountry
         
         //  Table UI
 		miniTable.autoSize();
@@ -145,13 +152,13 @@ public class CreateFromDE extends CreateFrom {
 			if (((Boolean)miniTable.getValueAt(i, 0)).booleanValue())
 			{
 				KeyNamePair pp = (KeyNamePair)miniTable.getValueAt(i, 1);
-				int LBR_NotaFiscal_ID = pp.getKey();
+				int LBR_NotaFiscalLine_ID = pp.getKey();
 				//
-				MLBRNotaFiscal nf = new MLBRNotaFiscal (Env.getCtx(), LBR_NotaFiscal_ID, null);
-				nf.setLBR_DE_ID(LBR_DE_ID);
-				log.fine("LBR_NotaFiscal_ID="+LBR_NotaFiscal_ID);
+				MLBRNotaFiscalLine nfl = new MLBRNotaFiscalLine (Env.getCtx(), LBR_NotaFiscalLine_ID, null);
+				nfl.setLBR_DE_ID(LBR_DE_ID);
+				log.fine("LBR_NotaFiscalLine_ID="+LBR_NotaFiscalLine_ID);
 				//
-				if (!nf.save())
+				if (!nfl.save())
 					log.log(Level.SEVERE, "NF not added to DE, #" + i);
 				
 			}   //   if selected
@@ -162,9 +169,11 @@ public class CreateFromDE extends CreateFrom {
 	protected Vector<String> getOISColumnNames()
 	{
 		//  Header Info
-		Vector<String> columnNames = new Vector<String>(5);
+		Vector<String> columnNames = new Vector<String>(7);
 		columnNames.add(Msg.getMsg(Env.getCtx(), "Select"));
 		columnNames.add(Msg.getElement(Env.getCtx(), "DocumentNo"));
+		columnNames.add(Msg.getElement(Env.getCtx(), "Line"));
+		columnNames.add(Msg.getElement(Env.getCtx(), "ProductValue"));
 		columnNames.add(Msg.translate(Env.getCtx(), "Date"));
 		columnNames.add(Msg.translate(Env.getCtx(), "BPName"));
 		columnNames.add(Msg.translate(Env.getCtx(), "lbr_BPCountry"));

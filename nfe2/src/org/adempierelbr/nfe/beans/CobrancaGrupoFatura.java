@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -12,6 +13,19 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import java.math.BigDecimal;
+
+import org.adempierelbr.util.TextUtil;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ *  Grupo da Fatura
+ *  
+ *  @author Mario Grigioni
+ *  @version $Id: CobrancaGrupoFatura.java,v 1.0 01/08/2012 15:00:00 mgrigioni Exp $
+ */
+@XStreamAlias ("fat")
 public class CobrancaGrupoFatura {
 
 	private String nFat;
@@ -19,41 +33,48 @@ public class CobrancaGrupoFatura {
 	private String vDesc;
 	private String vLiq;
 	
+	/**
+	 * Default Constructor
+	 * @param nFat
+	 * @param vOrig
+	 */
+	public CobrancaGrupoFatura(String nFat, BigDecimal vOrig) {
+		super();
+		setnFat(nFat);
+		setvOrig(vOrig);
+		setvLiq(vOrig);
+	}
+	
 	public String getnFat() {
 		return nFat;
 	}
 	public void setnFat(String nFat) {
-		if (nFat != null)
-			nFat = nFat.trim();
-	
-		this.nFat = nFat;
+		if (nFat != null)	
+			this.nFat = TextUtil.checkSize(nFat, 60);
 	}
+	
 	public String getvOrig() {
 		return vOrig;
 	}
-	public void setvOrig(String vOrig) {
+	public void setvOrig(BigDecimal vOrig) {
 		if (vOrig != null)
-			vOrig = vOrig.trim();
-	
-		this.vOrig = vOrig;
+			this.vOrig = TextUtil.bigdecimalToString(vOrig);
 	}
+	
 	public String getvDesc() {
 		return vDesc;
 	}
-	public void setvDesc(String vDesc) {
+	public void setvDesc(BigDecimal vDesc) {
 		if (vDesc != null)
-			vDesc = vDesc.trim();
-	
-		this.vDesc = vDesc;
+			this.vDesc = TextUtil.bigdecimalToString(vDesc);
 	}
+	
 	public String getvLiq() {
 		return vLiq;
 	}
-	public void setvLiq(String vLiq) {
+	public void setvLiq(BigDecimal vLiq) {
 		if (vLiq != null)
-			vLiq = vLiq.trim();
-	
-		this.vLiq = vLiq;
+			this.vLiq = TextUtil.bigdecimalToString(vLiq);
 	}
 
-}
+} // CobrancaGrupoFatura

@@ -15,10 +15,8 @@ import org.adempierelbr.gia.beans.CR20;
 import org.adempierelbr.model.X_LBR_ApuracaoICMSLine;
 import org.adempierelbr.model.X_LBR_ICMSBasis;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
-import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPeriod;
-import org.compiere.model.MRegion;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -33,18 +31,14 @@ public class GIAUtil{
 	
 	private static MOrgInfo   orgInfo = null;
 	private static MPeriod    period  = null;
-	private static String     regionName = "SP";
 
 	public static void setEnv(Properties ctx, String trx, int C_Period_ID){
 		GIAUtil.ctx = ctx;
 		GIAUtil.trx = trx;
 		
 		MOrgInfo oi    = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx),trx);
-		MLocation loc  = new MLocation(ctx,oi.getC_Location_ID(),trx);
-		MRegion   reg  = new MRegion(ctx,loc.getC_Region_ID(),trx);
 		MPeriod period = new MPeriod(ctx,C_Period_ID,trx);
 		
-		GIAUtil.regionName = reg.getName();
 		GIAUtil.orgInfo    = oi;
 		GIAUtil.period     = period;
 	} //setEnv
@@ -106,7 +100,8 @@ public class GIAUtil{
 		
 		String sql = "SELECT CFOP, UF, SUM(ValorContabil) as ValorContabil, SUM(BaseICMS) as Base, " +
 				     "SUM(ValorICMS) as ValorImposto, SUM(OutrosICMS) as ValorOutras, " +
-				     "SUM(IsentoICMS) as ValorIsento, SUM(ValorIPI) as ValorIPI " +
+				     "SUM(IsentoICMS) as ValorIsento, SUM(ValorIPI) as ValorIPI, " +
+				     "SUM(ValorICMSST) as ValorICMSST " +
 				     "FROM lbr_SitICMS_v " +
 				     "WHERE IsCancelled = 'N' " +
 				     "AND DataEntrada BETWEEN ? AND ? " +
@@ -135,15 +130,22 @@ public class GIAUtil{
 				BigDecimal base_1 = rs.getBigDecimal("Base");
 				BigDecimal base_2 = Env.ZERO;
 				
+				BigDecimal ICMSST = Env.ZERO;
+				
 				if (CFOP.equals("6.107") || CFOP.equals("6.108")){
 					valorContabil_2 = valorContabil_1;
 					base_2 = base_1;
 					valorContabil_1 = Env.ZERO; base_1 = Env.ZERO;
 				}
 				
+				
+				if (CFOP.startsWith("5")){ //SOMENTE VENDA INTERNA
+					ICMSST = rs.getBigDecimal("ValorICMSST");
+				}
+				
 				list.add(new CR14(CFOP, UF, valorContabil_1, base_1, valorContabil_2, 
 						base_2, rs.getBigDecimal("ValorImposto"), rs.getBigDecimal("ValorOutras"),
-						rs.getBigDecimal("ValorIsento"), rs.getBigDecimal("ValorIPI")));
+						rs.getBigDecimal("ValorIsento"), rs.getBigDecimal("ValorIPI"),ICMSST));
 			}
 		}
 		catch (Exception e)
@@ -227,10 +229,6 @@ public class GIAUtil{
 	
 	public static MOrgInfo getOrgInfo(){
 		return orgInfo;
-	}
-	
-	public static String getRegionName(){
-		return regionName;
 	}
 	
 } //GIAUtil

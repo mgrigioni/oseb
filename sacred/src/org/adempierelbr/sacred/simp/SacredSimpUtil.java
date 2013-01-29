@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.sacred.CounterSacred;
 import org.adempierelbr.sacred.simp.beans.B0R0000;
 import org.adempierelbr.sacred.simp.beans.B0R0150;
@@ -246,7 +247,8 @@ public class SacredSimpUtil{
 
 	public static B5R5335 createR5335(MLBRNotaFiscal nf){
 
-		String NUM_DECL_EXP = nf.getLBR_DE().getlbr_DE();
+		MLBRNotaFiscalLine nfl = new MLBRNotaFiscalLine(nf.getCtx(),nf.getPrimaryLBR_NotaFiscalLine_ID(),nf.get_TrxName());
+		String NUM_DECL_EXP = nfl.getLBR_DE().getlbr_DE();
 		String COMP_OPER    = "0";
 
 		return new B5R5335(NUM_DECL_EXP,COMP_OPER);

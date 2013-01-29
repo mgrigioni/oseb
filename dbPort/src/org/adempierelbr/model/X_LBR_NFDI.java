@@ -31,7 +31,7 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120529L;
+	private static final long serialVersionUID = 20130107L;
 
     /** Standard Constructor */
     public X_LBR_NFDI (Properties ctx, int LBR_NFDI_ID, String trxName)
@@ -230,6 +230,23 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Manufacturer.
+		@param Manufacturer 
+		Manufacturer of the Product
+	  */
+	public void setManufacturer (String Manufacturer)
+	{
+		set_Value (COLUMNNAME_Manufacturer, Manufacturer);
+	}
+
+	/** Get Manufacturer.
+		@return Manufacturer of the Product
+	  */
+	public String getManufacturer () 
+	{
+		return (String)get_Value(COLUMNNAME_Manufacturer);
 	}
 
 	/** Type AD_Reference_ID=1120013 */

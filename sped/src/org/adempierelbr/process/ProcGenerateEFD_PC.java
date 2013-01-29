@@ -233,6 +233,12 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			} //loop Linhas da Nota Fiscal
 				
 		} //loop Nota Fiscal
+		
+		//BLOCO C: NF Inutilizada
+		List<RC100> listRC100 = EFDUtil_PC.createRC100(p_C_Period_ID);
+		for (RC100 rc100 : listRC100){
+			_RC100.put(rc100.hashCode(), rc100);
+		}
 			
 		//BLOCOS SPED EFD		
 		StringBuilder BLOCO0 = montaBLOCO0(count,dateFrom,dateTo); //Abertura, Identificação e Referências
