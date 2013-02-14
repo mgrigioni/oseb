@@ -394,8 +394,8 @@ public class EFDUtil_PC
 		Timestamp DT_EXE_SERV = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		BigDecimal VL_DOC = nf.getGrandTotal().subtract(nf.getTotalLines());
 		String IND_PAG    = nf.getIndPag();
-		if (IND_PAG.equals("2")) // 2 é usado na NFe
-			IND_PAG = "1";
+		if (IND_PAG.equals("9")) // 9 é usado na NFe
+			IND_PAG = "2";
 		
 		BigDecimal VL_DESC = nf.getDiscountAmt(nf.getlbr_ServiceTotalAmt());
 		BigDecimal VL_BC_PIS = nf.getTaxBaseAmt("PIS", true);
