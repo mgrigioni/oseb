@@ -15,7 +15,7 @@ public class CR01 extends RegGIA{
 
 	private final String TIPODOCTO      = "01"; //01 front-end NOVA GIA
 	private final String VERSAOFRONTEND = "0000"; //Deve ser igual a ZEROS
-	private final String VERSAOPREF     = "0209"; //Deve ser igual a 0209
+	private final String VERSAOPREF     = "0210"; //Versão Nova Gia 0800
 	private final String Q5             = "0001"; //quantidade de registros-filhos  05 
 	
 	private String DATAGERACAO = ""; //AAAAMMDD
