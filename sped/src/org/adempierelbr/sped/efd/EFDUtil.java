@@ -1082,7 +1082,7 @@ public class EFDUtil{
 		
 		//BigDecimal VL_OR  = reg.get_ValueAsBD("VL_ICMS_ST");
 		Timestamp DT_VCTO = reg.get_ValueAsTS("DT_DOC");
-		String COD_REC    = "10009-9"; //FIXME
+		String COD_REC    = "100099"; //FIXME HARDCODED ICMS ST
 		String NUM_PROC   = ""; //TODO
 		String IND_PROC   = ""; //TODO
 		String PROC       = ""; //TODO
