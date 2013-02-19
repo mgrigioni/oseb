@@ -15,43 +15,43 @@ import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
 import org.adempierelbr.sped.CounterSped;
 import org.adempierelbr.sped.RegSped;
-import org.adempierelbr.sped.efd.piscofins.EFDUtil_PC;
-import org.adempierelbr.sped.efd.piscofins.beans.R0001;
-import org.adempierelbr.sped.efd.piscofins.beans.R0100;
-import org.adempierelbr.sped.efd.piscofins.beans.R0150;
-import org.adempierelbr.sped.efd.piscofins.beans.R0190;
-import org.adempierelbr.sped.efd.piscofins.beans.R0200;
-import org.adempierelbr.sped.efd.piscofins.beans.R0990;
-import org.adempierelbr.sped.efd.piscofins.beans.R1001;
-import org.adempierelbr.sped.efd.piscofins.beans.R1990;
-import org.adempierelbr.sped.efd.piscofins.beans.R9001;
-import org.adempierelbr.sped.efd.piscofins.beans.R9900;
-import org.adempierelbr.sped.efd.piscofins.beans.R9990;
-import org.adempierelbr.sped.efd.piscofins.beans.R9999;
-import org.adempierelbr.sped.efd.piscofins.beans.RA001;
-import org.adempierelbr.sped.efd.piscofins.beans.RA100;
-import org.adempierelbr.sped.efd.piscofins.beans.RA170;
-import org.adempierelbr.sped.efd.piscofins.beans.RA990;
-import org.adempierelbr.sped.efd.piscofins.beans.RC001;
-import org.adempierelbr.sped.efd.piscofins.beans.RC100;
-import org.adempierelbr.sped.efd.piscofins.beans.RC120;
-import org.adempierelbr.sped.efd.piscofins.beans.RC170;
-import org.adempierelbr.sped.efd.piscofins.beans.RC500;
-import org.adempierelbr.sped.efd.piscofins.beans.RC501;
-import org.adempierelbr.sped.efd.piscofins.beans.RC505;
-import org.adempierelbr.sped.efd.piscofins.beans.RC990;
-import org.adempierelbr.sped.efd.piscofins.beans.RD001;
-import org.adempierelbr.sped.efd.piscofins.beans.RD100;
-import org.adempierelbr.sped.efd.piscofins.beans.RD101;
-import org.adempierelbr.sped.efd.piscofins.beans.RD105;
-import org.adempierelbr.sped.efd.piscofins.beans.RD500;
-import org.adempierelbr.sped.efd.piscofins.beans.RD501;
-import org.adempierelbr.sped.efd.piscofins.beans.RD505;
-import org.adempierelbr.sped.efd.piscofins.beans.RD990;
-import org.adempierelbr.sped.efd.piscofins.beans.RF001;
-import org.adempierelbr.sped.efd.piscofins.beans.RF990;
-import org.adempierelbr.sped.efd.piscofins.beans.RM001;
-import org.adempierelbr.sped.efd.piscofins.beans.RM990;
+import org.adempierelbr.sped.efd.contrib.EFDUtil_Contrib;
+import org.adempierelbr.sped.efd.contrib.beans.R0001;
+import org.adempierelbr.sped.efd.contrib.beans.R0100;
+import org.adempierelbr.sped.efd.contrib.beans.R0150;
+import org.adempierelbr.sped.efd.contrib.beans.R0190;
+import org.adempierelbr.sped.efd.contrib.beans.R0200;
+import org.adempierelbr.sped.efd.contrib.beans.R0990;
+import org.adempierelbr.sped.efd.contrib.beans.R1001;
+import org.adempierelbr.sped.efd.contrib.beans.R1990;
+import org.adempierelbr.sped.efd.contrib.beans.R9001;
+import org.adempierelbr.sped.efd.contrib.beans.R9900;
+import org.adempierelbr.sped.efd.contrib.beans.R9990;
+import org.adempierelbr.sped.efd.contrib.beans.R9999;
+import org.adempierelbr.sped.efd.contrib.beans.RA001;
+import org.adempierelbr.sped.efd.contrib.beans.RA100;
+import org.adempierelbr.sped.efd.contrib.beans.RA170;
+import org.adempierelbr.sped.efd.contrib.beans.RA990;
+import org.adempierelbr.sped.efd.contrib.beans.RC001;
+import org.adempierelbr.sped.efd.contrib.beans.RC100;
+import org.adempierelbr.sped.efd.contrib.beans.RC120;
+import org.adempierelbr.sped.efd.contrib.beans.RC170;
+import org.adempierelbr.sped.efd.contrib.beans.RC500;
+import org.adempierelbr.sped.efd.contrib.beans.RC501;
+import org.adempierelbr.sped.efd.contrib.beans.RC505;
+import org.adempierelbr.sped.efd.contrib.beans.RC990;
+import org.adempierelbr.sped.efd.contrib.beans.RD001;
+import org.adempierelbr.sped.efd.contrib.beans.RD100;
+import org.adempierelbr.sped.efd.contrib.beans.RD101;
+import org.adempierelbr.sped.efd.contrib.beans.RD105;
+import org.adempierelbr.sped.efd.contrib.beans.RD500;
+import org.adempierelbr.sped.efd.contrib.beans.RD501;
+import org.adempierelbr.sped.efd.contrib.beans.RD505;
+import org.adempierelbr.sped.efd.contrib.beans.RD990;
+import org.adempierelbr.sped.efd.contrib.beans.RF001;
+import org.adempierelbr.sped.efd.contrib.beans.RF990;
+import org.adempierelbr.sped.efd.contrib.beans.RM001;
+import org.adempierelbr.sped.efd.contrib.beans.RM990;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.model.MPeriod;
@@ -60,10 +60,10 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 
 /**
- * ESCRITURAÇÃO FISCAL DIGITAL - EFD (PIS/COFINS)
+ * ESCRITURAÇÃO FISCAL DIGITAL - EFD (Contribuições)
  * 
  * @author Mario Grigioni
- * @version $Id: ProcGenerateEFD, 17/02/2011, 11:44, mgrigioni
+ * @version $Id: ProcGenerateEFD_PC, 17/02/2011, 11:44, mgrigioni
  */
 public class ProcGenerateEFD_PC extends SvrProcess
 {
@@ -148,7 +148,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		if (!(p_FilePath.endsWith(AdempiereLBR.getFileSeparator())))
 			fileName += AdempiereLBR.getFileSeparator();
 		
-		fileName += "EFDpiscofins_" + TextUtil.timeToString(dateFrom, "MMyyyy") + ".txt";
+		fileName += "EFDcontrib_" + TextUtil.timeToString(dateFrom, "MMyyyy") + ".txt";
 		
 		TextUtil.generateFile(result.toString(), fileName);
 		//
@@ -168,7 +168,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 	private StringBuilder runEFD(Timestamp dateFrom, Timestamp dateTo) throws Exception
 	{
 		log.fine("init");
-		EFDUtil_PC.setEnv(getCtx(),get_TrxName(),p_AD_Org_ID);
+		EFDUtil_Contrib.setEnv(getCtx(),get_TrxName(),p_AD_Org_ID);
 		CounterSped.clear();
 				
 		//Notas Fiscais Período
@@ -183,14 +183,14 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			
 			String COD_MOD  = nf.getlbr_NFModel().isEmpty() ? "01" : nf.getlbr_NFModel();
 			String IND_EMIT = nf.islbr_IsOwnDocument() ? "0" : "1"; //0 = Própria, 1 = Terceiros
-			String nfReg    = EFDUtil_PC.getNFHeaderReg(COD_MOD); //Cabeçalho da NFe
+			String nfReg    = EFDUtil_Contrib.getNFHeaderReg(COD_MOD); //Cabeçalho da NFe
 			
 			if (!(nfReg.startsWith("C") || nfReg.startsWith("D"))){
 				continue; //NAO PERTENCE AOS BLOCOS C OU D
 			}
 			
 			//Cadastro de Parceiros de Negócios
-			R0150 r0150 = EFDUtil_PC.createR0150(nf);
+			R0150 r0150 = EFDUtil_Contrib.createR0150(nf);
 			if (r0150 != null){
 				if (_R0150.contains(r0150))
 					r0150.subtractCounter();
@@ -210,14 +210,14 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			for (MLBRNotaFiscalLine nfLine : nfLines){
 				
 				//UDM
-				R0190 r0190 = EFDUtil_PC.createR0190(nfLine);
+				R0190 r0190 = EFDUtil_Contrib.createR0190(nfLine);
 				if (_R0190.contains(r0190))
 					r0190.subtractCounter();
 				else
 					_R0190.add(r0190);
 				
 				//PRODUTO
-				R0200 r0200 = EFDUtil_PC.createR0200(nfLine);
+				R0200 r0200 = EFDUtil_Contrib.createR0200(nfLine);
 				if (_R0200.contains(r0200))
 					r0200.subtractCounter();
 				else
@@ -235,7 +235,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		} //loop Nota Fiscal
 		
 		//BLOCO C: NF Inutilizada
-		List<RC100> listRC100 = EFDUtil_PC.createRC100(p_C_Period_ID);
+		List<RC100> listRC100 = EFDUtil_Contrib.createRC100(p_C_Period_ID);
 		for (RC100 rc100 : listRC100){
 			_RC100.put(rc100.hashCode(), rc100);
 		}
@@ -280,7 +280,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			}
 			
 			if (hasProduct){
-				RC100 rc100 = EFDUtil_PC.createRC100(nf, COD_PART, COD_MOD, IND_EMIT);
+				RC100 rc100 = EFDUtil_Contrib.createRC100(nf, COD_PART, COD_MOD, IND_EMIT);
 				if (_RC100.containsKey(rc100.hashCode())){
 					RC100 oldRC100 = _RC100.get(rc100.hashCode());
 					rc100.addValues(oldRC100);
@@ -292,7 +292,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			}
 			
 			if (hasService){
-				RA100 ra100 = EFDUtil_PC.createRA100(nf, COD_PART, IND_EMIT);
+				RA100 ra100 = EFDUtil_Contrib.createRA100(nf, COD_PART, IND_EMIT);
 				if (_RA100.containsKey(ra100.hashCode())){
 					RA100 oldRA100 = _RA100.get(ra100.hashCode());
 					ra100.addValues(oldRA100);
@@ -310,7 +310,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		//REGISTROS C500
 		if (nfReg.equals("C500")){
 				
-			RC500 rc500 = EFDUtil_PC.createRC500(nf, COD_PART, COD_MOD);
+			RC500 rc500 = EFDUtil_Contrib.createRC500(nf, COD_PART, COD_MOD);
 			if (rc500 != null){
 				if (_RC500.containsKey(rc500.hashCode())){
 					RC500 oldRC500 = _RC500.get(rc500.hashCode());
@@ -327,7 +327,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		
 		//REGISTROS D100
 		if (nfReg.equals("D100")){
-			RD100 rd100 = EFDUtil_PC.createRD100(nf, COD_PART, COD_MOD, IND_EMIT);
+			RD100 rd100 = EFDUtil_Contrib.createRD100(nf, COD_PART, COD_MOD, IND_EMIT);
 			if (rd100 != null){
 				if (_RD100.containsKey(rd100.hashCode())){
 					RD100 oldRD100 = _RD100.get(rd100.hashCode());
@@ -344,7 +344,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			
 		//REGISTROS D500
 		if (nfReg.equals("D500")){
-			RD500 rd500 = EFDUtil_PC.createRD500(nf, COD_PART, COD_MOD, IND_EMIT);
+			RD500 rd500 = EFDUtil_Contrib.createRD500(nf, COD_PART, COD_MOD, IND_EMIT);
 			if (rd500 != null){
 				if (_RD500.containsKey(rd500.hashCode())){
 					RD500 oldRD500 = _RD500.get(rd500.hashCode());
@@ -382,7 +382,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			
 				int line = setRA170.size() + 1;
 				
-				RA170 ra170 = EFDUtil_PC.createRA170(nfLine, COD_ITEM, line);
+				RA170 ra170 = EFDUtil_Contrib.createRA170(nfLine, COD_ITEM, line);
 				setRA170.add(ra170);
 				_RA170.put(fiscalHeader.hashCode(), setRA170);
 				//FIM A170
@@ -398,7 +398,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 					return;
 				
 				//INFORMACOES DE IMPORTACAO
-				RC120 rc120 = EFDUtil_PC.createRC120(nfLine);
+				RC120 rc120 = EFDUtil_Contrib.createRC120(nfLine);
 				if (rc120 != null){
 					
 					ArrayList<RC120> listRC120 = _RC120.get(fiscalHeader.hashCode());
@@ -427,7 +427,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			
 				int line = setRC170.size() + 1;
 								
-				RC170 rc170 = EFDUtil_PC.createRC170(nfLine, COD_ITEM, TIPO_ITEM, UNID, line);
+				RC170 rc170 = EFDUtil_Contrib.createRC170(nfLine, COD_ITEM, TIPO_ITEM, UNID, line);
 				setRC170.add(rc170);
 				_RC170.put(fiscalHeader.hashCode(), setRC170);
 				//FIM C170
@@ -444,7 +444,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 				if (setRC501 == null)
 					setRC501 = new LinkedHashSet<RC501>();
 				
-				RC501 rc501 = EFDUtil_PC.createRC501(nfLine);
+				RC501 rc501 = EFDUtil_Contrib.createRC501(nfLine);
 				
 				if (setRC501.contains(rc501)){
 					Iterator<RC501> values = setRC501.iterator();
@@ -464,7 +464,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 				if (setRC505 == null)
 					setRC505 = new LinkedHashSet<RC505>();
 				
-				RC505 rc505 = EFDUtil_PC.createRC505(nfLine);
+				RC505 rc505 = EFDUtil_Contrib.createRC505(nfLine);
 				
 				if (setRC505.contains(rc505)){
 					Iterator<RC505> values = setRC505.iterator();
@@ -492,7 +492,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 				if (setRD101 == null)
 					setRD101 = new LinkedHashSet<RD101>();
 					
-				RD101 rd101 = EFDUtil_PC.createRD101(nfLine);
+				RD101 rd101 = EFDUtil_Contrib.createRD101(nfLine);
 					
 				if (setRD101.contains(rd101)){
 					Iterator<RD101> values = setRD101.iterator();
@@ -512,7 +512,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 				if (setRD105 == null)
 					setRD105 = new LinkedHashSet<RD105>();
 					
-				RD105 rd105 = EFDUtil_PC.createRD105(nfLine);
+				RD105 rd105 = EFDUtil_Contrib.createRD105(nfLine);
 					
 				if (setRD105.contains(rd105)){
 					Iterator<RD105> values = setRD105.iterator();
@@ -540,7 +540,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 				if (setRD501 == null)
 					setRD501 = new LinkedHashSet<RD501>();
 					
-				RD501 rd501 = EFDUtil_PC.createRD501(nfLine);
+				RD501 rd501 = EFDUtil_Contrib.createRD501(nfLine);
 					
 				if (setRD501.contains(rd501)){
 					Iterator<RD501> values = setRD501.iterator();
@@ -560,7 +560,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 				if (setRD505 == null)
 					setRD505 = new LinkedHashSet<RD505>();
 					
-				RD505 rd505 = EFDUtil_PC.createRD505(nfLine);
+				RD505 rd505 = EFDUtil_Contrib.createRD505(nfLine);
 					
 				if (setRD505.contains(rd505)){
 					Iterator<RD505> values = setRD505.iterator();
@@ -587,16 +587,16 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		StringBuilder BLOCO0 = new StringBuilder("");
 		
 		//MONTA BLOCO 0
-		BLOCO0.append(EFDUtil_PC.createR0000(dateFrom,dateTo));
+		BLOCO0.append(EFDUtil_Contrib.createR0000(dateFrom,dateTo));
 		BLOCO0.append(new R0001(count > 0));
 		
-		R0100 r0100 = EFDUtil_PC.createR0100(); //CONTADOR
+		R0100 r0100 = EFDUtil_Contrib.createR0100(); //CONTADOR
 		if (r0100 != null)
 			BLOCO0.append(r0100);
 		
-		BLOCO0.append(EFDUtil_PC.createR0110());
-		BLOCO0.append(EFDUtil_PC.createR0111(_RA170,_RC170));
-		BLOCO0.append(EFDUtil_PC.createR0140());
+		BLOCO0.append(EFDUtil_Contrib.createR0110());
+		BLOCO0.append(EFDUtil_Contrib.createR0111(_RA170,_RC170));
+		BLOCO0.append(EFDUtil_Contrib.createR0140());
 		
 		for (R0150 r0150 : _R0150){ //PARCEIROS
 			BLOCO0.append(r0150);
@@ -624,7 +624,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		BLOCOA.append(new RA001(hasA));
 		
 		if (hasA)
-			BLOCOA.append(EFDUtil_PC.createRA010());
+			BLOCOA.append(EFDUtil_Contrib.createRA010());
 		
 		RA100[] arrayRA100 = new RA100[_RA100.size()];
 		_RA100.values().toArray(arrayRA100);
@@ -660,7 +660,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		BLOCOC.append(new RC001(hasC));
 		
 		if (hasC) 
-			BLOCOC.append(EFDUtil_PC.createRC010());
+			BLOCOC.append(EFDUtil_Contrib.createRC010());
 		
 		RC100[] arrayRC100 = new RC100[_RC100.size()];
 		_RC100.values().toArray(arrayRC100);
@@ -730,7 +730,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		BLOCOD.append(new RD001(hasD));
 		
 		if (hasD)
-			BLOCOD.append(EFDUtil_PC.createRD010());
+			BLOCOD.append(EFDUtil_Contrib.createRD010());
 		
 		RD100[] arrayRD100 = new RD100[_RD100.size()];
 		_RD100.values().toArray(arrayRD100);
@@ -839,7 +839,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 		R9990 r9990 = new R9990();
 		R9999 r9999 = new R9999();
 		
-		R9900[] contRegistros = EFDUtil_PC.createR9900();
+		R9900[] contRegistros = EFDUtil_Contrib.createR9900();
 		Arrays.sort(contRegistros);
 		for(R9900 registro : contRegistros){
 			BLOCO9.append(registro);
