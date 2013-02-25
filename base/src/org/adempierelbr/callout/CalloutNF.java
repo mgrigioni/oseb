@@ -21,6 +21,7 @@ import java.util.logging.Level;
 
 import org.adempierelbr.model.MLBRCFOP;
 import org.adempierelbr.model.MLBRNCM;
+import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
 import org.compiere.model.CalloutEngine;
@@ -101,6 +102,34 @@ public class CalloutNF extends CalloutEngine
 		
 		return "";
 	}	// setNCM
+	
+	/**
+	 *  setManufacturer
+	 *
+	 *  @param ctx      Context
+	 *  @param WindowNo current Window No
+	 *  @param mTab     Model Tab
+	 *  @param mField   Model Field
+	 *  @param value    The new value
+	 *  @return Error message or ""
+	 *  
+	 *  Table - LBR_NFDI / Column Type
+	 * 
+	 */
+	public String setManufacturer (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+	{
+		
+		Integer LBR_NotaFiscal_ID = (Integer)mTab.getValue("LBR_NotaFiscal_ID");
+		if (LBR_NotaFiscal_ID == null || LBR_NotaFiscal_ID.intValue() == 0)
+			return "";
+		
+		MLBRNotaFiscal nf = new MLBRNotaFiscal(ctx,LBR_NotaFiscal_ID,null);
+		
+		mTab.setValue("Manufacturer", nf.getBPName());
+		mTab.setValue("lbr_CodExportador", nf.getC_BPartner().getValue());
+		
+		return "";
+	}	// setManufacturer
 	
 	/**
 	 *  Aviso para cancelamento após 24h

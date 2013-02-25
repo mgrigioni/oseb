@@ -255,6 +255,16 @@ public abstract class AdempiereLBR{
 		
 		return (qtyOnHand.abs()).subtract(movementQty.abs());
 	}
+	
+	public static int getDefaultPaymentTerm(Properties ctx, String trx){
+		
+		String sql = "SELECT MAX(C_PaymentTerm_ID) " +
+				     "FROM C_PaymentTerm " +
+				     "WHERE IsDefault='Y' AND AD_Client_ID = ?";
+		
+		int C_PaymentTerm_ID = DB.getSQLValue(trx, sql, Env.getAD_Client_ID(ctx));
+		return C_PaymentTerm_ID;
+	}
 
 	public static int getARReceipt(){
 
