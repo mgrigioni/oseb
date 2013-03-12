@@ -27,6 +27,7 @@ public class RH005 extends RegSped
 {
 	private Timestamp DT_INV;
 	private BigDecimal VL_INV;
+	private final String MOT_INV="01"; //01 - No final no período
 
 	/**
 	 * Constructor
@@ -51,6 +52,7 @@ public class RH005 extends RegSped
 	               (PIPE).append(REG)
 	        .append(PIPE).append(TextUtil.timeToString(DT_INV, "ddMMyyyy"))
 	        .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(VL_INV), 255))
+	        .append(PIPE).append(MOT_INV)
 	        .append(PIPE).append(EOL);
 	       
 		return format.toString();

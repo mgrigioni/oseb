@@ -398,6 +398,11 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			return DocAction.STATUS_Invalid;
 		}
 				
+		if (getlbr_NFModel() == null || getlbr_NFModel().isEmpty()){
+			m_processMsg = "Modelo da Nota Fiscal não informado";
+			return DocAction.STATUS_Invalid;
+		}
+		
 		//Validação Tipo de Nota Fiscal (terceiros)
 		if (!islbr_IsOwnDocument()){
 			if (getlbr_NFeID() == null || getlbr_NFeID().isEmpty()){
