@@ -115,10 +115,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			int ii = DB.getSQLValue (get_TrxName(), sql, getLBR_NotaFiscal_ID());
 			setLine (ii);
 		}
-		
-		//Valiação Situação Tributária
-		validateCST();
-		
+			
 		return true;
 	} //beforeSave
 	
@@ -177,6 +174,9 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		//Valores
 		setlbr_ServiceTaxes();
 		setAmounts(iLine);
+		
+		//Valiação Situação Tributária
+		validateCST();
 
 		save(get_TrxName());
 	} //setInvoiceLine
