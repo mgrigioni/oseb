@@ -248,12 +248,12 @@ public abstract class AdempiereLBR{
 				     "AND p.M_Product_ID=? AND l.M_Locator_ID=?";
 		
 		BigDecimal movementQty = DB.getSQLValueBD(trx, sql, new Object[]{movementDate, M_Product_ID,M_Locator_ID});
-		if (movementQty == null)
+		if (movementQty == null || movementQty.signum() == -1) //MAIS SAIDA QUE ENTRADA, ENTAO ZERA PARA NAO ACHAR QUE EXISTE SALDO
 			movementQty = Env.ZERO;
 		
 		BigDecimal qtyOnHand = getQtyOnHand(M_Product_ID,M_Locator_ID,trx);
 		
-		return (qtyOnHand.abs()).subtract(movementQty.abs());
+		return qtyOnHand.subtract(movementQty);
 	}
 	
 	public static int getDefaultPaymentTerm(Properties ctx, String trx){
