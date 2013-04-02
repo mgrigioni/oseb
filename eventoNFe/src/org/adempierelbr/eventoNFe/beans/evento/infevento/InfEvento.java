@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 
 import org.adempierelbr.annotation.Validate;
 import org.adempierelbr.annotation.XMLFieldProperties;
+import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.I_DetEvento;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.model.MSysConfig;
 import org.compiere.util.Env;
@@ -28,18 +29,23 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  *  Grupo de informações do registro do Evento
  * 
- *  @contributor Mario Grigioni
- *  	<li>Alteração para classe abstrata, e extender para eventos específicos</li>
- * 
  * 	@author Ricardo Santana (Kenos, www.kenos.com.br)
  *	@version $Id: InfEvento.java, v1.0 2012/05/12 16:44:58 PM, ralexsander Exp $
  */
 @XStreamAlias ("infEvento")
-public abstract class InfEvento
+public class InfEvento
 {	
 	/**		Error Msg	**/
 	@XStreamOmitField
 	private String errorMsg;
+	
+	/**
+	 * Constructor
+	 * @param tpEvento
+	 */
+	public InfEvento(String tpEvento){
+		setTpEvento(tpEvento);
+	}
 	
 	@XStreamAlias ("Id")
 	@XStreamAsAttribute
@@ -65,13 +71,16 @@ public abstract class InfEvento
 	private String dhEvento;
 	
 	@XMLFieldProperties	(minSize=6, maxSize=6, id = "HP14")
-	protected String tpEvento;
+	private String tpEvento;
 	
 	@XMLFieldProperties	(minSize=1, maxSize=2, id = "HP15")
 	private String nSeqEvento;
 	
 	@XMLFieldProperties	(minSize=1, maxSize=4, id = "HP16")
 	private String verEvento;
+	
+	@XMLFieldProperties	(needsValidation=true, id = "HP17")
+	private I_DetEvento detEvento;
 	
 	public String getId()
 	{
@@ -148,6 +157,10 @@ public abstract class InfEvento
 		return tpEvento;
 	}	//	getTpEvento
 	
+	private void setTpEvento (String tpEvento){
+		this.tpEvento = tpEvento;
+	} // setTpEvento
+	
 	public String getNSeqEvento()
 	{
 		return nSeqEvento;
@@ -167,6 +180,16 @@ public abstract class InfEvento
 	{
 		this.verEvento = verEvento;
 	}	//	setVerEvento
+	
+	public  I_DetEvento getDetEvento()
+	{
+		return detEvento;
+	}	//	getDetEvento
+
+	public void setDetEvento(I_DetEvento detEvento)
+	{
+		this.detEvento = detEvento;
+	}	//	setDetEvento
 
 	/**
 	 * 		Verifica se as informações são válidas

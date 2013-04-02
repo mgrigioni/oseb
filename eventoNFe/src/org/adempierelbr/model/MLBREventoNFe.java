@@ -30,19 +30,15 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
-import org.adempierelbr.eventoNFe.beans.EnvCCe;
-import org.adempierelbr.eventoNFe.beans.EnvCancelamento;
 import org.adempierelbr.eventoNFe.beans.EnvEvento;
-import org.adempierelbr.eventoNFe.beans.ProcEventoCCe;
-import org.adempierelbr.eventoNFe.beans.ProcEventoCancelamento;
+import org.adempierelbr.eventoNFe.beans.ProcEvento;
 import org.adempierelbr.eventoNFe.beans.RetEnvEvento;
 import org.adempierelbr.eventoNFe.beans.Signature;
-import org.adempierelbr.eventoNFe.beans.evento.EventoCCe;
-import org.adempierelbr.eventoNFe.beans.evento.EventoCancelamento;
-import org.adempierelbr.eventoNFe.beans.evento.infevento.InfCCe;
-import org.adempierelbr.eventoNFe.beans.evento.infevento.InfCancelamento;
+import org.adempierelbr.eventoNFe.beans.evento.Evento;
+import org.adempierelbr.eventoNFe.beans.evento.infevento.InfEvento;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.DetCCe;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.DetCancelamento;
+import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.I_DetEvento;
 import org.adempierelbr.eventoNFe.beans.retevento.RetEvento;
 import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
@@ -162,27 +158,22 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 			
 			//	Arquivo de Distribuição
 			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+			xstream.aliasSystemAttribute(null, "class");
 			xstream.autodetectAnnotations(true);
 			StringWriter sw = new StringWriter ();
-			
 			String result     = null;
-			Object procEvento = null;
+			
+			ProcEvento procEvento = new ProcEvento();
+			procEvento.setVersao (NFeUtil.VERSAO_CCE);
+			procEvento.setEvento(evento.getEvento());
+			procEvento.setRetEvento(retEvent.getRetEvento());
+			xstream.marshal (procEvento,  new CompactWriter (sw));
 			
 			// Valida o resultado do SEFAZ, gerando um LOG, mas não impede o processo
-			if (evento instanceof EnvCCe){
-				procEvento = new ProcEventoCCe();
-				((ProcEventoCCe)procEvento).setVersao (NFeUtil.VERSAO_CCE);
-				((ProcEventoCCe)procEvento).setEvento(((EnvCCe)evento).getEvento());
-				((ProcEventoCCe)procEvento).setRetEvento(retEvent.getRetEvento());
-				xstream.marshal ((ProcEventoCCe)procEvento,  new CompactWriter (sw));
+			if (evento.getEvento().getInfEvento().getTpEvento().equals(X_LBR_EventoNFe.EVENTTYPE_CartaDeCorreção)){
 				result = ValidaXML.validaProcCCeNFe(sw.toString());
 			} //Carta de Correção
-			else if (evento instanceof EnvCancelamento){
-				procEvento = new ProcEventoCancelamento();
-				((ProcEventoCancelamento)procEvento).setVersao (NFeUtil.VERSAO_CCE);
-				((ProcEventoCancelamento)procEvento).setEvento(((EnvCancelamento)evento).getEvento());
-				((ProcEventoCancelamento)procEvento).setRetEvento(retEvent.getRetEvento());
-				xstream.marshal ((ProcEventoCancelamento)procEvento,  new CompactWriter (sw));
+			else if (evento.getEvento().getInfEvento().getTpEvento().equals(X_LBR_EventoNFe.EVENTTYPE_Cancelamento)){
 				result = ValidaXML.validaProcEventoCancNFe(sw.toString());
 			
 				//Processa NF
@@ -206,10 +197,10 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		
 	} //processEvent
 	
-	private EnvCCe createEnvCCe(MLBRNotaFiscal nf, MOrgInfo oi) throws Exception{
+	private EnvEvento createEnvCCe(MLBRNotaFiscal nf, MOrgInfo oi) throws Exception{
 		
 		// Classes usadas para annotation
-		Class<?>[] classForAnnotation = new Class[]{DetCCe.class, InfCCe.class,EventoCCe.class, EnvCCe.class, 
+		Class<?>[] classForAnnotation = new Class[]{DetCCe.class, InfEvento.class,Evento.class, EnvEvento.class, 
 				Signature.CanonicalizationMethod.class, Signature.DigestMethod.class, 
 				Signature.KeyInfo.class, Signature.Reference.class, Signature.SignatureMethod.class, Signature.SignedInfo.class, 
 				Signature.Transform.class, Signature.Transforms.class, Signature.X509Data.class};
@@ -222,7 +213,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		det.setXCorrecao(RemoverAcentos.remover(getDescription()));
 		
 		//	Informações do Evento da Carta de Correção
-		InfCCe cce = new InfCCe ();
+		InfEvento cce = new InfEvento (X_LBR_EventoNFe.EVENTTYPE_CartaDeCorreção);
 		cce.setCOrgao(BPartnerUtil.getRegionCode(oiW.getC_Location().getC_Region_ID()));
 		cce.setTpAmb(oiW.getlbr_NFeEnv());
 		cce.setCNPJ(oiW.getlbr_CNPJ());
@@ -234,12 +225,12 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		cce.setId();
 		
 		//	Dados do Evento da Carta de Correção
-		EventoCCe evento = new EventoCCe ();
+		Evento evento = new Evento ();
 		evento.setVersao(NFeUtil.VERSAO_CCE);
 		evento.setInfEvento(cce);
 		
 		//	Dados do Envio
-		EnvCCe envEvento = new EnvCCe();
+		EnvEvento envEvento = new EnvEvento();
 		envEvento.setVersao(NFeUtil.VERSAO_CCE);
 		envEvento.setIdLote(getDocumentNo());
 		
@@ -250,6 +241,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		}
 		
 		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.aliasSystemAttribute(null, "class");
 		xstream.autodetectAnnotations(true);
 		
 		StringWriter sw = new StringWriter ();
@@ -263,19 +255,20 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 			
 		//	Lê o arquivo assinado
 		xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.alias("detEvento", I_DetEvento.class, DetCCe.class);
 		xstream.processAnnotations (classForAnnotation);
-		evento = (EventoCCe) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
+		evento = (Evento) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
 			
 		//	Popula o evio do Evento com o XML assinado
 		envEvento.setEvento(evento);
 		return envEvento;
 	} //createEnvCCe
 	
-	private EnvCancelamento createEnvCancelamento(MLBRNotaFiscal nf, MOrgInfo oi) throws Exception{
+	private EnvEvento createEnvCancelamento(MLBRNotaFiscal nf, MOrgInfo oi) throws Exception{
 		
 		// Classes usadas para annotation
-		Class<?>[] classForAnnotation = new Class[]{DetCancelamento.class, InfCancelamento.class,EventoCancelamento.class, 
-				EnvCancelamento.class, Signature.CanonicalizationMethod.class, Signature.DigestMethod.class, 
+		Class<?>[] classForAnnotation = new Class[]{DetCancelamento.class, InfEvento.class, Evento.class, 
+				EnvEvento.class, Signature.CanonicalizationMethod.class, Signature.DigestMethod.class, 
 				Signature.KeyInfo.class, Signature.Reference.class, Signature.SignatureMethod.class, Signature.SignedInfo.class, 
 				Signature.Transform.class, Signature.Transforms.class, Signature.X509Data.class};
 		
@@ -287,8 +280,8 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		det.setNProt(nf.getlbr_NFeProt());
 		det.setXJust(RemoverAcentos.remover(getDescription()));
 		
-		//	Informações do Evento da Carta de Correção
-		InfCancelamento infCanc = new InfCancelamento ();
+		//	Informações do Evento de Cancelamento
+		InfEvento infCanc = new InfEvento (X_LBR_EventoNFe.EVENTTYPE_Cancelamento);
 		infCanc.setCOrgao(BPartnerUtil.getRegionCode(oiW.getC_Location().getC_Region_ID()));
 		infCanc.setTpAmb(oiW.getlbr_NFeEnv());
 		infCanc.setCNPJ(oiW.getlbr_CNPJ());
@@ -300,12 +293,12 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		infCanc.setId();
 		
 		//	Dados do Evento da Carta de Correção
-		EventoCancelamento evento = new EventoCancelamento ();
+		Evento evento = new Evento ();
 		evento.setVersao(NFeUtil.VERSAO_EVENTO_CANC);
 		evento.setInfEvento(infCanc);
 		
 		//	Dados do Envio
-		EnvCancelamento envEvento = new EnvCancelamento();
+		EnvEvento envEvento = new EnvEvento();
 		envEvento.setVersao(NFeUtil.VERSAO_EVENTO_CANC);
 		envEvento.setIdLote(getDocumentNo());
 		
@@ -316,6 +309,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		}
 		
 		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.aliasSystemAttribute(null, "class");
 		xstream.autodetectAnnotations(true);
 		
 		StringWriter sw = new StringWriter ();
@@ -329,8 +323,9 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 			
 		//	Lê o arquivo assinado
 		xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.alias("detEvento", I_DetEvento.class, DetCancelamento.class);
 		xstream.processAnnotations (classForAnnotation);
-		evento = (EventoCancelamento) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
+		evento = (Evento) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
 			
 		//	Popula o evio do Evento com o XML assinado
 		envEvento.setEvento(evento);
@@ -486,10 +481,11 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 			StringBuilder xml = new StringBuilder();
 			StringWriter sw   = new StringWriter();
 			XStream xstream   = new XStream (new DomDriver(TextUtil.UTF8));
+			xstream.aliasSystemAttribute(null, "class");
 			xstream.autodetectAnnotations(true);
 			
 			if (getEventType().equals(X_LBR_EventoNFe.EVENTTYPE_CartaDeCorreção)){
-				EnvCCe envCCe = createEnvCCe(nf,oi);
+				EnvEvento envCCe = createEnvCCe(nf,oi);
 				xstream.marshal (envCCe,  new CompactWriter (sw));
 				xml =  new StringBuilder (sw.toString());
 				
@@ -502,7 +498,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 				envEvento = envCCe;
 			}
 			else if (getEventType().equals(X_LBR_EventoNFe.EVENTTYPE_Cancelamento)){
-				EnvCancelamento envCancelamento = createEnvCancelamento(nf,oi);
+				EnvEvento envCancelamento = createEnvCancelamento(nf,oi);
 				xstream.marshal (envCancelamento,  new CompactWriter (sw));
 				xml =  new StringBuilder (sw.toString());
 				

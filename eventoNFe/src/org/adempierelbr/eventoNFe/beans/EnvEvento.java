@@ -1,6 +1,6 @@
 /******************************************************************************
- * Product: OSeB http://code.google.com/p/oseb                                *
- * Copyright (C) 2013 Mario Grigioni                                          *
+ * Copyright (C) 2011 Kenos Assessoria e Consultoria de Sistemas Ltda         *
+ * Copyright (C) 2011 Ricardo Santana                                         *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -14,18 +14,19 @@
 package org.adempierelbr.eventoNFe.beans;
 
 import org.adempierelbr.annotation.XMLFieldProperties;
+import org.adempierelbr.eventoNFe.beans.evento.Evento;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- * 	Envio de Evento
+ * 	EnvEvento
  * 
- * 	@author Mario Grigioni
- *	@version $Id: EnvCancelamento.java, v1.0 01/04/2013 15:09, mgrigioni Exp $
+ * 	@author Ricardo Santana (Kenos, www.kenos.com.br)
+ * 	@version $Id: EnvEvento.java, v1.0 2012/05/14 1:22:43 AM, ralexsander Exp $
  */
 @XStreamAlias ("envEvento")
-public abstract class EnvEvento
+public class EnvEvento
 {
 	@XStreamAsAttribute
 	@XMLFieldProperties	(id = "HP02")
@@ -37,6 +38,9 @@ public abstract class EnvEvento
 	@XMLFieldProperties	(minSize=1, maxSize=15, id = "HP03")
 	private String idLote;
 	
+	@XMLFieldProperties	(needsValidation=true, id = "HP04")
+	private Evento evento;
+		
 	public String getVersao()
 	{
 		return versao;
@@ -55,6 +59,16 @@ public abstract class EnvEvento
 	public void setIdLote(String idLote)
 	{
 		this.idLote = idLote;
+	}
+	
+	public Evento getEvento()
+	{
+		return evento;
+	}
+
+	public void setEvento(Evento evento)
+	{
+		this.evento = evento;
 	}
 
 }	//	EnvEvento
