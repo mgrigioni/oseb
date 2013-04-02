@@ -16,6 +16,7 @@ package org.adempierelbr.eventoNFe.beans.evento.infevento.detevento;
 import org.adempierelbr.annotation.XMLFieldProperties;
 import org.adempierelbr.model.X_LBR_EventoNFe;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
@@ -24,7 +25,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * 	@author Mario Grigioni
  *	@version $Id: DetManifesto.java, v1.0 01/04/2013 11:06, mgrigioni Exp $
  */
-public class DetManifesto
+@XStreamAlias ("detEvento")
+public class DetManifesto implements I_DetEvento
 {
 	public DetManifesto(String tpEvento){
 		setDescEvento(tpEvento);

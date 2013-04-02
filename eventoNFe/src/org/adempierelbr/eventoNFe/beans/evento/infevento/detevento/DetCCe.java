@@ -15,6 +15,7 @@ package org.adempierelbr.eventoNFe.beans.evento.infevento.detevento;
 
 import org.adempierelbr.annotation.XMLFieldProperties;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
@@ -23,7 +24,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * 	@author Ricardo Santana (Kenos, www.kenos.com.br)
  *	@version $Id: DetCCe.java, v1.0 2012/05/12 16:44:58 PM, ralexsander Exp $
  */
-public class DetCCe
+@XStreamAlias ("detEvento")
+public class DetCCe implements I_DetEvento
 {
 	@XStreamAsAttribute
 	@XMLFieldProperties	(id = "HP18")

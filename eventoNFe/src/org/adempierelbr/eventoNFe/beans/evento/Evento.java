@@ -11,41 +11,55 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.eventoNFe.beans.evento.infevento;
+package org.adempierelbr.eventoNFe.beans.evento;
 
 import org.adempierelbr.annotation.XMLFieldProperties;
-import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.DetCCe;
-import org.adempierelbr.model.X_LBR_EventoNFe;
+import org.adempierelbr.eventoNFe.beans.Signature;
+import org.adempierelbr.eventoNFe.beans.evento.infevento.InfEvento;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- * 	Grupo de informações do registro do Evento
- * 
- *  @contributor Mario Grigioni
- *  	<li>Extensão da classe abstrata InfEvento</li>
+ * 	Evento
  * 
  * 	@author Ricardo Santana (Kenos, www.kenos.com.br)
- *	@version $Id: InfCCe.java, v1.0 2012/05/12 16:44:58 PM, ralexsander Exp $
+ *	@version $Id: EventoCCe.java, v1.0 2012/05/14 1:21:57 AM, ralexsander Exp $
  */
-@XStreamAlias ("infEvento")
-public class InfCCe extends InfEvento {	
+@XStreamAlias ("evento")
+public class Evento
+{
+	@XStreamAsAttribute
+	@XMLFieldProperties	(id = "HP05")
+	private String versao;
 	
-	public InfCCe(){
-		this.tpEvento = X_LBR_EventoNFe.EVENTTYPE_CartaDeCorreção;
-	}
+	@XStreamAsAttribute
+	private final String xmlns="http://www.portalfiscal.inf.br/nfe";
 	
-	@XMLFieldProperties	(needsValidation=true, id = "HP17")
-	private DetCCe detEvento;
-
-	public DetCCe getDetEvento()
+	@XMLFieldProperties	(needsValidation=true, id = "HP06")
+	private InfEvento infEvento;
+	
+	@XStreamAlias ("Signature")
+	private Signature signature;
+	
+	public String getVersao()
 	{
-		return detEvento;
-	}	//	getDetEvento
+		return versao;
+	}	//	getVersao
 
-	public void setDetEvento(DetCCe detEvento)
+	public void setVersao(String versao)
 	{
-		this.detEvento = detEvento;
-	}	//	setDetEvento
+		this.versao = versao;
+	}	//	setVersao
 
-}	//	InfCCe
+	public InfEvento getInfEvento()
+	{
+		return infEvento;
+	}	//	getInfEvento
+
+	public void setInfEvento(InfEvento infEvento)
+	{
+		this.infEvento = infEvento;
+	}	//	setInfEvento
+	
+}	//	Evento

@@ -15,6 +15,7 @@ package org.adempierelbr.eventoNFe.beans.evento.infevento.detevento;
 
 import org.adempierelbr.annotation.XMLFieldProperties;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
@@ -23,7 +24,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * 	@author Mario Grigioni
  *	@version $Id: DetCancelamento.java, v1.0 01/04/2013 10:35, mgrigioni Exp $
  */
-public class DetCancelamento
+@XStreamAlias ("detEvento")
+public class DetCancelamento implements I_DetEvento
 {
 	@XStreamAsAttribute
 	@XMLFieldProperties	(id = "HP18")

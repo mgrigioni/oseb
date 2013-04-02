@@ -1,6 +1,6 @@
 /******************************************************************************
- * Product: OSeB http://code.google.com/p/oseb                                *
- * Copyright (C) 2013 Mario Grigioni                                          *
+ * Copyright (C) 2011 Kenos Assessoria e Consultoria de Sistemas Ltda         *
+ * Copyright (C) 2011 Ricardo Santana                                         *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -11,55 +11,55 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,    *
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *
  *****************************************************************************/
-package org.adempierelbr.eventoNFe.beans.evento;
+package org.adempierelbr.eventoNFe.beans;
 
-import org.adempierelbr.annotation.XMLFieldProperties;
-import org.adempierelbr.eventoNFe.beans.Signature;
-import org.adempierelbr.eventoNFe.beans.evento.infevento.InfCancelamento;
+import org.adempierelbr.eventoNFe.beans.evento.Evento;
+import org.adempierelbr.eventoNFe.beans.retevento.RetEvento;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- * 	Evento Cancelamento
+ * 		4.8.10 Armazenamento e Disponibilização da Carta de Correção
  * 
- * 	@author Mario Grigioni
- *	@version $Id: EventoCancelamento.java, v1.0 01/04/2013 10:56, mgrigioni Exp $
+ * 	@author Ricardo Santana (Kenos, www.kenos.com.br)
+ *	@version $Id: ProcEvento.java, v1.0 2012/05/21 13:59:56 PM, ralexsander Exp $
  */
-@XStreamAlias ("evento")
-public class EventoCancelamento
+@XStreamAlias ("procEventoNFe")
+public class ProcEvento
 {
 	@XStreamAsAttribute
-	@XMLFieldProperties	(id = "HP05")
 	private String versao;
 	
 	@XStreamAsAttribute
-	private final String xmlns="http://www.portalfiscal.inf.br/nfe";
-		
-	@XMLFieldProperties	(needsValidation=true, id = "HP06")
-	private InfCancelamento infEvento;
+	private String xmlns="http://www.portalfiscal.inf.br/nfe";
 	
-	@XStreamAlias ("Signature")
-	private Signature signature;
+	private Evento evento;
+	private RetEvento retEvento;
 	
 	public String getVersao()
 	{
 		return versao;
 	}	//	getVersao
-
 	public void setVersao(String versao)
 	{
 		this.versao = versao;
 	}	//	setVersao
-
-	public InfCancelamento getInfEvento()
+	public Evento getEvento()
 	{
-		return infEvento;
-	}	//	getInfEvento
-
-	public void setInfEvento(InfCancelamento infEvento)
+		return evento;
+	}	//	getEvento
+	public void setEvento(Evento evento)
 	{
-		this.infEvento = infEvento;
-	}	//	setInfEvento
+		this.evento = evento;
+	}	//	setEvento
+	public RetEvento getRetEvento()
+	{
+		return retEvento;
+	}	//	getRetEvento
+	public void setRetEvento(RetEvento retEvento)
+	{
+		this.retEvento = retEvento;
+	}	//	setRetEvento
 	
-}	//	EventoCancelamento
+}	//	ProcEvento
