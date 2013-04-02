@@ -90,7 +90,7 @@ public class ProcGenerateDistribution extends SvrProcess
 			return attach;
 
 		String status = nf.getlbr_NFeStatus();
-		String FILE_EXT = NFeUtil.EXT_DISTRIBUICAO;
+		String FILE_EXT = NFeUtil.EXT_DIST_NFE;
 		
 		if (!status.equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E)){ //Autorizado o uso da NF-e
 			return attach;

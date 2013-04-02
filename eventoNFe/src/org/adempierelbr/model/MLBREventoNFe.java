@@ -186,7 +186,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 				log.severe ("Erro na validação da resposta: " + result);
 			
 			//	Arquivo de resposta final
-			String xmlFile = TextUtil.generateTmpFile (NFeUtil.XML_HEADER + sw.toString(), infReturn.getId() + NFeUtil.EXT_DISTRIBUICAO);
+			String xmlFile = TextUtil.generateTmpFile (NFeUtil.XML_HEADER + sw.toString(), infReturn.getId() + NFeUtil.EXT_DIST_EVENTO);
 
 			MAttachment attachCCe = createAttachment (true);
 			attachCCe.addEntry(new File (xmlFile));
@@ -248,7 +248,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		xstream.marshal (evento,  new CompactWriter (sw));
 		
 		StringBuilder xml = new StringBuilder (sw.toString());
-		String xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + NFeUtil.EXT_CCE);
+		String xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + NFeUtil.EXT_EVENTO);
 		
 		log.fine ("Assinando XML: " + xml);
 		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
@@ -316,7 +316,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		xstream.marshal (evento,  new CompactWriter (sw));
 		
 		StringBuilder xml = new StringBuilder (sw.toString());
-		String xmlFile = TextUtil.generateTmpFile (xml.toString(), infCanc.getId() + NFeUtil.EXT_CCE);
+		String xmlFile = TextUtil.generateTmpFile (xml.toString(), infCanc.getId() + NFeUtil.EXT_EVENTO);
 		
 		log.fine ("Assinando XML: " + xml);
 		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
