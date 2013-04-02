@@ -92,14 +92,15 @@ public abstract class NFeUtil
 	
 	/** Padrões de Extensão */
 	public static final String EXT_NFE          = "-nfe.xml";
-	public static final String EXT_CCE          = "-cce.xml";
+	public static final String EXT_EVENTO       = "-evento.xml";
 	public static final String EXT_ENV_LOTE     = "-env-lot.xml";
 	public static final String EXT_RECIBO       = "-rec.xml";
 	public static final String EXT_PEDIDO_CANC  = "-ped-can.xml";
 	public static final String EXT_CANCELAMENTO = "-can.xml";
 	public static final String EXT_PEDIDO_INUT  = "-ped-inu.xml";
 	public static final String EXT_INUTILIZACAO = "-inu.xml";
-	public static final String EXT_DISTRIBUICAO = "-dst.xml";
+	public static final String EXT_DIST_NFE     = "-procNFe.xml";
+	public static final String EXT_DIST_EVENTO  = "-procEventoNFe.xml";
 	public static final String EXT_RPS          = "-rps.xml";
 	
 	/** Namespace padrão da NF-e */
@@ -483,7 +484,7 @@ public abstract class NFeUtil
 	    String rodape    = geraRodapDistribuicao(protNFe);
 		//
 		StringBuilder dadosEmXML = new StringBuilder(cabecalho).append(dados).append(rodape);
-		attach = new File(TextUtil.generateTmpFile(dadosEmXML.toString(), nf.getlbr_NFeID() + NFeUtil.EXT_DISTRIBUICAO));
+		attach = new File(TextUtil.generateTmpFile(dadosEmXML.toString(), nf.getlbr_NFeID() + NFeUtil.EXT_DIST_NFE));
 
 		nf.getAttachment(true).delete(true); //Exclui anexo anterior. BUG ADempiere
 

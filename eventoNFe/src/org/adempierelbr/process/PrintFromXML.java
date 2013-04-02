@@ -131,7 +131,9 @@ public class PrintFromXML extends SvrProcess
 		
 		for (MAttachmentEntry entry : entries)
 		{
-			if (entry.getName().endsWith(NFeUtil.EXT_DISTRIBUICAO))
+			if (entry.getName().endsWith(NFeUtil.EXT_DIST_NFE) || 
+			    entry.getName().endsWith(NFeUtil.EXT_DIST_EVENTO) ||
+			    entry.getName().endsWith("-dst.xml")) //OLD VERSION
 			{
 				xml = entry.getInputStream();
 				break;
