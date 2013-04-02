@@ -31,19 +31,14 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
+import org.adempierelbr.eventoNFe.beans.retevento.infevento.InfEvento;
 import org.adempierelbr.nfe.NFeXMLGenerator;
-import org.adempierelbr.nfe.beans.retCancNFe.InfCanc;
-import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
 import org.adempierelbr.process.ProcGenerateRpsXml;
 import org.adempierelbr.util.AdempiereLBR;
-import org.adempierelbr.util.AssinaturaDigital;
 import org.adempierelbr.util.BPartnerUtil;
-import org.adempierelbr.util.NFeEmail;
 import org.adempierelbr.util.NFeUtil;
-import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
-import org.adempierelbr.util.ValidaXML;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.adempierelbr.wrapper.I_W_C_Invoice;
@@ -82,11 +77,7 @@ import org.compiere.util.Msg;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  *  LBR_NotaFiscal Model
@@ -545,7 +536,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		if (isNFe()){ //Executa processo para cancelar NFe junto ao Sefaz
 			try{
-				m_processMsg = voidNFe();
+				m_processMsg = eventoCancNFe();
 			} catch (Exception e){
 				log.warning(e.getLocalizedMessage());
 			}
@@ -917,93 +908,42 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 	} //getNFeStatus
 	
-	/**
-	 * Processo para cancelar NFe
-	 * @return resultado do cancelamento
-	 * @throws Exception
-	 */
-	private String voidNFe() throws Exception {
-
+	private String eventoCancNFe() throws Exception{
+		
 		if (getlbr_MotivoCancel() == null)
 			return "Sem motivo de cancelamento";
 		else if (getlbr_MotivoCancel().length() < 16 || getlbr_MotivoCancel().length() >= 255)
 			return "Tamanho Motivo de cancelamento inválido. Min: 15 letras Max: 254 letras";
 
-		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
-		I_W_AD_OrgInfo oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
-		
-		if (oiW.getlbr_NFeEnv() == null || oiW.getlbr_NFeEnv().isEmpty()){
-			return "Ambiente da NF-e deve ser preenchido.";
-		}
-		
-		//PREPARA AMBIENTE PARA CONSULTA
-		MLBRDigitalCertificate.setCertificate(getCtx(), orgInfo);
-		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.CANCELAMENTO);
-		if (ws == null) {
-			return "Não foi encontrado um endereço WebServices válido.";
-		}
-		
-		try{
-			
-			String nfeCancDadosMsg 	= NFeUtil.geraMsgCancelamento(oiW.getlbr_NFeEnv(), getlbr_NFeID(), 
-					getlbr_NFeProt(), RemoverAcentos.remover(getlbr_MotivoCancel()));
-
-			File attachFile = new File(TextUtil.generateTmpFile(nfeCancDadosMsg, getDocumentNo() + NFeUtil.EXT_PEDIDO_CANC));
-			AssinaturaDigital.Assinar(attachFile.toString(), orgInfo, AssinaturaDigital.DOCTYPE_CANCELAMENTO_NFE);
-			nfeCancDadosMsg = NFeUtil.XMLtoString(attachFile);
-
-			String validation = ValidaXML.validaCancNFe(nfeCancDadosMsg);
-			if (!validation.isEmpty()) {
-	        	return validation;
-			}
-						
-			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader("<nfeDadosMsg>" + nfeCancDadosMsg + "</nfeDadosMsg>"));
-
-			NfeCancelamento2Stub.NfeDadosMsg dadosMsg = NfeCancelamento2Stub.NfeDadosMsg.Factory.parse(dadosXML);
-			NfeCancelamento2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecCancelamento(orgInfo.getC_Location().getC_Region_ID());
-
-			NfeCancelamento2Stub.setAddress(ws);
-			NfeCancelamento2Stub stub = new NfeCancelamento2Stub();
-
-			String respCanc = stub.nfeCancelamentoNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
-			//	Validação resposta
-			validation = ValidaXML.validaRetCancNFe(respCanc);
-			if (!validation.isEmpty())
-				return validation;
-
-			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
-			xstream.processAnnotations(new Class[]{InfCanc.class,RetCancNFe.class});
-			//
-			RetCancNFe retCancNFe = (RetCancNFe)xstream.fromXML (NFeUtil.XML_HEADER + respCanc);
-			InfCanc infCanc    = retCancNFe.getInfCanc();
-
-	        appendNFeDesc("["+infCanc.getDhRecbto().replace('T', ' ')+"] " + infCanc.getxMotivo() + "\n");
-	        setlbr_NFeStatus(infCanc.getcStat());
-	        //
-	        if (infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado) ||
-	        	infCanc.getcStat().equals(MLBRNotaFiscal.LBR_NFESTATUS_151_CancelamentoDeNF_EHomologadoForaDePrazo)) {
-		        setlbr_NFeProt(infCanc.getnProt());
-		        setDateTrx(NFeUtil.stringToTime(infCanc.getDhRecbto()));
-		        
-				//Adiciona arquivo de distribuição - Cancelamento
-		        try {
-					if (!NFeUtil.updateAttach(this, NFeUtil.generateNFeCancFile(nfeCancDadosMsg,retCancNFe)))
-						return Msg.getMsg(Env.getCtx(), "AttachmentNull");
-
-					NFeEmail.sendMail(this,true);
-				} catch (Exception e) {
-					log.warning(e.getLocalizedMessage());
-				}
-
-	        }
-		}
-		catch (Throwable e1){
-			e1.printStackTrace();
-			return e1.getLocalizedMessage();
+		MLBREventoNFe eventoNFe = new MLBREventoNFe(getCtx(),0,get_TrxName());
+		eventoNFe.setEventType(X_LBR_EventoNFe.EVENTTYPE_Cancelamento);
+		eventoNFe.setLBR_NotaFiscal_ID(get_ID());
+		eventoNFe.setDateDoc(new Timestamp(System.currentTimeMillis()));
+		eventoNFe.setDescription(getlbr_MotivoCancel());
+		eventoNFe.save();
+		//	Manually Process Event
+		String status = eventoNFe.completeIt();
+		eventoNFe.setDocStatus(status);
+		eventoNFe.save();
+		if (!X_LBR_EventoNFe.DOCSTATUS_Completed.equals(status)){
+			return eventoNFe.getProcessMsg();
 		}
 		
 		return null;
-	} //voidNFe
+	} //eventoCancNFe
+	
+	public void setIsCancelled(MLBREventoNFe eventoNFe, InfEvento infReturn){
+		setlbr_NFeProt(eventoNFe.getlbr_NFeProt());
+		setDateTrx(eventoNFe.getDateTrx());
+        setlbr_NFeStatus(eventoNFe.getlbr_NFeStatus());
+        appendNFeDesc("["+infReturn.getDhRegEvento().replace('T', ' ')+"] " + infReturn.getxMotivo() + "\n");
+		setIsCancelled(true);
+		setProcessed(true);
+		setDocStatus(X_LBR_NotaFiscal.DOCSTATUS_Voided);
+		setDocAction(X_LBR_NotaFiscal.DOCACTION_None);
+		if (getlbr_MotivoCancel() == null || getlbr_MotivoCancel().trim().isEmpty())
+			setlbr_MotivoCancel(eventoNFe.getDescription());
+	} //setIsCancelled
 	
 	private boolean setSiscomexTax(){
 

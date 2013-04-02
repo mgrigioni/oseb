@@ -19,7 +19,10 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_Persistent;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 
 /** Generated Model for LBR_ProductCategory
  *  @author ADempiereLBR (generated) 
@@ -30,7 +33,7 @@ public class X_LBR_ProductCategory extends PO implements I_LBR_ProductCategory, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130107L;
+	private static final long serialVersionUID = 20130401L;
 
     /** Standard Constructor */
     public X_LBR_ProductCategory (Properties ctx, int LBR_ProductCategory_ID, String trxName)

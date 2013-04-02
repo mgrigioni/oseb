@@ -18,7 +18,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempierelbr.model.MLBREventoNFe;
 import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.model.X_LBR_EventoNFe;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
@@ -48,11 +50,40 @@ public abstract class NFeEmail {
 	/**
 	 * Send Mail
 	 * 
-	 * @param MLBRNotaFiscal
-	 *            nf
+	 * @param MLBRNotaFiscal nf
 	 * @return E-mail enviado
 	 * */
-	public static boolean sendMail(final MLBRNotaFiscal nf, boolean isCancelled) {
+	public static boolean sendMail(final MLBRNotaFiscal nf){
+		MAttachment attachment = nf.getAttachment(true);
+		final Collection<File> files = new ArrayList<File>();
+		for (MAttachmentEntry entry : attachment.getEntries()){
+			files.add(entry.getFile());
+		}
+		return sendMail(nf,files,false);
+	} //sendMail
+	
+	/**
+	 * Send Mail
+	 * 
+	 * @param MLBREventoNFe evento
+	 * @return E-mail enviado
+	 * */
+	public static boolean sendMail(final MLBREventoNFe evento){
+		if (evento.getEventType().equals(X_LBR_EventoNFe.EVENTTYPE_CartaDeCorreção) ||
+			evento.getEventType().equals(X_LBR_EventoNFe.EVENTTYPE_Cancelamento)){
+		
+			MLBRNotaFiscal nf = new MLBRNotaFiscal(evento.getCtx(),evento.getLBR_NotaFiscal_ID(),evento.get_TrxName());
+			MAttachment attachment = evento.getAttachment(true);
+			final Collection<File> files = new ArrayList<File>();
+			for (MAttachmentEntry entry : attachment.getEntries()){
+				files.add(entry.getFile());
+			}
+			return sendMail(nf,files,true);
+		}
+		return true;
+	} //sendMail
+	
+	private static boolean sendMail(final MLBRNotaFiscal nf, final Collection<File> files, final boolean isEvent) {
 
 		final Properties ctx = nf.getCtx();
 		final String trx = nf.get_TrxName();
@@ -87,13 +118,7 @@ public abstract class NFeEmail {
 				final String subject = "NFe - " + nf.getlbr_NFeID();
 				final String message = getMessage(nf.getDocumentNo(),
 						nf.getlbr_OrgName(), nf.getlbr_CNPJ(),
-						isCancelled, nf.getlbr_NFeID());
-
-				MAttachment attachment = nf.getAttachment(true);
-				final Collection<File> files = new ArrayList<File>();
-				for (MAttachmentEntry entry : attachment.getEntries()){
-					files.add(entry.getFile());
-				}
+						isEvent, nf.getlbr_NFeID());
 
 				new Thread() {
 					public void run() {
@@ -131,12 +156,12 @@ public abstract class NFeEmail {
 	} // sendProductMail
 
 	private static final String getMessage(String documentNo,
-			String companyName, String CNPJ, boolean isCancelled, String NFe_ID) {
-		if (isCancelled) {
+			String companyName, String CNPJ, boolean isEvent, String NFe_ID) {
+		if (isEvent) {
 			StringBuilder messageCancel = new StringBuilder("");
 			messageCancel
 					.append("Prezado Cliente,\n\n")
-					.append("Você está recebendo o XML referente ao CANCELAMENTO da Nota Fiscal Eletrônica número [")
+					.append("Você está recebendo o XML referente ao EVENTO da Nota Fiscal Eletrônica número [")
 					.append(documentNo)
 					.append("] da [")
 					.append(companyName)

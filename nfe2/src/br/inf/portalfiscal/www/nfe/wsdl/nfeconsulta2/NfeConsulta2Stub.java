@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.adempierelbr.model.MLBRNFeWebService;
-import org.adempierelbr.util.NFeUtil;
 
 /*
  *  NfeConsulta2Stub java implementation

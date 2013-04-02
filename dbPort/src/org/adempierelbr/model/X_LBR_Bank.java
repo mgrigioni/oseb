@@ -19,7 +19,10 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_Persistent;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 
 /** Generated Model for LBR_Bank
  *  @author ADempiereLBR (generated) 
@@ -30,7 +33,7 @@ public class X_LBR_Bank extends PO implements I_LBR_Bank, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130107L;
+	private static final long serialVersionUID = 20130401L;
 
     /** Standard Constructor */
     public X_LBR_Bank (Properties ctx, int LBR_Bank_ID, String trxName)

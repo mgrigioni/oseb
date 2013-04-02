@@ -19,7 +19,12 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_C_Period;
+import org.compiere.model.I_Persistent;
+import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 
 /** Generated Model for LBR_NFeInut
  *  @author ADempiereLBR (generated) 
@@ -30,7 +35,7 @@ public class X_LBR_NFeInut extends PO implements I_LBR_NFeInut, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130110L;
+	private static final long serialVersionUID = 20130401L;
 
     /** Standard Constructor */
     public X_LBR_NFeInut (Properties ctx, int LBR_NFeInut_ID, String trxName)

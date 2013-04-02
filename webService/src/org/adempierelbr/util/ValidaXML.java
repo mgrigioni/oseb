@@ -214,6 +214,24 @@ public abstract class ValidaXML {
 	}
 	
 	/**
+	 * Validate xml file against xsd schema (eventoCanc/envEventoCancNFe_v1.00.xsd)
+	 * @param stringXml
+	 * @return validation result
+	 */
+	public static String validaEnvCanc(String stringXml) {
+		return ValidaDoc(stringXml, "eventoCanc/envEventoCancNFe_v1.00.xsd");
+	}
+	
+	/**
+	 * Validate xml file against xsd schema (eventoCanc/procEventoCancNFe_v1.00.xsd)
+	 * @param stringXml
+	 * @return validation result
+	 */
+	public static String validaProcEventoCancNFe(String stringXml) {
+		return ValidaDoc(stringXml, "eventoCanc/procEventoCancNFe_v1.00.xsd");
+	}
+	
+	/**
 	 * Validate xml file against xsd schema (ginfes/servico_enviar_lote_rps_envio_v03.xsd")
 	 * @param stringXml
 	 * @return validation result
