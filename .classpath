@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="boleto/src"/>
 	<classpathentry kind="src" path="client/src"/>
 	<classpathentry kind="src" path="dbPort/src"/>
-	<classpathentry kind="src" path="cce/src"/>
+	<classpathentry kind="src" path="eventoNFe/src"/>
 	<classpathentry kind="src" path="nfe2/src"/>
 	<classpathentry kind="src" path="ginfes/src"/>
 	<classpathentry kind="src" path="rdef/src"/>
@@ -12,6 +12,7 @@
 	<classpathentry kind="src" path="gnre/src"/>
 	<classpathentry kind="src" path="sacred/src"/>
 	<classpathentry kind="src" path="sped/src"/>
+	<classpathentry kind="src" path="fci/src"/>
 	<classpathentry kind="src" path="webService/src"/>
 	<classpathentry kind="src" output="zkbin/WEB-INF/classes" path="zkwebui/WEB-INF/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFBox/bcmail-jdk14-132.jar"/>

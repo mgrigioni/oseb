@@ -19,7 +19,11 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_Persistent;
+import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 
 /** Generated Model for LBR_TaxConfig_BPGroup
  *  @author ADempiereLBR (generated) 
@@ -30,7 +34,7 @@ public class X_LBR_TaxConfig_BPGroup extends PO implements I_LBR_TaxConfig_BPGro
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130107L;
+	private static final long serialVersionUID = 20130401L;
 
     /** Standard Constructor */
     public X_LBR_TaxConfig_BPGroup (Properties ctx, int LBR_TaxConfig_BPGroup_ID, String trxName)

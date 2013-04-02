@@ -80,8 +80,9 @@ public abstract class NFeUtil
 	private static CLogger log = CLogger.getCLogger(NFeUtil.class);
 
 	/** Versão */
-	public static final String VERSAO      = "2.00";
-	public static final String VERSAO_CCE  = "1.00";
+	public static final String VERSAO              = "2.00";
+	public static final String VERSAO_CCE          = "1.00";
+	public static final String VERSAO_EVENTO_CANC  = "1.00";
 
 	/** XML */
 	public static final long   XML_SIZE = 500;
@@ -553,7 +554,7 @@ public abstract class NFeUtil
 				error = Msg.getMsg(Env.getCtx(), "AttachmentNull");
 
 			if (error == null && nf.isNFeProcessed()){
-				NFeEmail.sendMail(nf,false);
+				NFeEmail.sendMail(nf);
 			}
 
 		} catch (Exception e) {

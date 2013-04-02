@@ -19,7 +19,14 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_C_AcctSchema;
+import org.compiere.model.I_C_DocType;
+import org.compiere.model.I_C_ValidCombination;
+import org.compiere.model.I_Persistent;
+import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 
 /** Generated Model for LBR_DocType_Acct
  *  @author ADempiereLBR (generated) 
@@ -30,7 +37,7 @@ public class X_LBR_DocType_Acct extends PO implements I_LBR_DocType_Acct, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130107L;
+	private static final long serialVersionUID = 20130401L;
 
     /** Standard Constructor */
     public X_LBR_DocType_Acct (Properties ctx, int LBR_DocType_Acct_ID, String trxName)

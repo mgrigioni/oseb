@@ -20,7 +20,14 @@ package org.adempierelbr.model;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+
+import org.compiere.model.I_C_InvoiceLine;
+import org.compiere.model.I_C_UOM;
+import org.compiere.model.I_M_Product;
+import org.compiere.model.I_Persistent;
+import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 
@@ -33,7 +40,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130117L;
+	private static final long serialVersionUID = 20130401L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -511,12 +518,37 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 		return (String)get_Value(COLUMNNAME_lbr_ServiceTaxes);
 	}
 
+	/** lbr_TaxStatus AD_Reference_ID=1000029 */
+	public static final int LBR_TAXSTATUS_AD_Reference_ID=1000029;
+	/** 00 - Tributada integralmente = 00 */
+	public static final String LBR_TAXSTATUS_00_TributadaIntegralmente = "00";
+	/** 10 - Tributada e com cobranca do ICMS por Sub. Tributaria = 10 */
+	public static final String LBR_TAXSTATUS_10_TributadaEComCobrancaDoICMSPorSubTributaria = "10";
+	/** 20 - Com reducao de base de calculo = 20 */
+	public static final String LBR_TAXSTATUS_20_ComReducaoDeBaseDeCalculo = "20";
+	/** 30 - Isenta ou nao-trib. e com cobr. do ICMS por Sub. Tribut = 30 */
+	public static final String LBR_TAXSTATUS_30_IsentaOuNao_TribEComCobrDoICMSPorSubTribut = "30";
+	/** 40 - Isenta = 40 */
+	public static final String LBR_TAXSTATUS_40_Isenta = "40";
+	/** 41 - Nao-tributada = 41 */
+	public static final String LBR_TAXSTATUS_41_Nao_Tributada = "41";
+	/** 50 - Suspensao = 50 */
+	public static final String LBR_TAXSTATUS_50_Suspensao = "50";
+	/** 51 - Diferimento  = 51 */
+	public static final String LBR_TAXSTATUS_51_Diferimento = "51";
+	/** 60 - ICMS cobrado anteriormente por substituicao tributaria = 60 */
+	public static final String LBR_TAXSTATUS_60_ICMSCobradoAnteriormentePorSubstituicaoTributaria = "60";
+	/** 70 - Com red. de base de calc. e cobr. do ICMS por Sub. Trib = 70 */
+	public static final String LBR_TAXSTATUS_70_ComRedDeBaseDeCalcECobrDoICMSPorSubTrib = "70";
+	/** 90 - Outras = 90 */
+	public static final String LBR_TAXSTATUS_90_Outras = "90";
 	/** Set Tax Status.
 		@param lbr_TaxStatus 
 		Defines the Tax Status
 	  */
 	public void setlbr_TaxStatus (String lbr_TaxStatus)
 	{
+
 		set_Value (COLUMNNAME_lbr_TaxStatus, lbr_TaxStatus);
 	}
 
