@@ -23,7 +23,7 @@ public interface I_DetEvento {
 
 	public String getVersao(); // getVersao
 	
-	public String setVersao(); // setVersao
+	public void setVersao(String versao); // setVersao
 
 	public String getDescEvento();	// getDescEvento
 
