@@ -251,7 +251,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		String xmlFile = TextUtil.generateTmpFile (xml.toString(), cce.getId() + NFeUtil.EXT_EVENTO);
 		
 		log.fine ("Assinando XML: " + xml);
-		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
+		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_EVENTO_NFE);
 			
 		//	Lê o arquivo assinado
 		xstream = new XStream (new DomDriver(TextUtil.UTF8));
@@ -319,7 +319,7 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		String xmlFile = TextUtil.generateTmpFile (xml.toString(), infCanc.getId() + NFeUtil.EXT_EVENTO);
 		
 		log.fine ("Assinando XML: " + xml);
-		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_CARTADECORRECAO_CCE);
+		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_EVENTO_NFE);
 			
 		//	Lê o arquivo assinado
 		xstream = new XStream (new DomDriver(TextUtil.UTF8));

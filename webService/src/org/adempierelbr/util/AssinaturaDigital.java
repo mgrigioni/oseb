@@ -73,7 +73,7 @@ public class AssinaturaDigital
 	public static final int DOCTYPE_RECEPCAO_NFE		= 1;
 	public static final int DOCTYPE_CANCELAMENTO_NFE	= 2;
 	public static final int DOCTYPE_INUTILIZACAO_NFE	= 3;
-	public static final int DOCTYPE_CARTADECORRECAO_CCE = 4;
+	public static final int DOCTYPE_EVENTO_NFE          = 4;
 	public static final int DOCTYPE_GINFES_RPS          = 5;
 	public static final int DOCTYPE_GINFES_LOTE_RPS     = 6;
 	
@@ -227,7 +227,7 @@ public class AssinaturaDigital
 			case DOCTYPE_RECEPCAO_NFE:        tag = "infNFe";    break;
 			case DOCTYPE_CANCELAMENTO_NFE:    tag = "infCanc";   break;
 			case DOCTYPE_INUTILIZACAO_NFE:    tag = "infInut";   break;
-			case DOCTYPE_CARTADECORRECAO_CCE: tag = "infEvento"; break;
+			case DOCTYPE_EVENTO_NFE:          tag = "infEvento"; break;
 			case DOCTYPE_GINFES_RPS:          tag = "InfRps";    break;
 			case DOCTYPE_GINFES_LOTE_RPS:     tag = "LoteRps";   break;
 		}

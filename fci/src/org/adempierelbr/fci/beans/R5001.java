@@ -14,42 +14,31 @@
 package org.adempierelbr.fci.beans;
 
 import org.adempierelbr.fci.RegFci;
-import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 
 /**
- * Registro 0000 - Identificação do contribuinte
+ * Registro 5001 – Inicio do bloco de produtos e mercadorias
  * @author Mario Grigioni, mgrigioni
- * @version $Id: R0000.java, 14/03/2013, 10:59:00, mgrigioni
+ * @version $Id: R5001.java, 03/04/2013, 14:52:00, mgrigioni
  */
-public class R0000 extends RegFci {
+public class R5001 extends RegFci {
 	
-	private String CNPJ_CONTRIBUINTE;
-	private String NOME_CONTRIBUINTE;
-	private String VERSAO_LEIAUTE;
-
-	public R0000(String CNPJ_CONTRIBUINTE, String NOME_CONTRIBUINTE, String VERSAO_LEIAUTE)
+	public R5001()
 	{
 		super();
-		this.CNPJ_CONTRIBUINTE 	= CNPJ_CONTRIBUINTE;
-		this.NOME_CONTRIBUINTE 	= NOME_CONTRIBUINTE;
-		this.VERSAO_LEIAUTE 	= VERSAO_LEIAUTE;
-	} 	//R0000
+	} 	//R5001
 
 	/**
-	 * Formata o Bloco 0 Registro 000
+	 * Formata o Bloco 5 Registro 001
 	 * 
 	 * @return
 	 */
 	public String toString() {
 		
 		StringBuilder format = new StringBuilder
-				   (REG)
-		    .append(PIPE).append(TextUtil.toNumeric(CNPJ_CONTRIBUINTE))
-		    .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(NOME_CONTRIBUINTE), 0, 255))
-		    .append(PIPE).append(VERSAO_LEIAUTE);
+				   (REG);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();
 	}	//	toString
 	
-}	//R0000
+}	//R5001

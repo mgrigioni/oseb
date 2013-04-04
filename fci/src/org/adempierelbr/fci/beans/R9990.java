@@ -13,43 +13,38 @@
  *****************************************************************************/
 package org.adempierelbr.fci.beans;
 
+import org.adempierelbr.fci.CounterFci;
 import org.adempierelbr.fci.RegFci;
-import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 
 /**
- * Registro 0000 - Identificação do contribuinte
+ * REGISTRO 9990: ENCERRAMENTO DO BLOCO 9
  * @author Mario Grigioni, mgrigioni
- * @version $Id: R0000.java, 14/03/2013, 10:59:00, mgrigioni
+ * @version $Id: R9990.java, 14/03/2013, 15:32:00, mgrigioni
  */
-public class R0000 extends RegFci {
+public class R9990 extends RegFci {
 	
-	private String CNPJ_CONTRIBUINTE;
-	private String NOME_CONTRIBUINTE;
-	private String VERSAO_LEIAUTE;
+	private String QUANTIDADE_LINHAS = "";
 
-	public R0000(String CNPJ_CONTRIBUINTE, String NOME_CONTRIBUINTE, String VERSAO_LEIAUTE)
+	public R9990()
 	{
 		super();
-		this.CNPJ_CONTRIBUINTE 	= CNPJ_CONTRIBUINTE;
-		this.NOME_CONTRIBUINTE 	= NOME_CONTRIBUINTE;
-		this.VERSAO_LEIAUTE 	= VERSAO_LEIAUTE;
-	} 	//R0000
+	} 	//R9990
 
 	/**
-	 * Formata o Bloco 0 Registro 000
+	 * Formata o Bloco 9 Registro 990
 	 * 
 	 * @return
 	 */
 	public String toString() {
 		
+		QUANTIDADE_LINHAS = "" + CounterFci.getBlockCounter(REG);
+		
 		StringBuilder format = new StringBuilder
-				   (REG)
-		    .append(PIPE).append(TextUtil.toNumeric(CNPJ_CONTRIBUINTE))
-		    .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(NOME_CONTRIBUINTE), 0, 255))
-		    .append(PIPE).append(VERSAO_LEIAUTE);
+				   (REG) 
+		    .append(PIPE).append(QUANTIDADE_LINHAS);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();
 	}	//	toString
 	
-}	//R0000
+}	//R9990
