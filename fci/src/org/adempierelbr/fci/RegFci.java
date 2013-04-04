@@ -36,7 +36,6 @@ public abstract class RegFci {
 	protected String REG = getClassName();
 		
 	//Método para retornar registro formatado
-	//Todo registro do SPED deve iniciar com PIPE e terminar com PIPE
 	public abstract String toString();
 	
 	/**

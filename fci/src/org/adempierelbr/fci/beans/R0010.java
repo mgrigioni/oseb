@@ -18,38 +18,61 @@ import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 
 /**
- * Registro 0000 - Identificação do contribuinte
+ * Registro 0010 – Informações do estabelecimento/Contribuinte informante
  * @author Mario Grigioni, mgrigioni
- * @version $Id: R0000.java, 14/03/2013, 10:59:00, mgrigioni
+ * @version $Id: R0010.java, 14/03/2013, 11:00:00, mgrigioni
  */
-public class R0000 extends RegFci {
+public class R0010 extends RegFci {
 	
 	private String CNPJ_CONTRIBUINTE;
-	private String NOME_CONTRIBUINTE;
-	private String VERSAO_LEIAUTE;
-
-	public R0000(String CNPJ_CONTRIBUINTE, String NOME_CONTRIBUINTE, String VERSAO_LEIAUTE)
-	{
-		super();
-		this.CNPJ_CONTRIBUINTE 	= CNPJ_CONTRIBUINTE;
-		this.NOME_CONTRIBUINTE 	= NOME_CONTRIBUINTE;
-		this.VERSAO_LEIAUTE 	= VERSAO_LEIAUTE;
-	} 	//R0000
+	private String NOME_RAZAO_SOCIAL;
+	private String INSCRICAO_ESTADUAL;
+	private String ENDERECO_ESTABELECIMENTO;
+	private String CEP;
+	private String MUNICIPIO;
+	private String UF;
 
 	/**
-	 * Formata o Bloco 0 Registro 000
+	 * Constructor
+	 * @param cNPJ_CONTRIBUINTE
+	 * @param nOME_RAZAO_SOCIAL
+	 * @param iNSCRIÇÃO_ESTADUAL
+	 * @param eNDEREÇO_ESTABELECIMENTO
+	 * @param cEP
+	 * @param mUNICIPIO
+	 * @param uF
+	 */
+	public R0010(String cNPJ_CONTRIBUINTE, String nOME_RAZAO_SOCIAL,
+			String iNSCRICAO_ESTADUAL, String eNDERECO_ESTABELECIMENTO,
+			String cEP, String mUNICIPIO, String uF) {
+		super();
+		CNPJ_CONTRIBUINTE = cNPJ_CONTRIBUINTE;
+		NOME_RAZAO_SOCIAL = nOME_RAZAO_SOCIAL;
+		INSCRICAO_ESTADUAL = iNSCRICAO_ESTADUAL;
+		ENDERECO_ESTABELECIMENTO = eNDERECO_ESTABELECIMENTO;
+		CEP = cEP;
+		MUNICIPIO = mUNICIPIO;
+		UF = uF;
+	}
+
+	/**
+	 * Formata o Bloco 0 Registro 010
 	 * 
 	 * @return
 	 */
 	public String toString() {
 		
 		StringBuilder format = new StringBuilder
-				   (REG)
+				   (REG) 
 		    .append(PIPE).append(TextUtil.toNumeric(CNPJ_CONTRIBUINTE))
-		    .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(NOME_CONTRIBUINTE), 0, 255))
-		    .append(PIPE).append(VERSAO_LEIAUTE);
+		    .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(NOME_RAZAO_SOCIAL), 0, 255))
+		    .append(PIPE).append(TextUtil.toNumeric(INSCRICAO_ESTADUAL))
+		    .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(ENDERECO_ESTABELECIMENTO), 0, 255))
+		    .append(PIPE).append(TextUtil.toNumeric(CEP))
+		    .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(MUNICIPIO), 0, 255))
+		    .append(PIPE).append(TextUtil.checkSize(UF, 0, 2));
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();
 	}	//	toString
 	
-}	//R0000
+}	//R0010
