@@ -395,6 +395,7 @@ public abstract class NFeUtil
 	 * Método para gerar cabeçalho cancelamento
 	 * @param region
 	 * @return NfeCancelamento2Stub.NfeCabecMsgE
+	 * @deprecated
 	 */
 	public static NfeCancelamento2Stub.NfeCabecMsgE geraCabecCancelamento(int C_Region_ID){
 
@@ -450,7 +451,9 @@ public abstract class NFeUtil
 		return sw.toString() + "</nfeProc>";
 	}	//	geraRodapDistribuicao
 	
-
+	/**
+	 * @deprecated
+	 */
 	public static String geraRodapCanc(RetCancNFe retCancNFe) {
 			
 		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
@@ -491,6 +494,9 @@ public abstract class NFeUtil
 		return attach;
 	} //generateNFeDistFile
 	
+	/**
+	 * @deprecated
+	 */
 	public static File generateNFeCancFile(String nfeCancDadosMsg, RetCancNFe retCancNFe){
 		
 		String cabecalho = geraCabecCanc();
