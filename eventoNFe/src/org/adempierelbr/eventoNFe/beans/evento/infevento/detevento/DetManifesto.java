@@ -28,8 +28,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias ("detEvento")
 public class DetManifesto implements I_DetEvento
 {
-	public DetManifesto(String tpEvento){
-		setDescEvento(tpEvento);
+	public DetManifesto(String tpEvento, String xJust){
+		setDescEvento(tpEvento,xJust);
 	}
 	
 	@XStreamAsAttribute
@@ -39,7 +39,7 @@ public class DetManifesto implements I_DetEvento
 	@XMLFieldProperties	(minSize=5, maxSize=60, id = "HP19")
 	private String descEvento;
 	
-	@XMLFieldProperties	(minSize=15, maxSize=255, id = "HP20")
+	@XMLFieldProperties	(minSize=15, maxSize=255, id = "HP20", isMandatory=false)
 	private String xJust;
 
 	public String getVersao()
@@ -57,15 +57,17 @@ public class DetManifesto implements I_DetEvento
 		return descEvento;
 	}	//	getDescEvento
 
-	private void setDescEvento(String tpEvento){
+	private void setDescEvento(String tpEvento, String xJust){
 		if (tpEvento.equals(X_LBR_EventoNFe.EVENTTYPE_ConfirmaçãoDaOperação))
 			this.descEvento = "Confirmacao da Operacao";
 		else if (tpEvento.equals(X_LBR_EventoNFe.EVENTTYPE_CiênciaDaOperação))
 			this.descEvento = "Ciência da Operação";
 		else if (tpEvento.equals(X_LBR_EventoNFe.EVENTTYPE_DesconhecimentoDaOperação))
 			this.descEvento = "Desconhecimento da Operação";
-		else if (tpEvento.equals(X_LBR_EventoNFe.EVENTTYPE_OperaçãoNãoRealizada))
+		else if (tpEvento.equals(X_LBR_EventoNFe.EVENTTYPE_OperaçãoNãoRealizada)){
 			this.descEvento = "Operação não Realizada";
+			setXJust(xJust);
+		}
 	}
 	
 	public String getXJust()
@@ -73,7 +75,7 @@ public class DetManifesto implements I_DetEvento
 		return xJust;
 	}	//	getXJust
 
-	public void setXJust(String xJust)
+	private void setXJust(String xJust)
 	{
 		this.xJust = xJust;
 	}	//	setXJust

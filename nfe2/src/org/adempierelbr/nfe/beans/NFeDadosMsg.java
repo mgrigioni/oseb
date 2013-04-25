@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import org.adempierelbr.nfe.beans.downloadNFe.DownloadNFe;
 import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ConsNFeDest;
 import org.adempierelbr.nfe.beans.statusServicoNFe.ConsStatServ;
 
@@ -37,6 +38,9 @@ public class NFeDadosMsg {
 	
 	@XStreamAlias("consNFeDest")
 	public ConsNFeDest  consNFeDest;
+	
+	@XStreamAlias("downloadNFe")
+	public DownloadNFe  downloadNFe;
 
 	/**
 	 * Consulta Protocolo
@@ -74,6 +78,15 @@ public class NFeDadosMsg {
 		setConsCad(consCad);
 	}
 	
+	/**
+	 * Download NFe
+	 * @param downloadNFe
+	 */
+	public NFeDadosMsg(DownloadNFe downloadNFe) {
+		super();
+		setDownloadNFe(downloadNFe);
+	}
+	
 	public ConsSitNFe getConsSitNFe() {
 		return consSitNFe;
 	}
@@ -97,6 +110,13 @@ public class NFeDadosMsg {
 	}
 	public void setConsNFeDest(ConsNFeDest consNFeDest) {
 		this.consNFeDest = consNFeDest;
+	}
+	
+	public DownloadNFe getDownloadNFe() {
+		return downloadNFe;
+	}
+	public void setDownloadNFe(DownloadNFe downloadNFe) {
+		this.downloadNFe = downloadNFe;
 	}
 	
 }	// NFeDadosMsg

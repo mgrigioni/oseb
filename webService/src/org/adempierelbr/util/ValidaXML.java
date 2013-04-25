@@ -232,6 +232,24 @@ public abstract class ValidaXML {
 	}
 	
 	/**
+	 * Validate xml file against xsd schema (eventoManif/envConfRecebto_v1.00.xsd)
+	 * @param stringXml
+	 * @return validation result
+	 */
+	public static String validaEnvManif(String stringXml) {
+		return ValidaDoc(stringXml, "eventoManif/envConfRecebto_v1.00.xsd");
+	}
+	
+	/**
+	 * Validate xml file against xsd schema (eventoManif/procConfRecebtoNFe_v1.00.xsd)
+	 * @param stringXml
+	 * @return validation result
+	 */
+	public static String validaProcEventoManifNFe(String stringXml) {
+		return ValidaDoc(stringXml, "eventoManif/procConfRecebtoNFe_v1.00.xsd");
+	}
+	
+	/**
 	 * Validate xml file against xsd schema (ginfes/servico_enviar_lote_rps_envio_v03.xsd")
 	 * @param stringXml
 	 * @return validation result

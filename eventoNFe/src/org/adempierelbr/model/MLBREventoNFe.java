@@ -38,6 +38,7 @@ import org.adempierelbr.eventoNFe.beans.evento.Evento;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.InfEvento;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.DetCCe;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.DetCancelamento;
+import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.DetManifesto;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.I_DetEvento;
 import org.adempierelbr.eventoNFe.beans.retevento.RetEvento;
 import org.adempierelbr.util.AssinaturaDigital;
@@ -188,9 +189,9 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 			//	Arquivo de resposta final
 			String xmlFile = TextUtil.generateTmpFile (NFeUtil.XML_HEADER + sw.toString(), infReturn.getId() + NFeUtil.EXT_DIST_EVENTO);
 
-			MAttachment attachCCe = createAttachment (true);
-			attachCCe.addEntry(new File (xmlFile));
-			attachCCe.save();
+			MAttachment attachEvento = createAttachment (true);
+			attachEvento.addEntry(new File (xmlFile));
+			attachEvento.save();
 		}
 		else
 			throw new AdempiereException (infReturn.getxMotivo());
@@ -331,6 +332,73 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 		envEvento.setEvento(evento);
 		return envEvento;
 	} //createEnvCancelamento
+	
+	private EnvEvento createEnvManifesto(MLBRNotaFiscal nf, MOrgInfo oi) throws Exception{
+		
+		// Classes usadas para annotation
+		Class<?>[] classForAnnotation = new Class[]{DetManifesto.class, InfEvento.class, Evento.class, 
+				EnvEvento.class, Signature.CanonicalizationMethod.class, Signature.DigestMethod.class, 
+				Signature.KeyInfo.class, Signature.Reference.class, Signature.SignatureMethod.class, Signature.SignedInfo.class, 
+				Signature.Transform.class, Signature.Transforms.class, Signature.X509Data.class};
+		
+		I_W_AD_OrgInfo oiW = POWrapper.create (oi, I_W_AD_OrgInfo.class);
+		
+		//	Detalhes
+		DetManifesto det = new DetManifesto (getEventType(),
+				RemoverAcentos.remover(getDescription()));
+		det.setVersao(NFeUtil.VERSAO_EVENTO_MANIF);
+		
+		//	Informações do Evento de Cancelamento
+		InfEvento infManif = new InfEvento (getEventType());
+		infManif.setCOrgao(BPartnerUtil.getRegionCode(oiW.getC_Location().getC_Region_ID()));
+		infManif.setTpAmb(oiW.getlbr_NFeEnv());
+		infManif.setCNPJ(oiW.getlbr_CNPJ());
+		infManif.setChNFe(nf.getlbr_NFeID());
+		infManif.setDhEvento(getDateDoc());
+		infManif.setNSeqEvento("" + getSeqNo());
+		infManif.setVerEvento(NFeUtil.VERSAO_EVENTO_MANIF);
+		infManif.setDetEvento(det);
+		infManif.setId();
+		
+		//	Dados do Evento da Carta de Correção
+		Evento evento = new Evento ();
+		evento.setVersao(NFeUtil.VERSAO_EVENTO_MANIF);
+		evento.setInfEvento(infManif);
+		
+		//	Dados do Envio
+		EnvEvento envEvento = new EnvEvento();
+		envEvento.setVersao(NFeUtil.VERSAO_EVENTO_MANIF);
+		envEvento.setIdLote(getDocumentNo());
+		
+		//	Valida as informações
+		if (!infManif.isValid()) {
+			m_processMsg = infManif.getErrorMsg();
+			throw new AdempiereException(m_processMsg);
+		}
+		
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.aliasSystemAttribute(null, "class");
+		xstream.autodetectAnnotations(true);
+		
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (evento,  new CompactWriter (sw));
+		
+		StringBuilder xml = new StringBuilder (sw.toString());
+		String xmlFile = TextUtil.generateTmpFile (xml.toString(), infManif.getId() + NFeUtil.EXT_EVENTO);
+		
+		log.fine ("Assinando XML: " + xml);
+		AssinaturaDigital.Assinar (xmlFile, oi, AssinaturaDigital.DOCTYPE_EVENTO_NFE);
+			
+		//	Lê o arquivo assinado
+		xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.alias("detEvento", I_DetEvento.class, DetManifesto.class);
+		xstream.processAnnotations (classForAnnotation);
+		evento = (Evento) xstream.fromXML (TextUtil.readFile(new File(xmlFile)));
+			
+		//	Popula o evio do Evento com o XML assinado
+		envEvento.setEvento(evento);
+		return envEvento;
+	} //createEnvManifesto
 	
 	/**
 	 * 	Get Document Info
@@ -498,8 +566,8 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 				envEvento = envCCe;
 			}
 			else if (getEventType().equals(X_LBR_EventoNFe.EVENTTYPE_Cancelamento)){
-				EnvEvento envCancelamento = createEnvCancelamento(nf,oi);
-				xstream.marshal (envCancelamento,  new CompactWriter (sw));
+				EnvEvento envCanc = createEnvCancelamento(nf,oi);
+				xstream.marshal (envCanc,  new CompactWriter (sw));
 				xml =  new StringBuilder (sw.toString());
 				
 				String result = ValidaXML.validaEnvCanc(xml.toString());
@@ -508,7 +576,20 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 					m_processMsg = result;
 					throw new AdempiereException(result);
 				}
-				envEvento = envCancelamento;
+				envEvento = envCanc;
+			}
+			else if (getEventType().startsWith(X_LBR_EventoNFe.EVENTTYPE_ConfirmaçãoDaOperação.substring(0, 4))){
+				EnvEvento envManifesto = createEnvManifesto(nf,oi);
+				xstream.marshal (envManifesto,  new CompactWriter (sw));
+				xml =  new StringBuilder (sw.toString());
+				
+				String result = ValidaXML.validaEnvManif(xml.toString());
+					
+				if (result != null && !result.isEmpty()) {
+					m_processMsg = result;
+					throw new AdempiereException(result);
+				}
+				envEvento = envManifesto;
 			}
 			
 			//	Arquivo para transmitir
@@ -707,6 +788,12 @@ public class MLBREventoNFe extends X_LBR_EventoNFe implements DocAction
 
 			//
 			setSeqNo (seqNo);
+			
+			
+			if (getDescription()==null){
+				setDescription("Evento NFe Automático");
+			}
+			
 		}
 		return true;
 	}	//	beforeSave
