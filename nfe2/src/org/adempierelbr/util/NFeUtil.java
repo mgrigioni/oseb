@@ -35,6 +35,7 @@ import org.adempierelbr.nfe.beans.ConsSitNFe;
 import org.adempierelbr.nfe.beans.InutNFe;
 import org.adempierelbr.nfe.beans.NFeDadosMsg;
 import org.adempierelbr.nfe.beans.cancNFe.CancNFe;
+import org.adempierelbr.nfe.beans.downloadNFe.DownloadNFe;
 import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ConsNFeDest;
 import org.adempierelbr.nfe.beans.retCancNFe.RetCancNFe;
 import org.adempierelbr.nfe.beans.retRecepcao.ConsReciNFe;
@@ -56,6 +57,7 @@ import br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2.CadConsultaCadastro
 import br.inf.portalfiscal.www.nfe.wsdl.nfecancelamento2.NfeCancelamento2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsultadest.NFeConsultaDestStub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfedownloadnf.NfeDownloadNFStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
@@ -83,6 +85,7 @@ public abstract class NFeUtil
 	public static final String VERSAO              = "2.00";
 	public static final String VERSAO_CCE          = "1.00";
 	public static final String VERSAO_EVENTO_CANC  = "1.00";
+	public static final String VERSAO_EVENTO_MANIF = "1.00";
 
 	/** XML */
 	public static final long   XML_SIZE = 500;
@@ -199,6 +202,22 @@ public abstract class NFeUtil
 		
 		return sw.toString();
 	}	//	geraMsgConsultaDest
+	
+	/**
+	 * Método para gerar dados para download NFe
+	 * @return msg
+	 */
+	public static String geraMsgDownloadNFe(String tpAmb, String CNPJ, String chNFe) {
+				
+		XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
+		xstream.autodetectAnnotations(true);
+		// 
+		StringWriter sw = new StringWriter ();
+		xstream.marshal (new NFeDadosMsg(new DownloadNFe(VERSAO_EVENTO_MANIF,tpAmb,CNPJ,chNFe)),
+				new CompactWriter (sw));
+		
+		return sw.toString();
+	}	//	geraMsgDownloadNFe
 	
 	/**
 	 * Método para gerar dados para inutilizar número nf
@@ -339,6 +358,23 @@ public abstract class NFeUtil
 
 		return cabecMsgE;
 	} //geraCabecConsultaDest
+	
+	/**
+	 * Método para gerar cabeçalho download NFe
+	 * @param region
+	 * @return NfeDownloadNFStub.NfeCabecMsgE
+	 */
+	public static NfeDownloadNFStub.NfeCabecMsgE geraCabecDownloadNFe(int C_Region_ID){
+		
+		NfeDownloadNFStub.NfeCabecMsg cabecMsg = new NfeDownloadNFStub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(VERSAO_EVENTO_MANIF);
+
+		NfeDownloadNFStub.NfeCabecMsgE cabecMsgE = new NfeDownloadNFStub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecDownloadNFe
 	
 	/**
 	 * Método para gerar cabeçalho consulta cadastro
