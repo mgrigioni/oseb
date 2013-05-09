@@ -147,7 +147,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 * Retorna as Notas Fiscais por período (compra, venda ou ambos)
 	 * @param dateFrom
 	 * @param dateTo
+	 * @param AD_Org_ID
 	 * @param isSOTrx: true = venda, false = compra, null = ambos
+	 * @param trxName
 	 * @return List<MLBRNotaFiscal> nf
 	 */
 	private static List<MLBRNotaFiscal> get(Timestamp dateFrom, Timestamp dateTo, int AD_Org_ID, Boolean isSOTrx, String trxName){
@@ -1831,7 +1833,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		if (getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_100_AutorizadoOUsoDaNF_E) ||
 			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_101_CancelamentoDeNF_EHomologado) ||
 			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_150_AutorizadoOUsoDaNF_EAutorizaçãoForaDePrazo) ||
-			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_151_CancelamentoDeNF_EHomologadoForaDePrazo))
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_151_CancelamentoDeNF_EHomologadoForaDePrazo) ||
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_301_UsoDenegadoIrregularidadeFiscalDoEmitente) ||
+			getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_302_UsoDenegadoIrregularidadeFiscalDoDestinatário))
 			return true;
 		
 		return false;
