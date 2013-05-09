@@ -41,7 +41,7 @@ import org.compiere.model.MPInstance;
 import org.compiere.model.MProcess;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
-import org.compiere.report.JasperViewer;
+import org.compiere.report.ReportStarter;
 import org.compiere.sqlj.Adempiere;
 import org.compiere.util.Env;
 
@@ -150,7 +150,7 @@ public class PrintFromXML extends SvrProcess
 
 		JasperPrint jasperPrint = JasperFillManager.fillReport (jasperReport, files, dataSource);
 
-		JasperViewer.viewReport (jasperPrint, "Impress\u00E7\u00E3o de Documento");
+		ReportStarter.getReportViewerProvider().openViewer(jasperPrint, "Impress\u00E7\u00E3o de Documento");
 		
 		return "@Success@";
 	}	//	doIt
