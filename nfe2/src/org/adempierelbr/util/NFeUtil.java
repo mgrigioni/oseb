@@ -589,6 +589,15 @@ public abstract class NFeUtil
 	    nf.setlbr_NFeProt(infProt.getnProt());
 	    nf.setDateTrx(NFeUtil.stringToTime(infProt.getDhRecbto()));
 	    nf.setlbr_NFeStatus(infProt.getcStat());          
+		
+		//NFe Denegada - Marcar como cancelada para efeitos de escrituração
+		if (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_301_UsoDenegadoIrregularidadeFiscalDoEmitente) ||
+			nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_302_UsoDenegadoIrregularidadeFiscalDoDestinatário)){
+			nf.setIsCancelled(true);
+			nf.setDocStatus(MLBRNotaFiscal.DOCSTATUS_Voided);
+			nf.setDocAction(MLBRNotaFiscal.DOCACTION_None);
+		}
+		
 		nf.save(trxName);
 
 		//Atualiza XML para padrão de distribuição
