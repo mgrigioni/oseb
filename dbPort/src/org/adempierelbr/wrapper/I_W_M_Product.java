@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_M_Product;
+import org.compiere.model.*;
 
 /** Generated Interface for M_Product
  *  @author Adempiere (generated) 

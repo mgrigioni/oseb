@@ -16,8 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_AD_Sequence;
-import org.compiere.model.I_C_BankAccount;
+import org.compiere.model.*;
 
 /** Generated Interface for C_BankAccount
  *  @author Adempiere (generated) 

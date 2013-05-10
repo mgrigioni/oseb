@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_AD_User;
+import org.compiere.model.*;
 
 /** Generated Interface for AD_User
  *  @author Adempiere (generated) 

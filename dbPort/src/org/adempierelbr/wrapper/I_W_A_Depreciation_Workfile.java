@@ -17,8 +17,7 @@
 package org.adempierelbr.wrapper;
 
 import java.math.BigDecimal;
-
-import org.compiere.model.I_A_Depreciation_Workfile;
+import org.compiere.model.*;
 
 /** Generated Interface for A_Depreciation_Workfile
  *  @author Adempiere (generated) 

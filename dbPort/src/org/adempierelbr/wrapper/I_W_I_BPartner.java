@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_I_BPartner;
+import org.compiere.model.*;
 
 /** Generated Interface for I_BPartner
  *  @author Adempiere (generated) 

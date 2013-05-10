@@ -20,7 +20,7 @@ import org.adempierelbr.fci.RegFci;
  * @author Mario Grigioni, mgrigioni
  * @version $Id: R9001.java, 03/04/2013, 14:52:00, mgrigioni
  */
-public class R9900 extends RegFci {
+public class R9900 extends RegFci implements Comparable<Object> {
 	
 	private String REG_BLC     = "";
 	private String QTD_REG_BLC = "";

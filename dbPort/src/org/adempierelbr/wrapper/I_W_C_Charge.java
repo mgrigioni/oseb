@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_C_Charge;
+import org.compiere.model.*;
 
 /** Generated Interface for C_Charge
  *  @author Adempiere (generated) 
