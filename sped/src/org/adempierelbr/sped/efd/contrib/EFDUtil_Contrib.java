@@ -451,6 +451,13 @@ public class EFDUtil_Contrib
 		
 		String IND_OPER   = nf.isSOTrx() ? "1" : "0"; //0 = Entrada, 1 = Saída
 		String COD_SIT    = nf.isCancelled() ? "02" : ("2".equals(nf.getlbr_FinNFe()) ? "06" : "00");
+		
+		//NFe Denegada
+		if (nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_301_UsoDenegadoIrregularidadeFiscalDoEmitente) ||
+			nf.getlbr_NFeStatus().equals(MLBRNotaFiscal.LBR_NFESTATUS_302_UsoDenegadoIrregularidadeFiscalDoDestinatário)){
+			COD_SIT = "04";
+		}
+		
 		String SER        = nf.getSerieNo();
 		String NUM_DOC    = nf.getDocumentNo(true);
 		String CHV_NFE    = nf.getlbr_NFeID();
