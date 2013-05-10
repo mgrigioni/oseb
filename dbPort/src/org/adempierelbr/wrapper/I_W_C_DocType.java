@@ -16,8 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_C_DocType;
-import org.compiere.model.I_M_Warehouse;
+import org.compiere.model.*;
 
 /** Generated Interface for C_DocType
  *  @author Adempiere (generated) 

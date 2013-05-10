@@ -19,13 +19,7 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-
-import org.compiere.model.I_C_Tax;
-import org.compiere.model.I_M_PriceList;
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 
 /** Generated Model for LBR_TaxIncludedList
  *  @author ADempiereLBR (generated) 
@@ -36,7 +30,7 @@ public class X_LBR_TaxIncludedList extends PO implements I_LBR_TaxIncludedList, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130401L;
+	private static final long serialVersionUID = 20130509L;
 
     /** Standard Constructor */
     public X_LBR_TaxIncludedList (Properties ctx, int LBR_TaxIncludedList_ID, String trxName)

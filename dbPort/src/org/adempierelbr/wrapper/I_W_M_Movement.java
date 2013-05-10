@@ -16,8 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_M_InOut;
-import org.compiere.model.I_M_Movement;
+import org.compiere.model.*;
 
 /** Generated Interface for M_Movement
  *  @author Adempiere (generated) 

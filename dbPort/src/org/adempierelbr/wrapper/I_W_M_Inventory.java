@@ -17,8 +17,7 @@
 package org.adempierelbr.wrapper;
 
 import java.sql.Timestamp;
-
-import org.compiere.model.I_M_Inventory;
+import org.compiere.model.*;
 
 /** Generated Interface for M_Inventory
  *  @author Adempiere (generated) 

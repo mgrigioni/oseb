@@ -18,10 +18,7 @@ package org.adempierelbr.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-
-import org.compiere.model.I_C_Tax;
-import org.compiere.model.I_M_PriceList;
-import org.compiere.model.MTable;
+import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LBR_TaxIncludedList

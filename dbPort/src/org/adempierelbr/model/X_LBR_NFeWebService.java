@@ -19,12 +19,7 @@ package org.adempierelbr.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-
-import org.compiere.model.I_C_Region;
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 
 /** Generated Model for LBR_NFeWebService
  *  @author ADempiereLBR (generated) 
@@ -35,7 +30,7 @@ public class X_LBR_NFeWebService extends PO implements I_LBR_NFeWebService, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130401L;
+	private static final long serialVersionUID = 20130509L;
 
     /** Standard Constructor */
     public X_LBR_NFeWebService (Properties ctx, int LBR_NFeWebService_ID, String trxName)

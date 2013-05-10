@@ -26,14 +26,13 @@ public class R0000 extends RegFci {
 	
 	private String CNPJ_CONTRIBUINTE;
 	private String NOME_CONTRIBUINTE;
-	private String VERSAO_LEIAUTE;
+	private final String VERSAO_LEIAUTE = "1.0";
 
-	public R0000(String CNPJ_CONTRIBUINTE, String NOME_CONTRIBUINTE, String VERSAO_LEIAUTE)
+	public R0000(String CNPJ_CONTRIBUINTE, String NOME_CONTRIBUINTE)
 	{
 		super();
 		this.CNPJ_CONTRIBUINTE 	= CNPJ_CONTRIBUINTE;
 		this.NOME_CONTRIBUINTE 	= NOME_CONTRIBUINTE;
-		this.VERSAO_LEIAUTE 	= VERSAO_LEIAUTE;
 	} 	//R0000
 
 	/**

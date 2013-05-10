@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_M_PriceList;
+import org.compiere.model.*;
 
 /** Generated Interface for M_PriceList
  *  @author Adempiere (generated) 

@@ -16,8 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_C_BankAccount;
-import org.compiere.model.I_C_Invoice;
+import org.compiere.model.*;
 
 /** Generated Interface for C_Invoice
  *  @author Adempiere (generated) 
@@ -106,19 +105,6 @@ public interface I_W_C_Invoice extends I_C_Invoice
 	  * Identifies the model of Nota Fiscal
 	  */
 	public String getlbr_NFModel();
-
-    /** Column name lbr_NFType */
-    public static final String COLUMNNAME_lbr_NFType = "lbr_NFType";
-
-	/** Set NF Type.
-	  * Nota Fiscal Type
-	  */
-	public void setlbr_NFType (String lbr_NFType);
-
-	/** Get NF Type.
-	  * Nota Fiscal Type
-	  */
-	public String getlbr_NFType();
 
     /** Column name LBR_NotaFiscal_ID */
     public static final String COLUMNNAME_LBR_NotaFiscal_ID = "LBR_NotaFiscal_ID";

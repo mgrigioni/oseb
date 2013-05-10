@@ -17,8 +17,7 @@
 package org.adempierelbr.wrapper;
 
 import java.math.BigDecimal;
-
-import org.compiere.model.I_M_ProductionPlan;
+import org.compiere.model.*;
 
 /** Generated Interface for M_ProductionPlan
  *  @author Adempiere (generated) 

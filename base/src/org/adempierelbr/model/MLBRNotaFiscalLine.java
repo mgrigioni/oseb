@@ -177,9 +177,25 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		
 		//Valiação Situação Tributária
 		validateCST();
+		
+		//FCI
+		setFCI(product);
 
 		save(get_TrxName());
 	} //setInvoiceLine
+	
+	private void setFCI(MProduct product){
+		MLBRProductFCI fci = MLBRProductFCI.getActual(product.get_ID(), get_TrxName());
+		if (fci != null){
+			StringBuilder fciDesc = 
+					new StringBuilder("\nResolução do Senado Federal nº 13/2012, ")
+			                  .append("Valor da Parcela Importada R$ ").append(fci.getAmtSource())
+			                  .append(", Número da FCI ").append(fci.getValue())
+			                  .append(", Conteúdo de Importação ").append(fci.getPercentage()).append("%.");
+			
+			setDescription(getDescription() + fciDesc.toString());
+		}
+	} //setFCI
 	
 	/**
 	 * @param M_Product_ID

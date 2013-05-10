@@ -20,12 +20,7 @@ package org.adempierelbr.model;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
-
-import org.compiere.model.I_M_Product;
-import org.compiere.model.I_Persistent;
-import org.compiere.model.MTable;
-import org.compiere.model.PO;
-import org.compiere.model.POInfo;
+import org.compiere.model.*;
 import org.compiere.util.Env;
 
 /** Generated Model for LBR_AverageCostLine
@@ -37,7 +32,7 @@ public class X_LBR_AverageCostLine extends PO implements I_LBR_AverageCostLine, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130401L;
+	private static final long serialVersionUID = 20130509L;
 
     /** Standard Constructor */
     public X_LBR_AverageCostLine (Properties ctx, int LBR_AverageCostLine_ID, String trxName)

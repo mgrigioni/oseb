@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_A_Asset;
+import org.compiere.model.*;
 
 /** Generated Interface for A_Asset
  *  @author Adempiere (generated) 

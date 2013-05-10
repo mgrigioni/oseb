@@ -14,6 +14,8 @@
 package org.adempierelbr.fci.beans;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.adempierelbr.fci.RegFci;
 import org.adempierelbr.util.RemoverAcentos;
@@ -25,6 +27,13 @@ import org.adempierelbr.util.TextUtil;
  * @version $Id: R5001.java, 03/04/2013, 14:52:00, mgrigioni
  */
 public class R5020 extends RegFci {
+	
+	private final List<String> _UDM = Arrays.asList("A","Ah","ASTM","Bq","°C","CCD",
+			"cg","cm","cm2","cm3","cN","cSt","DCI","g","Gbit","GHz","h","HP",
+			"HRC","Hz","ISO","IV","kbit","kcal","kg","kgf","kHz","kN","kPa",
+			"kV","kVA","kvar","kW","l","m","m-","m2","m3","mbar","Mbit","μCi",
+			"mg","MHz","min","mm","mN","MPa","MW","N","n°","nm","Nm","ns",
+			"o-","p-","pH","s","t","UV","V","vol","W","x°","%","pç","unid");
 	
 	public String NOME_MERCADORIA;
 	public String CODIGO_NCM;
@@ -57,11 +66,18 @@ public class R5020 extends RegFci {
 		CODIGO_NCM = cODIGO_NCM;
 		CODIGO_MERCADORIA = cODIGO_MERCADORIA;
 		CODIGO_GTIN = cODIGO_GTIN;
-		UNIDADE_MERCADORIA = uNIDADE_MERCADORIA;
+		setUNIDADE_MERCADORIA(uNIDADE_MERCADORIA);
 		VALOR_SAIDA_MERCADORIA_INTERESTADUAL = vALOR_SAIDA_MERCADORIA_INTERESTADUAL;
 		VALOR_PARCELA_IMPORTADA_EXTERIOR = vALOR_PARCELA_IMPORTADA_EXTERIOR;
 		CONTEUDO_IMPORTACAO_CI = cONTEUDO_IMPORTACAO_CI;
 	} //R5020
+	
+	private void setUNIDADE_MERCADORIA(String udm){
+		if (!_UDM.contains(udm))
+			udm = "99";
+		
+		this.UNIDADE_MERCADORIA = udm;
+	}
 
 	/**
 	 * Formata o Bloco 5 Registro 020

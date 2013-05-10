@@ -16,7 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_C_Bank;
+import org.compiere.model.*;
 
 /** Generated Interface for C_Bank
  *  @author Adempiere (generated) 

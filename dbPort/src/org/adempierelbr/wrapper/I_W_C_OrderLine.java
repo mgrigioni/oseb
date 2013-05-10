@@ -17,11 +17,7 @@
 package org.adempierelbr.wrapper;
 
 import java.math.BigDecimal;
-
-import org.compiere.model.I_C_InvoiceLine;
-import org.compiere.model.I_C_OrderLine;
-import org.compiere.model.I_M_Locator;
-import org.compiere.model.I_M_ProductionLine;
+import org.compiere.model.*;
 
 /** Generated Interface for C_OrderLine
  *  @author Adempiere (generated) 

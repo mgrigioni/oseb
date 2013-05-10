@@ -16,8 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
-import org.compiere.model.I_C_BPartner;
-import org.compiere.model.I_M_Locator;
+import org.compiere.model.*;
 
 /** Generated Interface for M_Locator
  *  @author Adempiere (generated) 
