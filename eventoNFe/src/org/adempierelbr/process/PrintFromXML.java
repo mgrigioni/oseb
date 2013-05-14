@@ -150,7 +150,7 @@ public class PrintFromXML extends SvrProcess
 
 		JasperPrint jasperPrint = JasperFillManager.fillReport (jasperReport, files, dataSource);
 
-		ReportStarter.getReportViewerProvider().openViewer(jasperPrint, "Impress\u00E7\u00E3o de Documento");
+		ReportStarter.getReportViewerProvider().openViewer(jasperPrint, "Impress\u00E3o de Documento");
 		
 		return "@Success@";
 	}	//	doIt
