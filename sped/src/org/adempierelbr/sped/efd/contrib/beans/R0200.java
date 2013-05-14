@@ -106,7 +106,7 @@ public class R0200 extends RegSped {
 	private void setUNID_INV(String UNID_INV) {
 		
 		if (UNID_INV == null || UNID_INV.isEmpty())
-			this.UNID_INV = "UN"; //OUTROS
+			this.UNID_INV = "UNID"; //OUTROS
 		else
 			this.UNID_INV = TextUtil.checkSize(RemoverAcentos.remover(UNID_INV), 6).toUpperCase();
 	}
