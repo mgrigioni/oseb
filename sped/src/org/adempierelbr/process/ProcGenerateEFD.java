@@ -269,7 +269,7 @@ public class ProcGenerateEFD extends SvrProcess
 				
 				String COD_ITEM  = r0200 == null ? "SEM CODIGO" : r0200.getCOD_ITEM();
 				String TIPO_ITEM = r0200 == null ? "99" : r0200.getTIPO_ITEM();
-				String UNID      = r0190 == null ? "UN" : r0190.getUNID();
+				String UNID      = r0190 == null ? "UNID" : r0190.getUNID();
 				
 				//Detalhes do Documento Fiscal
 				createFiscalDetail(nfLine,fiscalHeader,COD_ITEM,TIPO_ITEM,UNID);
