@@ -85,6 +85,11 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		
 		setValue("TEMP_" + getM_Product_ID());
 		
+		if (getAmtSource().signum() == 1 && getInvoicedAmt().signum() == 1){
+			BigDecimal percentage = ((getAmtSource().divide(getInvoicedAmt(), TaxBR.MCROUND)).multiply(Env.ONEHUNDRED)).setScale(TaxBR.SCALE, TaxBR.ROUND);
+			setPercentage(percentage);
+		}
+		
 		String sql = "SELECT MAX(p.EndDate) " +
 				     "FROM C_Period p " +
 				     "INNER JOIN LBR_ProductFCI fci ON (p.C_Period_ID = fci.C_Period_ID) " +
@@ -98,11 +103,6 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		if (maxDate.compareTo(period.getEndDate()) >= 0){
 			log.warning(Msg.getMsg(getCtx(), "SaveError"));
 			return false;
-		}
-		
-		if (getAmtSource().signum() == 1 && getInvoicedAmt().signum() == 1){
-			BigDecimal percentage = ((getAmtSource().divide(getInvoicedAmt(), TaxBR.MCROUND)).multiply(Env.ONEHUNDRED)).setScale(TaxBR.SCALE, TaxBR.ROUND);
-			setPercentage(percentage);
 		}
 		
 		return true;
