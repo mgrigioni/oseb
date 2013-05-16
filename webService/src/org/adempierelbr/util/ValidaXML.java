@@ -14,6 +14,8 @@ package org.adempierelbr.util;
 
 import java.io.StringReader;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,6 +33,8 @@ public abstract class ValidaXML {
 	/**	Logger				*/
 	private static CLogger log = CLogger.getCLogger(ValidaXML.class);
 	
+	private static Map<String,Validator> mapurl = new HashMap<String,Validator>();
+	
 	/**
 	 * Validate xml file against xsd schema
 	 * @param XML File
@@ -42,20 +46,29 @@ public abstract class ValidaXML {
 		String schemaLang = "http://www.w3.org/2001/XMLSchema";
 		//Get validation driver
 		SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
+		
 		//Create schema by reading it from an XSD file
-		try 
-		{
-			//	Grava o arquivo no tmp
-			URL xsdPath = org.adempierelbr.util.ValidaXML.class.getResource("/org/adempierelbr/xsd/" + xsdFileName);
-          //File xsdFile = new File(xsdPath.getPath());
-			//
-			Schema schema = factory.newSchema(new StreamSource(xsdPath.toURI().toString()));
-			Validator validator = schema.newValidator();
+		try {
+
+			Validator validator = null;			
+			if(mapurl == null || !mapurl.containsKey(xsdFileName)) {
+				//	Grava o arquivo no tmp
+				URL xsdPath = org.adempierelbr.util.ValidaXML.class.getResource("/org/adempierelbr/xsd/" + xsdFileName);
+				Schema schema = factory.newSchema(new StreamSource(xsdPath.toURI().toString()));
+				validator = schema.newValidator();
+				
+				mapurl.put(xsdFileName, validator);
+			}
+			else{
+				validator = mapurl.get(xsdFileName);
+			}
+			
 			//Perform the validation:
 			validator.validate(new StreamSource(new StringReader(stringXml)));
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = fact.newDocumentBuilder();
 			builder.parse(new InputSource(new StringReader(stringXml)));
+			
 		} catch (Exception e) {
 			if (e instanceof SAXParseException)
 				return "XML Parse Error on Col: "
@@ -65,6 +78,7 @@ public abstract class ValidaXML {
 			else
 				return "Unknow error attemping to validate XML.";
 		}
+		
 		return "";
 	}
 

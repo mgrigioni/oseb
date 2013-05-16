@@ -16,15 +16,22 @@ package org.adempierelbr.model;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
+import org.adempiere.model.POWrapper;
 import org.adempierelbr.util.TaxBR;
+import org.adempierelbr.wrapper.I_W_M_Product;
+import org.compiere.model.MPeriod;
 import org.compiere.model.MProduct;
+import org.compiere.model.MProductBOM;
 import org.compiere.model.MTable;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
 /**
  *  LBR_ProductFCI Model
@@ -71,6 +78,50 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		setC_Period_ID(C_Period_ID);
 	}
 	
+	protected boolean beforeSave(boolean newRecord) {
+		
+		if (!newRecord)
+			return true;
+		
+		setValue("TEMP_" + getM_Product_ID());
+		
+		String sql = "SELECT MAX(p.EndDate) " +
+				     "FROM C_Period p " +
+				     "INNER JOIN LBR_ProductFCI fci ON (p.C_Period_ID = fci.C_Period_ID) " +
+				     "WHERE fci.M_Product_ID = ?";
+		
+		Timestamp maxDate = DB.getSQLValueTSEx(get_TrxName(), sql, new Object[]{getM_Product_ID()});
+		if (maxDate == null) //NAO POSSUE NENHUM ENTRADA
+			return true;
+		
+		MPeriod period = MPeriod.get(getCtx(), getC_Period_ID());
+		if (maxDate.compareTo(period.getEndDate()) >= 0){
+			log.warning(Msg.getMsg(getCtx(), "SaveError"));
+			return false;
+		}
+		
+		if (getAmtSource().signum() == 1 && getInvoicedAmt().signum() == 1){
+			BigDecimal percentage = ((getAmtSource().divide(getInvoicedAmt(), TaxBR.MCROUND)).multiply(Env.ONEHUNDRED)).setScale(TaxBR.SCALE, TaxBR.ROUND);
+			setPercentage(percentage);
+		}
+		
+		return true;
+	}	//	beforeSave
+	
+	protected boolean afterSave (boolean newRecord, boolean success){
+		
+		if (!newRecord)
+			return success;
+		
+		MProduct product = MProduct.get(getCtx(), getM_Product_ID());
+		String productSource = "5";
+		if (getPercentage().compareTo(new BigDecimal("40")) > 0)
+			productSource = "3";
+			
+		product.set_ValueOfColumn("lbr_ProductSource", productSource);
+		return product.save(get_TrxName());
+	}	//	afterSave
+		
 	public static MLBRProductFCI get(Properties ctx, String productValue, int C_Period_ID, String trxName){
 		
 		MProduct[] products = MProduct.get(ctx, "Value='"+productValue+"'", trxName);
@@ -176,5 +227,29 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		Timestamp dateDoc = DB.getSQLValueTSEx(trxName, sql, new Object[]{isSOTrx,M_Product_ID,dateTo});
 		return dateDoc;
 	} //getLastDate
+	
+	public static Set<Integer> loadBOM(MProduct product){	
+		Set<Integer> importados =  new LinkedHashSet<Integer>();
+		
+		if (product.isBOM()){
+			MProductBOM[] boms = MProductBOM.getBOMLines(product);
+			for(MProductBOM bom : boms){
+				if (!bom.isActive())
+					continue;
+				
+				MProduct pBOM = new MProduct(bom.getCtx(),bom.getM_ProductBOM_ID(),bom.get_TrxName());
+				if (pBOM.getProductType().equals(MProduct.PRODUCTTYPE_Item))
+					importados.addAll(loadBOM(pBOM));
+			}
+		}
+		
+		I_W_M_Product pW = POWrapper.create(product, I_W_M_Product.class);
+		if ("1".equals(pW.getlbr_ProductSource()) && product.isPurchased() && product.isStocked()){ //MATERIAL IMPORTADO
+			importados.add(product.get_ID());
+		}
+		
+		return importados;
+	} //loadBOM
+	
 
 } //MLBRProductFCI

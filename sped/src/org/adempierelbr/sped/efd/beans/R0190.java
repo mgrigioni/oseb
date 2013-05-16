@@ -44,7 +44,7 @@ public class R0190 extends RegSped {
 	private void setUNID(String UNID,String DESCR) {
 		
 		if (UNID == null || UNID.isEmpty()){
-			this.UNID = "UN"; //OUTROS
+			this.UNID = "UNID"; //OUTROS
 			this.DESCR= "UNIDADE";
 		}
 		else{
