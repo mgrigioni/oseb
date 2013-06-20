@@ -17,15 +17,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.compiere.util.CLogger;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
 public abstract class ValidaXML {
@@ -65,9 +62,12 @@ public abstract class ValidaXML {
 			
 			//Perform the validation:
 			validator.validate(new StreamSource(new StringReader(stringXml)));
+			
+			/* ??
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = fact.newDocumentBuilder();
 			builder.parse(new InputSource(new StringReader(stringXml)));
+			*/
 			
 		} catch (Exception e) {
 			if (e instanceof SAXParseException)
