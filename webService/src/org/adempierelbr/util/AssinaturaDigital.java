@@ -251,6 +251,8 @@ public class AssinaturaDigital
 
 		DOMSignContext dsc = new DOMSignContext(getChavePrivada(), doc
 				.getDocumentElement());
+		dsc.setIdAttributeNS(el, null, "Id");
+		
 		XMLSignature signature = sig.newXMLSignature(si, ki);
 		signature.sign(dsc);
 		OutputStream os = new FileOutputStream(localDocumento);
