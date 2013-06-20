@@ -134,6 +134,9 @@ public class ProcDownloadNFe extends SvrProcess
 			    
 			    String cStat = NFeUtil.getValue(doc, "cStat");
 			    if (cStat.equals("139")){
+			    	if (respStatus.indexOf("<nfeProc") == -1 || respStatus.indexOf("</procNFe>") == -1)
+			    		continue;
+			    	
 			    	respStatus = NFeUtil.XML_HEADER + respStatus.substring(respStatus.indexOf("<nfeProc"), respStatus.indexOf("</procNFe>"));
 					File xml = new File(TextUtil.generateTmpFile(respStatus, nf.getlbr_NFeID() + NFeUtil.EXT_DIST_NFE));
 					NFeUtil.updateAttach(nf, xml);
