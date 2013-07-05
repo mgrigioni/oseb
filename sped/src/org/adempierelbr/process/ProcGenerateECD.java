@@ -26,11 +26,15 @@ import org.adempierelbr.sped.ecd.beans.RI010;
 import org.adempierelbr.sped.ecd.beans.RI030;
 import org.adempierelbr.sped.ecd.beans.RI050;
 import org.adempierelbr.sped.ecd.beans.RI051;
+import org.adempierelbr.sped.ecd.beans.RI052;
 import org.adempierelbr.sped.ecd.beans.RI150;
 import org.adempierelbr.sped.ecd.beans.RI155;
 import org.adempierelbr.sped.ecd.beans.RI250;
 import org.adempierelbr.sped.ecd.beans.RI990;
 import org.adempierelbr.sped.ecd.beans.RJ001;
+import org.adempierelbr.sped.ecd.beans.RJ005;
+import org.adempierelbr.sped.ecd.beans.RJ100;
+import org.adempierelbr.sped.ecd.beans.RJ150;
 import org.adempierelbr.sped.ecd.beans.RJ900;
 import org.adempierelbr.sped.ecd.beans.RJ930;
 import org.adempierelbr.sped.ecd.beans.RJ990;
@@ -160,11 +164,13 @@ public class ProcGenerateECD extends SvrProcess {
 		MLocation lOrg = new MLocation(ctx, oi.getC_Location_ID(), trxName);
 		//
 		//		Results	
-		StringBuffer result_B0 = new StringBuffer("");
-		StringBuffer result_BI_1 = new StringBuffer("");
-		StringBuffer result_BI_2 = new StringBuffer("");
-		StringBuffer result_BI_3 = new StringBuffer("");
+		StringBuffer result_B0    = new StringBuffer("");
+		StringBuffer result_BI_1  = new StringBuffer("");
+		StringBuffer result_BI_2  = new StringBuffer("");
+		StringBuffer result_BI_3  = new StringBuffer("");
 		StringBuffer result_BI_2A = new StringBuffer("");
+		StringBuffer result_BJ100 = new StringBuffer("");
+		StringBuffer result_BJ150 = new StringBuffer("");
 		StringBuffer result = new StringBuffer("");
 		//
 		String orgCityCode = BPartnerUtil.getCityCode(lOrg);
@@ -223,6 +229,7 @@ public class ProcGenerateECD extends SvrProcess {
 		result_BI_2A.append(rI150);
 		//
 		ECDBalance[] balances = ECDBalance.getBalances (p_DateFrom, p_DateTo, _AccountUnq);
+		Arrays.sort(balances);
 		for (ECDBalance balance : balances)
 		{
 			BigDecimal totDebit;
@@ -247,8 +254,18 @@ public class ProcGenerateECD extends SvrProcess {
 			//
 			result_BI_2.append(uniqAccount(balance.getAccount(),p_DateTo));
 			//
-			RI155 rI155 = new RI155 (balance, totDebit, totCredit);
-			result_BI_2A.append(rI155);
+			int COD_NAT = Integer.parseInt(ECDUtil.getCOD_NAT(balance.getAccount().getAccountType()));
+			
+			if (!balance.getAccount().isSummary()){
+				result_BI_2A.append(new RI155 (balance, totDebit, totCredit));
+			}
+			else if (COD_NAT <= 3){
+				result_BJ100.append(new RJ100 (COD_NAT, balance));
+			}
+			else if (COD_NAT > 3){
+				result_BJ150.append(new RJ150 (balance));
+			}
+			
 		}	//	for
 		//	Contas superiores
 		result_BI_2.append(RI050.getAccountParent());
@@ -291,6 +308,11 @@ public class ProcGenerateECD extends SvrProcess {
 
 		MBPartner bpCont = new MBPartner (ctx, oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_BP_Accountant_ID), null);
 		result.append(new RJ001(true));
+		if (result_BJ100.length() > 0){
+			result.append(new RJ005(p_DateFrom, p_DateTo, "1", null));
+			result.append(result_BJ100);
+			result.append(result_BJ150);
+		}
 		result.append(rJ900);
 		RJ930 rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF), "Contador", "900", bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CRC));
 		result.append(rJ930);
@@ -319,13 +341,15 @@ public class ProcGenerateECD extends SvrProcess {
 	private String uniqAccount(MElementValue ev, Timestamp DT_FIN){
 		
 		StringBuffer result = new StringBuffer("");
-		if (!_AccountUnq.contains(ev.getC_ElementValue_ID()))
+		if (!_AccountUnq.contains(ev.getC_ElementValue_ID()) && !ev.isSummary())
 		{
 			RI050 rI050 = new RI050 (DT_FIN, ev.getCreated(), ev.getAccountType(), "A", ev.getValue(), ev.getName());
 			RI051 rI051 = new RI051 (null, ev.get_ValueAsString("Description2"));
+			RI052 rI052 = new RI052 (null, ev.getValue().substring(0, ev.getValue().lastIndexOf(".")));
 			//
 			result.append(rI050);
 			result.append(rI051);
+			result.append(rI052);
 			//
 			_AccountUnq.add(ev.getC_ElementValue_ID());
 		}

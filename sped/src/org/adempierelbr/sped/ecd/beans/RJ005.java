@@ -12,7 +12,6 @@
  *****************************************************************************/
 package org.adempierelbr.sped.ecd.beans;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import org.adempierelbr.sped.RegSped;
@@ -36,13 +35,13 @@ public class RJ005 extends RegSped {
 	
 	private Timestamp DT_INI;
 	private Timestamp DT_FIN;
-	private BigDecimal ID_DEM;
+	private String ID_DEM;
 	private String CAB_DEM;
 
 	/**
 	 * Constructor
 	 */
-	public RJ005(Timestamp DT_INI, Timestamp DT_FIN, BigDecimal ID_DEM,String CAB_DEM) 
+	public RJ005(Timestamp DT_INI, Timestamp DT_FIN, String ID_DEM, String CAB_DEM) 
 	{
 		super();
 		this.DT_INI = DT_INI;
@@ -62,7 +61,7 @@ public class RJ005 extends RegSped {
                    (PIPE).append(REG) 
             .append(PIPE).append(TextUtil.timeToString(DT_INI, "ddMMyyyy"))
             .append(PIPE).append(TextUtil.timeToString(DT_FIN, "ddMMyyyy"))
-            .append(PIPE).append(TextUtil.toNumeric(ID_DEM, 0, 1))
+            .append(PIPE).append(TextUtil.toNumeric(ID_DEM))
             .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(CAB_DEM), 65535))
             .append(PIPE);
 
