@@ -15,6 +15,7 @@ package org.adempierelbr.sped.ecd.beans;
 import java.math.BigDecimal;
 
 import org.adempierelbr.sped.RegSped;
+import org.adempierelbr.sped.ecd.ECDBalance;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 
@@ -47,16 +48,25 @@ public class RJ100 extends RegSped {
 	/**
 	 * Constructor
 	 */
-	public RJ100(String COD_AGL, BigDecimal NIVEL_AGL,String IND_GPR_BAL, String DESCR_COD_AGL,
-			BigDecimal VL_CTA, String IND_DC_BAL) 
+	public RJ100(int IND_GPR_BAL, ECDBalance balance) 
 	{
 		super();
-		this.COD_AGL       = COD_AGL;
-		this.NIVEL_AGL     = NIVEL_AGL;
-		this.DESCR_COD_AGL = DESCR_COD_AGL;
-		this.VL_CTA        = VL_CTA;
-		this.IND_DC_BAL    = IND_DC_BAL;
+		this.COD_AGL = balance.getAccount().getValue();
+		this.NIVEL_AGL = new BigDecimal (COD_AGL.replaceAll("[^.]","").length() + 1);
+		setIND_GPR_BAL(IND_GPR_BAL);
+		this.DESCR_COD_AGL = balance.getAccount().getName();
+		this.VL_CTA = balance.getBeginBalance().abs();
+		this.IND_DC_BAL = balance.getBeginBalance().signum() == 1 ? "D" : "C";
 	} // RJ100
+	
+	private void setIND_GPR_BAL(int IND_GPR_BAL){
+		if (IND_GPR_BAL == 1)
+			this.IND_GPR_BAL = "1";
+		else if (IND_GPR_BAL >= 2 && IND_GPR_BAL <= 3)
+			this.IND_GPR_BAL = "2";
+		else
+			log.warning("ERRO NO TIPO DE CONTA DO BALANÇO");
+	}
 
 	/**
 	 * Formata o Bloco J Registro 100
@@ -68,7 +78,7 @@ public class RJ100 extends RegSped {
 		StringBuilder format = new StringBuilder
                    (PIPE).append(REG) 
             .append(PIPE).append(TextUtil.checkSize(COD_AGL, 255))
-            .append(PIPE).append(TextUtil.toNumeric(NIVEL_AGL, 0, 255) )
+            .append(PIPE).append(TextUtil.toNumeric(NIVEL_AGL, 0) )
             .append(PIPE).append(TextUtil.checkSize(IND_GPR_BAL, 1))
             .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(DESCR_COD_AGL), 255))
             .append(PIPE).append(TextUtil.toNumeric(VL_CTA, 0, 255))

@@ -15,8 +15,10 @@ package org.adempierelbr.sped.ecd.beans;
 import java.math.BigDecimal;
 
 import org.adempierelbr.sped.RegSped;
+import org.adempierelbr.sped.ecd.ECDBalance;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
+import org.compiere.model.MElementValue;
 /**
  * Identificação do Arquivo
  * 
@@ -44,16 +46,34 @@ public class RJ150 extends RegSped {
 	/**
 	 * Constructor
 	 */
-	public RJ150(String COD_AGL, BigDecimal NIVEL_AGL, String DESCR_COD_AGL,
-			BigDecimal VL_CTA, String IND_VL)
+	public RJ150(ECDBalance balance)
 	{
 		super();
-		this.COD_AGL       = COD_AGL;
-		this.NIVEL_AGL     = NIVEL_AGL;
-		this.DESCR_COD_AGL = DESCR_COD_AGL;
-		this.VL_CTA		   = VL_CTA;
-		this.IND_VL		   = IND_VL;
+		this.COD_AGL       = balance.getAccount().getValue();;
+		this.NIVEL_AGL     = new BigDecimal (COD_AGL.replaceAll("[^.]","").length() + 1);
+		this.DESCR_COD_AGL = balance.getAccount().getName();
+		this.VL_CTA		   = balance.getBeginBalance().abs();
+		setIND_VL(balance);
 	} // RJ150
+	
+	private void setIND_VL(ECDBalance balance){
+		
+		String acctType = balance.getAccount().getAccountType();
+		if (acctType.equals(MElementValue.ACCOUNTTYPE_Revenue)){
+			this.IND_VL = "R";
+		}
+		else if (acctType.equals(MElementValue.ACCOUNTTYPE_Expense)){
+			this.IND_VL = "D";
+		}
+		else {
+			if (balance.getBeginBalance().signum() == 1){
+				this.IND_VL = "R";
+			}
+			else{
+				this.IND_VL = "D";
+			}
+		}
+	}
 
 	/**
 	 * Formata o Bloco J Registro 150
@@ -65,7 +85,7 @@ public class RJ150 extends RegSped {
 		StringBuilder format = new StringBuilder
                    (PIPE).append(REG) 
             .append(PIPE).append(TextUtil.checkSize(COD_AGL, 255))
-            .append(PIPE).append(TextUtil.toNumeric(NIVEL_AGL, 0, 255))
+            .append(PIPE).append(TextUtil.toNumeric(NIVEL_AGL, 0))
             .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(DESCR_COD_AGL), 255))
             .append(PIPE).append(TextUtil.toNumeric(VL_CTA, 0, 255))
             .append(PIPE).append(TextUtil.checkSize(IND_VL, 1))

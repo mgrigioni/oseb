@@ -110,13 +110,13 @@ public class AssinaturaDigital
 	{
 		Integer cert = (Integer) oi.get_Value(I_W_AD_OrgInfo.COLUMNNAME_LBR_DC_Org_ID);
 		MLBRDigitalCertificate dc = new MLBRDigitalCertificate(Env.getCtx(), cert, null);
-		String aliascliente = dc.getAlias();
-		String password = dc.getPassword();
+
 		MAttachment attachJKS = dc.getAttachment();
 		File jksFile = NFeUtil.getAttachmentEntryFile(attachJKS.getEntry(0));
+		
 		jksData = new FileInputStream(jksFile);
-		alias = aliascliente;
-		senha = password.toCharArray();
+		alias = dc.getAlias();;
+		senha = dc.getPassword().toCharArray();
 		//
 		if (dc.getlbr_CertType() == null)
 			throw new AdempiereException("Certificate Type is NULL");

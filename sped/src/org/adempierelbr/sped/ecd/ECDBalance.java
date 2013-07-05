@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempierelbr.util.TextUtil;
 import org.compiere.model.MElementValue;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -22,7 +23,7 @@ import org.compiere.util.Env;
  * @contributor Mario Grigioni, mgrigioni
  * @version $Id: ECDBalance.java, 17/11/2010, 09:42:00, mgrigioni
  */
-public class ECDBalance
+public class ECDBalance implements Comparable<Object>
 {
 	private static CLogger log = CLogger.getCLogger(ECDBalance.class);
 	
@@ -49,22 +50,46 @@ public class ECDBalance
 		ArrayList<ECDBalance> list = new ArrayList<ECDBalance> ();
 		ArrayList<Integer> found = new ArrayList<Integer>();
 		Properties ctx = Env.getCtx();
+		int AD_Client_ID = Env.getAD_Client_ID(ctx);
+		
+		boolean hasSummary = false;
 
-		String sql = "SELECT FABR.Account_ID AS C_ElementValue_ID, " +
+		String sql = "SELECT '1' AS Type, FABR.Account_ID AS C_ElementValue_ID, " +
 				     " NVL(SUM(FABR.AmtAcctDr-FABR.AmtAcctCr), 0) AS Balance " +
 		             " FROM LBR_Fact_Acct FABR " +
 		             " WHERE FABR.AD_Client_ID=? " +
 		             " AND FABR.DocStatus='CO'" +
 		             " AND FABR.DateAcct < ? " +
 		             " GROUP BY FABR.Account_ID ";
+		
+		if (TextUtil.timeToString(dateTo, "dd/MM").equals("31/12")){
+			  hasSummary = true;
+		      sql += " UNION ALL " +
+		             "SELECT '2' AS Type, EV.C_ElementValue_ID, " +		             
+		             " (NVL(SUM((CASE WHEN FABR.DateAcct >= ? THEN FABR.AmtAcctDr-FABR.AmtAcctCr ELSE 0 END)), 0)) + " +
+		             " (NVL(SUM((CASE WHEN FABR.DateAcct < ? THEN FABR.AmtAcctDr-FABR.AmtAcctCr ELSE 0 END)), 0)) AS Balance " +
+		             " FROM C_ElementValue EV" +
+		             " INNER JOIN LBR_Fact_Acct FABR ON (FABR.DateAcct <= ? AND FABR.ElementValue_Value LIKE EV.Value || '.%')" +
+		             " WHERE EV.AD_Client_ID = ? AND EV.IsSummary = 'Y' AND FABR.DocStatus='CO'" +
+		             " AND EV.C_ElementValue_ID NOT IN (SELECT DISTINCT C_ElementValue_ID FROM LBR_Fact_Acct WHERE AD_Client_ID = ?)" +
+		             " AND EV.C_Element_ID NOT IN (SELECT C_Element_ID FROM C_Element WHERE ElementType = 'U')" +
+		             " GROUP BY EV.C_ElementValue_ID";
+		}
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try
 		{
 			pstmt = DB.prepareStatement(sql, null);
-			pstmt.setInt(1, Env.getAD_Client_ID(Env.getCtx()));
+			pstmt.setInt(1, AD_Client_ID);
 			pstmt.setTimestamp(2, dateFrom);
+			if (hasSummary){
+				pstmt.setTimestamp(3, dateFrom);
+				pstmt.setTimestamp(4, dateFrom);
+				pstmt.setTimestamp(5, dateTo);
+				pstmt.setInt(6, AD_Client_ID);
+				pstmt.setInt(7, AD_Client_ID);
+			}
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{
@@ -230,5 +255,36 @@ public class ECDBalance
 	{
 		this.indicator = indicator;
 	}	//	setIndicator
+	
+	/**
+	 * 	Comparador para Collection
+	 * 
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
+	public int compare (Object o1, Object o2) {
+		if (o1 == null)									//	Depois
+			return 1;
+		else if (o2 == null)
+			return -1;									//	Antes
+		else if (o1 instanceof ECDBalance && o2 instanceof ECDBalance)
+		{
+			ECDBalance b1 = (ECDBalance) o1;
+			ECDBalance b2 = (ECDBalance) o2;
+			//
+			String s1 = b1.getAccount().getValue();
+			String s2 = b2.getAccount().getValue();
+			
+			return s1.compareTo(s2);
+		}
+		
+		return 0;
+	}
+
+	/**
+	 * 	Comparador para Collection
+	 */
+	public int compareTo (Object o) {
+		return compare (this, o);
+	}
 	
 }	//	ECDBalance
