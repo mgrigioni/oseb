@@ -60,7 +60,7 @@ public class MLBRDE extends X_LBR_DE {
 	
 	public boolean beforeDelete(){
 		
-		String sql = "UPDATE LBR_NotaFiscal SET LBR_DE_ID = NULL " +
+		String sql = "UPDATE LBR_NotaFiscalLine SET LBR_DE_ID = NULL " +
 					     "WHERE LBR_DE_ID = ?";
 		if (DB.executeUpdate(sql, get_ID(), false, get_TrxName()) == -1){
 			log.severe("Erro ao excluir a Declaração de Exportação");
