@@ -200,6 +200,7 @@ public class MLBRBoleto extends X_LBR_Boleto
 
 			}			
 			
+			DB.close(rs, pstmt);
 			
 			/** 
 			 * ESSES MÉTODOS ABAIXO SÃO PARA CASOS EM QUA NÃO ENCONTRE A FATURA + NUMERO DA PARCELA

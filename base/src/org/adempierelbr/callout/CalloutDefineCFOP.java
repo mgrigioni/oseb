@@ -259,6 +259,8 @@ public class CalloutDefineCFOP extends CalloutEngine {
 			while(rs.next()){
 				contRows++;
 			}
+			rs.close();
+			
 			int cont = 0;
 			rs = pstmt.executeQuery();
 			if(contRows < 2){
