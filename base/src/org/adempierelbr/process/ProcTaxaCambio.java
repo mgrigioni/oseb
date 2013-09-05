@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.model.MConversionRate;
 import org.compiere.model.MConversionType;
@@ -46,7 +47,7 @@ public class ProcTaxaCambio extends SvrProcess
 	private Timestamp dataCambio;
 	private BigDecimal taxaVenda;
 	
-	private final String fonte = "http://www4.bcb.gov.br/pec/taxas/batch/taxas.asp?id=txdolar";
+	private final String fonte = "https://www3.bcb.gov.br/ptax_internet/consultarUltimaCotacaoDolar.do";
 	
 	private final int USD = 100;
 	private final int BRL = 297;
@@ -110,12 +111,13 @@ public class ProcTaxaCambio extends SvrProcess
     private void extract(String texto) {
     	         
         String textocota = new String();
+        texto = RemoverAcentos.remover(texto);
                 
         /**
          * Removendo texto que interessa com expressões regulares
          */
         
-        Pattern tabelacota = Pattern.compile("<table cellspacing=\"1\" summary=\"Cotação de fechamento do Dólar americano\">(.*?)</table>");
+        Pattern tabelacota = Pattern.compile("table cellspacing1 summaryCotacao de fechamento do Dolar americano(.*?)/table", Pattern.CASE_INSENSITIVE);
         Matcher m = tabelacota.matcher(texto);
         if(m.find()) {
             //System.out.println(m.group());
@@ -129,11 +131,13 @@ public class ProcTaxaCambio extends SvrProcess
             dataCambio = TextUtil.stringToTime(datam.group(),"dd/MM/yyyy");
         }
         
-        Pattern taxacota = Pattern.compile("(\\d),(\\d+)</td></tr>");
+        Pattern taxacota = Pattern.compile("(\\d),(\\d+)/td");
         Matcher taxacotam = taxacota.matcher(textocota);
         
         if(taxacotam.find()) {
-            taxaVenda = new BigDecimal((taxacotam.group().replaceAll("</td></tr>", "")).replace(",", "."));
+        	if(taxacotam.find()) {
+            taxaVenda = new BigDecimal((taxacotam.group().replaceAll("/td", "")).replace(",", "."));
+        	}
         }
     } //extract
 
