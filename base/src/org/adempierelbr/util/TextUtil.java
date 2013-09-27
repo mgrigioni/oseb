@@ -873,6 +873,9 @@ public abstract class TextUtil
 	 */
 	public static Timestamp stringToTime(String data,String dateFormat) {
 
+		if (data == null || data.isEmpty())
+			return null;
+		
 		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 		ParsePosition pos = new ParsePosition(0);
 		java.util.Date date = null;
