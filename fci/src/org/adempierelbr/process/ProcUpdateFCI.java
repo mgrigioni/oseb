@@ -44,7 +44,7 @@ public class ProcUpdateFCI extends SvrProcess
 			String name = para.getParameterName();
 			if (para.getParameter() == null)
 				;
-			else if (name.equals("")){
+			else if (name.equals("FileName")){
 				fileName = (String)para.getParameter();
 			}
 			else
@@ -68,7 +68,7 @@ public class ProcUpdateFCI extends SvrProcess
 			if (!linha.startsWith("5020") || linha.indexOf(TextUtil.PIPE) == -1)
 				continue;
 
-			String[] campos = linha.split(TextUtil.PIPE);
+			String[] campos = linha.split("\\" + TextUtil.PIPE);
 			if (campos.length == 11){
 				
 				isValid = true;

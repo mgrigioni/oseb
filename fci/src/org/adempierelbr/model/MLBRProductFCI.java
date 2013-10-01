@@ -170,7 +170,7 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 			else if (!isSOTrx && !cfop.startsWith("3"))
 				break; //SOMENTE IMPORTACAO
 			
-			BigDecimal baseICMS = line.getICMSBaseAmt();
+			BigDecimal baseICMS = line.getTaxBaseAmt("PIS");
 			if (baseICMS.signum() == 1){
 				qtd = qtd.add(line.getQty());
 				valor = valor.add(baseICMS);
@@ -218,7 +218,7 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		String sql = "SELECT MAX(TRUNC(COALESCE(lbr_DateInOut, DateDoc))) " +
 				     "FROM LBR_NotaFiscalLine nfl " +
 				     "INNER JOIN LBR_NotaFiscal nf ON (nfl.LBR_NotaFiscal_ID = nf.LBR_NotaFiscal_ID) " +
-				     "INNER JOIN LBR_NFLineTax_v nft ON (nfl.LBR_NotaFiscalLine_ID = nft.LBR_NotaFiscalLine_ID AND nft.TaxIndicator='ICMS') " +
+				     "INNER JOIN LBR_NFLineTax_v nft ON (nfl.LBR_NotaFiscalLine_ID = nft.LBR_NotaFiscalLine_ID AND nft.TaxIndicator='PIS') " +
 				     "WHERE nf.IsSOTrx=? AND nf.IsCancelled='N' AND nfl.M_Product_ID=? AND nft.lbr_TaxBaseAmt > 0 " +
 				     "AND (CASE WHEN nf.IsSOTrx='Y' THEN TRUNC(DateDoc) " +
 				     "ELSE TRUNC(COALESCE(lbr_DateInOut, DateDoc)) END) < ? " +
