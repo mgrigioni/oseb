@@ -16,10 +16,13 @@ package org.adempierelbr.nfe.beans;
 import java.math.BigDecimal;
 
 import org.adempiere.exceptions.AdempiereException;
+import org.adempiere.model.POWrapper;
 import org.adempierelbr.model.MLBRNotaFiscalLine;
+import org.adempierelbr.model.MLBRProductFCI;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.MProduct;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -53,6 +56,7 @@ public class ProdutoNFe {
 	private String vOutro;
 	private final String indTot = "1"; //v2.0 = 0 – VL Ñ ENTRA NO TOT 1 - VL ENTRA
 	private DeclaracaoDI DI;
+	private String nFCI;
 	
 	/**
 	 * Default Constructor
@@ -78,6 +82,7 @@ public class ProdutoNFe {
 		setvFrete(nfLine.getFreightAmt());
 		setvSeg(nfLine.getInsuranceAmt());
 		setvOutro(nfLine.getChargeAmt());
+		setnFCI(MProduct.get(nfLine.getCtx(), nfLine.getM_Product_ID()));
 	}
 	
 	public String getcProd() {
@@ -248,6 +253,21 @@ public class ProdutoNFe {
 	}
 	public void setDI(DeclaracaoDI dI) {
 		DI = dI;
+	}
+
+	public String getnFCI() {
+		return nFCI;
+	}
+	public void setnFCI(MProduct product) {
+		
+		I_W_M_Product proW = POWrapper.create(product, I_W_M_Product.class);
+		
+		if ("358".indexOf(proW.getlbr_ProductSource()) != -1){
+			MLBRProductFCI fci = MLBRProductFCI.getActual(product.get_ID(), product.get_TrxName());
+			if (fci != null){
+				this.nFCI = fci.getValue().toUpperCase();
+			}
+		}
 	}
 	
 } // ProdutoNFe

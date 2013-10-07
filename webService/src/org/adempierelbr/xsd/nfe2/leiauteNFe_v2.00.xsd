@@ -19,6 +19,8 @@
 <!-- PL_006p - 29/10/2012 -  inclusão da tabela completa codANP  -->
 <!-- PL_006p - 29/10/2012 -  restabelecidas as restrições para qVol  -->
 <!-- PL_006q - 20/11/2012 -  Origem mercadoria de acordo com NT 2012/005 -->
+<!-- PL_006r - 23/04/2013 -  Redução qtde. máxima ocorrências NFref; inclusão do elemento vTotTrib (NT 2013/003) -->
+<!-- PL_006s - 01/10/2013 - Inclusão de campos de controle Resolução 13: FCI (NT 2013/006) -->
 <xs:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.portalfiscal.inf.br/nfe" targetNamespace="http://www.portalfiscal.inf.br/nfe" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema_v1.01.xsd"/>
 	<xs:include schemaLocation="tiposBasico_v1.03.xsd"/>
@@ -105,7 +107,7 @@ SCAN 900-999</xs:documentation>
 											<xs:documentation>Data de emissão do Documento Fiscal (AAAA-MM-DD)</xs:documentation>
 										</xs:annotation>
 									</xs:element>
-									<xs:element name="dSaiEnt" type="TData" minOccurs="0">
+									<xs:element name="dSaiEnt" type="TData">
 										<xs:annotation>
 											<xs:documentation>Data de saída ou de entrada da mercadoria / produto (AAAA-MM-DD)</xs:documentation>
 										</xs:annotation>
@@ -132,7 +134,7 @@ SCAN 900-999</xs:documentation>
 											<xs:documentation>Código do Município de Ocorrência do Fato Gerador (utilizar a tabela do IBGE)</xs:documentation>
 										</xs:annotation>
 									</xs:element>
-									<xs:element name="NFref" minOccurs="0" maxOccurs="unbounded">
+									<xs:element name="NFref" minOccurs="0" maxOccurs="500">
 										<xs:annotation>
 											<xs:documentation>Grupo de infromações da NF referenciada</xs:documentation>
 										</xs:annotation>
@@ -573,7 +575,7 @@ Este campo será obrigatoriamente preenchido com:
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:element>
-									<xs:element name="fone">
+									<xs:element name="fone" minOccurs="0">
 										<xs:annotation>
 											<xs:documentation>Telefone</xs:documentation>
 										</xs:annotation>
@@ -589,7 +591,7 @@ Este campo será obrigatoriamente preenchido com:
 											<xs:documentation>Sigla da Unidade da Federação</xs:documentation>
 										</xs:annotation>
 									</xs:element>
-									<xs:element name="nDAR">
+									<xs:element name="nDAR" minOccurs="0">
 										<xs:annotation>
 											<xs:documentation>Número do Documento de Arrecadação de Receita</xs:documentation>
 										</xs:annotation>
@@ -600,12 +602,12 @@ Este campo será obrigatoriamente preenchido com:
 											</xs:restriction>
 										</xs:simpleType>
 									</xs:element>
-									<xs:element name="dEmi" type="TData">
+									<xs:element name="dEmi" type="TData" minOccurs="0">
 										<xs:annotation>
 											<xs:documentation>Data de emissão do DAR (AAAA-MM-DD)</xs:documentation>
 										</xs:annotation>
 									</xs:element>
-									<xs:element name="vDAR" type="TDec_1302">
+									<xs:element name="vDAR" type="TDec_1302" minOccurs="0">
 										<xs:annotation>
 											<xs:documentation>Valor Total constante no DAR</xs:documentation>
 										</xs:annotation>
@@ -685,8 +687,7 @@ Este campo será obrigatoriamente preenchido com:
 de recepção da NF-e indicada pelo destinatário (v2.0)</xs:documentation>
 										</xs:annotation>
 										<xs:simpleType>
-											<xs:restriction base="xs:string">
-												<xs:whiteSpace value="preserve"/>
+											<xs:restriction base="TString">
 												<xs:minLength value="1"/>
 												<xs:maxLength value="60"/>
 											</xs:restriction>
@@ -873,11 +874,15 @@ Formato ”CFOP9999”.</xs:documentation>
 													</xs:simpleType>
 												</xs:element>
 												<xs:element name="DI" minOccurs="0" maxOccurs="unbounded">
+													<xs:annotation>
+														<xs:documentation>Delcaração de Importação
+(NT 2011/004)</xs:documentation>
+													</xs:annotation>
 													<xs:complexType>
 														<xs:sequence>
 															<xs:element name="nDI">
 																<xs:annotation>
-																	<xs:documentation>Numero do Documento de Importação DI/DSI/DA (DI/DSI/DA)</xs:documentation>
+																	<xs:documentation>Numero do Documento de Importação DI/DSI/DA/DRI-E (DI/DSI/DA/DRI-E) (NT2011/004)</xs:documentation>
 																</xs:annotation>
 																<xs:simpleType>
 																	<xs:restriction base="TString">
@@ -925,7 +930,7 @@ Formato ”CFOP9999”.</xs:documentation>
 															</xs:element>
 															<xs:element name="adi" maxOccurs="unbounded">
 																<xs:annotation>
-																	<xs:documentation>Adições</xs:documentation>
+																	<xs:documentation>Adições (NT 2011/004)</xs:documentation>
 																</xs:annotation>
 																<xs:complexType>
 																	<xs:sequence>
@@ -994,6 +999,11 @@ Formato ”CFOP9999”.</xs:documentation>
 															<xs:pattern value="[0-9]{1,6}"/>
 														</xs:restriction>
 													</xs:simpleType>
+												</xs:element>
+												<xs:element name="nFCI" type="TGuid" minOccurs="0">												
+													<xs:annotation>
+														<xs:documentation>Número de controle da FCI - Ficha de Conteúdo de Importação.</xs:documentation>
+													</xs:annotation>
 												</xs:element>
 												<xs:choice minOccurs="0">
 													<xs:annotation>
@@ -1416,21 +1426,18 @@ N-NormalVIN </xs:documentation>
 													</xs:element>
 													<xs:element name="comb">
 														<xs:annotation>
-															<xs:documentation>Informar apenas para operações
-com combustíveis líquidos</xs:documentation>
+															<xs:documentation>Informar apenas para operações com combustíveis líquidos</xs:documentation>
 														</xs:annotation>
 														<xs:complexType>
 															<xs:sequence>
 																<xs:element name="cProdANP">
 																	<xs:annotation>
-																		<xs:documentation>Código de produto da ANP. Utilizar a codificação de produtos do Sistema de Informações de Movimentação de produtos - SIMP(http://www.anp.gov.br/simp/index.h
-tm), somente informar 999999999 quando não se tratar  de produtos não regulados pela ANP -
-Agência Nacional do Petróleo.</xs:documentation>
+																		<xs:documentation>Código de produto da ANP. codificação de produtos do SIMP (http://www.anp.gov.br)</xs:documentation>
 																	</xs:annotation>
 																	<xs:simpleType>
 																		<xs:restriction base="xs:string">
-																			<xs:whiteSpace value="preserve"/>
-																			<xs:pattern value="[0-9]{9}"/>
+																		<xs:whiteSpace value="preserve"/>
+																		<xs:pattern value="[0-9]{9}"/>
 																		</xs:restriction>
 																	</xs:simpleType>
 																</xs:element>
@@ -1504,6 +1511,11 @@ ambiente.</xs:documentation>
 										</xs:annotation>
 										<xs:complexType>
 											<xs:sequence>
+												<xs:element name="vTotTrib" type="TDec_1302" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>Valor estimado total de impostos federais, estaduais e municipais</xs:documentation>
+													</xs:annotation>
+												</xs:element>
 												<xs:choice>
 													<xs:sequence>
 														<xs:element name="ICMS">
@@ -1521,9 +1533,10 @@ ambiente.</xs:documentation>
 																			<xs:sequence>
 																				<xs:element name="orig" type="Torig">
 																					<xs:annotation>
-																						<xs:documentation>origem da mercadoria: 0 - Nacional 
-1 - Estrangeira - Importação direta 
-2 - Estrangeira - Adquirida no mercado interno 
+																						<xs:documentation>origem da mercadoria: 0-Nacional 
+1-Estrangeira - Importação direta; 2-Estrangeira - Adquirida no mercado interno; 3-Nacional, conteudo superior 40%; 4-Nacional, processos produtivos 
+básicos; 5-Nacional, conteudo inferior 40%; 6-Estrangeira - Importação direta, com similar nacional, lista CAMEX; 7-Estrangeira - mercado interno, sem simular,
+lista CAMEX. 
 </xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
@@ -2009,6 +2022,7 @@ A exigência do preenchimento das informações do ICMS diferido fica à critér
 																						<xs:documentation>Valor do ICMS ST retido anteriormente  (v2.0)</xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
+																				
 																			</xs:sequence>
 																		</xs:complexType>
 																	</xs:element>
@@ -2684,7 +2698,7 @@ Operação interestadual para consumidor final com partilha do ICMS  devido na o
 																				</xs:element>
 																				<xs:element name="vBCSTRet" type="TDec_1302">
 																					<xs:annotation>
-																						<xs:documentation>Valor da BC do ICMS ST retido anteriormente (v2.0)</xs:documentation>
+																						<xs:documentation>Valor da BC do ICMS ST retido anteriormente (v2.0) </xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
 																				<xs:element name="vICMSSTRet" type="TDec_1302">
@@ -2692,6 +2706,7 @@ Operação interestadual para consumidor final com partilha do ICMS  devido na o
 																						<xs:documentation>Valor do ICMS ST retido anteriormente  (v2.0)</xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
+																				
 																			</xs:sequence>
 																		</xs:complexType>
 																	</xs:element>
@@ -3129,12 +3144,12 @@ I – ISENTA. (v.2.0)
 																		</xs:element>
 																		<xs:element name="qBCProd" type="TDec_1204">
 																			<xs:annotation>
-																				<xs:documentation>Quantidade Vendida </xs:documentation>
+																				<xs:documentation>Quantidade Vendida  (NT2011/004)</xs:documentation>
 																			</xs:annotation>
 																		</xs:element>
 																		<xs:element name="vAliqProd" type="TDec_1104v">
 																			<xs:annotation>
-																				<xs:documentation>Alíquota do PIS (em reais)</xs:documentation>
+																				<xs:documentation>Alíquota do PIS (em reais) (NT2011/004)</xs:documentation>
 																			</xs:annotation>
 																		</xs:element>
 																		<xs:element name="vPIS" type="TDec_1302">
@@ -3237,12 +3252,12 @@ I – ISENTA. (v.2.0)
 																			<xs:sequence>
 																				<xs:element name="qBCProd" type="TDec_1204">
 																					<xs:annotation>
-																						<xs:documentation>Quantidade Vendida </xs:documentation>
+																						<xs:documentation>Quantidade Vendida (NT2011/004) </xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
 																				<xs:element name="vAliqProd" type="TDec_1104v">
 																					<xs:annotation>
-																						<xs:documentation>Alíquota do PIS (em reais)</xs:documentation>
+																						<xs:documentation>Alíquota do PIS (em reais) (NT2011/004)</xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
 																			</xs:sequence>
@@ -3364,12 +3379,12 @@ I – ISENTA. (v.2.0)
 																		</xs:element>
 																		<xs:element name="qBCProd" type="TDec_1204">
 																			<xs:annotation>
-																				<xs:documentation>Quantidade Vendida </xs:documentation>
+																				<xs:documentation>Quantidade Vendida (NT2011/004)</xs:documentation>
 																			</xs:annotation>
 																		</xs:element>
 																		<xs:element name="vAliqProd" type="TDec_1104v">
 																			<xs:annotation>
-																				<xs:documentation>Alíquota do COFINS (em reais)</xs:documentation>
+																				<xs:documentation>Alíquota do COFINS (em reais) (NT2011/004)</xs:documentation>
 																			</xs:annotation>
 																		</xs:element>
 																		<xs:element name="vCOFINS" type="TDec_1302">
@@ -3518,12 +3533,12 @@ I – ISENTA. (v.2.0)
 																			<xs:sequence>
 																				<xs:element name="qBCProd" type="TDec_1204">
 																					<xs:annotation>
-																						<xs:documentation>Quantidade Vendida </xs:documentation>
+																						<xs:documentation>Quantidade Vendida (NT2011/004) </xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
 																				<xs:element name="vAliqProd" type="TDec_1104v">
 																					<xs:annotation>
-																						<xs:documentation>Alíquota do COFINS (em reais)</xs:documentation>
+																						<xs:documentation>Alíquota do COFINS (em reais) (NT2011/004)</xs:documentation>
 																					</xs:annotation>
 																				</xs:element>
 																			</xs:sequence>
@@ -3688,6 +3703,11 @@ Substituição Tributaria;</xs:documentation>
 												<xs:element name="vNF" type="TDec_1302">
 													<xs:annotation>
 														<xs:documentation>Valor Total da NF-e</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="vTotTrib" type="TDec_1302" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>Valor estimado total de impostos federais, estaduais e municipais</xs:documentation>
 													</xs:annotation>
 												</xs:element>
 											</xs:sequence>
@@ -3997,7 +4017,7 @@ Substituição Tributaria;</xs:documentation>
 														<xs:documentation>Peso bruto (em kg)</xs:documentation>
 													</xs:annotation>
 												</xs:element>
-												<xs:element name="lacres" minOccurs="0" maxOccurs="unbounded">
+												<xs:element name="lacres" minOccurs="0" maxOccurs="5000">
 													<xs:complexType>
 														<xs:sequence>
 															<xs:element name="nLacre">
@@ -4063,7 +4083,7 @@ Substituição Tributaria;</xs:documentation>
 									</xs:element>
 									<xs:element name="dup" minOccurs="0" maxOccurs="unbounded">
 										<xs:annotation>
-											<xs:documentation>Dados das duplicatas</xs:documentation>
+											<xs:documentation>Dados das duplicatas NT 2011/004</xs:documentation>
 										</xs:annotation>
 										<xs:complexType>
 											<xs:sequence>
@@ -4083,7 +4103,7 @@ Substituição Tributaria;</xs:documentation>
 														<xs:documentation>Data de vencimento da duplicata (AAAA-MM-DD)</xs:documentation>
 													</xs:annotation>
 												</xs:element>
-												<xs:element name="vDup" type="TDec_1302Opc" minOccurs="0">
+												<xs:element name="vDup" type="TDec_1302Opc">
 													<xs:annotation>
 														<xs:documentation>Valor da duplicata</xs:documentation>
 													</xs:annotation>
@@ -4253,7 +4273,7 @@ concessório</xs:documentation>
 								<xs:sequence>
 									<xs:element name="xNEmp" minOccurs="0">
 										<xs:annotation>
-											<xs:documentation>Informação da Nota de Empenho de compras públicas</xs:documentation>
+											<xs:documentation>Informação da Nota de Empenho de compras públicas (NT2011/004)</xs:documentation>
 										</xs:annotation>
 										<xs:simpleType>
 											<xs:restriction base="TString">
@@ -4618,7 +4638,7 @@ concessório</xs:documentation>
 				<xs:element name="cMsg">
 					<xs:annotation>
 						<xs:documentation>Código da Mensagem (v2.0) 
-Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.</xs:documentation>
+alterado para tamanho variavel 1-4. (NT2011/004)</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
@@ -4818,12 +4838,12 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 			</xs:element>
 			<xs:element name="cMun" type="TCodMunIBGE">
 				<xs:annotation>
-					<xs:documentation>Código do município (utilizar a tabela do IBGE), informar 9999999 para operações com o exterior.</xs:documentation>
+					<xs:documentation>Código do município</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="xMun">
 				<xs:annotation>
-					<xs:documentation>Nome do município, informar EXTERIOR para operações com o exterior.</xs:documentation>
+					<xs:documentation>Nome do município</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="TString">
@@ -4837,9 +4857,9 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 					<xs:documentation>Sigla da UF</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="CEP" minOccurs="0">
+			<xs:element name="CEP">
 				<xs:annotation>
-					<xs:documentation>CEP</xs:documentation>
+					<xs:documentation>CEP - NT 2011/004</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -4973,14 +4993,12 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 		<xs:sequence>
 			<xs:element name="placa">
 				<xs:annotation>
-					<xs:documentation>Placa do veículo</xs:documentation>
+					<xs:documentation>Placa do veículo (NT2011/004)</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:minLength value="1"/>
-						<xs:maxLength value="8"/>
 						<xs:whiteSpace value="preserve"/>
-						<xs:pattern value="[A-Z0-9]+"/>
+						<xs:pattern value="[A-Z]{2,3}[0-9]{4}|[A-Z]{3,4}[0-9]{3}"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -5567,8 +5585,7 @@ Campo de uso da SEFAZ para enviar mensagem de interesse da SEFAZ para o emissor.
 		<xs:annotation>
 			<xs:documentation>Tipo Origem da mercadoria CST ICMS. origem da mercadoria: 0-Nacional 
 1-Estrangeira - Importação direta; 2-Estrangeira - Adquirida no mercado interno; 3-Nacional, conteudo superior 40%; 4-Nacional, processos produtivos 
-básicos; 5-Nacional, conteudo inferior 40%; 6-Estrangeira - Importação direta, com similar nacional, lista CAMEX; 7-Estrangeira - mercado interno, sem simular,
-lista CAMEX. </xs:documentation>
+básicos; 5-Nacional, conteudo inferior 40%; 6-Estrangeira - Importação direta, com similar nacional, lista CAMEX; 7-Estrangeira - mercado interno, sem simular,lista CAMEX;8-Nacional, mercadoria ou bem com Conteúdo de Importação superior a 70%</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:whiteSpace value="preserve"/>
@@ -5580,6 +5597,7 @@ lista CAMEX. </xs:documentation>
 			<xs:enumeration value="5"/>
 			<xs:enumeration value="6"/>
 			<xs:enumeration value="7"/>
+			<xs:enumeration value="8"/>			
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="TFinNFe">
@@ -5822,6 +5840,15 @@ lista CAMEX. </xs:documentation>
 		<xs:restriction base="xs:string">
 			<xs:whiteSpace value="preserve"/>
 			<xs:pattern value="2\.00"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TGuid">
+		<xs:annotation>
+			<xs:documentation>Identificador único (Globally Unique Identifier). Ex.: B01F70AF-10BF-4B1F-848C-65FF57F616FE </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="preserve"/>
+			<xs:pattern value="[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}"/>
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>
