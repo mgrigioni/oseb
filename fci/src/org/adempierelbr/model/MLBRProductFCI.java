@@ -115,8 +115,13 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		
 		MProduct product = MProduct.get(getCtx(), getM_Product_ID());
 		String productSource = "5";
-		if (getPercentage().compareTo(new BigDecimal("40")) > 0)
+		if (getPercentage().compareTo(new BigDecimal("40")) > 0 && 
+			getPercentage().compareTo(new BigDecimal("70")) <= 0){
 			productSource = "3";
+		}
+		else if (getPercentage().compareTo(new BigDecimal("70")) > 0){
+			productSource = "8";
+		}
 			
 		product.set_ValueOfColumn("lbr_ProductSource", productSource);
 		return product.save(get_TrxName());
