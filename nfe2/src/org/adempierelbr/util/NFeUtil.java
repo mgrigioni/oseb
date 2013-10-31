@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Properties;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +45,8 @@ import org.adempierelbr.nfe.beans.retRecepcao.ProtNFe;
 import org.adempierelbr.nfe.beans.statusServicoNFe.ConsStatServ;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
+import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -616,7 +619,8 @@ public abstract class NFeUtil
 		return error;
 	} //authorizeNFe
 	
-	public static boolean checkNFeID(String documentNo, String nfeID){
+	public static boolean checkNFeID(Properties ctx, int C_BPartner_Location_ID, 
+			String documentNo, String nfeID){
 		
 		if (documentNo == null || nfeID == null)
 			return false;
@@ -632,11 +636,25 @@ public abstract class NFeUtil
 		if (digito != Integer.parseInt(nfeID.substring(43)))
 			return false;
 		
-		int nfNo  = Integer.parseInt(documentNo);		
-		int nfeNo = Integer.parseInt(nfeID.substring(25, 34));
+		long nfNo  = Long.parseLong(documentNo);		
+		long nfeNo = Long.parseLong(nfeID.substring(25, 34));
 		
 		if (nfNo != nfeNo)
 			return false;
+		
+		if (C_BPartner_Location_ID != 0){
+			MBPartnerLocation bpLocation = new MBPartnerLocation(ctx,C_BPartner_Location_ID,null);
+			MBPartner bpartner = new MBPartner(ctx,bpLocation.getC_BPartner_ID(),null);
+			String cnpj = BPartnerUtil.getCNPJ(bpartner, bpLocation);
+			if (cnpj != null && BPartnerUtil.getBPTypeBR(bpartner).equals("PJ")){
+				cnpj = TextUtil.toNumeric(cnpj);
+				String nfeCnpj = nfeID.substring(6,20);
+				if (!cnpj.equals(nfeCnpj)){
+					log.severe("ERRO: CNPJ Chave x CNPJ Parceiro");
+					return false;
+				}
+			}
+		}
 		
 		return true;
 	} //checkNFeID

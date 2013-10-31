@@ -258,6 +258,51 @@ public class CalloutNF extends CalloutEngine
 	}	//	docType
 	
 	/**
+	 * 	Set the BPartner Address Info
+	 *
+	 *	@param ctx
+	 *	@param WindowNo
+	 *	@param mTab
+	 *	@param mField
+	 *	@param value
+	 *	@return error message or ""
+	 */
+	public String bpLocation (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+	{
+	
+		Integer C_BPartner_Location_ID = (Integer)value;
+		if (C_BPartner_Location_ID == null || C_BPartner_Location_ID.intValue() == 0)
+			return "";
+		
+		MBPartnerLocation bpLocation = new MBPartnerLocation(ctx,C_BPartner_Location_ID,null);
+		MBPartner bpartner = new MBPartner(ctx,bpLocation.getC_BPartner_ID(),null);
+		
+		MLocation location = new MLocation(ctx,bpLocation.getC_Location_ID(),null);
+		I_C_Country country = location.getC_Country();
+		
+		mTab.setValue("lbr_BPPhone", bpLocation.getPhone());
+		//
+		mTab.setValue("lbr_BPCNPJ",BPartnerUtil.getCNPJ(bpartner,bpLocation));
+		mTab.setValue("lbr_BPIE",BPartnerUtil.getIE(bpartner,bpLocation));
+		mTab.setValue("lbr_BPSuframa",BPartnerUtil.getSuframa(bpartner,bpLocation));
+		//
+		mTab.setValue("lbr_BPAddress1",location.getAddress1()); //Endereço
+		mTab.setValue("lbr_BPAddress2",location.getAddress2()); //Número
+		mTab.setValue("lbr_BPAddress3",location.getAddress3()); //Bairro
+		mTab.setValue("lbr_BPAddress4",location.getAddress4()); //Complemento
+		mTab.setValue("lbr_BPCity",location.getCity());
+		mTab.setValue("lbr_BPPostal",location.getPostal());
+		mTab.setValue("lbr_BPCountry",location.getC_Country().getCountryCode());
+		mTab.setValue("lbr_BPRegion",location.getRegionName(true)); 
+
+		if (country.getC_Country_ID() != AdempiereLBR.BRASIL)
+			mTab.setValue("lbr_BPRegion",BPartnerUtil.EXTREG);
+		
+		return "";
+	} //bpLocation
+	
+	
+	/**
 	 * 	Set the Shipper Address Info
 	 *
 	 *	@param ctx

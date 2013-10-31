@@ -1041,6 +1041,50 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		return true;
 	} //setFreightTax
+	
+	private boolean setOtherChargesTax(){
+
+		BigDecimal TotalLinesAmt = getTotalLines();
+		if (TotalLinesAmt.signum() == 0)
+			return true;
+
+		BigDecimal ChargeAmt = getChargeAmt();
+		if (ChargeAmt.signum() == 0)
+			return true;
+
+		List<MLBRNotaFiscalLine> nfLines = getLines(false);
+		for (MLBRNotaFiscalLine nfLine : nfLines){
+
+			BigDecimal ICMSRate = nfLine.getICMSRate();
+			if (ICMSRate == null || ICMSRate.signum() == 0)
+				continue;
+
+			BigDecimal chargeAmt = nfLine.getAvgExpenseAmt(TotalLinesAmt, ChargeAmt);
+
+			//despesa/(1-(ICMS/100))
+			BigDecimal taxBaseAmt = chargeAmt.divide((Env.ONE.subtract(
+					                                   (ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND))))
+					                                   ,TaxBR.MCROUND);
+			//taxBase*(ICMS/100)
+			BigDecimal taxAmt     = taxBaseAmt.multiply((ICMSRate.divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
+
+			int LBR_TaxGroup_ID   = TaxBR.getTaxGroup_ID("ICMS");
+			if (LBR_TaxGroup_ID > 0){
+				MLBRNFLineTax nfLineTax = new MLBRNFLineTax(LBR_TaxGroup_ID,nfLine);
+				nfLineTax.setlbr_TaxBaseAmt(taxBaseAmt);
+				nfLineTax.setlbr_TaxAmt(taxAmt);
+				nfLineTax.setlbr_TaxRate(ICMSRate);
+				nfLineTax.setDescription("OUTRAS DESPESAS");
+				if (!nfLineTax.save(get_TrxName())){
+					return false;
+				}
+				setGrandTotal(getGrandTotal().add(taxAmt));
+			}
+
+		} //for lines
+		
+		return true;
+	} //setOtherChargesTax
 
 	private MBPartnerLocation getBPartnerLocation(MOrder order, MInvoice invoice, MInOut shipment){
 
@@ -1331,6 +1375,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		//RATEIO VALORES DE FRETE E SISCOMEX
 		setFreightTax();
 		setSiscomexTax();
+		setOtherChargesTax();
 		save(get_TrxName());
 	} //setInvoice
 		
