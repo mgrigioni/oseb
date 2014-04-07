@@ -139,9 +139,11 @@ public class EFDUtil{
 		else if (dateFrom.before(TextUtil.stringToTime("01/01/2013", "dd/MM/yyyy"))){
 			return "006"; //A PARTIR DE JUL/2012 - VERSAO 006
 		}
-		else{
+		else if (dateFrom.before(TextUtil.stringToTime("01/01/2014", "dd/MM/yyyy"))){
 			return "007"; //A PARTIR DE JAN/2013 - VERSAO 007
 		}
+		else
+			return "008"; //A PARTIR DE JAN/2014 - VERSAO 008
 	}
 	
 	public static String getNFHeaderReg(String nfModel){

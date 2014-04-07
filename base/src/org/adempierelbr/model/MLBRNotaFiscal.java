@@ -205,7 +205,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				new Object[]{DocumentNo,C_BPartner_ID,isSOTrx},trxName);
 	}
 	
-	private static MLBRNotaFiscal get(String whereClause, Object[] parameters, String trxName){
+	public static MLBRNotaFiscal get(String whereClause, Object[] parameters, String trxName){
 		MTable table = MTable.get(Env.getCtx(), MLBRNotaFiscal.Table_Name);
 		Query q =  new Query(Env.getCtx(), table, whereClause.toString(), trxName);
 			  q.setClient_ID();
