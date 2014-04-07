@@ -129,6 +129,12 @@ public class MLBRNCM extends X_LBR_NCM {
 				return "Erro: NCM não cadastrado. Linha: " + line.getLine();
 			}
 
+			MLBRNCM ncm = new MLBRNCM(invoice.getCtx(),LBR_NCM_ID,invoice.get_TrxName());
+			if (ncm.getValue().length() != 10 && !ncm.getValue().equals("99")){
+				return "Erro: NCM inválido. Linha: " + line.getLine();
+			}
+			
+			
 		}
 
 		return null;

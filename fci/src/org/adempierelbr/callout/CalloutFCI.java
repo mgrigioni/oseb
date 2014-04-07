@@ -98,7 +98,7 @@ public class CalloutFCI extends CalloutEngine
 			}
 		}
 			
-		if (parcImp.compareTo(parcSai) > 0) //SE IMPORTACAO MAIOR QUE SAIDA, AJUSTA PARA 100%
+		if (parcImp.compareTo(parcSai) > 0 && parcSai.signum() == 1) //SE IMPORTACAO MAIOR QUE SAIDA, AJUSTA PARA 100%
 			parcImp = parcSai;
 			
 		mTab.setValue("AmtSource", parcImp);
