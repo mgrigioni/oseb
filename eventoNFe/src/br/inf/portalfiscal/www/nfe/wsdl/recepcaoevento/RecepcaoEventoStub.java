@@ -3,7 +3,7 @@
  * RecepcaoEventoStub.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis2 version: 1.5.6  Built on : Aug 30, 2011 (10:00:16 CEST)
+ * by the Apache Axis2 version: 1.6.2  Built on : Apr 17, 2012 (05:33:49 IST)
  */
         package br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento;
 
@@ -15,22 +15,21 @@ import org.adempierelbr.model.MLBRNFeWebService;
         *  RecepcaoEventoStub java implementation
         */
 
-		@SuppressWarnings({ "rawtypes", "unchecked", "unused", "serial", "deprecation" })
+        @SuppressWarnings({ "rawtypes", "unchecked", "unused", "serial", "deprecation" })
         public class RecepcaoEventoStub extends org.apache.axis2.client.Stub
         {
         protected org.apache.axis2.description.AxisOperation[] _operations;
 
         //hashmaps to keep the fault mapping
-        
-		private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
+        private java.util.HashMap faultExceptionNameMap = new java.util.HashMap();
         private java.util.HashMap faultExceptionClassNameMap = new java.util.HashMap();
         private java.util.HashMap faultMessageMap = new java.util.HashMap();
 
         private static int counter = 0;
         
-    	// mgrigioni, 25/05/2012
+    	// mgrigioni, 31/05/2012
     	private static String stubAddress = "";
-
+    	
     	public static void setAddress(MLBRNFeWebService ws) {
     		stubAddress = ws.getURL();
     	}
@@ -116,7 +115,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
      */
     public RecepcaoEventoStub(org.apache.axis2.context.ConfigurationContext configurationContext) throws org.apache.axis2.AxisFault {
         
-                    this(configurationContext,stubAddress);
+                    this(configurationContext,stubAddress );
                 
     }
 
@@ -125,7 +124,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
      */
     public RecepcaoEventoStub() throws org.apache.axis2.AxisFault {
         
-                    this(stubAddress);
+                    this(stubAddress );
                 
     }
 
@@ -182,7 +181,8 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
                                                     nfeDadosMsg0,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento",
-                                                    "nfeRecepcaoEvento")));
+                                                    "nfeRecepcaoEvento")), new javax.xml.namespace.QName("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento",
+                                                    "nfeRecepcaoEvento"));
                                                 
                                                env.build();
                                     
@@ -223,18 +223,18 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
             org.apache.axiom.om.OMElement faultElt = f.getDetail();
             if (faultElt!=null){
-                if (faultExceptionNameMap.containsKey(faultElt.getQName())){
+                if (faultExceptionNameMap.containsKey(new org.apache.axis2.client.FaultMapKey(faultElt.getQName(),"nfeRecepcaoEvento"))){
                     //make the fault by reflection
                     try{
-                        java.lang.String exceptionClassName = (java.lang.String)faultExceptionClassNameMap.get(faultElt.getQName());
+                        java.lang.String exceptionClassName = (java.lang.String)faultExceptionClassNameMap.get(new org.apache.axis2.client.FaultMapKey(faultElt.getQName(),"nfeRecepcaoEvento"));
                         java.lang.Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-                        java.lang.Exception ex=
-                                (java.lang.Exception) exceptionClass.newInstance();
+                        java.lang.reflect.Constructor constructor = exceptionClass.getConstructor(String.class);
+                        java.lang.Exception ex = (java.lang.Exception) constructor.newInstance(f.getMessage());
                         //message class
-                        java.lang.String messageClassName = (java.lang.String)faultMessageMap.get(faultElt.getQName());
+                        java.lang.String messageClassName = (java.lang.String)faultMessageMap.get(new org.apache.axis2.client.FaultMapKey(faultElt.getQName(),"nfeRecepcaoEvento"));
                         java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
                         java.lang.Object messageObject = fromOM(faultElt,messageClass,null);
-						java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
+                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
                                    new java.lang.Class[]{messageClass});
                         m.invoke(ex,new java.lang.Object[]{messageObject});
                         
@@ -311,7 +311,8 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                                     env = toEnvelope(getFactory(_operationClient.getOptions().getSoapVersionURI()),
                                                     nfeDadosMsg0,
                                                     optimizeContent(new javax.xml.namespace.QName("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento",
-                                                    "nfeRecepcaoEvento")));
+                                                    "nfeRecepcaoEvento")), new javax.xml.namespace.QName("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento",
+                                                    "nfeRecepcaoEvento"));
                                                 
                                          // add the soap_headers only if they are not null
                                         if (nfeCabecMsg1!=null){
@@ -352,15 +353,15 @@ import org.adempierelbr.model.MLBRNFeWebService;
 									org.apache.axis2.AxisFault f = (org.apache.axis2.AxisFault) error;
 									org.apache.axiom.om.OMElement faultElt = f.getDetail();
 									if (faultElt!=null){
-										if (faultExceptionNameMap.containsKey(faultElt.getQName())){
+										if (faultExceptionNameMap.containsKey(new org.apache.axis2.client.FaultMapKey(faultElt.getQName(),"nfeRecepcaoEvento"))){
 											//make the fault by reflection
 											try{
-													java.lang.String exceptionClassName = (java.lang.String)faultExceptionClassNameMap.get(faultElt.getQName());
+													java.lang.String exceptionClassName = (java.lang.String)faultExceptionClassNameMap.get(new org.apache.axis2.client.FaultMapKey(faultElt.getQName(),"nfeRecepcaoEvento"));
 													java.lang.Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-													java.lang.Exception ex=
-														(java.lang.Exception) exceptionClass.newInstance();
+													java.lang.reflect.Constructor constructor = exceptionClass.getConstructor(String.class);
+                                                    java.lang.Exception ex = (java.lang.Exception) constructor.newInstance(f.getMessage());
 													//message class
-													java.lang.String messageClassName = (java.lang.String)faultMessageMap.get(faultElt.getQName());
+													java.lang.String messageClassName = (java.lang.String)faultMessageMap.get(new org.apache.axis2.client.FaultMapKey(faultElt.getQName(),"nfeRecepcaoEvento"));
 														java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
 													java.lang.Object messageObject = fromOM(faultElt,messageClass,null);
 													java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
@@ -460,7 +461,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
         }
         return false;
     }
-     //https://homologacao.nfe.fazenda.sp.gov.br/eventosWEB/services/RecepcaoEvento.asmx
+     //https://nfe.fazenda.sp.gov.br/ws/recepcaoevento.asmx
         public static class NfeDadosMsg
         implements org.apache.axis2.databinding.ADBBean{
         
@@ -470,15 +471,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 "ns1");
 
             
-
-        private static java.lang.String generatePrefix(java.lang.String namespace) {
-            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
-                return "ns1";
-            }
-            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
-        }
-
-        
 
                         /**
                         * field for ExtraElement
@@ -510,20 +502,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                }
                             
 
-     /**
-     * isReaderMTOMAware
-     * @return true if the reader supports MTOM
-     */
-   public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader) {
-        boolean isReaderMTOMAware = false;
-        
-        try{
-          isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader.getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
-        }catch(java.lang.IllegalArgumentException e){
-          isReaderMTOMAware = false;
-        }
-        return isReaderMTOMAware;
-   }
      
      
         /**
@@ -538,28 +516,20 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
 
         
-                org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
-
-                 public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       NfeDadosMsg.this.serialize(MY_QNAME,factory,xmlWriter);
-                 }
-               };
-               return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               MY_QNAME,factory,dataSource);
+               org.apache.axiom.om.OMDataSource dataSource =
+                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME);
+               return factory.createOMElement(dataSource,MY_QNAME);
             
-       }
+        }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                                       final org.apache.axiom.om.OMFactory factory,
-                                       org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+                                       javax.xml.stream.XMLStreamWriter xmlWriter)
                                 throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
-                           serialize(parentQName,factory,xmlWriter,false);
+                           serialize(parentQName,xmlWriter,false);
          }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                               final org.apache.axiom.om.OMFactory factory,
-                               org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter,
+                               javax.xml.stream.XMLStreamWriter xmlWriter,
                                boolean serializeType)
             throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
             
@@ -572,23 +542,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
                     prefix = parentQName.getPrefix();
                     namespace = parentQName.getNamespaceURI();
-
-                    if ((namespace != null) && (namespace.trim().length() > 0)) {
-                        java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
-                        if (writerPrefix != null) {
-                            xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
-                        } else {
-                            if (prefix == null) {
-                                prefix = generatePrefix(namespace);
-                            }
-
-                            xmlWriter.writeStartElement(prefix, parentQName.getLocalPart(), namespace);
-                            xmlWriter.writeNamespace(prefix, namespace);
-                            xmlWriter.setPrefix(prefix, namespace);
-                        }
-                    } else {
-                        xmlWriter.writeStartElement(parentQName.getLocalPart());
-                    }
+                    writeStartElement(prefix, namespace, parentQName.getLocalPart(), xmlWriter);
                 
                   if (serializeType){
                
@@ -619,36 +573,58 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
 
-         /**
-          * Util method to write an attribute with the ns prefix
-          */
-          private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-              if (xmlWriter.getPrefix(namespace) == null) {
-                       xmlWriter.writeNamespace(prefix, namespace);
-                       xmlWriter.setPrefix(prefix, namespace);
-
-              }
-
-              xmlWriter.writeAttribute(namespace,attName,attValue);
-
-         }
+        private static java.lang.String generatePrefix(java.lang.String namespace) {
+            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
+                return "ns1";
+            }
+            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        }
 
         /**
-          * Util method to write an attribute without the ns prefix
-          */
-          private void writeAttribute(java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-                if (namespace.equals(""))
-              {
-                  xmlWriter.writeAttribute(attName,attValue);
-              }
-              else
-              {
-                  registerPrefix(xmlWriter, namespace);
-                  xmlWriter.writeAttribute(namespace,attName,attValue);
-              }
-          }
+         * Utility method to write an element start tag.
+         */
+        private void writeStartElement(java.lang.String prefix, java.lang.String namespace, java.lang.String localPart,
+                                       javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
+            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            if (writerPrefix != null) {
+                xmlWriter.writeStartElement(namespace, localPart);
+            } else {
+                if (namespace.length() == 0) {
+                    prefix = "";
+                } else if (prefix == null) {
+                    prefix = generatePrefix(namespace);
+                }
+
+                xmlWriter.writeStartElement(prefix, localPart, namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+        }
+        
+        /**
+         * Util method to write an attribute with the ns prefix
+         */
+        private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (xmlWriter.getPrefix(namespace) == null) {
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+            xmlWriter.writeAttribute(namespace,attName,attValue);
+        }
+
+        /**
+         * Util method to write an attribute without the ns prefix
+         */
+        private void writeAttribute(java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (namespace.equals("")) {
+                xmlWriter.writeAttribute(attName,attValue);
+            } else {
+                registerPrefix(xmlWriter, namespace);
+                xmlWriter.writeAttribute(namespace,attName,attValue);
+            }
+        }
 
 
            /**
@@ -741,25 +717,26 @@ import org.adempierelbr.model.MLBRNFeWebService;
         }
 
 
-         /**
+        /**
          * Register a namespace prefix
          */
-         private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
-                java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
-                if (prefix == null) {
-                    prefix = generatePrefix(namespace);
-
-                    while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null) {
-                        prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
+            java.lang.String prefix = xmlWriter.getPrefix(namespace);
+            if (prefix == null) {
+                prefix = generatePrefix(namespace);
+                javax.xml.namespace.NamespaceContext nsContext = xmlWriter.getNamespaceContext();
+                while (true) {
+                    java.lang.String uri = nsContext.getNamespaceURI(prefix);
+                    if (uri == null || uri.length() == 0) {
+                        break;
                     }
-
-                    xmlWriter.writeNamespace(prefix, namespace);
-                    xmlWriter.setPrefix(prefix, namespace);
+                    prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
                 }
-
-                return prefix;
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
             }
+            return prefix;
+        }
 
 
   
@@ -854,7 +831,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 java.util.Vector handledAttributes = new java.util.Vector();
                 
 
-                 
+                
                     
                     reader.next();
                 
@@ -881,7 +858,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                 
                                 else{
                                     // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getName());
                                 }
                               
                             while (!reader.isStartElement() && !reader.isEndElement())
@@ -889,7 +866,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                             
                                 if (reader.isStartElement())
                                 // A start element we are not expecting indicates a trailing invalid property
-                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getName());
                             
 
 
@@ -907,7 +884,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
            
-          
+    
         public static class ExtensionMapper{
 
           public static java.lang.Object getTypeObject(java.lang.String namespaceURI,
@@ -940,15 +917,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
             
 
-        private static java.lang.String generatePrefix(java.lang.String namespace) {
-            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
-                return "ns1";
-            }
-            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
-        }
-
-        
-
                         /**
                         * field for ExtraElement
                         */
@@ -979,20 +947,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                }
                             
 
-     /**
-     * isReaderMTOMAware
-     * @return true if the reader supports MTOM
-     */
-   public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader) {
-        boolean isReaderMTOMAware = false;
-        
-        try{
-          isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader.getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
-        }catch(java.lang.IllegalArgumentException e){
-          isReaderMTOMAware = false;
-        }
-        return isReaderMTOMAware;
-   }
      
      
         /**
@@ -1007,28 +961,20 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
 
         
-                org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
-
-                 public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       NfeRecepcaoEventoResult.this.serialize(MY_QNAME,factory,xmlWriter);
-                 }
-               };
-               return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               MY_QNAME,factory,dataSource);
+               org.apache.axiom.om.OMDataSource dataSource =
+                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME);
+               return factory.createOMElement(dataSource,MY_QNAME);
             
-       }
+        }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                                       final org.apache.axiom.om.OMFactory factory,
-                                       org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+                                       javax.xml.stream.XMLStreamWriter xmlWriter)
                                 throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
-                           serialize(parentQName,factory,xmlWriter,false);
+                           serialize(parentQName,xmlWriter,false);
          }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                               final org.apache.axiom.om.OMFactory factory,
-                               org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter,
+                               javax.xml.stream.XMLStreamWriter xmlWriter,
                                boolean serializeType)
             throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
             
@@ -1041,23 +987,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
                     prefix = parentQName.getPrefix();
                     namespace = parentQName.getNamespaceURI();
-
-                    if ((namespace != null) && (namespace.trim().length() > 0)) {
-                        java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
-                        if (writerPrefix != null) {
-                            xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
-                        } else {
-                            if (prefix == null) {
-                                prefix = generatePrefix(namespace);
-                            }
-
-                            xmlWriter.writeStartElement(prefix, parentQName.getLocalPart(), namespace);
-                            xmlWriter.writeNamespace(prefix, namespace);
-                            xmlWriter.setPrefix(prefix, namespace);
-                        }
-                    } else {
-                        xmlWriter.writeStartElement(parentQName.getLocalPart());
-                    }
+                    writeStartElement(prefix, namespace, parentQName.getLocalPart(), xmlWriter);
                 
                   if (serializeType){
                
@@ -1088,36 +1018,58 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
 
-         /**
-          * Util method to write an attribute with the ns prefix
-          */
-          private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-              if (xmlWriter.getPrefix(namespace) == null) {
-                       xmlWriter.writeNamespace(prefix, namespace);
-                       xmlWriter.setPrefix(prefix, namespace);
-
-              }
-
-              xmlWriter.writeAttribute(namespace,attName,attValue);
-
-         }
+        private static java.lang.String generatePrefix(java.lang.String namespace) {
+            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
+                return "ns1";
+            }
+            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        }
 
         /**
-          * Util method to write an attribute without the ns prefix
-          */
-          private void writeAttribute(java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-                if (namespace.equals(""))
-              {
-                  xmlWriter.writeAttribute(attName,attValue);
-              }
-              else
-              {
-                  registerPrefix(xmlWriter, namespace);
-                  xmlWriter.writeAttribute(namespace,attName,attValue);
-              }
-          }
+         * Utility method to write an element start tag.
+         */
+        private void writeStartElement(java.lang.String prefix, java.lang.String namespace, java.lang.String localPart,
+                                       javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
+            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            if (writerPrefix != null) {
+                xmlWriter.writeStartElement(namespace, localPart);
+            } else {
+                if (namespace.length() == 0) {
+                    prefix = "";
+                } else if (prefix == null) {
+                    prefix = generatePrefix(namespace);
+                }
+
+                xmlWriter.writeStartElement(prefix, localPart, namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+        }
+        
+        /**
+         * Util method to write an attribute with the ns prefix
+         */
+        private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (xmlWriter.getPrefix(namespace) == null) {
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+            xmlWriter.writeAttribute(namespace,attName,attValue);
+        }
+
+        /**
+         * Util method to write an attribute without the ns prefix
+         */
+        private void writeAttribute(java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (namespace.equals("")) {
+                xmlWriter.writeAttribute(attName,attValue);
+            } else {
+                registerPrefix(xmlWriter, namespace);
+                xmlWriter.writeAttribute(namespace,attName,attValue);
+            }
+        }
 
 
            /**
@@ -1210,25 +1162,26 @@ import org.adempierelbr.model.MLBRNFeWebService;
         }
 
 
-         /**
+        /**
          * Register a namespace prefix
          */
-         private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
-                java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
-                if (prefix == null) {
-                    prefix = generatePrefix(namespace);
-
-                    while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null) {
-                        prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
+            java.lang.String prefix = xmlWriter.getPrefix(namespace);
+            if (prefix == null) {
+                prefix = generatePrefix(namespace);
+                javax.xml.namespace.NamespaceContext nsContext = xmlWriter.getNamespaceContext();
+                while (true) {
+                    java.lang.String uri = nsContext.getNamespaceURI(prefix);
+                    if (uri == null || uri.length() == 0) {
+                        break;
                     }
-
-                    xmlWriter.writeNamespace(prefix, namespace);
-                    xmlWriter.setPrefix(prefix, namespace);
+                    prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
                 }
-
-                return prefix;
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
             }
+            return prefix;
+        }
 
 
   
@@ -1323,7 +1276,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 java.util.Vector handledAttributes = new java.util.Vector();
                 
 
-                 
+                
                     
                     reader.next();
                 
@@ -1350,7 +1303,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                 
                                 else{
                                     // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getName());
                                 }
                               
                             while (!reader.isStartElement() && !reader.isEndElement())
@@ -1358,7 +1311,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                             
                                 if (reader.isStartElement())
                                 // A start element we are not expecting indicates a trailing invalid property
-                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getName());
                             
 
 
@@ -1376,7 +1329,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
            
-          
+    
         public static class NfeCabecMsgE
         implements org.apache.axis2.databinding.ADBBean{
         
@@ -1386,15 +1339,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 "ns1");
 
             
-
-        private static java.lang.String generatePrefix(java.lang.String namespace) {
-            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
-                return "ns1";
-            }
-            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
-        }
-
-        
 
                         /**
                         * field for NfeCabecMsg
@@ -1426,20 +1370,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                }
                             
 
-     /**
-     * isReaderMTOMAware
-     * @return true if the reader supports MTOM
-     */
-   public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader) {
-        boolean isReaderMTOMAware = false;
-        
-        try{
-          isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader.getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
-        }catch(java.lang.IllegalArgumentException e){
-          isReaderMTOMAware = false;
-        }
-        return isReaderMTOMAware;
-   }
      
      
         /**
@@ -1454,28 +1384,20 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
 
         
-                org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
-
-                 public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       NfeCabecMsgE.this.serialize(MY_QNAME,factory,xmlWriter);
-                 }
-               };
-               return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               MY_QNAME,factory,dataSource);
+               org.apache.axiom.om.OMDataSource dataSource =
+                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME);
+               return factory.createOMElement(dataSource,MY_QNAME);
             
-       }
+        }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                                       final org.apache.axiom.om.OMFactory factory,
-                                       org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+                                       javax.xml.stream.XMLStreamWriter xmlWriter)
                                 throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
-                           serialize(parentQName,factory,xmlWriter,false);
+                           serialize(parentQName,xmlWriter,false);
          }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                               final org.apache.axiom.om.OMFactory factory,
-                               org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter,
+                               javax.xml.stream.XMLStreamWriter xmlWriter,
                                boolean serializeType)
             throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
             
@@ -1483,43 +1405,65 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 //We can safely assume an element has only one type associated with it
                 
                                  if (localNfeCabecMsg==null){
-                                   throw new org.apache.axis2.databinding.ADBException("Property cannot be null!");
+                                   throw new org.apache.axis2.databinding.ADBException("nfeCabecMsg cannot be null!");
                                  }
-                                 localNfeCabecMsg.serialize(MY_QNAME,factory,xmlWriter);
+                                 localNfeCabecMsg.serialize(MY_QNAME,xmlWriter);
                             
 
         }
 
-         /**
-          * Util method to write an attribute with the ns prefix
-          */
-          private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-              if (xmlWriter.getPrefix(namespace) == null) {
-                       xmlWriter.writeNamespace(prefix, namespace);
-                       xmlWriter.setPrefix(prefix, namespace);
-
-              }
-
-              xmlWriter.writeAttribute(namespace,attName,attValue);
-
-         }
+        private static java.lang.String generatePrefix(java.lang.String namespace) {
+            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
+                return "ns1";
+            }
+            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        }
 
         /**
-          * Util method to write an attribute without the ns prefix
-          */
-          private void writeAttribute(java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-                if (namespace.equals(""))
-              {
-                  xmlWriter.writeAttribute(attName,attValue);
-              }
-              else
-              {
-                  registerPrefix(xmlWriter, namespace);
-                  xmlWriter.writeAttribute(namespace,attName,attValue);
-              }
-          }
+         * Utility method to write an element start tag.
+         */
+        private void writeStartElement(java.lang.String prefix, java.lang.String namespace, java.lang.String localPart,
+                                       javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
+            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            if (writerPrefix != null) {
+                xmlWriter.writeStartElement(namespace, localPart);
+            } else {
+                if (namespace.length() == 0) {
+                    prefix = "";
+                } else if (prefix == null) {
+                    prefix = generatePrefix(namespace);
+                }
+
+                xmlWriter.writeStartElement(prefix, localPart, namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+        }
+        
+        /**
+         * Util method to write an attribute with the ns prefix
+         */
+        private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (xmlWriter.getPrefix(namespace) == null) {
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+            xmlWriter.writeAttribute(namespace,attName,attValue);
+        }
+
+        /**
+         * Util method to write an attribute without the ns prefix
+         */
+        private void writeAttribute(java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (namespace.equals("")) {
+                xmlWriter.writeAttribute(attName,attValue);
+            } else {
+                registerPrefix(xmlWriter, namespace);
+                xmlWriter.writeAttribute(namespace,attName,attValue);
+            }
+        }
 
 
            /**
@@ -1612,25 +1556,26 @@ import org.adempierelbr.model.MLBRNFeWebService;
         }
 
 
-         /**
+        /**
          * Register a namespace prefix
          */
-         private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
-                java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
-                if (prefix == null) {
-                    prefix = generatePrefix(namespace);
-
-                    while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null) {
-                        prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
+            java.lang.String prefix = xmlWriter.getPrefix(namespace);
+            if (prefix == null) {
+                prefix = generatePrefix(namespace);
+                javax.xml.namespace.NamespaceContext nsContext = xmlWriter.getNamespaceContext();
+                while (true) {
+                    java.lang.String uri = nsContext.getNamespaceURI(prefix);
+                    if (uri == null || uri.length() == 0) {
+                        break;
                     }
-
-                    xmlWriter.writeNamespace(prefix, namespace);
-                    xmlWriter.setPrefix(prefix, namespace);
+                    prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
                 }
-
-                return prefix;
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
             }
+            return prefix;
+        }
 
 
   
@@ -1687,7 +1632,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 java.util.Vector handledAttributes = new java.util.Vector();
                 
 
-                    
+                   
                 while(!reader.isEndElement()) {
                     if (reader.isStartElement() ){
                 
@@ -1699,7 +1644,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                 
                              else{
                                         // A start element we are not expecting indicates an invalid parameter was passed
-                                        throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                        throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getName());
                              }
                           
                              } else {
@@ -1723,7 +1668,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
            
-          
+    
         public static class NfeCabecMsg
         implements org.apache.axis2.databinding.ADBBean{
         /* This type was generated from the piece of schema that had
@@ -1732,15 +1677,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 Namespace Prefix = ns1
                 */
             
-
-        private static java.lang.String generatePrefix(java.lang.String namespace) {
-            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
-                return "ns1";
-            }
-            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
-        }
-
-        
 
                         /**
                         * field for CUF
@@ -1754,6 +1690,11 @@ import org.adempierelbr.model.MLBRNFeWebService;
                            *   in the serialized XML
                            */
                            protected boolean localCUFTracker = false ;
+
+                           public boolean isCUFSpecified(){
+                               return localCUFTracker;
+                           }
+
                            
 
                            /**
@@ -1771,14 +1712,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                * @param param CUF
                                */
                                public void setCUF(java.lang.String param){
-                            
-                                       if (param != null){
-                                          //update the setting tracker
-                                          localCUFTracker = true;
-                                       } else {
-                                          localCUFTracker = false;
-                                              
-                                       }
+                            localCUFTracker = param != null;
                                    
                                             this.localCUF=param;
                                     
@@ -1798,6 +1732,11 @@ import org.adempierelbr.model.MLBRNFeWebService;
                            *   in the serialized XML
                            */
                            protected boolean localVersaoDadosTracker = false ;
+
+                           public boolean isVersaoDadosSpecified(){
+                               return localVersaoDadosTracker;
+                           }
+
                            
 
                            /**
@@ -1815,14 +1754,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                * @param param VersaoDados
                                */
                                public void setVersaoDados(java.lang.String param){
-                            
-                                       if (param != null){
-                                          //update the setting tracker
-                                          localVersaoDadosTracker = true;
-                                       } else {
-                                          localVersaoDadosTracker = false;
-                                              
-                                       }
+                            localVersaoDadosTracker = param != null;
                                    
                                             this.localVersaoDados=param;
                                     
@@ -1904,20 +1836,6 @@ import org.adempierelbr.model.MLBRNFeWebService;
                              }
                              
 
-     /**
-     * isReaderMTOMAware
-     * @return true if the reader supports MTOM
-     */
-   public static boolean isReaderMTOMAware(javax.xml.stream.XMLStreamReader reader) {
-        boolean isReaderMTOMAware = false;
-        
-        try{
-          isReaderMTOMAware = java.lang.Boolean.TRUE.equals(reader.getProperty(org.apache.axiom.om.OMConstants.IS_DATA_HANDLERS_AWARE));
-        }catch(java.lang.IllegalArgumentException e){
-          isReaderMTOMAware = false;
-        }
-        return isReaderMTOMAware;
-   }
      
      
         /**
@@ -1933,27 +1851,19 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         
                org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,parentQName){
-
-                 public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       NfeCabecMsg.this.serialize(parentQName,factory,xmlWriter);
-                 }
-               };
-               return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               parentQName,factory,dataSource);
+                       new org.apache.axis2.databinding.ADBDataSource(this,parentQName);
+               return factory.createOMElement(dataSource,parentQName);
             
-       }
+        }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                                       final org.apache.axiom.om.OMFactory factory,
-                                       org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
+                                       javax.xml.stream.XMLStreamWriter xmlWriter)
                                 throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
-                           serialize(parentQName,factory,xmlWriter,false);
+                           serialize(parentQName,xmlWriter,false);
          }
 
          public void serialize(final javax.xml.namespace.QName parentQName,
-                               final org.apache.axiom.om.OMFactory factory,
-                               org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter,
+                               javax.xml.stream.XMLStreamWriter xmlWriter,
                                boolean serializeType)
             throws javax.xml.stream.XMLStreamException, org.apache.axis2.databinding.ADBException{
             
@@ -1966,23 +1876,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
                     prefix = parentQName.getPrefix();
                     namespace = parentQName.getNamespaceURI();
-
-                    if ((namespace != null) && (namespace.trim().length() > 0)) {
-                        java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
-                        if (writerPrefix != null) {
-                            xmlWriter.writeStartElement(namespace, parentQName.getLocalPart());
-                        } else {
-                            if (prefix == null) {
-                                prefix = generatePrefix(namespace);
-                            }
-
-                            xmlWriter.writeStartElement(prefix, parentQName.getLocalPart(), namespace);
-                            xmlWriter.writeNamespace(prefix, namespace);
-                            xmlWriter.setPrefix(prefix, namespace);
-                        }
-                    } else {
-                        xmlWriter.writeStartElement(parentQName.getLocalPart());
-                    }
+                    writeStartElement(prefix, namespace, parentQName.getLocalPart(), xmlWriter);
                 
                   if (serializeType){
                
@@ -2010,24 +1904,8 @@ import org.adempierelbr.model.MLBRNFeWebService;
                              }
                          if (localCUFTracker){
                                     namespace = "http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"cUF", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"cUF");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("cUF");
-                                    }
-                                
+                                    writeStartElement(null, namespace, "cUF", xmlWriter);
+                             
 
                                           if (localCUF==null){
                                               // write the nil attribute
@@ -2044,24 +1922,8 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                    xmlWriter.writeEndElement();
                              } if (localVersaoDadosTracker){
                                     namespace = "http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"versaoDados", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"versaoDados");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("versaoDados");
-                                    }
-                                
+                                    writeStartElement(null, namespace, "versaoDados", xmlWriter);
+                             
 
                                           if (localVersaoDados==null){
                                               // write the nil attribute
@@ -2082,36 +1944,58 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
 
-         /**
-          * Util method to write an attribute with the ns prefix
-          */
-          private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-              if (xmlWriter.getPrefix(namespace) == null) {
-                       xmlWriter.writeNamespace(prefix, namespace);
-                       xmlWriter.setPrefix(prefix, namespace);
-
-              }
-
-              xmlWriter.writeAttribute(namespace,attName,attValue);
-
-         }
+        private static java.lang.String generatePrefix(java.lang.String namespace) {
+            if(namespace.equals("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento")){
+                return "ns1";
+            }
+            return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        }
 
         /**
-          * Util method to write an attribute without the ns prefix
-          */
-          private void writeAttribute(java.lang.String namespace,java.lang.String attName,
-                                      java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
-                if (namespace.equals(""))
-              {
-                  xmlWriter.writeAttribute(attName,attValue);
-              }
-              else
-              {
-                  registerPrefix(xmlWriter, namespace);
-                  xmlWriter.writeAttribute(namespace,attName,attValue);
-              }
-          }
+         * Utility method to write an element start tag.
+         */
+        private void writeStartElement(java.lang.String prefix, java.lang.String namespace, java.lang.String localPart,
+                                       javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
+            java.lang.String writerPrefix = xmlWriter.getPrefix(namespace);
+            if (writerPrefix != null) {
+                xmlWriter.writeStartElement(namespace, localPart);
+            } else {
+                if (namespace.length() == 0) {
+                    prefix = "";
+                } else if (prefix == null) {
+                    prefix = generatePrefix(namespace);
+                }
+
+                xmlWriter.writeStartElement(prefix, localPart, namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+        }
+        
+        /**
+         * Util method to write an attribute with the ns prefix
+         */
+        private void writeAttribute(java.lang.String prefix,java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (xmlWriter.getPrefix(namespace) == null) {
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            }
+            xmlWriter.writeAttribute(namespace,attName,attValue);
+        }
+
+        /**
+         * Util method to write an attribute without the ns prefix
+         */
+        private void writeAttribute(java.lang.String namespace,java.lang.String attName,
+                                    java.lang.String attValue,javax.xml.stream.XMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException{
+            if (namespace.equals("")) {
+                xmlWriter.writeAttribute(attName,attValue);
+            } else {
+                registerPrefix(xmlWriter, namespace);
+                xmlWriter.writeAttribute(namespace,attName,attValue);
+            }
+        }
 
 
            /**
@@ -2204,25 +2088,26 @@ import org.adempierelbr.model.MLBRNFeWebService;
         }
 
 
-         /**
+        /**
          * Register a namespace prefix
          */
-         private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
-                java.lang.String prefix = xmlWriter.getPrefix(namespace);
-
-                if (prefix == null) {
-                    prefix = generatePrefix(namespace);
-
-                    while (xmlWriter.getNamespaceContext().getNamespaceURI(prefix) != null) {
-                        prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
+        private java.lang.String registerPrefix(javax.xml.stream.XMLStreamWriter xmlWriter, java.lang.String namespace) throws javax.xml.stream.XMLStreamException {
+            java.lang.String prefix = xmlWriter.getPrefix(namespace);
+            if (prefix == null) {
+                prefix = generatePrefix(namespace);
+                javax.xml.namespace.NamespaceContext nsContext = xmlWriter.getNamespaceContext();
+                while (true) {
+                    java.lang.String uri = nsContext.getNamespaceURI(prefix);
+                    if (uri == null || uri.length() == 0) {
+                        break;
                     }
-
-                    xmlWriter.writeNamespace(prefix, namespace);
-                    xmlWriter.setPrefix(prefix, namespace);
+                    prefix = org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
                 }
-
-                return prefix;
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
             }
+            return prefix;
+        }
 
 
   
@@ -2333,20 +2218,20 @@ import org.adempierelbr.model.MLBRNFeWebService;
                 java.util.Vector handledAttributes = new java.util.Vector();
                 
 
-                 
+                
                         // now run through all any or extra attributes
                         // which were not reflected until now
                         for (int i=0; i < reader.getAttributeCount(); i++) {
                             if (!handledAttributes.contains(reader.getAttributeLocalName(i))) {
                                 // this is an anyAttribute and we create
                                 // an OMAttribute for this
-                                org.apache.axiom.om.impl.llom.OMAttributeImpl attr =
-                                    new org.apache.axiom.om.impl.llom.OMAttributeImpl(
+                                org.apache.axiom.om.OMFactory factory = org.apache.axiom.om.OMAbstractFactory.getOMFactory();
+                                org.apache.axiom.om.OMAttribute attr =
+                                    factory.createOMAttribute(
                                             reader.getAttributeLocalName(i),
-                                            new org.apache.axiom.om.impl.dom.NamespaceImpl(
+                                            factory.createOMNamespace(
                                                 reader.getAttributeNamespace(i), reader.getAttributePrefix(i)),
-                                            reader.getAttributeValue(i),
-                                            org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                                            reader.getAttributeValue(i));
 
                                 // and add it to the extra attributes
                                 
@@ -2364,6 +2249,12 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                 
                                     if (reader.isStartElement() && new javax.xml.namespace.QName("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento","cUF").equals(reader.getName())){
                                 
+                                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance","nil");
+                                    if ("true".equals(nillableValue) || "1".equals(nillableValue)){
+                                        throw new org.apache.axis2.databinding.ADBException("The element: "+"cUF" +"  cannot be null");
+                                    }
+                                    
+
                                     java.lang.String content = reader.getElementText();
                                     
                                               object.setCUF(
@@ -2382,6 +2273,12 @@ import org.adempierelbr.model.MLBRNFeWebService;
                                 
                                     if (reader.isStartElement() && new javax.xml.namespace.QName("http://www.portalfiscal.inf.br/nfe/wsdl/RecepcaoEvento","versaoDados").equals(reader.getName())){
                                 
+                                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance","nil");
+                                    if ("true".equals(nillableValue) || "1".equals(nillableValue)){
+                                        throw new org.apache.axis2.databinding.ADBException("The element: "+"versaoDados" +"  cannot be null");
+                                    }
+                                    
+
                                     java.lang.String content = reader.getElementText();
                                     
                                               object.setVersaoDados(
@@ -2400,7 +2297,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
                             
                                 if (reader.isStartElement())
                                 // A start element we are not expecting indicates a trailing invalid property
-                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getName());
                             
 
 
@@ -2418,7 +2315,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
 
         }
            
-          
+    
             private  org.apache.axiom.om.OMElement  toOM(br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeDadosMsg param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
 
@@ -2462,7 +2359,7 @@ import org.adempierelbr.model.MLBRNFeWebService;
             }
         
                                     
-                                        private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeDadosMsg param, boolean optimizeContent)
+                                        private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeDadosMsg param, boolean optimizeContent, javax.xml.namespace.QName methodQName)
                                         throws org.apache.axis2.AxisFault{
 
                                              
