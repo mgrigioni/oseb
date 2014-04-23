@@ -83,130 +83,94 @@ public abstract class ValidaXML {
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/enviNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/enviNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaEnviNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/enviNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/enviNFe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/nfe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/nfe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaNFe(String stringXml) {
 		log.info("Validando NFe");
-		return ValidaDoc(stringXml, "nfe2/nfe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/nfe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/retEnviNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/retEnviNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaRetEnviNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retEnviNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/retEnviNFe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/consReciNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/consReciNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaConsReciNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/consReciNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/consReciNFe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/retConsReciNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/retConsReciNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaRetConsReciNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retConsReciNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/retConsReciNFe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/consSitNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/consSitNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaConsSitNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/consSitNFe_v2.01.xsd");
+		return ValidaDoc(stringXml, "nfe3/consSitNFe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/retConsSitNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/retConsSitNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaRetConsSitNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retConsSitNFe_v2.01.xsd");
+		return ValidaDoc(stringXml, "nfe3/retConsSitNFe_v3.10.xsd");
 	}
 
 	/**
-	 * Validate xml file against xsd schema (nfe2/procNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/procNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaProcNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/procNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/procNFe_v3.10.xsd");
 	}
 	
 	/**
-	 * Validate xml file against xsd schema (nfe2/cancNFe_v2.00.xsd)
-	 * @param stringXml
-	 * @return validation result
-	 */
-	public static String validaCancNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/cancNFe_v2.00.xsd");
-	}
-	
-	/**
-	 * Validate xml file against xsd schema (nfe2/retCancNFe_v2.00.xsd)
-	 * @param stringXml
-	 * @return validation result
-	 */
-	public static String validaRetCancNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retCancNFe_v2.00.xsd");
-	}
-	
-	/**
-	 * Validate xml file against xsd schema (nfe2/inutNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/inutNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaInutNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/inutNFe_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/inutNFe_v3.10.xsd");
 	}
 	
 	/**
-	 * Validate xml file against xsd schema (nfe2/retInutNFe_v2.00.xsd)
+	 * Validate xml file against xsd schema (nfe3/retInutNFe_v3.10.xsd)
 	 * @param stringXml
 	 * @return validation result
 	 */
 	public static String validaRetInutNFe(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retInutNFe_v2.00.xsd");
-	}
-	
-	/**
-	 * Validate xml file against xsd schema (nfe2/consCad_v2.00.xsd)
-	 * @param stringXml
-	 * @return validation result
-	 */
-	public static String validaConsCad(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/consCad_v2.00.xsd");
-	}
-	
-	/**
-	 * Validate xml file against xsd schema (nfe2/retConsCad_v2.00.xsd)
-	 * @param stringXml
-	 * @return validation result
-	 */
-	public static String validaRetConsCad(String stringXml) {
-		return ValidaDoc(stringXml, "nfe2/retConsCad_v2.00.xsd");
+		return ValidaDoc(stringXml, "nfe3/retInutNFe_v3.10.xsd");
 	}
 	
 	/**

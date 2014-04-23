@@ -49,8 +49,8 @@ import org.compiere.process.DocumentEngine;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 
-import br.inf.portalfiscal.www.nfe.wsdl.nferecepcao2.NfeRecepcao2Stub;
-import br.inf.portalfiscal.www.nfe.wsdl.nferetrecepcao2.NfeRetRecepcao2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfeautorizacao.NfeAutorizacaoStub;
+import br.inf.portalfiscal.www.nfe.wsdl.nferetautorizacao.NfeRetAutorizacaoStub;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -149,13 +149,13 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance()
 					.createXMLStreamReader(new StringReader(nfeLotDadosMsg));
 
-			NfeRecepcao2Stub.NfeDadosMsg dadosMsg = NfeRecepcao2Stub.NfeDadosMsg.Factory.parse(dadosXML);
-			NfeRecepcao2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecRecepcao(orgInfo.getC_Location().getC_Region_ID());
+			NfeAutorizacaoStub.NfeDadosMsg dadosMsg = NfeAutorizacaoStub.NfeDadosMsg.Factory.parse(dadosXML);
+			NfeAutorizacaoStub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecAutorizacao(orgInfo.getC_Location().getC_Region_ID());
 
-			NfeRecepcao2Stub.setAddress(ws);
-			NfeRecepcao2Stub stub = new NfeRecepcao2Stub();
+			NfeAutorizacaoStub.setAddress(ws);
+			NfeAutorizacaoStub stub = new NfeAutorizacaoStub();
 
-			String respLote = stub.nfeRecepcaoLote2(dadosMsg, cabecMsgE).getExtraElement().toString();
+			String respLote = stub.nfeAutorizacaoLote(dadosMsg, cabecMsgE).getExtraElement().toString();
 
 			//	Validar resposta
 			String validation = ValidaXML.validaRetEnviNFe(respLote);
@@ -246,13 +246,13 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance()
 					.createXMLStreamReader(new StringReader(nfeConsultaDadosMsg));
 
-			NfeRetRecepcao2Stub.NfeDadosMsg dadosMsg = NfeRetRecepcao2Stub.NfeDadosMsg.Factory.parse(dadosXML);
-			NfeRetRecepcao2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecRetRecepcao(orgInfo.getC_Location().getC_Region_ID());
+			NfeRetAutorizacaoStub.NfeDadosMsg dadosMsg = NfeRetAutorizacaoStub.NfeDadosMsg.Factory.parse(dadosXML);
+			NfeRetAutorizacaoStub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecRetAutorizacao(orgInfo.getC_Location().getC_Region_ID());
 
-			NfeRetRecepcao2Stub.setAddress(ws);
-			NfeRetRecepcao2Stub stub = new NfeRetRecepcao2Stub();
+			NfeRetAutorizacaoStub.setAddress(ws);
+			NfeRetAutorizacaoStub stub = new NfeRetAutorizacaoStub();
 
-			String respConsulta = stub.nfeRetRecepcao2(dadosMsg, cabecMsgE).getExtraElement().toString();
+			String respConsulta = stub.nfeRetAutorizacaoLote(dadosMsg, cabecMsgE).getExtraElement().toString();
 			//	Validação recebimento
 			validation = ValidaXML.validaRetConsReciNFe(respConsulta);
 			if (!validation.isEmpty()){
