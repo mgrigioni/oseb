@@ -204,7 +204,7 @@ public class IdentNFe {
 	public String getIdDest() {
 		return idDest;
 	}
-	private void setIdDest(String iDest) {
+	private void setIdDest(String idDest) {
 		if (idDest == null || idDest.length() != 1 || "123".indexOf(idDest) == -1)
 			throw new AdempiereException("idDest = " + idDest); 
 		else
