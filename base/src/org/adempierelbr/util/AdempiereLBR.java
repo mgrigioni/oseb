@@ -642,7 +642,7 @@ public abstract class AdempiereLBR{
 	 */
 	public static Timestamp getToday(){
 		
-		Timestamp day = new Timestamp(System.currentTimeMillis());
+		Timestamp day = DB.getSQLValueTSEx(null, "SELECT SYSDATE FROM DUAL", new Object[]{});
 		//
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(day);

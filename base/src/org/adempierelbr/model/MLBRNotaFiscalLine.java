@@ -459,7 +459,11 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 
 	protected BigDecimal getAvgExpenseAmt(BigDecimal totalLinesAmt, BigDecimal totalExpenseAmt){
 
-		if (totalLinesAmt.signum() <= 0 || totalExpenseAmt.signum() <= 0)
+		if (totalLinesAmt.signum() <= 0){
+			return totalExpenseAmt;
+		}
+
+		if (totalExpenseAmt.signum() <= 0)
 			return Env.ZERO;
 		
 		BigDecimal lineAmt = getLineTotalAmt();
