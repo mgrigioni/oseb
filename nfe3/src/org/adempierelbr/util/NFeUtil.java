@@ -19,9 +19,14 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -665,6 +670,21 @@ public abstract class NFeUtil
 
         return dados;
 	} //XMLtoString
+	
+	public static String retornaDataNfe(Timestamp dataASerFormatada) {
+        GregorianCalendar calendar = new GregorianCalendar();  
+        calendar.setTime(dataASerFormatada);  
+        XMLGregorianCalendar xmlCalendar = null;
+        try {
+            xmlCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
+            xmlCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
+        
+            return(xmlCalendar.toString());
+        } catch (DatatypeConfigurationException ex) {
+            log.saveError("Erro parse Data", ex);
+        }
+        return null;
+    }
 	
 	/**
 	 * String para Timestamp
