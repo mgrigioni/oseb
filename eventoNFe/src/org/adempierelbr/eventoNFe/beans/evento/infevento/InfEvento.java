@@ -18,9 +18,8 @@ import java.sql.Timestamp;
 import org.adempierelbr.annotation.Validate;
 import org.adempierelbr.annotation.XMLFieldProperties;
 import org.adempierelbr.eventoNFe.beans.evento.infevento.detevento.I_DetEvento;
+import org.adempierelbr.util.NFeUtil;
 import org.adempierelbr.util.TextUtil;
-import org.compiere.model.MSysConfig;
-import org.compiere.util.Env;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -149,7 +148,7 @@ public class InfEvento
 
 	public void setDhEvento (Timestamp dhEvento)
 	{
-		this.dhEvento = TextUtil.timeToString (dhEvento, "yyyy-MM-dd'T'HH:mm:ss") + MSysConfig.getValue ("LBR_TIMEZONE", "-03:00", Env.getAD_Client_ID (Env.getCtx()));
+		this.dhEvento = NFeUtil.retornaDataNfe(dhEvento);
 	}	//	setDhEvento
 	
 	public String getTpEvento()

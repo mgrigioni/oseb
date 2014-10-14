@@ -1321,8 +1321,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		setlbr_TransactionType(iW.getlbr_TransactionType());
 		setlbr_NFModel(iW.getlbr_NFModel());
-		setDateDoc(invoice.getDateInvoiced());
-		setlbr_DateInOut(invoice.getDateAcct());
+		setDateDoc(AdempiereLBR.getDateAndTime(invoice.getDateInvoiced()));
+		setlbr_DateInOut(AdempiereLBR.getDateAndTime(invoice.getDateAcct()));
 		
 		if (islbr_IsOwnDocument()){
 			MDocType docType = AdempiereLBR.getNFBDocType(invoice, getAD_Org_ID(), isSOTrx(), oiW.islbr_IsScan());

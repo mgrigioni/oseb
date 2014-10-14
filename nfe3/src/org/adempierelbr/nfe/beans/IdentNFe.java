@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
+import org.adempierelbr.model.MLBRCFOP;
 import org.adempierelbr.model.MLBRNotaFiscal;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
@@ -33,7 +34,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *  B - Identificação da Nota Fiscal eletrônica
  *  
  *  @author Mario Grigioni
- *  @version $Id: IdentNFe.java,v 2.0 03/07/2012 11:58:00 mgrigioni Exp $
+ *  @version $Id: IdentNFe.java,v 3.0 14/10/2014 10:21:00 mgrigioni Exp $
  */
 @XStreamAlias ("ide")
 public class IdentNFe {
@@ -46,9 +47,8 @@ public class IdentNFe {
 	private final String mod = "55"; //NFe = 55
 	private String serie;
 	private String nNF;
-	private String dEmi;
-	private String dSaiEnt;
-	private String hSaiEnt;
+	private String dhEmi;
+	private String dhSaiEnt;
 	private String tpNF;
 	private String idDest;
 	private String cMunFG;
@@ -58,6 +58,8 @@ public class IdentNFe {
 	private String cDV;
 	private String tpAmb;
 	private String finNFe;
+	private final String indFinal = "0"; //0=Normal;
+	private final String indPres = "9"; //9=Operação não presencial, outros
 	private final String procEmi = "0"; //Emissão aplicativo próprio
 	private final String verProc = AdempiereLBR.VERSION; //Versão do aplicativo
 	private String dhCont;
@@ -79,11 +81,10 @@ public class IdentNFe {
 		setIndPag(nf.getIndPag());
 		setSerie(nf.getSerieNo());
 		setnNF(nf.getDocumentNo(true));
-		setdEmi(nf.getDateDoc());
-		setdSaiEnt(nf.getlbr_DateInOut());
-		sethSaiEnt(nf.getlbr_TimeInOut());
+		setdhEmi(nf.getDateDoc());
+		setdhSaiEnt(nf.getlbr_DateInOut());
 		setTpNF(nf.isSOTrx() ? "1" : "0");
-		setIdDest("1"); //FIXME
+		setIdDest(nf.getLBR_CFOP()); //FIXME
 		setcDV(chaveNFe.getcDV());
 		setFinNFe(nf.getlbr_FinNFe());
 		setcMunFG(BPartnerUtil.getCityCode(MLocation.get(nf.getCtx(), nf.getOrg_Location_ID(), null)));
@@ -165,30 +166,22 @@ public class IdentNFe {
 			this.nNF = nNF;
 	}
 	
-	public String getdEmi() {
-		return dEmi;
+	public String getdhEmi() {
+		return dhEmi;
 	}
-	private void setdEmi(Timestamp dEmi) {
-		if (dEmi == null)
-			throw new AdempiereException("dEmi = " + dEmi);
+	private void setdhEmi(Timestamp dhEmi) {
+		if (dhEmi == null)
+			throw new AdempiereException("dhEmi = " + dhEmi);
 		else
-			this.dEmi = TextUtil.timeToString(dEmi, "yyyy-MM-dd");
+			this.dhEmi = NFeUtil.retornaDataNfe(dhEmi);
 	}
 	
-	public String getdSaiEnt() {
-		return dSaiEnt;
+	public String getdhSaiEnt() {
+		return dhSaiEnt;
 	}
-	private void setdSaiEnt(Timestamp dSaiEnt) {
-		if (dSaiEnt != null)
-			this.dSaiEnt = TextUtil.timeToString(dSaiEnt, "yyyy-MM-dd");;
-	}
-	
-	public String gethSaiEnt() {
-		return hSaiEnt;
-	}
-	private void sethSaiEnt(String hSaiEnt) {
-		if (hSaiEnt != null && hSaiEnt.length() == 5)
-			this.hSaiEnt = hSaiEnt + ":00";
+	private void setdhSaiEnt(Timestamp dhSaiEnt) {
+		if (dhSaiEnt != null)
+			this.dhSaiEnt = NFeUtil.retornaDataNfe(dhSaiEnt);
 	}
 	
 	public String getTpNF() {
@@ -204,7 +197,15 @@ public class IdentNFe {
 	public String getIdDest() {
 		return idDest;
 	}
-	private void setIdDest(String idDest) {
+	private void setIdDest(MLBRCFOP cfop) {
+		String idDest = "1"; //1=Operação interna;
+		if (cfop.getValue().startsWith("2") || cfop.getValue().startsWith("6")){
+			idDest = "2";  //2=Operação interestadual;
+		}
+		else if (cfop.getValue().startsWith("3") || cfop.getValue().startsWith("7")){
+			idDest = "3"; //3=Operação com exterior.
+		}
+		
 		if (idDest == null || idDest.length() != 1 || "123".indexOf(idDest) == -1)
 			throw new AdempiereException("idDest = " + idDest); 
 		else
@@ -270,6 +271,12 @@ public class IdentNFe {
 			throw new AdempiereException("finNFe = " + finNFe);
 		else
 			this.finNFe = finNFe;
+	}
+	public String getIndFinal() {
+		return indFinal;
+	}
+	public String getIndPres() {
+		return indPres;
 	}
 	public String getProcEmi() {
 		return procEmi;
