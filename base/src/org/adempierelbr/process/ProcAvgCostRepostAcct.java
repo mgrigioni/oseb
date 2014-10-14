@@ -73,28 +73,29 @@ public class ProcAvgCostRepostAcct extends SvrProcess
 		X_LBR_AverageCost avgCost = new X_LBR_AverageCost(getCtx(), p_LBR_AverageCost_ID, trxName);
 		MPeriod period = new MPeriod(getCtx(), avgCost.getC_Period_ID(), trxName);
 		Timestamp startDate = period.getStartDate();
+		Timestamp endDate   = period.getEndDate();
 				
-		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 472 AND TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
-		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 473 AND TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
-		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 319 AND TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
-		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 321 AND TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
-		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 325 AND TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
+		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 472 AND TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
+		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 473 AND TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
+		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 319 AND TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
+		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 321 AND TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
+		DB.executeUpdate("DELETE Fact_Acct WHERE AD_Table_ID = 325 AND TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
 		DB.executeUpdate("DELETE M_CostDetail WHERE M_ProductionLine_ID IN " +
 				         "(SELECT M_ProductionLine_ID FROM M_ProductionLine WHERE M_ProductionPlan_ID IN " +
 				         "(SELECT M_ProductionPlan_ID FROM M_ProductionPlan WHERE M_Production_ID IN " +
-				         "(SELECT M_Production_ID FROM M_Production WHERE TRUNC(MovementDate) >= ?)))", new Object[]{startDate},false, trxName);
+				         "(SELECT M_Production_ID FROM M_Production WHERE TRUNC(MovementDate) BETWEEN ? AND ?)))", new Object[]{startDate,endDate},false, trxName);
 		DB.executeUpdate("UPDATE M_InOut SET Processing = 'N' WHERE Processing = 'Y'", trxName);
-		DB.executeUpdate("UPDATE M_InOut SET Posted = 'N' WHERE TRUNC(MovementDate) >= ?", new Object[]{startDate}, false, trxName);
+		DB.executeUpdate("UPDATE M_InOut SET Posted = 'N' WHERE TRUNC(MovementDate) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
 		DB.executeUpdate("UPDATE M_Inventory SET Processing = 'N' WHERE Processing = 'Y'", trxName);
-		DB.executeUpdate("UPDATE M_Inventory SET Posted = 'N' WHERE TRUNC(MovementDate) >= ?", new Object[]{startDate}, false, trxName);
+		DB.executeUpdate("UPDATE M_Inventory SET Posted = 'N' WHERE TRUNC(MovementDate) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
 		DB.executeUpdate("UPDATE M_MatchInv SET Processing = 'N' WHERE Processing = 'Y'", trxName);
-		DB.executeUpdate("UPDATE M_MatchInv SET Posted = 'N' WHERE TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
+		DB.executeUpdate("UPDATE M_MatchInv SET Posted = 'N' WHERE TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
 		DB.executeUpdate("UPDATE M_MatchPO SET Processing = 'N' WHERE Processing = 'Y'", trxName);
-		DB.executeUpdate("UPDATE M_MatchPO SET Posted = 'N' WHERE TRUNC(DateAcct) >= ?", new Object[]{startDate}, false, trxName);
+		DB.executeUpdate("UPDATE M_MatchPO SET Posted = 'N' WHERE TRUNC(DateAcct) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
 		DB.executeUpdate("UPDATE C_Invoice SET Processing = 'N' WHERE Processing = 'Y'", trxName);
 		DB.executeUpdate("UPDATE M_Movement SET Processing = 'N' WHERE Processing = 'Y'", trxName);
-		DB.executeUpdate("UPDATE M_Movement SET Posted = 'N' WHERE TRUNC(MovementDate) >= ?", new Object[]{startDate}, false, trxName);
-		DB.executeUpdate("UPDATE M_Production SET Posted = 'N' WHERE TRUNC(MovementDate) >= ?", new Object[]{startDate}, false, trxName);
+		DB.executeUpdate("UPDATE M_Movement SET Posted = 'N' WHERE TRUNC(MovementDate) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
+		DB.executeUpdate("UPDATE M_Production SET Posted = 'N' WHERE TRUNC(MovementDate) BETWEEN ? AND ?", new Object[]{startDate,endDate}, false, trxName);
 		
 		avgCost.setlbr_AvgStep5(true);
 		avgCost.setProcessed(true);

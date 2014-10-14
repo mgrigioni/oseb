@@ -116,13 +116,13 @@ public class ProcAvgCostCreate extends SvrProcess
 			sql = "SELECT PlanCost.M_Product_ID, QtyOnDate(PlanCost.M_Product_ID, ?), c.CurrentCostPrice, " +
 						"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 					"FROM " +
-						"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, ABS(pp.ProductionQty) AS ProductionQty, " +
+						"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty AS ProductionQty, " +
 							"SUM(((pl.MovementQty*-1)/pp.ProductionQty) * c.CurrentCostPrice) AS Custo FROM M_Production pr " +
 							"INNER JOIN M_ProductionPlan pp ON pr.M_Production_ID=pp.M_Production_ID " +
 							"INNER JOIN M_ProductionLine pl ON (pl.M_ProductionPlan_ID=pp.M_ProductionPlan_ID AND pl.M_Product_ID <> pp.M_Product_ID) " +
 							"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +
 						"WHERE pr.Processed='Y' " +
-							"AND pr.AD_Client_ID=? " +
+							"AND pr.AD_Client_ID=? AND pp.ProductionQty > 0 " +
 							"AND TRUNC(pr.MovementDate) BETWEEN ? AND ? " +
 						" GROUP BY pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty " +
 						") PlanCost INNER JOIN M_Cost c ON (c.M_Product_ID=PlanCost.M_Product_ID AND c.M_CostElement_ID=?) " +
@@ -183,14 +183,14 @@ public class ProcAvgCostCreate extends SvrProcess
 					sql = "SELECT PlanCost.M_Product_ID,  PlanCost.LBR_AverageCostLine_ID, " +
 								"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 							"FROM " +
-								"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, avgl.LBR_AverageCostLine_ID, ABS(pp.ProductionQty) AS ProductionQty, " +
+								"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, avgl.LBR_AverageCostLine_ID, pp.ProductionQty AS ProductionQty, " +
 									"SUM(((pl.MovementQty*-1)/pp.ProductionQty) * (CASE WHEN new_avg_cost.FutureCostPrice IS NOT NULL OR new_avg_cost.FutureCostPrice > 0 THEN new_avg_cost.FutureCostPrice ELSE c.CurrentCostPrice END)) AS Custo FROM M_Production pr " +
 									"INNER JOIN M_ProductionPlan pp ON pr.M_Production_ID=pp.M_Production_ID " +
 									"INNER JOIN M_ProductionLine pl ON (pl.M_ProductionPlan_ID=pp.M_ProductionPlan_ID AND pl.M_Product_ID <> pp.M_Product_ID) " +
 									"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +
 									"INNER JOIN LBR_AverageCostLine avgl ON (avgl.M_Product_ID=pp.M_Product_ID AND avgl.LBR_AverageCost_ID=? AND avgl.lbr_AvgCostType='M') " +
 									" LEFT JOIN LBR_AverageCostLine new_avg_cost ON (new_avg_cost.M_Product_ID=pl.M_Product_ID AND new_avg_cost.LBR_AverageCost_ID=? AND new_avg_cost.lbr_AvgCostType='M') " +
-								"WHERE pr.Processed='Y' " +
+								"WHERE pr.Processed='Y' AND pp.ProductionQty > 0 " +
 									"AND pr.AD_Client_ID=? " +
 									"AND TRUNC(pr.MovementDate) BETWEEN ? AND ? " +
 								"GROUP BY pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty, avgl.LBR_AverageCostLine_ID " +

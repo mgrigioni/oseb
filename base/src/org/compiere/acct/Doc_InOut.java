@@ -209,7 +209,7 @@ public class Doc_InOut extends Doc
 					MProduct product = line.getProduct();
 					if (product.isStocked())
 					{
-						p_Error = "No Costs for " + line.getProduct().getName();
+						p_Error = "No Costs for " + line.getProduct().getValue();
 						log.log(Level.WARNING, p_Error);
 						return null;
 					}
@@ -310,7 +310,7 @@ public class Doc_InOut extends Doc
 					MProduct product = line.getProduct();
 					if (product.isStocked())
 					{
-						p_Error = "No Costs for " + line.getProduct().getName();
+						p_Error = "No Costs for " + line.getProduct().getValue();
 						log.log(Level.WARNING, p_Error);
 						return null;
 					}
@@ -438,7 +438,7 @@ public class Doc_InOut extends Doc
 				}
 				if (costs == null || costs.signum() == 0)
 				{
-					p_Error = "Resubmit - No Costs for " + product.getName();
+					p_Error = "Resubmit - No Costs for " + product.getValue();
 					log.log(Level.WARNING, p_Error);
 					return null;
 				}
@@ -548,7 +548,7 @@ public class Doc_InOut extends Doc
 				costs = line.getProductCosts(as, line.getAD_Org_ID(), false);	//	current costs
 				if (costs == null || costs.signum() == 0)
 				{
-					p_Error = "Resubmit - No Costs for " + product.getName();
+					p_Error = "Resubmit - No Costs for " + product.getValue();
 					log.log(Level.WARNING, p_Error);
 					return null;
 				}
@@ -678,7 +678,7 @@ public class Doc_InOut extends Doc
 				// Se produto, for estocável
 				if (product.isStocked())
 				{
-					p_Error = "No Costs for " + line.getProduct().getName();
+					p_Error = "No Costs for " + line.getProduct().getValue();
 					log.log(Level.WARNING, p_Error);
 					return null;
 				}
@@ -809,7 +809,7 @@ public class Doc_InOut extends Doc
 			// Se o produto não tiver custo, ou custo = 0
 			if (costs == null || costs.signum() == 0)
 			{
-				p_Error = "Resubmit - No Costs for " + product.getName();
+				p_Error = "Resubmit - No Costs for " + product.getValue();
 				log.log(Level.WARNING, p_Error);
 				return null;
 			}
