@@ -34,10 +34,13 @@ public class IdentDest {
 
 	private String CNPJ;
 	private String CPF;
+	private String idEstrangeiro;
 	private String xNome;
 	private EnderDest enderDest;
+	private String indIEDest;
 	private String IE;
 	private String ISUF;
+	private String IM;
 	private String email;
 	
 	/**
@@ -61,7 +64,7 @@ public class IdentDest {
 			if (nf.getlbr_BPCNPJ() != null)
 				setCNPJ("99999999000191");
 			else
-				setCNPJ(""); //Operacao Comex nao preencher
+				setIdEstrangeiro(""); //Operacao Comex nao preencher
 				
 			setxNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
 			setIE("");
@@ -79,7 +82,7 @@ public class IdentDest {
 		else if (id.length() == 14)
 			setCNPJ(id);
 		else
-			setCNPJ(""); //Operacao Comex
+			setIdEstrangeiro(""); //Operacao Comex
 	}
 	
 	public String getCNPJ() {
@@ -94,7 +97,13 @@ public class IdentDest {
 	private void setCPF(String cPF) {
 		CPF = cPF;
 	}
-	
+	public String getIdEstrangeiro() {
+		return idEstrangeiro;
+	}
+	public void setIdEstrangeiro(String idEstrangeiro) {
+		this.idEstrangeiro = idEstrangeiro;
+	}
+
 	public String getxNome() {
 		return xNome;
 	}
@@ -109,7 +118,16 @@ public class IdentDest {
 	public void setEnderDest(EnderDest enderDest) {
 		this.enderDest = enderDest;
 	}
+	public String getIndIEDest() {
+		return indIEDest;
+	}
 
+	private void setIndIEDest(String indIEDest) {
+		if (indIEDest == null || indIEDest.length() != 1 || "129".indexOf(indIEDest) == -1)
+			throw new AdempiereException("indIEDest = " + indIEDest); 
+		else
+			this.indIEDest = indIEDest;
+	}
 	public String getIE() {
 		return IE;
 	}
@@ -117,8 +135,19 @@ public class IdentDest {
 	public void setIE(String iE) {
 		if (iE == null)
 			throw new AdempiereException("IE inválido");
-		else	
+		else{
+			if ((iE.trim()).isEmpty()){
+				setIndIEDest("9"); //9=Não Contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes do ICMS.
+				return;
+			}
+			else if (iE.toUpperCase().contains("ISENT")){
+				setIndIEDest("2"); //2=Contribuinte isento de Inscrição no cadastro de Contribuintes do ICMS;
+				return;
+			}
+			
+			setIndIEDest("1"); //1=Contribuinte ICMS (informar a IE do destinatário);
 			IE = iE;
+		}
 	}
 
 	public String getISUF() {
@@ -130,7 +159,13 @@ public class IdentDest {
 		if(!iSUF.isEmpty())	
 			ISUF = iSUF;
 	}
+	public String getIM() {
+		return IM;
+	}
 
+	public void setIM(String iM) {
+		IM = iM;
+	}
 	public String getEmail() {
 		return email;
 	}

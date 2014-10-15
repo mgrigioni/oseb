@@ -34,8 +34,7 @@ public class AdicoesDI {
 	private String nSeqAdic;
 	private String cFabricante;
 	private String vDescDI;
-	private String xPed;
-	private String nItemPed;
+	private String nDraw;
 	
 	/**
 	 * Default Constructor
@@ -88,19 +87,11 @@ public class AdicoesDI {
 		if (vDescDI != null)
 			this.vDescDI = TextUtil.bigdecimalToString(vDescDI);
 	}
-	
-	public String getxPed() {
-		return xPed;
+	public String getnDraw() {
+		return nDraw;
 	}
-	public void setxPed(String xPed) {
-		this.xPed = xPed;
-	}
-	
-	public String getnItemPed() {
-		return nItemPed;
-	}
-	public void setnItemPed(String nItemPed) {
-		this.nItemPed = nItemPed;
+	public void setnDraw(String nDraw) {
+		this.nDraw = nDraw;
 	}
 	
 } //AdicoesDI
