@@ -36,6 +36,7 @@ public class InfNFE {
 	private IdentDest dest;
 	private IdentLocRetirada retirada;
 	private IdentLocalEntrega entrega;
+	private AutXML autXML;
 	
 	@XStreamImplicit(itemFieldName="det")
 	private List<DetalheProduto> det = new ArrayList<DetalheProduto>();
@@ -94,6 +95,12 @@ public class InfNFE {
 	}
 	public void setEntrega(IdentLocalEntrega entrega) {
 		this.entrega = entrega;
+	}
+	public AutXML getAutXML() {
+		return autXML;
+	}
+	public void setAutXML(AutXML autXML) {
+		this.autXML = autXML;
 	}
 	public Valores getTotal() {
 		return total;

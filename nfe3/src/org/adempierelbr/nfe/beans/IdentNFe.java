@@ -84,7 +84,7 @@ public class IdentNFe {
 		setdhEmi(nf.getDateDoc());
 		setdhSaiEnt(nf.getlbr_DateInOut());
 		setTpNF(nf.isSOTrx() ? "1" : "0");
-		setIdDest(nf.getLBR_CFOP()); //FIXME
+		setIdDest(nf.getLBR_CFOP());
 		setcDV(chaveNFe.getcDV());
 		setFinNFe(nf.getlbr_FinNFe());
 		setcMunFG(BPartnerUtil.getCityCode(MLocation.get(nf.getCtx(), nf.getOrg_Location_ID(), null)));
@@ -226,7 +226,7 @@ public class IdentNFe {
 		return tpImp;
 	}
 	private void setTpImp(String tpImp) {
-		if (tpImp == null || tpImp.length() != 1 || "12".indexOf(tpImp) == -1)
+		if (tpImp == null || tpImp.length() != 1 || "012345".indexOf(tpImp) == -1)
 			throw new AdempiereException("tpImp = " + tpImp);
 		else
 			this.tpImp = tpImp;
@@ -236,7 +236,7 @@ public class IdentNFe {
 		return tpEmis;
 	}
 	private void setTpEmis(String tpEmis, Timestamp dhCont, String xJust) {
-		if (tpEmis == null || tpEmis.length() != 1 || "1234567".indexOf(tpEmis) == -1)
+		if (tpEmis == null || tpEmis.length() != 1 || "12345679".indexOf(tpEmis) == -1)
 			throw new AdempiereException("tpEmis = " + tpEmis);
 		else{
 			this.tpEmis = tpEmis;
@@ -267,7 +267,7 @@ public class IdentNFe {
 		return finNFe;
 	}
 	private void setFinNFe(String finNFe) {
-		if (finNFe == null || finNFe.length() != 1 || "123".indexOf(finNFe) == -1)
+		if (finNFe == null || finNFe.length() != 1 || "1234".indexOf(finNFe) == -1)
 			throw new AdempiereException("finNFe = " + finNFe);
 		else
 			this.finNFe = finNFe;
@@ -291,7 +291,7 @@ public class IdentNFe {
 	}
 	private void setDhCont(Timestamp dhCont) {
 		if (dhCont != null && getTpEmis().equals("3"))
-			this.dhCont = NFeUtil.timeToString(dhCont);
+			this.dhCont = NFeUtil.retornaDataNfe(dhCont);
 	}
 	
 	public String getxJust() {

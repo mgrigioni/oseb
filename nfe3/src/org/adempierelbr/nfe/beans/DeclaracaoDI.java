@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  *  @author Mario Grigioni
  *  @version $Id: DeclaracaoDI.java,v 2.0 02/08/2012 10:58:00 mgrigioni Exp $
  */
-@XStreamAlias ("dest")
+@XStreamAlias ("DI")
 public class DeclaracaoDI {
 	
 	private String nDI;
@@ -37,6 +37,11 @@ public class DeclaracaoDI {
 	private String xLocDesemb;
 	private String UFDesemb;
 	private String dDesemb;
+	private String tpViaTransp;
+	private String vAFRMM;
+	private String tpIntermedio;
+	private String CNPJ;
+	private String UFTerceiro;
 	private String cExportador;
 	
 	@XStreamImplicit(itemFieldName="adi")
@@ -114,7 +119,36 @@ public class DeclaracaoDI {
 		else	
 			this.dDesemb = TextUtil.timeToString(dDesemb, "yyyy-MM-dd");
 	}
-	
+	public String getTpViaTransp() {
+		return tpViaTransp;
+	}
+	public void setTpViaTransp(String tpViaTransp) {
+		this.tpViaTransp = tpViaTransp;
+	}
+	public String getvAFRMM() {
+		return vAFRMM;
+	}
+	public void setvAFRMM(String vAFRMM) {
+		this.vAFRMM = vAFRMM;
+	}
+	public String getTpIntermedio() {
+		return tpIntermedio;
+	}
+	public void setTpIntermedio(String tpIntermedio) {
+		this.tpIntermedio = tpIntermedio;
+	}
+	public String getCNPJ() {
+		return CNPJ;
+	}
+	public void setCNPJ(String cNPJ) {
+		CNPJ = cNPJ;
+	}
+	public String getUFTerceiro() {
+		return UFTerceiro;
+	}
+	public void setUFTerceiro(String uFTerceiro) {
+		UFTerceiro = uFTerceiro;
+	}
 	public String getcExportador() {
 		return cExportador;
 	}
