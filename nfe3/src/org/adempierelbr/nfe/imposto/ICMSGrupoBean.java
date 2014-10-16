@@ -12,6 +12,8 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.imposto;
 
+import org.adempiere.exceptions.AdempiereException;
+
 public class ICMSGrupoBean {
 
 	private String orig;
@@ -20,14 +22,25 @@ public class ICMSGrupoBean {
 	private String pRedBC;
 	private String vBC;
 	private String pICMS;
+	
+	//CST 51
+	private String vICMSOp;
+	private String pDif;
+	private String vICMSDif;
+	
 	private String vICMS;
 	
+	//CST 10, 30, 70, 90
 	private String modBCST;
 	private String pMVAST;
 	private String pRedBCST;
 	private String vBCST;
 	private String pICMSST;
 	private String vICMSST;
+	
+	//CST 20,30,40,70,90
+	private String vICMSDeson;
+	private String motDesICMS;
 	
 	public String getOrig() {
 		return orig;
@@ -145,6 +158,26 @@ public class ICMSGrupoBean {
 			vICMSST = vICMSST.trim();
 		
 		this.vICMSST = vICMSST;
+	}
+	
+	public String getvICMDeson() {
+		return vICMSDeson;
+	}
+	public void setvICMSDeson(String vICMSDeson) {
+		if (vICMSDeson != null)
+			vICMSDeson = vICMSDeson.trim();
+		
+		this.vICMSDeson = vICMSDeson;
+	}
+	
+	public String getMotDesICMS() {
+		return motDesICMS;
+	}
+	public void setMotDesICMS(String motDesICMS) {
+		if (motDesICMS == null || motDesICMS.length() > 2)
+			throw new AdempiereException("motDesICMS = " + motDesICMS);
+		else
+			this.motDesICMS = motDesICMS;
 	}
 	
 } //ICMSGrupoBean

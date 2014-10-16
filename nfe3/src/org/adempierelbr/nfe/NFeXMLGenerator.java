@@ -276,13 +276,13 @@ public class NFeXMLGenerator
 							icmsgrupo.setpRedBC(TextUtil.bigdecimalToString(lt.getpRedBC()));
 						}
 
-						if (taxStatus.endsWith("60"))
-						{
+						if (taxStatus.endsWith("60")){
 							icms60.setCST(taxStatus.substring(1));
 							icms60.setOrig(taxStatus.substring(0, 1));
 							icms60.setVBCSTRet(TextUtil.bigdecimalToString(lt.getvBCST()));
 							icms60.setVICMSSTRet(TextUtil.bigdecimalToString(lt.getvImpostoST()));
 						}
+						
 					}
 
 					int taxStatusDV = Integer.parseInt(taxStatus.substring(taxStatus.length()-2));
