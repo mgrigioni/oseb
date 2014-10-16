@@ -107,113 +107,113 @@ public class ICMSBean {
 		ICMS70 = icms70;
 	}
 
-	 public static class ICMS60Grp {
+	public static class ICMS60Grp {
 
-         @XmlElement(required = true)
-         protected String orig;
-         @XmlElement(name = "CST", required = true)
-         protected String CST;
-         @XmlElement(name = "vBCSTRet", required = true)
-         protected String vBCSTRet;
-         @XmlElement(name = "vICMSSTRet", required = true)
-         protected String vICMSSTRet;
+        @XmlElement(required = true)
+        protected String orig;
+        @XmlElement(name = "CST", required = true)
+        protected String CST;
+        @XmlElement(name = "vBCSTRet", required = true)
+        protected String vBCSTRet;
+        @XmlElement(name = "vICMSSTRet", required = true)
+        protected String vICMSSTRet;
 
-         /**
-          * Gets the value of the orig property.
-          *
-          * @return
-          *     possible object is
-          *     {@link String }
-          *
-          */
-         public String getOrig() {
-             return orig;
-         }
+        /**
+         * Gets the value of the orig property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getOrig() {
+            return orig;
+        }
 
-         /**
-          * Sets the value of the orig property.
-          *
-          * @param value
-          *     allowed object is
-          *     {@link String }
-          *
-          */
-         public void setOrig(String value) {
-             this.orig = value;
-         }
+        /**
+         * Sets the value of the orig property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setOrig(String value) {
+            this.orig = value;
+        }
 
-         /**
-          * Gets the value of the cst property.
-          *
-          * @return
-          *     possible object is
-          *     {@link String }
-          *
-          */
-         public String getCST() {
-             return CST;
-         }
+        /**
+         * Gets the value of the cst property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getCST() {
+            return CST;
+        }
 
-         /**
-          * Sets the value of the cst property.
-          *
-          * @param value
-          *     allowed object is
-          *     {@link String }
-          *
-          */
-         public void setCST(String value) {
-             this.CST = value;
-         }
+        /**
+         * Sets the value of the cst property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setCST(String value) {
+            this.CST = value;
+        }
 
-         /**
-          * Gets the value of the vbcst property.
-          *
-          * @return
-          *     possible object is
-          *     {@link String }
-          *
-          */
-         public String getVBCSTRet() {
-             return vBCSTRet;
-         }
+        /**
+         * Gets the value of the vbcst property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getVBCSTRet() {
+            return vBCSTRet;
+        }
 
-         /**
-          * Sets the value of the vbcst property.
-          *
-          * @param value
-          *     allowed object is
-          *     {@link String }
-          *
-          */
-         public void setVBCSTRet(String value) {
-             this.vBCSTRet = value;
-         }
+        /**
+         * Sets the value of the vbcst property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setVBCSTRet(String value) {
+            this.vBCSTRet = value;
+        }
 
-         /**
-          * Gets the value of the vicmsst property.
-          *
-          * @return
-          *     possible object is
-          *     {@link String }
-          *
-          */
-         public String getVICMSSTRet() {
-             return vICMSSTRet;
-         }
+        /**
+         * Gets the value of the vicmsst property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getVICMSSTRet() {
+            return vICMSSTRet;
+        }
 
-         /**
-          * Sets the value of the vicmsst property.
-          *
-          * @param value
-          *     allowed object is
-          *     {@link String }
-          *
-          */
-         public void setVICMSSTRet(String value) {
-             this.vICMSSTRet = value;
-         }
+        /**
+         * Sets the value of the vicmsst property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setVICMSSTRet(String value) {
+            this.vICMSSTRet = value;
+        }
 
-     }
+    } //ICMS60Grp
 
 }
