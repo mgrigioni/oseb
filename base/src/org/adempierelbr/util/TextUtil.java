@@ -309,7 +309,20 @@ public abstract class TextUtil
 	 * @param File fp
 	 */
 	public static void deleteFile(File fp){
-		boolean success = fp.delete();
+		
+		boolean success = false;
+		
+		if(fp.isDirectory()){
+			File[] entries = fp.listFiles();
+			for(File currentFile: entries){
+				deleteFile(currentFile);
+			}
+			success = fp.delete();
+	    }
+		else{
+			success = fp.delete();
+	    }
+
 	    if (!success)
 	        throw new IllegalArgumentException("Delete: deletion failed");
 	} //deleteFile
