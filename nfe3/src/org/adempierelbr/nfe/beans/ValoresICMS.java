@@ -25,25 +25,26 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *  Grupo de Valores Totais referentes ao ICMS
  *  
  *  @author Mario Grigioni
- *  @version $Id: ValoresICMS.java,v 2.0 31/07/2012 11:55:00 mgrigioni Exp $
+ *  @version $Id: ValoresICMS.java,v 3.0 16/10/2014 15:09:00 mgrigioni Exp $
  */
 @XStreamAlias ("ICMSTot")
 public class ValoresICMS {
 	
-	private String vBC;     // vBC - BC do ICMS
-	private String vICMS;   // vICMS - Valor Total do ICMS
-	private String vBCST;   // vBCST - BC do ICMS ST
-	private String vST;     // vST - Valor Total do ICMS ST
-	private String vProd;   // vProd - Valor Total dos produtos e serviços
-	private String vFrete;  // vFrete - Valor Total do Frete
-	private String vSeg;    // vSeg - Valor Total do Seguro
-	private String vDesc;   // vDesc - Valor Total do Desconto
-	private String vII;     // vII - Valor Total do II
-	private String vIPI;    // vIPI - Valor Total do IPI
-	private String vPIS;    // vPIS - Valor do PIS
-	private String vCOFINS; // vCOFINS - Valor do COFINS
-	private String vOutro;  // vOutro - Outras Despesas acessórias
-	private String vNF;     // vNF - Valor Total da NF-e
+	private String vBC;        // vBC - BC do ICMS
+	private String vICMS;      // vICMS - Valor Total do ICMS
+	private String vICMSDeson; // vICMSDeson - Valor Total do ICMS desonerado
+	private String vBCST;      // vBCST - BC do ICMS ST
+	private String vST;        // vST - Valor Total do ICMS ST
+	private String vProd;      // vProd - Valor Total dos produtos e serviços
+	private String vFrete;     // vFrete - Valor Total do Frete
+	private String vSeg;       // vSeg - Valor Total do Seguro
+	private String vDesc;      // vDesc - Valor Total do Desconto
+	private String vII;        // vII - Valor Total do II
+	private String vIPI;       // vIPI - Valor Total do IPI
+	private String vPIS;       // vPIS - Valor do PIS
+	private String vCOFINS;    // vCOFINS - Valor do COFINS
+	private String vOutro;     // vOutro - Outras Despesas acessórias
+	private String vNF;        // vNF - Valor Total da NF-e
 	
 	/**
 	 * Default Constructor
@@ -59,6 +60,7 @@ public class ValoresICMS {
 		setvProd(totalLines);
 		setvFrete(freightAmt);
 		setvSeg(lbr_InsuranceAmt);
+		setvICMSDeson(null);
 		setvDesc(null);
 		setvBCST(null);
 		setvST(null);
@@ -124,6 +126,13 @@ public class ValoresICMS {
 	}
 	private void setvICMS(BigDecimal vICMS) {
 		this.vICMS = TextUtil.bigdecimalToString(vICMS);
+	}
+	
+	public String getvICMSDeson() {
+		return vICMSDeson;
+	}
+	private void setvICMSDeson(BigDecimal vICMSDeson) {
+		this.vICMSDeson = TextUtil.bigdecimalToString(vICMSDeson);
 	}
 	
 	public String getvBCST() {

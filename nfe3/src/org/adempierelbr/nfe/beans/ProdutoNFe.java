@@ -56,6 +56,7 @@ public class ProdutoNFe {
 	private String vOutro;
 	private final String indTot = "1"; //v2.0 = 0 – VL Ñ ENTRA NO TOT 1 - VL ENTRA
 	private DeclaracaoDI DI;
+	private DetExport detExport;
 	private String nFCI;
 	
 	/**
@@ -253,6 +254,13 @@ public class ProdutoNFe {
 	}
 	public void setDI(DeclaracaoDI dI) {
 		DI = dI;
+	}
+	
+	public DetExport getDetExport() {
+		return detExport;
+	}
+	public void setDetExport(DetExport detExport) {
+		this.detExport = detExport;
 	}
 
 	public String getnFCI() {

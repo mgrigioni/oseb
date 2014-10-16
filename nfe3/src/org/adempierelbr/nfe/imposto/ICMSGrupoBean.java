@@ -1,5 +1,6 @@
 /******************************************************************************
- * Product: ADempiereLBR - ADempiere Localization Brazil                      *
+ * Product: OSeB http://code.google.com/p/oseb                                *
+ * Copyright (C) 2012 Mario Grigioni                                          *
  * This program is free software; you can redistribute it and/or modify it    *
  * under the terms version 2 of the GNU General Public License as published   *
  * by the Free Software Foundation. This program is distributed in the hope   *
@@ -96,6 +97,33 @@ public class ICMSGrupoBean {
 	
 		this.pICMS = pICMS;
 	}
+	public String getvICMSOp() {
+		return vICMSOp;
+	}
+	public void setvICMSOp(String vICMSOp) {
+		if (vICMSOp != null)
+			vICMSOp = vICMSOp.trim();
+	
+		this.vICMSOp = vICMSOp;
+	}
+	public String getpDif() {
+		return pDif;
+	}
+	public void setpDif(String pDif) {
+		if (pDif != null)
+			pDif = pDif.trim();
+	
+		this.pDif = pDif;
+	}
+	public String getvICMSDif() {
+		return vICMSDif;
+	}
+	public void setvICMSDif(String vICMSDif) {
+		if (vICMSDif != null)
+			vICMSDif = vICMSDif.trim();
+	
+		this.vICMSDif = vICMSDif;
+	}
 	public String getvICMS() {
 		return vICMS;
 	}
@@ -160,7 +188,7 @@ public class ICMSGrupoBean {
 		this.vICMSST = vICMSST;
 	}
 	
-	public String getvICMDeson() {
+	public String getvICMSDeson() {
 		return vICMSDeson;
 	}
 	public void setvICMSDeson(String vICMSDeson) {

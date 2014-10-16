@@ -13,11 +13,14 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import java.math.BigDecimal;
+
 import org.adempierelbr.nfe.imposto.COFINSBean;
 import org.adempierelbr.nfe.imposto.ICMSBean;
 import org.adempierelbr.nfe.imposto.ImpostoII;
 import org.adempierelbr.nfe.imposto.ImpostoIPIBean;
 import org.adempierelbr.nfe.imposto.PISBean;
+import org.adempierelbr.util.TextUtil;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -25,17 +28,25 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *  M - Tributos incidentes no Produto ou Serviço
  *  
  *  @author Mario Grigioni
- *  @version $Id: ImpostoProduto.java,v 2.0 02/08/2012 14:13:00 mgrigioni Exp $
+ *  @version $Id: ImpostoProduto.java,v 3.0 16/10/2014 15:44:00 mgrigioni Exp $
  */
 @XStreamAlias ("imposto")
 public class ImpostoProduto {
 
+	private String vTotTrib;
 	private ICMSBean ICMS;
 	private ImpostoIPIBean IPI;
 	private ImpostoII II;
 	private PISBean PIS;
 	private COFINSBean COFINS;
 
+	public String getvTotTrib() {
+		return vTotTrib;
+	}
+	public void setvTotTrib(BigDecimal vTotTrib) {
+		this.vTotTrib = TextUtil.bigdecimalToString(vTotTrib);
+	}
+	
 	public ICMSBean getICMS() {
 		return ICMS;
 	}

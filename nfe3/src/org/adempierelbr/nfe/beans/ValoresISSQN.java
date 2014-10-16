@@ -12,6 +12,11 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import org.adempierelbr.util.TextUtil;
+
 public class ValoresISSQN {
 
 	private String vServ;
@@ -19,6 +24,13 @@ public class ValoresISSQN {
 	private String vISS;
 	private String vPIS;
 	private String vCOFINS;
+	private String dCompet;
+	private String vDeducao;
+	private String vOutro;
+	private String vDescIncond;
+	private String vDescCond;
+	private String vISSRet;
+	private String cRegTrib;
 	
 	public String getvServ() {
 		return vServ;
@@ -50,20 +62,58 @@ public class ValoresISSQN {
 	public String getvPIS() {
 		return vPIS;
 	}
-	public void setvPIS(String vPIS) {
-		if (vPIS != null)
-			vPIS = vPIS.trim();
-	
-		this.vPIS = vPIS;
+	public void setvPIS(BigDecimal vPIS) {
+		this.vPIS = TextUtil.bigdecimalToString(vPIS);;
 	}
 	public String getvCOFINS() {
 		return vCOFINS;
 	}
-	public void setvCOFINS(String vCOFINS) {
-		if (vCOFINS != null)
-			vCOFINS = vCOFINS.trim();
-	
-		this.vCOFINS = vCOFINS;
+	public void setvCOFINS(BigDecimal vCOFINS) {
+		this.vCOFINS = TextUtil.bigdecimalToString(vCOFINS);
 	}
-	
+	public String getdCompet() {
+		return dCompet;
+	}
+	public void setdCompet(Timestamp dCompet) {
+		this.dCompet = TextUtil.timeToString(dCompet, "yyyy-MM-dd");
+	}
+	public String getvDeducao() {
+		return vDeducao;
+	}
+	public void setvDeducao(BigDecimal vDeducao) {
+		this.vDeducao = TextUtil.bigdecimalToString(vDeducao);
+	}
+	public String getvOutro() {
+		return vOutro;
+	}
+	public void setvOutro(BigDecimal vOutro) {
+		this.vOutro = TextUtil.bigdecimalToString(vOutro);
+	}
+	public String getvDescIncond() {
+		return vDescIncond;
+	}
+	public void setvDescIncond(BigDecimal vDescIncond) {
+		this.vDescIncond = TextUtil.bigdecimalToString(vDescIncond);
+	}
+	public String getvDescCond() {
+		return vDescCond;
+	}
+	public void setvDescCond(BigDecimal vDescCond) {
+		this.vDescCond = TextUtil.bigdecimalToString(vDescCond);
+	}
+	public String getvISSRet() {
+		return vISSRet;
+	}
+	public void setvISSRet(BigDecimal vISSRet) {
+		this.vISSRet = TextUtil.bigdecimalToString(vISSRet);
+	}
+	public String getcRegTrib() {
+		return cRegTrib;
+	}
+	public void setcRegTrib(String cRegTrib) {
+		if (cRegTrib != null)
+			cRegTrib = cRegTrib.trim();
+		
+		this.cRegTrib = cRegTrib;
+	}
 }
