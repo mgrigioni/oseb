@@ -691,8 +691,8 @@ public abstract class NFeUtil
 	 * @param dhRecbto
 	 * @return
 	 */
-	public static Timestamp stringToTime(String dhRecbto){
-		return TextUtil.stringToTime(dhRecbto.replace('T', ' '), "yyyy-MM-dd HH:mm:ss");
+	public static Timestamp stringToTime(String data){
+		return TextUtil.stringToTime(data.replace('T', ' '), "yyyy-MM-dd HH:mm:ss");
 	} //StringToDate
 
 	/**
@@ -700,8 +700,8 @@ public abstract class NFeUtil
 	 * @param dhRecbto
 	 * @return
 	 */
-	public static String timeToString(Timestamp dhRecbto){
-		return TextUtil.timeToString(dhRecbto, "yyyy-MM-dd HH:mm:ss").replace(' ', 'T');
+	public static String timeToString(Timestamp data){
+		return TextUtil.timeToString(data, "yyyy-MM-dd HH:mm:ss").replace(' ', 'T');
 	} //DateToString
 	
 	/**
