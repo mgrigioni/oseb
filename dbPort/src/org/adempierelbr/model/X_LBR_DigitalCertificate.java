@@ -31,7 +31,7 @@ public class X_LBR_DigitalCertificate extends PO implements I_LBR_DigitalCertifi
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_DigitalCertificate (Properties ctx, int LBR_DigitalCertificate_ID, String trxName)

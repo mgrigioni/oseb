@@ -402,6 +402,15 @@ public interface I_LBR_NotaFiscalLine
 	  */
 	public String getlbr_UOMName();
 
+    /** Column name lbr_ValorTotTrib */
+    public static final String COLUMNNAME_lbr_ValorTotTrib = "lbr_ValorTotTrib";
+
+	/** Set Valor Total de Tributos	  */
+	public void setlbr_ValorTotTrib (BigDecimal lbr_ValorTotTrib);
+
+	/** Get Valor Total de Tributos	  */
+	public BigDecimal getlbr_ValorTotTrib();
+
     /** Column name Line */
     public static final String COLUMNNAME_Line = "Line";
 

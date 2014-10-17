@@ -471,6 +471,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		BigDecimal sumGrandTotal   = Env.ZERO;
 		BigDecimal sumTotalLines   = Env.ZERO;
 		BigDecimal sumServiceTotal = Env.ZERO;
+		BigDecimal valorTotTrib    = Env.ZERO;
 		
 		for (MLBRNotaFiscalLine nfLine : m_lines){
 			sumGrandTotal = sumGrandTotal.add(nfLine.getTotalOperationAmt());
@@ -478,6 +479,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 				sumServiceTotal = sumServiceTotal.add(nfLine.getLineTotalAmt());
 			else
 				sumTotalLines = sumTotalLines.add(nfLine.getLineTotalAmt());
+			
+			valorTotTrib = valorTotTrib.add(nfLine.getlbr_ValorTotTrib());
 		}
 		
 		if (((getGrandTotal().subtract(sumGrandTotal)).abs()).compareTo(NFeUtil.TOLERANCIA) > 0){
@@ -494,6 +497,9 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total de Serviços difere da soma dos serviços";
 			return DocAction.STATUS_Invalid;
 		}
+		
+		//Val Aprox Tributos R$99.999,99 (99,99%) Fonte: IBPT
+		
 		
 		//Processar NFe
 		m_processMsg = processNFe();

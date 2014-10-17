@@ -24,10 +24,14 @@ import org.adempiere.model.POWrapper;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_C_DocType;
+import org.adempierelbr.wrapper.I_W_C_Invoice;
 import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
 import org.adempierelbr.wrapper.I_W_M_Product;
 import org.compiere.model.MClientInfo;
 import org.compiere.model.MConversionRate;
+import org.compiere.model.MDocType;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MProduct;
 import org.compiere.model.MTable;
@@ -278,6 +282,23 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 					divide(getPriceListAmt(), TaxBR.MCROUND))).multiply(Env.ONEHUNDRED));
 		}
 		
+		
+		//Valor Total Aprox. Tributos
+		MInvoice invoice = MInvoice.get(getCtx(), getParent().getC_Invoice_ID());
+		I_W_C_Invoice iW   = POWrapper.create(invoice,I_W_C_Invoice.class);
+		I_W_C_DocType dtW  = POWrapper.create(MDocType.get(getCtx(), invoice.getC_DocType_ID()), I_W_C_DocType.class);
+		if (iW.getlbr_TransactionType().equals("END") && dtW.islbr_HasOpenItems()){
+			//SOMENTE CONSUMIDOR FINAL E VENDA
+			BigDecimal aliq = getLBR_NCM().getlbr_aliqNac();
+			if (getlbr_ProductSource().indexOf("0345") == -1) //CST diferente aliq imp
+				aliq = getLBR_NCM().getlbr_aliqImp();
+			
+			if (aliq.signum() == 1){
+				BigDecimal vTotTrib = getLineTotalAmt().multiply((aliq.divide(Env.ONEHUNDRED, TaxBR.MCROUND)));
+				setlbr_ValorTotTrib(vTotTrib.setScale(TaxBR.SCALE, TaxBR.ROUND));
+			}
+		}
+			
 		//Valores cabeçalho
 		BigDecimal grandTotal  = getParent().getGrandTotal(); //Total da Nota
 		BigDecimal totalLines  = getParent().getTotalLines(); //Total dos Produtos

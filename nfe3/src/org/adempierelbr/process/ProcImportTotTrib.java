@@ -13,8 +13,10 @@
  *****************************************************************************/
 package org.adempierelbr.process;
 
+import java.math.BigDecimal;
 import java.util.logging.Level;
 
+import org.adempierelbr.model.MLBRNCM;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -53,7 +55,6 @@ public class ProcImportTotTrib extends SvrProcess{
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	protected String doIt() throws Exception {
 		
 		if(p_FileName == null || p_FileName.isEmpty())
@@ -69,15 +70,19 @@ public class ProcImportTotTrib extends SvrProcess{
 			
 			//codigo [0];ex [1];tabela [2];descricao [3];aliqNac [4];aliqImp [5];
 			String[] valores = linha.split(";");
-			if (valores.length < 7)
+			if (valores.length != 6)
 				continue;
 			
 			int LBR_NCM_ID = getLBR_NCM_ID(valores[0]);
-			//TODO
-		}
+			if (LBR_NCM_ID <= 0)
+				continue;
+			
+			MLBRNCM ncm = new MLBRNCM(getCtx(),LBR_NCM_ID,get_TrxName());
+			ncm.setlbr_aliqNac(new BigDecimal(valores[4]));
+			ncm.setlbr_aliqImp(new BigDecimal(valores[5]));
+			ncm.save(get_TrxName());
+		} //loop linhas
 		
-		
-	
 		return "Processo concluído";
 	}
 

@@ -30,7 +30,7 @@ public class X_LBR_TaxFormula extends PO implements I_LBR_TaxFormula, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_TaxFormula (Properties ctx, int LBR_TaxFormula_ID, String trxName)

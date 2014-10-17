@@ -31,7 +31,7 @@ public class X_LBR_AverageCost extends PO implements I_LBR_AverageCost, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_AverageCost (Properties ctx, int LBR_AverageCost_ID, String trxName)

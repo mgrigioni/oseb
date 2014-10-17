@@ -105,6 +105,24 @@ public interface I_LBR_NCM
 	  */
 	public boolean isActive();
 
+    /** Column name lbr_aliqImp */
+    public static final String COLUMNNAME_lbr_aliqImp = "lbr_aliqImp";
+
+	/** Set Alíquota Importado	  */
+	public void setlbr_aliqImp (BigDecimal lbr_aliqImp);
+
+	/** Get Alíquota Importado	  */
+	public BigDecimal getlbr_aliqImp();
+
+    /** Column name lbr_aliqNac */
+    public static final String COLUMNNAME_lbr_aliqNac = "lbr_aliqNac";
+
+	/** Set Alíquota Nacional	  */
+	public void setlbr_aliqNac (BigDecimal lbr_aliqNac);
+
+	/** Get Alíquota Nacional	  */
+	public BigDecimal getlbr_aliqNac();
+
     /** Column name LBR_NCM_ID */
     public static final String COLUMNNAME_LBR_NCM_ID = "LBR_NCM_ID";
 

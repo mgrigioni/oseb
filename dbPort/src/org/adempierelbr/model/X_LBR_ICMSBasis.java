@@ -30,7 +30,7 @@ public class X_LBR_ICMSBasis extends PO implements I_LBR_ICMSBasis, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_ICMSBasis (Properties ctx, int LBR_ICMSBasis_ID, String trxName)

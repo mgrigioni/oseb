@@ -33,7 +33,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -466,8 +466,8 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	public static final String LBR_PRODUCTSOURCE_1_Imported = "1";
 	/** 2 - Imported - Acquired from a domestic distributor = 2 */
 	public static final String LBR_PRODUCTSOURCE_2_Imported_AcquiredFromADomesticDistributor = "2";
-	/** 3 - Domestic with more than 40 percent Imported = 3 */
-	public static final String LBR_PRODUCTSOURCE_3_DomesticWithMoreThan40PercentImported = "3";
+	/** 3 - Domestic with more than 40 percent Imported and less than 70 percent = 3 */
+	public static final String LBR_PRODUCTSOURCE_3_DomesticWithMoreThan40PercentImportedAndLessThan70Percent = "3";
 	/** 4 - Product acquired from Manaus = 4 */
 	public static final String LBR_PRODUCTSOURCE_4_ProductAcquiredFromManaus = "4";
 	/** 5 - Domestic until 40 percent Imported = 5 */
@@ -476,6 +476,8 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	public static final String LBR_PRODUCTSOURCE_6_Foreign_DirectImportNoSimilarNational = "6";
 	/** 7 - Foreign - Acquired from a domestic distributor no similar national = 7 */
 	public static final String LBR_PRODUCTSOURCE_7_Foreign_AcquiredFromADomesticDistributorNoSimilarNational = "7";
+	/** 8 - Domestic with more than 70 percent Imported = 8 */
+	public static final String LBR_PRODUCTSOURCE_8_DomesticWithMoreThan70PercentImported = "8";
 	/** Set Product Source.
 		@param lbr_ProductSource 
 		Defines the Product Source
@@ -788,6 +790,23 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	public String getlbr_UOMName () 
 	{
 		return (String)get_Value(COLUMNNAME_lbr_UOMName);
+	}
+
+	/** Set Valor Total de Tributos.
+		@param lbr_ValorTotTrib Valor Total de Tributos	  */
+	public void setlbr_ValorTotTrib (BigDecimal lbr_ValorTotTrib)
+	{
+		set_Value (COLUMNNAME_lbr_ValorTotTrib, lbr_ValorTotTrib);
+	}
+
+	/** Get Valor Total de Tributos.
+		@return Valor Total de Tributos	  */
+	public BigDecimal getlbr_ValorTotTrib () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_lbr_ValorTotTrib);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Line No.

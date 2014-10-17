@@ -30,7 +30,7 @@ public class X_LBR_DocType_Acct extends PO implements I_LBR_DocType_Acct, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_DocType_Acct (Properties ctx, int LBR_DocType_Acct_ID, String trxName)

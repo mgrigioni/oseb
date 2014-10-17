@@ -17,9 +17,11 @@
 /** Generated Model - DO NOT CHANGE */
 package org.adempierelbr.model;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.Env;
 
 /** Generated Model for LBR_NCM
  *  @author ADempiereLBR (generated) 
@@ -30,7 +32,7 @@ public class X_LBR_NCM extends PO implements I_LBR_NCM, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_NCM (Properties ctx, int LBR_NCM_ID, String trxName)
@@ -86,6 +88,40 @@ public class X_LBR_NCM extends PO implements I_LBR_NCM, I_Persistent
 	public String getDescription () 
 	{
 		return (String)get_Value(COLUMNNAME_Description);
+	}
+
+	/** Set Alíquota Importado.
+		@param lbr_aliqImp Alíquota Importado	  */
+	public void setlbr_aliqImp (BigDecimal lbr_aliqImp)
+	{
+		set_Value (COLUMNNAME_lbr_aliqImp, lbr_aliqImp);
+	}
+
+	/** Get Alíquota Importado.
+		@return Alíquota Importado	  */
+	public BigDecimal getlbr_aliqImp () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_lbr_aliqImp);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Alíquota Nacional.
+		@param lbr_aliqNac Alíquota Nacional	  */
+	public void setlbr_aliqNac (BigDecimal lbr_aliqNac)
+	{
+		set_Value (COLUMNNAME_lbr_aliqNac, lbr_aliqNac);
+	}
+
+	/** Get Alíquota Nacional.
+		@return Alíquota Nacional	  */
+	public BigDecimal getlbr_aliqNac () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_lbr_aliqNac);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set NCM.

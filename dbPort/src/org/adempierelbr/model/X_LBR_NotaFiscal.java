@@ -34,7 +34,7 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -2261,6 +2261,10 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_650_RejeiçãoEventoDeCiênciaDaOperaçãoParaNF_ECanceladaOuDenegada = "650";
 	/** 651 - Rejeição: Evento de "Desconhecimento da Operação" para NF-e Cancelada ou Denegada = 651 */
 	public static final String LBR_NFESTATUS_651_RejeiçãoEventoDeDesconhecimentoDaOperaçãoParaNF_ECanceladaOuDenegada = "651";
+	/** 777 - Rejeição: Obrigatória a informação do NCM completo = 777 */
+	public static final String LBR_NFESTATUS_777_RejeiçãoObrigatóriaAInformaçãoDoNCMCompleto = "777";
+	/** 471 - Rejeição: Informado NCM=00 indevidamente = 471 */
+	public static final String LBR_NFESTATUS_471_RejeiçãoInformadoNCMEq00Indevidamente = "471";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe
