@@ -80,7 +80,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  *  
  *  @author Mario Grigioni
  *  @contributor Ricardo Alexsander (old version)
- *  @version $Id: NFeUtil.java,v 2.0 26/06/2012 13:52:00 mgrigioni Exp $
+ *  @version $Id: NFeUtil.java,v 3.0 17/10/2014 07:43:00 mgrigioni Exp $
  */
 public abstract class NFeUtil
 {

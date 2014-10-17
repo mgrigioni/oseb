@@ -102,7 +102,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 	}
 	
 	/**
-	 * Process to send NFeLot (WebService MLBRNFeWebService.RECEPCAO)
+	 * Process to send NFeLot (WebService MLBRNFeWebService.AUTORIZACAO)
 	 * @return boolean success
 	 * @throws Exception
 	 */
@@ -135,7 +135,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 		
 		//PREPARA AMBIENTE PARA ENVIO
 		MLBRDigitalCertificate.setCertificate(getCtx(), orgInfo);
-		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.RECEPCAO);
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.AUTORIZACAO);
 		if (ws == null){
 			m_processMsg = "Não foi encontrado um endereço WebServices válido.";
 			return false;
@@ -205,7 +205,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 	} //sendNFeLot
 	
 	/**
-	 * Process to check NFeLot (MLBRNFeWebService.RETRECEPCAO)
+	 * Process to check NFeLot (MLBRNFeWebService.RETAUTORIZACAO)
 	 * @return
 	 * @throws Exception
 	 */
@@ -225,7 +225,7 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 
 		//PREPARA AMBIENTE PARA ENVIO
 		MLBRDigitalCertificate.setCertificate(getCtx(), orgInfo);
-		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.RETRECEPCAO);
+		MLBRNFeWebService ws = MLBRNFeWebService.get(orgInfo,MLBRNFeWebService.RETAUTORIZACAO);
 		if (ws == null) {
 			m_processMsg = "Não foi encontrado um endereço WebServices válido.";
 			return false;
