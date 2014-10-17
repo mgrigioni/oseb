@@ -45,6 +45,7 @@ public class ValoresICMS {
 	private String vCOFINS;    // vCOFINS - Valor do COFINS
 	private String vOutro;     // vOutro - Outras Despesas acessórias
 	private String vNF;        // vNF - Valor Total da NF-e
+	private String vTotTrib;   // vTotTrib - Valor aproximado total de tributos federais, estaduais e municipais.
 	
 	/**
 	 * Default Constructor
@@ -70,6 +71,7 @@ public class ValoresICMS {
 		setvCOFINS(null);
 		setvIPI(null);
 		setvII(null);
+		setvTotTrib(null);
 		setvOutro(chargeAmt); 
 	} //ValoresICMS
 	
@@ -217,6 +219,13 @@ public class ValoresICMS {
 	}
 	private void setvNF(BigDecimal vNF) {
 		this.vNF = TextUtil.bigdecimalToString(vNF);
+	}
+	
+	public String getvTotTrib() {
+		return vTotTrib;
+	}
+	private void setvTotTrib(BigDecimal vTotTrib) {
+		this.vTotTrib = TextUtil.bigdecimalToString(vTotTrib);
 	}
 
 } //ValoresICMS
