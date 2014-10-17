@@ -32,7 +32,7 @@ public class X_LBR_ApuracaoICMSLine extends PO implements I_LBR_ApuracaoICMSLine
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20130509L;
+	private static final long serialVersionUID = 20141017L;
 
     /** Standard Constructor */
     public X_LBR_ApuracaoICMSLine (Properties ctx, int LBR_ApuracaoICMSLine_ID, String trxName)
