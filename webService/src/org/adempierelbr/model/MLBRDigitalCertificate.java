@@ -124,6 +124,9 @@ public class MLBRDigitalCertificate extends X_LBR_DigitalCertificate
 			}
         }
 		
+		//Erro NFe 3.10
+		System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");  
+		
   		X509Certificate certificate = (X509Certificate) ks.getCertificate(alias);
 		PrivateKey privateKey = (PrivateKey) ks.getKey(alias, orgPassword.toCharArray());
 		SocketFactoryDinamico socketFactoryDinamico = new SocketFactoryDinamico(certificate, privateKey);
