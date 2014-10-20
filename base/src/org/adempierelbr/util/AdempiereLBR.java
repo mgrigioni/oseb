@@ -640,28 +640,6 @@ public abstract class AdempiereLBR{
 	/**
 	 * Date Utils
 	 */
-	public static Timestamp getDateAndTime(Timestamp day){
-		
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		
-		if (day == null)
-			day = now;
-		//
-		GregorianCalendar cal = new GregorianCalendar();
-		GregorianCalendar actualCal = new GregorianCalendar();
-		
-		cal.setTime(day);
-		actualCal.setTime(now);
-		
-		cal.set(Calendar.HOUR_OF_DAY, actualCal.get(Calendar.HOUR_OF_DAY));
-		cal.set(Calendar.MINUTE, actualCal.get(Calendar.MINUTE));
-		cal.set(Calendar.SECOND, actualCal.get(Calendar.SECOND));
-		cal.setTimeZone(actualCal.getTimeZone());
-		cal.set(Calendar.MILLISECOND, 0);
-		
-		return new Timestamp(cal.getTimeInMillis());
-	}
-	
 	public static Timestamp getToday(){
 		
 		Timestamp day = DB.getSQLValueTSEx(null, "SELECT SYSDATE FROM DUAL", new Object[]{});
