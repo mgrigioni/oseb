@@ -105,6 +105,45 @@ public interface I_LBR_NFDI
 	  */
 	public boolean isActive();
 
+    /** Column name lbr_AFRMM */
+    public static final String COLUMNNAME_lbr_AFRMM = "lbr_AFRMM";
+
+	/** Set AFRMM.
+	  * Valor da AFRMM - Adicional ao Frete para Renovação da Marinha Mercante
+	  */
+	public void setlbr_AFRMM (BigDecimal lbr_AFRMM);
+
+	/** Get AFRMM.
+	  * Valor da AFRMM - Adicional ao Frete para Renovação da Marinha Mercante
+	  */
+	public BigDecimal getlbr_AFRMM();
+
+    /** Column name lbr_BPCNPJ */
+    public static final String COLUMNNAME_lbr_BPCNPJ = "lbr_BPCNPJ";
+
+	/** Set BP CNPJ.
+	  * BP CNPJ - Copied from the BP into Brazilan Legal and Tax Books
+	  */
+	public void setlbr_BPCNPJ (String lbr_BPCNPJ);
+
+	/** Get BP CNPJ.
+	  * BP CNPJ - Copied from the BP into Brazilan Legal and Tax Books
+	  */
+	public String getlbr_BPCNPJ();
+
+    /** Column name lbr_BPDeliveryRegion */
+    public static final String COLUMNNAME_lbr_BPDeliveryRegion = "lbr_BPDeliveryRegion";
+
+	/** Set BP DeliveryRegion.
+	  * BP DeliveryRegion - Copied from the BP Location into Brazilan Legal and Tax Books
+	  */
+	public void setlbr_BPDeliveryRegion (String lbr_BPDeliveryRegion);
+
+	/** Get BP DeliveryRegion.
+	  * BP DeliveryRegion - Copied from the BP Location into Brazilan Legal and Tax Books
+	  */
+	public String getlbr_BPDeliveryRegion();
+
     /** Column name lbr_BPRegion */
     public static final String COLUMNNAME_lbr_BPRegion = "lbr_BPRegion";
 
@@ -194,6 +233,32 @@ public interface I_LBR_NFDI
 	public int getLBR_NotaFiscal_ID();
 
 	public org.adempierelbr.model.I_LBR_NotaFiscal getLBR_NotaFiscal() throws RuntimeException;
+
+    /** Column name lbr_TpIntermedio */
+    public static final String COLUMNNAME_lbr_TpIntermedio = "lbr_TpIntermedio";
+
+	/** Set Tipo de Intermedio.
+	  * Forma de importação quanto a intermediação
+	  */
+	public void setlbr_TpIntermedio (String lbr_TpIntermedio);
+
+	/** Get Tipo de Intermedio.
+	  * Forma de importação quanto a intermediação
+	  */
+	public String getlbr_TpIntermedio();
+
+    /** Column name lbr_ViaTransp */
+    public static final String COLUMNNAME_lbr_ViaTransp = "lbr_ViaTransp";
+
+	/** Set Via de Transporte Internacional.
+	  * Via de transporte internacional informada na Declaração de Importação (DI)
+	  */
+	public void setlbr_ViaTransp (String lbr_ViaTransp);
+
+	/** Get Via de Transporte Internacional.
+	  * Via de transporte internacional informada na Declaração de Importação (DI)
+	  */
+	public String getlbr_ViaTransp();
 
     /** Column name Manufacturer */
     public static final String COLUMNNAME_Manufacturer = "Manufacturer";

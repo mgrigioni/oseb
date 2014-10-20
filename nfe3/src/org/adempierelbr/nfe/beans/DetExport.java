@@ -37,10 +37,9 @@ public class DetExport {
 	 * @param nDraw
 	 * @param exportInd
 	 */
-	public DetExport(String nDraw, List<ExportInd> exportInd) {
+	public DetExport(String nDraw) {
 		super();
 		setnDraw(nDraw);
-		setExportInd(exportInd);
 	}
 
 	public String getnDraw() {
@@ -55,7 +54,6 @@ public class DetExport {
 	public void setExportInd(List<ExportInd> exportInd) {
 		this.exportInd = exportInd;
 	}
-	
 	
 } // DetExport
 

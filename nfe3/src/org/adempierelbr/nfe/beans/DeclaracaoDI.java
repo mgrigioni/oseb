@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.beans;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  *  Declaração de Importação
  *  
  *  @author Mario Grigioni
- *  @version $Id: DeclaracaoDI.java,v 2.0 02/08/2012 10:58:00 mgrigioni Exp $
+ *  @version $Id: DeclaracaoDI.java,v 3.0 20/10/2014 15:44:00 mgrigioni Exp $
  */
 @XStreamAlias ("DI")
 public class DeclaracaoDI {
@@ -58,8 +59,8 @@ public class DeclaracaoDI {
 	 * @param adi
 	 */
 	public DeclaracaoDI(String nDI, Timestamp dDI, String xLocDesemb,
-			String uFDesemb, Timestamp dDesemb, String cExportador,
-			List<AdicoesDI> adi) {
+			String uFDesemb, Timestamp dDesemb, String cExportador, 
+			String tpViaTransp, String tpIntermedio, List<AdicoesDI> adi) {
 		super();
 		setnDI(nDI);
 		setdDI(dDI);
@@ -67,6 +68,8 @@ public class DeclaracaoDI {
 		setUFDesemb(uFDesemb);
 		setdDesemb(dDesemb);
 		setcExportador(cExportador);
+		setTpViaTransp(tpViaTransp);
+		setTpIntermedio(tpIntermedio);
 		setAdi(adi);
 	}
 	
@@ -122,19 +125,20 @@ public class DeclaracaoDI {
 	public String getTpViaTransp() {
 		return tpViaTransp;
 	}
-	public void setTpViaTransp(String tpViaTransp) {
-		this.tpViaTransp = tpViaTransp;
+	private void setTpViaTransp(String tpViaTransp) {
+		int viaTransp = Integer.parseInt(tpViaTransp); //excluir 0 à esquerda
+		this.tpViaTransp = String.valueOf(viaTransp);
 	}
 	public String getvAFRMM() {
 		return vAFRMM;
 	}
-	public void setvAFRMM(String vAFRMM) {
-		this.vAFRMM = vAFRMM;
+	public void setvAFRMM(BigDecimal vAFRMM) {
+		this.vAFRMM = TextUtil.bigdecimalToString(vAFRMM);
 	}
 	public String getTpIntermedio() {
 		return tpIntermedio;
 	}
-	public void setTpIntermedio(String tpIntermedio) {
+	private void setTpIntermedio(String tpIntermedio) {
 		this.tpIntermedio = tpIntermedio;
 	}
 	public String getCNPJ() {
@@ -147,6 +151,9 @@ public class DeclaracaoDI {
 		return UFTerceiro;
 	}
 	public void setUFTerceiro(String uFTerceiro) {
+		if (uFTerceiro.length() != 2)
+			throw new AdempiereException("UF Terceiros = " + uFTerceiro);
+		
 		UFTerceiro = uFTerceiro;
 	}
 	public String getcExportador() {

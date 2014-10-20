@@ -17,10 +17,12 @@
 /** Generated Model - DO NOT CHANGE */
 package org.adempierelbr.model;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.Env;
 
 /** Generated Model for LBR_NFDI
  *  @author ADempiereLBR (generated) 
@@ -31,7 +33,7 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141017L;
+	private static final long serialVersionUID = 20141020L;
 
     /** Standard Constructor */
     public X_LBR_NFDI (Properties ctx, int LBR_NFDI_ID, String trxName)
@@ -39,8 +41,14 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
       super (ctx, LBR_NFDI_ID, trxName);
       /** if (LBR_NFDI_ID == 0)
         {
+			setlbr_AFRMM (Env.ZERO);
+			setlbr_BPCNPJ (null);
+			setlbr_BPDeliveryRegion (null);
 			setLBR_NFDI_ID (0);
 			setLBR_NotaFiscal_ID (0);
+			setlbr_TpIntermedio (null);
+// 1
+			setlbr_ViaTransp (null);
 			setType (null);
 // 0
         } */
@@ -89,6 +97,60 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
 	public Timestamp getDateTrx () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_DateTrx);
+	}
+
+	/** Set AFRMM.
+		@param lbr_AFRMM 
+		Valor da AFRMM - Adicional ao Frete para Renovação da Marinha Mercante
+	  */
+	public void setlbr_AFRMM (BigDecimal lbr_AFRMM)
+	{
+		set_Value (COLUMNNAME_lbr_AFRMM, lbr_AFRMM);
+	}
+
+	/** Get AFRMM.
+		@return Valor da AFRMM - Adicional ao Frete para Renovação da Marinha Mercante
+	  */
+	public BigDecimal getlbr_AFRMM () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_lbr_AFRMM);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set BP CNPJ.
+		@param lbr_BPCNPJ 
+		BP CNPJ - Copied from the BP into Brazilan Legal and Tax Books
+	  */
+	public void setlbr_BPCNPJ (String lbr_BPCNPJ)
+	{
+		set_Value (COLUMNNAME_lbr_BPCNPJ, lbr_BPCNPJ);
+	}
+
+	/** Get BP CNPJ.
+		@return BP CNPJ - Copied from the BP into Brazilan Legal and Tax Books
+	  */
+	public String getlbr_BPCNPJ () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_BPCNPJ);
+	}
+
+	/** Set BP DeliveryRegion.
+		@param lbr_BPDeliveryRegion 
+		BP DeliveryRegion - Copied from the BP Location into Brazilan Legal and Tax Books
+	  */
+	public void setlbr_BPDeliveryRegion (String lbr_BPDeliveryRegion)
+	{
+		set_Value (COLUMNNAME_lbr_BPDeliveryRegion, lbr_BPDeliveryRegion);
+	}
+
+	/** Get BP DeliveryRegion.
+		@return BP DeliveryRegion - Copied from the BP Location into Brazilan Legal and Tax Books
+	  */
+	public String getlbr_BPDeliveryRegion () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_BPDeliveryRegion);
 	}
 
 	/** Set BP Region.
@@ -230,6 +292,72 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** lbr_TpIntermedio AD_Reference_ID=1250003 */
+	public static final int LBR_TPINTERMEDIO_AD_Reference_ID=1250003;
+	/** 1 - Importação por conta própria = 1 */
+	public static final String LBR_TPINTERMEDIO_1_ImportaçãoPorContaPrópria = "1";
+	/** 2 - Importação por conta e ordem = 2 */
+	public static final String LBR_TPINTERMEDIO_2_ImportaçãoPorContaEOrdem = "2";
+	/** 3 - Importação por encomenda = 3 */
+	public static final String LBR_TPINTERMEDIO_3_ImportaçãoPorEncomenda = "3";
+	/** Set Tipo de Intermedio.
+		@param lbr_TpIntermedio 
+		Forma de importação quanto a intermediação
+	  */
+	public void setlbr_TpIntermedio (String lbr_TpIntermedio)
+	{
+
+		set_Value (COLUMNNAME_lbr_TpIntermedio, lbr_TpIntermedio);
+	}
+
+	/** Get Tipo de Intermedio.
+		@return Forma de importação quanto a intermediação
+	  */
+	public String getlbr_TpIntermedio () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_TpIntermedio);
+	}
+
+	/** lbr_ViaTransp AD_Reference_ID=1250002 */
+	public static final int LBR_VIATRANSP_AD_Reference_ID=1250002;
+	/** 01 - Marítima = 01 */
+	public static final String LBR_VIATRANSP_01_Marítima = "01";
+	/** 02 - Fluvial = 02 */
+	public static final String LBR_VIATRANSP_02_Fluvial = "02";
+	/** 03 - Lacustre = 03 */
+	public static final String LBR_VIATRANSP_03_Lacustre = "03";
+	/** 04 - Aérea = 04 */
+	public static final String LBR_VIATRANSP_04_Aérea = "04";
+	/** 05 - Postal = 05 */
+	public static final String LBR_VIATRANSP_05_Postal = "05";
+	/** 06 - Ferroviária = 06 */
+	public static final String LBR_VIATRANSP_06_Ferroviária = "06";
+	/** 07 - Rodoviária = 07 */
+	public static final String LBR_VIATRANSP_07_Rodoviária = "07";
+	/** 08 - Conduto / Rede Transmissão = 08 */
+	public static final String LBR_VIATRANSP_08_CondutoRedeTransmissão = "08";
+	/** 09 - Meios Próprios = 09 */
+	public static final String LBR_VIATRANSP_09_MeiosPróprios = "09";
+	/** 10 - Entrada / Saída ficta = 10 */
+	public static final String LBR_VIATRANSP_10_EntradaSaídaFicta = "10";
+	/** Set Via de Transporte Internacional.
+		@param lbr_ViaTransp 
+		Via de transporte internacional informada na Declaração de Importação (DI)
+	  */
+	public void setlbr_ViaTransp (String lbr_ViaTransp)
+	{
+
+		set_Value (COLUMNNAME_lbr_ViaTransp, lbr_ViaTransp);
+	}
+
+	/** Get Via de Transporte Internacional.
+		@return Via de transporte internacional informada na Declaração de Importação (DI)
+	  */
+	public String getlbr_ViaTransp () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_ViaTransp);
 	}
 
 	/** Set Manufacturer.
