@@ -56,7 +56,7 @@ public class ValoresICMS {
 	 * @param chargeAmt
 	 */
 	public ValoresICMS(BigDecimal grandTotal, BigDecimal totalLines, BigDecimal freightAmt,
-			BigDecimal lbr_InsuranceAmt, BigDecimal chargeAmt){
+			BigDecimal lbr_InsuranceAmt, BigDecimal chargeAmt, BigDecimal vTotTrib){
 		setvNF(grandTotal);
 		setvProd(totalLines);
 		setvFrete(freightAmt);
@@ -71,7 +71,7 @@ public class ValoresICMS {
 		setvCOFINS(null);
 		setvIPI(null);
 		setvII(null);
-		setvTotTrib(null);
+		setvTotTrib(vTotTrib);
 		setvOutro(chargeAmt); 
 	} //ValoresICMS
 	
@@ -225,7 +225,8 @@ public class ValoresICMS {
 		return vTotTrib;
 	}
 	private void setvTotTrib(BigDecimal vTotTrib) {
-		this.vTotTrib = TextUtil.bigdecimalToString(vTotTrib);
+		if (vTotTrib != null && vTotTrib.signum() == 1)
+			this.vTotTrib = TextUtil.bigdecimalToString(vTotTrib);
 	}
 
 } //ValoresICMS
