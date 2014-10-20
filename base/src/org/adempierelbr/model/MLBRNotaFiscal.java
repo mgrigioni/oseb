@@ -1322,6 +1322,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		setlbr_TransactionType(iW.getlbr_TransactionType());
 		setlbr_NFModel(iW.getlbr_NFModel());
 		setDateDoc(new Timestamp(System.currentTimeMillis()));
+		setlbr_DateInOut(invoice.getDateAcct());
 		
 		if (islbr_IsOwnDocument()){
 			MDocType docType = AdempiereLBR.getNFBDocType(invoice, getAD_Org_ID(), isSOTrx(), oiW.islbr_IsScan());
@@ -1340,7 +1341,6 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			setlbr_NFeID(invoice.get_ValueAsString("lbr_NFeID")); //FIXME
 			
 			setDateDoc(invoice.getDateInvoiced());
-			setlbr_DateInOut(invoice.getDateAcct());
 		}
 		
 		//Dados da Empresa, Parceiro e Entrega
