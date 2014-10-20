@@ -37,6 +37,7 @@ import org.adempierelbr.nfe.beans.Cobranca;
 import org.adempierelbr.nfe.beans.CobrancaGrupoDuplicata;
 import org.adempierelbr.nfe.beans.CobrancaGrupoFatura;
 import org.adempierelbr.nfe.beans.DeclaracaoDI;
+import org.adempierelbr.nfe.beans.DetExport;
 import org.adempierelbr.nfe.beans.DetalheProduto;
 import org.adempierelbr.nfe.beans.IdentDest;
 import org.adempierelbr.nfe.beans.IdentEmit;
@@ -206,9 +207,30 @@ public class NFeXMLGenerator
 				X_LBR_NFDI di = new X_LBR_NFDI(ctx, nfLine.getLBR_NFDI_ID(), trxName);
 				DeclaracaoDI declaracaoDI = new DeclaracaoDI(di.getlbr_DI(),
 						di.getDateTrx(), di.getlbr_LocDesemb(), di.getlbr_BPRegion(),
-						di.getlbr_DataDesemb(),di.getlbr_CodExportador(),adis);
+						di.getlbr_DataDesemb(),di.getlbr_CodExportador(),
+						di.getlbr_ViaTransp(),di.getlbr_TpIntermedio(),adis);
+				
+				if (di.getlbr_ViaTransp().equals(X_LBR_NFDI.LBR_VIATRANSP_01_Marítima)){
+					declaracaoDI.setvAFRMM(di.getlbr_AFRMM());
+				}
+				
+				if (!di.getlbr_TpIntermedio().equals(X_LBR_NFDI.LBR_TPINTERMEDIO_1_ImportaçãoPorContaPrópria)){
+					declaracaoDI.setCNPJ(di.getlbr_BPCNPJ());
+					declaracaoDI.setUFTerceiro(di.getlbr_BPDeliveryRegion());
+				}
 				
 				produto.setDI(declaracaoDI);
+			}
+			
+			/*
+			 * Detalhes de Exportação do Produto
+			 */
+			if (nfLine.getCFOP().startsWith("7")) {
+				if (nfLine.getlbr_Drawback() != null &&
+					!nfLine.getlbr_Drawback().trim().isEmpty()){
+					DetExport detExport = new DetExport(nfLine.getlbr_Drawback());
+					produto.setDetExport(detExport);
+				}
 			}
 			
 			ICMSBean icmsnfe = new ICMSBean(); // ICMS

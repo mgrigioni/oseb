@@ -33,7 +33,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141017L;
+	private static final long serialVersionUID = 20141020L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)
@@ -237,6 +237,23 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Drawback No.
+		@param lbr_Drawback 
+		Identifies the Drawback No
+	  */
+	public void setlbr_Drawback (String lbr_Drawback)
+	{
+		set_Value (COLUMNNAME_lbr_Drawback, lbr_Drawback);
+	}
+
+	/** Get Drawback No.
+		@return Identifies the Drawback No
+	  */
+	public String getlbr_Drawback () 
+	{
+		return (String)get_Value(COLUMNNAME_lbr_Drawback);
 	}
 
 	/** Set Is Service.

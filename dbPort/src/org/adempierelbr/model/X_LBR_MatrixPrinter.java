@@ -30,7 +30,7 @@ public class X_LBR_MatrixPrinter extends PO implements I_LBR_MatrixPrinter, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141017L;
+	private static final long serialVersionUID = 20141020L;
 
     /** Standard Constructor */
     public X_LBR_MatrixPrinter (Properties ctx, int LBR_MatrixPrinter_ID, String trxName)

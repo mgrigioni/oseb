@@ -32,7 +32,7 @@ public class X_LBR_ApuracaoIPILine extends PO implements I_LBR_ApuracaoIPILine, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141017L;
+	private static final long serialVersionUID = 20141020L;
 
     /** Standard Constructor */
     public X_LBR_ApuracaoIPILine (Properties ctx, int LBR_ApuracaoIPILine_ID, String trxName)

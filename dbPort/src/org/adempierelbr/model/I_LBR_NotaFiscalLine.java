@@ -187,6 +187,19 @@ public interface I_LBR_NotaFiscalLine
 
 	public org.adempierelbr.model.I_LBR_DE getLBR_DE() throws RuntimeException;
 
+    /** Column name lbr_Drawback */
+    public static final String COLUMNNAME_lbr_Drawback = "lbr_Drawback";
+
+	/** Set Drawback No.
+	  * Identifies the Drawback No
+	  */
+	public void setlbr_Drawback (String lbr_Drawback);
+
+	/** Get Drawback No.
+	  * Identifies the Drawback No
+	  */
+	public String getlbr_Drawback();
+
     /** Column name lbr_IsService */
     public static final String COLUMNNAME_lbr_IsService = "lbr_IsService";
 
