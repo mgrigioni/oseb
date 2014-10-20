@@ -294,8 +294,8 @@ public abstract class NFeUtil
 	public static String geraCabecLoteNFe (String lote){
 		StringBuilder cabecalho = new StringBuilder("<enviNFe xmlns=\"").append(NAMESPACE_NFE)
 				.append("\" versao=\"").append(VERSAO).append("\">")
-				.append("\" indSinc=\"").append("0").append("\">")
-				.append("<idLote>").append(lote).append("</idLote>");
+				.append("<idLote>").append(lote).append("</idLote>")
+				.append("<indSinc>").append("0").append("</indSinc>");
 		return cabecalho.toString();
 	} // geraCabecLoteNFe 
 		

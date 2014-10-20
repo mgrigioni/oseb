@@ -41,6 +41,7 @@ public class RetConsReciNFe
 	private String cStat;
 	private String xMotivo;
 	private String cUF;
+	private String dhRecbto;
 	private String cMsg;
 	private String xMsg;
 	
@@ -64,6 +65,9 @@ public class RetConsReciNFe
 	}
 	public String getcUF() {
 		return cUF;
+	}
+	public String getdhRecbto(){
+		return dhRecbto;
 	}
 	public String getcMsg() {
 		return cMsg;
