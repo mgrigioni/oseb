@@ -494,7 +494,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			m_processMsg = Msg.getMsg(getCtx(), "ValidationError") + " Total de Serviços difere da soma dos serviços";
 			return DocAction.STATUS_Invalid;
 		}
-				
+		
 		//Processar NFe
 		m_processMsg = processNFe();
 		if (m_processMsg != null && !m_processMsg.isEmpty())
@@ -1340,6 +1340,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			setlbr_NFeID(invoice.get_ValueAsString("lbr_NFeID")); //FIXME
 			
 			setDateDoc(invoice.getDateInvoiced());
+			setlbr_DateInOut(invoice.getDateAcct());
 		}
 		
 		//Dados da Empresa, Parceiro e Entrega
@@ -1472,14 +1473,13 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	
 	public BigDecimal getValorTotTrib(){
 		
-		BigDecimal valorTotTrib = Env.ZERO;
+		BigDecimal vTotTrib = Env.ZERO;
 		List<MLBRNotaFiscalLine> lines = getLines(false);
-		for (MLBRNotaFiscalLine line : lines){
-			valorTotTrib = valorTotTrib.add(line.getlbr_ValorTotTrib());
+		for(MLBRNotaFiscalLine line : lines){
+			vTotTrib = vTotTrib.add(line.getlbr_ValorTotTrib());
 		}
-		
-		return valorTotTrib;
-	} //getValorTotTrib
+		return vTotTrib;
+	}
 	
 	/**
 	 * retorna o valor do imposto

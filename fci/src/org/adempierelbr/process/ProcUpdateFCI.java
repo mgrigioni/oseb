@@ -77,7 +77,7 @@ public class ProcUpdateFCI extends SvrProcess
 				String fciNumber    = campos[9];
 						
 				MLBRProductFCI fci = MLBRProductFCI.get(getCtx(), productValue, fciProcess.getC_Period_ID(), get_TrxName());
-				if (fci.getValue().startsWith("TEMP_")){
+				if (fci != null && fci.getValue().startsWith("TEMP_")){
 					fci.setValue(fciNumber);
 					fci.save(get_TrxName());
 				}		

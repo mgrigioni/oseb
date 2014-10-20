@@ -90,12 +90,12 @@ public abstract class CreateFrom implements ICreateFrom
 		String column = "ol.QtyDelivered";
 		if (forInvoice)
 			column = "ol.QtyInvoiced";
-		StringBuffer sql = new StringBuffer("SELECT o.C_Order_ID,").append(display)
-			.append(" FROM C_Order o "
-			+ "WHERE o.C_BPartner_ID=? AND o.IsSOTrx='N' AND o.DocStatus IN ('CL','CO')"
-			+ " AND o.C_Order_ID IN "
-				  + "(SELECT ol.C_Order_ID FROM C_OrderLine ol"
-				  + " WHERE ol.QtyOrdered - ").append(column).append(" != 0) ");
+		StringBuffer sql = new StringBuffer("SELECT DISTINCT o.C_Order_ID,").append(display)
+			.append(",o.DocumentNo, o.DateOrdered "
+			+ "FROM C_Order o "
+		    + " INNER JOIN C_OrderLine ol ON (o.C_Order_ID = ol.C_Order_ID)"
+			+ " WHERE o.C_BPartner_ID=? AND o.IsSOTrx='N' AND o.DocStatus IN ('CL','CO')"
+			+ " AND ol.QtyOrdered - ").append(column).append(" != 0");
 		if(sameWarehouseOnly)
 		{
 			sql = sql.append(" AND o.M_Warehouse_ID=? ");
