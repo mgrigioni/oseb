@@ -39,12 +39,18 @@ public class ImpostoProduto {
 	private ImpostoII II;
 	private PISBean PIS;
 	private COFINSBean COFINS;
-
+	
+	public ImpostoProduto(BigDecimal vTotTrib) {
+		super();
+		setvTotTrib(vTotTrib);
+	}
+	
 	public String getvTotTrib() {
 		return vTotTrib;
 	}
 	public void setvTotTrib(BigDecimal vTotTrib) {
-		this.vTotTrib = TextUtil.bigdecimalToString(vTotTrib);
+		if (vTotTrib != null && vTotTrib.signum() == 1)
+			this.vTotTrib = TextUtil.bigdecimalToString(vTotTrib);
 	}
 	
 	public ICMSBean getICMS() {

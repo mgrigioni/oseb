@@ -154,7 +154,7 @@ public class NFeXMLGenerator
 		
 		// Valores Totais
 		ValoresICMS valoresicms = new ValoresICMS(nf.getGrandTotal(),nf.getTotalLines(),
-				nf.getFreightAmt(),nf.getlbr_InsuranceAmt(), nf.getChargeAmt());
+				nf.getFreightAmt(),nf.getlbr_InsuranceAmt(), nf.getChargeAmt(), nf.getValorTotTrib());
 		
 		for (X_LBR_NFTax nfTax : nf.getTaxes()){
 			valoresicms.setValorImposto(nfTax);
@@ -220,7 +220,7 @@ public class NFeXMLGenerator
 			PISGrupoBean pisgrupo = new PISGrupoBean(); // Grupo de PIS
 			COFINSBean cofinsnfe = new COFINSBean(); // COFINS
 			COFINSGrupoBean cofinsgrupo = new COFINSGrupoBean(); // Grupo de COFINS
-			ImpostoProduto impostos = new ImpostoProduto(); // Tributos
+			ImpostoProduto impostos = new ImpostoProduto(nfLine.getlbr_ValorTotTrib()); // Tributos
 
 			dados.add(new DetalheProduto(linhaNF++, produto, impostos, nfLine.getDescription()));
 
