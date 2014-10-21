@@ -64,7 +64,6 @@ import org.w3c.dom.NodeList;
 import br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2.CadConsultaCadastro2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeautorizacao.NfeAutorizacaoStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
-import br.inf.portalfiscal.www.nfe.wsdl.nfeconsultadest.NFeConsultaDestStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfedownloadnf.NfeDownloadNFStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetautorizacao.NfeRetAutorizacaoStub;
@@ -129,7 +128,7 @@ public abstract class NFeUtil
 		xstream.autodetectAnnotations(true);
 		// 
 		StringWriter sw = new StringWriter ();
-		xstream.marshal (new NFeDadosMsg(new ConsSitNFe("2.01",tpAmb,chNFe)), 
+		xstream.marshal (new NFeDadosMsg(new ConsSitNFe(NFeUtil.VERSAO,tpAmb,chNFe)), 
 				new CompactWriter (sw));
 		
 		return sw.toString();
@@ -325,7 +324,7 @@ public abstract class NFeUtil
 
 		NfeConsulta2Stub.NfeCabecMsg cabecMsg = new NfeConsulta2Stub.NfeCabecMsg();
 		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
-		cabecMsg.setVersaoDados("2.01");
+		cabecMsg.setVersaoDados(NFeUtil.VERSAO);
 
 		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
 		cabecMsgE.setNfeCabecMsg(cabecMsg);
@@ -355,6 +354,7 @@ public abstract class NFeUtil
 	 * @param region
 	 * @return NFeConsultaDestStub.NfeCabecMsgE
 	 */
+	/*
 	public static NFeConsultaDestStub.NfeCabecMsgE geraCabecConsultaDest(int C_Region_ID){
 		
 		NFeConsultaDestStub.NfeCabecMsg cabecMsg = new NFeConsultaDestStub.NfeCabecMsg();
@@ -366,6 +366,7 @@ public abstract class NFeUtil
 
 		return cabecMsgE;
 	} //geraCabecConsultaDest
+	*/
 	
 	/**
 	 * Método para gerar cabeçalho download NFe
