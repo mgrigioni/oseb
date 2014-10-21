@@ -33,7 +33,7 @@ public class X_LBR_NotaFiscalLine extends PO implements I_LBR_NotaFiscalLine, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141020L;
+	private static final long serialVersionUID = 20141021L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscalLine (Properties ctx, int LBR_NotaFiscalLine_ID, String trxName)

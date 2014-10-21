@@ -34,7 +34,7 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141020L;
+	private static final long serialVersionUID = 20141021L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -1673,8 +1673,18 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 
 	/** lbr_NFeStatus AD_Reference_ID=1100004 */
 	public static final int LBR_NFESTATUS_AD_Reference_ID=1100004;
+	/** 338 - Rejeição: Número do processo de drawback não informado na exportação = 338 */
+	public static final String LBR_NFESTATUS_338_RejeiçãoNúmeroDoProcessoDeDrawbackNãoInformadoNaExportação = "338";
+	/** 336 - Rejeição: Informado o grupo de exportação no item para CFOP que não é de exportação = 336 */
+	public static final String LBR_NFESTATUS_336_RejeiçãoInformadoOGrupoDeExportaçãoNoItemParaCFOPQueNãoÉDeExportação = "336";
+	/** 337 - Rejeição: Não informado o grupo de exportação no item = 337 */
+	public static final String LBR_NFESTATUS_337_RejeiçãoNãoInformadoOGrupoDeExportaçãoNoItem = "337";
 	/** 471 - Rejeição: Informado NCM=00 indevidamente = 471 */
 	public static final String LBR_NFESTATUS_471_RejeiçãoInformadoNCMEq00Indevidamente = "471";
+	/** 328 - Rejeição: CFOP de devolução de mercadoria para NF-e que não tem finalidade de devolução de mercadoria = 328 */
+	public static final String LBR_NFESTATUS_328_RejeiçãoCFOPDeDevoluçãoDeMercadoriaParaNF_EQueNãoTemFinalidadeDeDevoluçãoDeMercadoria = "328";
+	/** 327 - Rejeição: CFOP inválido para NF-e com finalidade de devolução de mercadoria = 327 */
+	public static final String LBR_NFESTATUS_327_RejeiçãoCFOPInválidoParaNF_EComFinalidadeDeDevoluçãoDeMercadoria = "327";
 	/** 361 - Rejeição: NF-e com Nota de Empenho inexistente na UF = 361 */
 	public static final String LBR_NFESTATUS_361_RejeiçãoNF_EComNotaDeEmpenhoInexistenteNaUF = "361";
 	/** 360 - Rejeição: NF-e com Nota de Empenho inválida para a UF = 360 */
