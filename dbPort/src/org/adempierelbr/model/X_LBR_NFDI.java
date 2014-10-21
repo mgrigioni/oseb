@@ -33,7 +33,7 @@ public class X_LBR_NFDI extends PO implements I_LBR_NFDI, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141020L;
+	private static final long serialVersionUID = 20141021L;
 
     /** Standard Constructor */
     public X_LBR_NFDI (Properties ctx, int LBR_NFDI_ID, String trxName)

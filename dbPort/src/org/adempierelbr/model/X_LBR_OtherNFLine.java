@@ -33,7 +33,7 @@ public class X_LBR_OtherNFLine extends PO implements I_LBR_OtherNFLine, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141020L;
+	private static final long serialVersionUID = 20141021L;
 
     /** Standard Constructor */
     public X_LBR_OtherNFLine (Properties ctx, int LBR_OtherNFLine_ID, String trxName)

@@ -32,7 +32,7 @@ public class X_LBR_TaxLine extends PO implements I_LBR_TaxLine, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141020L;
+	private static final long serialVersionUID = 20141021L;
 
     /** Standard Constructor */
     public X_LBR_TaxLine (Properties ctx, int LBR_TaxLine_ID, String trxName)
