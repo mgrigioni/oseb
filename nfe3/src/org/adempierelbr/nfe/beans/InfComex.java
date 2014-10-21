@@ -28,37 +28,45 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias ("exporta")
 public class InfComex {
 
-	private String UFEmbarq;
-	private String xLocEmbarq;
+	private String UFSaidaPais;
+	private String xLocExporta;
+	private String xLocDespacho;
 	
 	/**
 	 * Default Constructor
 	 * @param ufEmbarq
 	 * @param xLocEmbarq
 	 */
-	public InfComex(String ufEmbarq, String xLocEmbarq){
-		setUFEmbarq(ufEmbarq);
-		setxLocEmbarq(xLocEmbarq);
+	public InfComex(String UFSaidaPais, String xLocExporta){
+		setUFSaidaPais(UFSaidaPais);
+		setxLocExporta(xLocExporta);
 	}
 	
-	public String getUFEmbarq() {
-		return UFEmbarq;
+	public String getUFSaidaPais() {
+		return UFSaidaPais;
 	}
-	public void setUFEmbarq(String uFEmbarq) {
-		if (uFEmbarq == null || uFEmbarq.length() != 2)
-			throw new AdempiereException("uF = " + uFEmbarq);
+	public void setUFSaidaPais(String UFSaidaPais) {
+		if (UFSaidaPais == null || UFSaidaPais.length() != 2)
+			throw new AdempiereException("uF = " + UFSaidaPais);
 		else
-			UFEmbarq = uFEmbarq;
+			this.UFSaidaPais = UFSaidaPais;
 	}
 	
-	public String getxLocEmbarq() {
-		return xLocEmbarq;
+	public String getxLocExporta() {
+		return xLocExporta;
 	}
-	public void setxLocEmbarq(String xLocEmbarq) {
-		if (xLocEmbarq == null || xLocEmbarq.length() < 2)
-			throw new AdempiereException("xLocEmbarq = " + xLocEmbarq);
+	public void setxLocExporta(String xLocExporta) {
+		if (xLocExporta == null || xLocExporta.length() < 2)
+			throw new AdempiereException("xLocExporta = " + xLocExporta);
 		else
-			this.xLocEmbarq = TextUtil.checkSize(RemoverAcentos.remover(xLocEmbarq),60);
+			this.xLocExporta = TextUtil.checkSize(RemoverAcentos.remover(xLocExporta),60);
 	}
+	public String getxLocDespacho() {
+		return xLocDespacho;
+	}
+	public void setxLocDespacho(String xLocDespacho) {
+		this.xLocDespacho = xLocDespacho;
+	}
+	
 
 } //InfComex

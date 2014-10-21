@@ -674,7 +674,7 @@ Este campo será obrigatoriamente preenchido com:
 											<xs:simpleType>
 												<xs:restriction base="xs:string">
 													<xs:whiteSpace value="preserve"/>
-												    <xs:pattern value="[!-ÿ]{5,20}"/>
+												    <xs:pattern value="[!-ÿ]{0,20}"/>
 												</xs:restriction>
 											</xs:simpleType>
 										</xs:element>
