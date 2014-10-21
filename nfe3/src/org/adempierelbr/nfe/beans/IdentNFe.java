@@ -52,7 +52,6 @@ public class IdentNFe {
 	private String tpNF;
 	private String idDest;
 	private String cMunFG;
-	private NFReferenciada NFref;
 	private String tpImp;
 	private String tpEmis;
 	private String cDV;
@@ -64,6 +63,7 @@ public class IdentNFe {
 	private final String verProc = AdempiereLBR.VERSION; //Versão do aplicativo
 	private String dhCont;
 	private String xJust;
+	private NFReferenciada NFref;
 	
 	/**
 	 * Default Constructor

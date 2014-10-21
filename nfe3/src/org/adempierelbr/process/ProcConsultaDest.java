@@ -13,23 +13,10 @@
  *****************************************************************************/
 package org.adempierelbr.process;
 
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.logging.Level;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
 import org.adempiere.model.POWrapper;
-import org.adempierelbr.model.MLBRDigitalCertificate;
 import org.adempierelbr.model.MLBRNFeWebService;
-import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ResCCe;
-import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ResCanc;
-import org.adempierelbr.nfe.beans.nfeConsultaNFDest.ResNFe;
-import org.adempierelbr.nfe.beans.nfeConsultaNFDest.Ret;
-import org.adempierelbr.nfe.beans.nfeConsultaNFDest.RetConsNFeDest;
-import org.adempierelbr.util.NFeUtil;
-import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.compiere.model.MOrgInfo;
 import org.compiere.process.ProcessInfoParameter;
@@ -37,12 +24,6 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-
-import br.inf.portalfiscal.www.nfe.wsdl.nfeconsultadest.NFeConsultaDestStub;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.CompactWriter;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * 	Processo para consulta NF-e destinadas
@@ -88,6 +69,9 @@ public class ProcConsultaDest extends SvrProcess
 			return "Processo disponível apenas no ambiente de Produção";
 		}
 
+		/**
+		PROCESSO ANTIGO
+		
 		//INICIALIZA CERTIFICADO
 		MLBRDigitalCertificate.setCertificate(getCtx(), orgInfo);
 		
@@ -117,6 +101,8 @@ public class ProcConsultaDest extends SvrProcess
 			log.severe(e1.getLocalizedMessage());
 			e1.printStackTrace();
 		}
+		
+		*/
 		
 		return Msg.getMsg(Env.getAD_Language(getCtx()), "ProcessOK", true);
 	}	//	doIt

@@ -286,7 +286,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		//Valor Total Aprox. Tributos
 		MInvoice invoice = MInvoice.get(getCtx(), getParent().getC_Invoice_ID());
 		I_W_C_Invoice iW   = POWrapper.create(invoice,I_W_C_Invoice.class);
-		I_W_C_DocType dtW  = POWrapper.create(MDocType.get(getCtx(), invoice.getC_DocType_ID()), I_W_C_DocType.class);
+		I_W_C_DocType dtW  = POWrapper.create(MDocType.get(getCtx(), invoice.getC_DocTypeTarget_ID()), I_W_C_DocType.class);
 		if (iW.getlbr_TransactionType().equals("END") && dtW.islbr_HasOpenItems()){
 			//SOMENTE CONSUMIDOR FINAL E VENDA
 			BigDecimal aliq = getLBR_NCM().getlbr_aliqNac();
