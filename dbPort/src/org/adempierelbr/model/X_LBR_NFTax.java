@@ -32,7 +32,7 @@ public class X_LBR_NFTax extends PO implements I_LBR_NFTax, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141021L;
+	private static final long serialVersionUID = 20141106L;
 
     /** Standard Constructor */
     public X_LBR_NFTax (Properties ctx, int LBR_NFTax_ID, String trxName)

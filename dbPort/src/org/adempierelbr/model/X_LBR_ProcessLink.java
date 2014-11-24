@@ -32,7 +32,7 @@ public class X_LBR_ProcessLink extends PO implements I_LBR_ProcessLink, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141021L;
+	private static final long serialVersionUID = 20141106L;
 
     /** Standard Constructor */
     public X_LBR_ProcessLink (Properties ctx, int LBR_ProcessLink_ID, String trxName)

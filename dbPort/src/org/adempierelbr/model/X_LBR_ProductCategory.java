@@ -30,7 +30,7 @@ public class X_LBR_ProductCategory extends PO implements I_LBR_ProductCategory, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141021L;
+	private static final long serialVersionUID = 20141106L;
 
     /** Standard Constructor */
     public X_LBR_ProductCategory (Properties ctx, int LBR_ProductCategory_ID, String trxName)
