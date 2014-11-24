@@ -42,11 +42,12 @@ public class AdicoesDI {
 	 * @param nSeqAdic
 	 * @param cFabricante
 	 */
-	public AdicoesDI(String nAdicao, String nSeqAdic, String cFabricante) {
+	public AdicoesDI(String nAdicao, String nSeqAdic, String cFabricante, String nDraw) {
 		super();
 		setnAdicao(nAdicao);
 		setnSeqAdic(nSeqAdic);
 		setcFabricante(cFabricante);
+		setnDraw(nDraw);
 	}
 	
 	public String getnAdicao() {
@@ -91,7 +92,8 @@ public class AdicoesDI {
 		return nDraw;
 	}
 	public void setnDraw(String nDraw) {
-		this.nDraw = nDraw;
+		if (nDraw != null && !nDraw.trim().isEmpty())
+			this.nDraw = nDraw;
 	}
 	
 } //AdicoesDI

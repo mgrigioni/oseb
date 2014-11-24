@@ -185,23 +185,19 @@ public class ProcGenerateCert extends SvrProcess
 			    md5.update(cert.getEncoded());
 			    System.out.println("   md5     " + toHexString(md5.digest()));
 			    System.out.println();
+			    
+				String alias = host + "-" + (i + 1);
+				ks.setCertificateEntry(alias, cert);
+			
+				OutputStream out = new FileOutputStream(FilePath + FileName);
+				ks.store(out, store);
+				out.close();
+			
+				System.out.println();
+				System.out.println(cert);
+				System.out.println();
+				System.out.println ("Added certificate to keystore " + FileName + " using alias '" + alias + "'");
 			}
-		
-			System.out.println("Enter certificate to add to trusted keystore");
-			int k = 0;
-		
-			X509Certificate cert = chain[k];
-			String alias = host + "-" + (k + 1);
-			ks.setCertificateEntry(alias, cert);
-		
-			OutputStream out = new FileOutputStream(FilePath + FileName);
-			ks.store(out, store);
-			out.close();
-		
-			System.out.println();
-			System.out.println(cert);
-			System.out.println();
-			System.out.println ("Added certificate to keystore " + FileName + " using alias '" + alias + "'");
 		}
 	}
 

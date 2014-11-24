@@ -199,12 +199,13 @@ public class NFeXMLGenerator
 				if (nfLine.getLBR_NFDI_ID() <= 0)
 					throw new AdempiereException("Linha: " + nfLine.getLine() + " sem DI");
 				
+				X_LBR_NFDI di = new X_LBR_NFDI(ctx, nfLine.getLBR_NFDI_ID(), trxName);
+				
 				List<AdicoesDI> adis = new ArrayList<AdicoesDI>();
 				adis.add(new AdicoesDI(nfLine.get_ValueAsString("lbr_NumAdicao"),
 						nfLine.get_ValueAsString("lbr_NumSeqItem"),
-						nfLine.get_ValueAsString("Manufacturer")));
+						nfLine.get_ValueAsString("Manufacturer"),di.getlbr_Drawback()));
 				
-				X_LBR_NFDI di = new X_LBR_NFDI(ctx, nfLine.getLBR_NFDI_ID(), trxName);
 				DeclaracaoDI declaracaoDI = new DeclaracaoDI(di.getlbr_DI(),
 						di.getDateTrx(), di.getlbr_LocDesemb(), di.getlbr_BPRegion(),
 						di.getlbr_DataDesemb(),di.getlbr_CodExportador(),
@@ -220,6 +221,12 @@ public class NFeXMLGenerator
 				}
 				
 				produto.setDI(declaracaoDI);
+				
+				if (di.getlbr_Drawback() != null && !di.getlbr_Drawback().trim().isEmpty()){
+					DetExport detExport = new DetExport(di.getlbr_Drawback());
+					produto.setDetExport(detExport);
+				}
+				
 			}
 			
 			/*

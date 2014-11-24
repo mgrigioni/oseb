@@ -57,6 +57,8 @@ public class ProdutoNFe {
 	private final String indTot = "1"; //v2.0 = 0 – VL Ñ ENTRA NO TOT 1 - VL ENTRA
 	private DeclaracaoDI DI;
 	private DetExport detExport;
+	private String xPed;
+	private String nItemPed;
 	private String nFCI;
 	
 	/**
@@ -83,6 +85,9 @@ public class ProdutoNFe {
 		setvFrete(nfLine.getFreightAmt());
 		setvSeg(nfLine.getInsuranceAmt());
 		setvOutro(nfLine.getChargeAmt());
+		
+		setxPed(nfLine.getC_InvoiceLine().getC_Invoice().getPOReference());
+		
 		setnFCI(MProduct.get(nfLine.getCtx(), nfLine.getM_Product_ID()));
 	}
 	
@@ -261,6 +266,21 @@ public class ProdutoNFe {
 	}
 	public void setDetExport(DetExport detExport) {
 		this.detExport = detExport;
+	}
+	
+	public String getxPed() {
+		return xPed;
+	}
+	public void setxPed(String xPed) {
+		xPed = TextUtil.itrim(xPed, "").replaceAll(" ","");
+		if (!xPed.isEmpty())
+			this.xPed = xPed;
+	}
+	public String getnItemPed() {
+		return nItemPed;
+	}
+	public void setnItemPed(String nItemPed) {
+		this.nItemPed = nItemPed;
 	}
 
 	public String getnFCI() {

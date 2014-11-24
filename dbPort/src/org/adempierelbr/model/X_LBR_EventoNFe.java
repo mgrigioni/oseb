@@ -31,7 +31,7 @@ public class X_LBR_EventoNFe extends PO implements I_LBR_EventoNFe, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141021L;
+	private static final long serialVersionUID = 20141106L;
 
     /** Standard Constructor */
     public X_LBR_EventoNFe (Properties ctx, int LBR_EventoNFe_ID, String trxName)
