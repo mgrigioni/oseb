@@ -272,7 +272,7 @@ public class ProdutoNFe {
 		return xPed;
 	}
 	public void setxPed(String xPed) {
-		xPed = TextUtil.itrim(xPed, "").replaceAll(" ","");
+		xPed = RemoverAcentos.remover(TextUtil.itrim(xPed, "").replaceAll(" ",""));
 		if (!xPed.isEmpty())
 			this.xPed = xPed;
 	}

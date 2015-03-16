@@ -60,6 +60,7 @@ import org.adempierelbr.sped.efd.beans.RD590;
 import org.adempierelbr.sped.efd.beans.RD990;
 import org.adempierelbr.sped.efd.beans.RE001;
 import org.adempierelbr.sped.efd.beans.RE100;
+import org.adempierelbr.sped.efd.beans.RE110;
 import org.adempierelbr.sped.efd.beans.RE111;
 import org.adempierelbr.sped.efd.beans.RE200;
 import org.adempierelbr.sped.efd.beans.RE210;
@@ -912,11 +913,17 @@ public class ProcGenerateEFD extends SvrProcess
 		if (CounterSped.getBlockCounter("C") > 2 || CounterSped.getBlockCounter("D") > 2){
 			BLOCOE.append(new RE001(true));
 			BLOCOE.append(new RE100(dateFrom,dateTo));
-			BLOCOE.append(EFDUtil.createRE110(dateFrom, _RE110));
+			
+			RE110 re110 = EFDUtil.createRE110(dateFrom, _RE110);
+			BLOCOE.append(re110);
 			
 			RE111[] arrayRE111 = EFDUtil.createRE111(dateFrom);
 			for (RE111 re111 : arrayRE111){
 				BLOCOE.append(re111);
+			}
+			
+			if (re110.getVL_ICMS_RECOLHER().signum() == 1){
+				BLOCOE.append(EFDUtil.createRE116(dateFrom, re110.getVL_ICMS_RECOLHER()));
 			}
 			
 			Iterator<String> ufs = _RE210.keySet().iterator();

@@ -19,6 +19,8 @@ package org.adempierelbr.process;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.adempierelbr.model.X_LBR_AverageCost;
@@ -86,6 +88,8 @@ public class ProcAvgCostCreate extends SvrProcess
 		
 		cleanupLines(avgCost.get_ID(),costType);
 		
+		Map<Integer,BigDecimal> nfsComp = getNfComplementar(period);
+		
 		String sql = "";
 		
 		if(costType.equals(PUCHASED)){
@@ -117,12 +121,12 @@ public class ProcAvgCostCreate extends SvrProcess
 						"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 					"FROM " +
 						"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty AS ProductionQty, " +
-							"SUM(((pl.MovementQty*-1)/pp.ProductionQty) * c.CurrentCostPrice) AS Custo FROM M_Production pr " +
+							"SUM((ABS(pl.MovementQty)/pp.ProductionQty) * c.CurrentCostPrice) AS Custo FROM M_Production pr " +
 							"INNER JOIN M_ProductionPlan pp ON pr.M_Production_ID=pp.M_Production_ID " +
 							"INNER JOIN M_ProductionLine pl ON (pl.M_ProductionPlan_ID=pp.M_ProductionPlan_ID AND pl.M_Product_ID <> pp.M_Product_ID) " +
 							"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +
 						"WHERE pr.Processed='Y' " +
-							"AND pr.AD_Client_ID=? AND pp.ProductionQty > 0 " +
+							"AND pr.AD_Client_ID=? " +
 							"AND TRUNC(pr.MovementDate) BETWEEN ? AND ? " +
 						" GROUP BY pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty " +
 						") PlanCost INNER JOIN M_Cost c ON (c.M_Product_ID=PlanCost.M_Product_ID AND c.M_CostElement_ID=?) " +
@@ -158,6 +162,13 @@ public class ProcAvgCostCreate extends SvrProcess
 				
 				BigDecimal totCurrent = line.getCurrentCostPrice().multiply(line.getCurrentQty());
 				BigDecimal totCumulated = line.getCumulatedAmt();
+				if (costType.equals(PUCHASED) && !nfsComp.isEmpty()){
+					BigDecimal compAmt = nfsComp.get(rs.getInt(1));
+					if (compAmt != null && compAmt.signum() == 1){
+						totCumulated = totCumulated.add(compAmt);
+					}
+				}
+				
 				BigDecimal total = totCurrent.add(totCumulated);
 				BigDecimal sumQty = line.getCurrentQty().add(line.getCumulatedQty());
 				if(sumQty.signum() == 0)
@@ -183,14 +194,14 @@ public class ProcAvgCostCreate extends SvrProcess
 					sql = "SELECT PlanCost.M_Product_ID,  PlanCost.LBR_AverageCostLine_ID, " +
 								"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 							"FROM " +
-								"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, avgl.LBR_AverageCostLine_ID, pp.ProductionQty AS ProductionQty, " +
+								"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, avgl.LBR_AverageCostLine_ID, ABS(pp.ProductionQty) AS ProductionQty, " +
 									"SUM(((pl.MovementQty*-1)/pp.ProductionQty) * (CASE WHEN new_avg_cost.FutureCostPrice IS NOT NULL OR new_avg_cost.FutureCostPrice > 0 THEN new_avg_cost.FutureCostPrice ELSE c.CurrentCostPrice END)) AS Custo FROM M_Production pr " +
 									"INNER JOIN M_ProductionPlan pp ON pr.M_Production_ID=pp.M_Production_ID " +
 									"INNER JOIN M_ProductionLine pl ON (pl.M_ProductionPlan_ID=pp.M_ProductionPlan_ID AND pl.M_Product_ID <> pp.M_Product_ID) " +
 									"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +
 									"INNER JOIN LBR_AverageCostLine avgl ON (avgl.M_Product_ID=pp.M_Product_ID AND avgl.LBR_AverageCost_ID=? AND avgl.lbr_AvgCostType='M') " +
 									" LEFT JOIN LBR_AverageCostLine new_avg_cost ON (new_avg_cost.M_Product_ID=pl.M_Product_ID AND new_avg_cost.LBR_AverageCost_ID=? AND new_avg_cost.lbr_AvgCostType='M') " +
-								"WHERE pr.Processed='Y' AND pp.ProductionQty > 0 " +
+								"WHERE pr.Processed='Y' " +
 									"AND pr.AD_Client_ID=? " +
 									"AND TRUNC(pr.MovementDate) BETWEEN ? AND ? " +
 								"GROUP BY pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty, avgl.LBR_AverageCostLine_ID " +
@@ -267,5 +278,48 @@ public class ProcAvgCostCreate extends SvrProcess
 		
 		DB.executeUpdate(sql, new Object[]{costType,ID}, false, trxName);
 	} //cleanupLine
+	
+	private Map<Integer,BigDecimal> getNfComplementar(MPeriod period){
+		
+		String sql =
+				"SELECT M_Product_ID, SUM(ComplAmt) FROM ( " +
+				"SELECT nfComplementar.*, (TotalLines * perct) as ComplAmt FROM ( " +
+				"SELECT M_Product_ID, LineTotalAmt, " +
+				"(SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID) as GrandTotal, " +
+				"ROUND(LineTotalAmt / (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID),4) as perct, " +
+				"compl.LBR_RefNotaFiscal_ID, compl.TotalLines " +
+				"FROM LBR_NotaFiscalLine nfl " +
+				"INNER JOIN " +
+				"(SELECT LBR_RefNotaFiscal_ID, TotalLines " +
+				"FROM LBR_NotaFiscal nf " +
+				"WHERE nf.lbr_FinNFe='2' " +
+				"and TRUNC(NVL(nf.lbr_dateinout,nf.datedoc)) BETWEEN ? and ?) compl " + 
+				"ON (nfl.LBR_NotaFiscal_ID = compl.LBR_RefNotaFiscal_ID)) nfComplementar) " +
+				"GROUP BY M_Product_ID";
+		
+		Map<Integer, BigDecimal> nfs = new HashMap<Integer,BigDecimal>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement (sql, get_TrxName());
+			pstmt.setTimestamp(1, period.getStartDate());
+			pstmt.setTimestamp(2, period.getEndDate());
+			rs = pstmt.executeQuery ();
+			while (rs.next ())
+			{
+				nfs.put(rs.getInt(1), rs.getBigDecimal(2));
+			}
+		}
+		catch (Exception e)
+		{
+			log.log(Level.SEVERE, "", e);
+		}
+		finally{
+		       DB.close(rs, pstmt);
+		}
+		
+		return nfs;
+	}
 
 }	//ProcAvgCostCreate

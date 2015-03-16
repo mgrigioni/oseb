@@ -49,6 +49,8 @@ public class GIAUtil{
 		String IE     = orgInfo.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_IE);
 		Timestamp REF = period.getStartDate();
 		BigDecimal SALDOCREDPERIODOANT = getCumulatedAmt();
+		if (SALDOCREDPERIODOANT.signum() != 1)
+			SALDOCREDPERIODOANT = Env.ZERO;
 		
 		return new CR05(IE,CNPJ,REF,SALDOCREDPERIODOANT);
 	} //createCR05

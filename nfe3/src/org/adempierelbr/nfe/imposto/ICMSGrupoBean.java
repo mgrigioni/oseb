@@ -13,7 +13,11 @@
  *****************************************************************************/
 package org.adempierelbr.nfe.imposto;
 
+import java.math.BigDecimal;
+
 import org.adempiere.exceptions.AdempiereException;
+import org.adempierelbr.util.TaxBR;
+import org.adempierelbr.util.TextUtil;
 
 public class ICMSGrupoBean {
 
@@ -91,6 +95,12 @@ public class ICMSGrupoBean {
 	
 		this.vBC = vBC;
 	}
+	public void setvBC(BigDecimal qCom, BigDecimal vUnCom) {
+		qCom = qCom.setScale(4, TaxBR.ROUND);
+		vUnCom = vUnCom.setScale(5,TaxBR.ROUND);
+		
+		this.vBC = TextUtil.bigdecimalToString(qCom.multiply(vUnCom));
+	}
 	public void setpICMS(String pICMS) {
 		if (pICMS != null)
 			pICMS = pICMS.trim();
@@ -100,11 +110,11 @@ public class ICMSGrupoBean {
 	public String getvICMSOp() {
 		return vICMSOp;
 	}
-	public void setvICMSOp(String vICMSOp) {
-		if (vICMSOp != null)
-			vICMSOp = vICMSOp.trim();
-	
-		this.vICMSOp = vICMSOp;
+	public void setvICMSOp(BigDecimal qCom, BigDecimal vUnCom) {
+		qCom = qCom.setScale(4, TaxBR.ROUND);
+		vUnCom = vUnCom.setScale(5,TaxBR.ROUND);
+		
+		this.vICMSOp = TextUtil.bigdecimalToString(qCom.multiply(vUnCom));
 	}
 	public String getpDif() {
 		return pDif;
@@ -118,11 +128,11 @@ public class ICMSGrupoBean {
 	public String getvICMSDif() {
 		return vICMSDif;
 	}
-	public void setvICMSDif(String vICMSDif) {
-		if (vICMSDif != null)
-			vICMSDif = vICMSDif.trim();
-	
-		this.vICMSDif = vICMSDif;
+	public void setvICMSDif(BigDecimal qCom, BigDecimal vUnCom) {
+		qCom = qCom.setScale(4, TaxBR.ROUND);
+		vUnCom = vUnCom.setScale(5,TaxBR.ROUND);
+		
+		this.vICMSDif = TextUtil.bigdecimalToString(qCom.multiply(vUnCom));
 	}
 	public String getvICMS() {
 		return vICMS;

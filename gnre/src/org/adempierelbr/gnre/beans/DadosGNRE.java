@@ -118,7 +118,7 @@ public class DadosGNRE {
 				if (uf.equals("MA")){
 					detalhamento = "000012";
 				}
-				else if (uf.equals("MT")){
+				else if (uf.equals("MT") || uf.equals("DF")){
 					detalhamento = "000022";
 				}
 				else if (uf.equals("TO")){
@@ -144,7 +144,8 @@ public class DadosGNRE {
 				if (uf.equals("AL") || uf.equals("BA") || uf.equals("CE") ||
 					uf.equals("GO") || uf.equals("MA") || uf.equals("MS") ||
 					uf.equals("PE") || uf.equals("RN") || uf.equals("RR") ||
-					uf.equals("SC") || uf.equals("SE") || uf.equals("TO")){
+					uf.equals("SC") || uf.equals("SE") || uf.equals("TO") ||
+					uf.equals("DF")){
 					produto = "46";
 				}
 			}
@@ -328,6 +329,9 @@ public class DadosGNRE {
 		if (uf != null){
 			if (uf.equals("AP")){
 				c39_camposExtras = new CamposExtras("47","T",nfeID);
+			}
+			else if (uf.equals("PE")){
+				c39_camposExtras = new CamposExtras("9","T",nfeID);
 			}
 		}
 		

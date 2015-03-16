@@ -73,6 +73,7 @@ import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrgInfo;
 import org.compiere.util.CLogger;
+import org.compiere.util.Env;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
@@ -152,17 +153,7 @@ public class NFeXMLGenerator
 		
 		// Dados Adicionais
 		dados.setInfAdic(new InfAdic(nf.getDescription()));
-		
-		// Valores Totais
-		ValoresICMS valoresicms = new ValoresICMS(nf.getGrandTotal(),nf.getTotalLines(),
-				nf.getFreightAmt(),nf.getlbr_InsuranceAmt(), nf.getChargeAmt(), nf.getValorTotTrib());
-		
-		for (X_LBR_NFTax nfTax : nf.getTaxes()){
-			valoresicms.setValorImposto(nfTax);
-		}
-		
-		dados.setTotal(new Valores(valoresicms));
-
+				
 		//Dados de Cobrança - Fatura
 		if (nf.getC_Invoice_ID() > 0){
 			MInvoice invoice = new MInvoice(ctx,nf.getC_Invoice_ID(),trxName);
@@ -186,6 +177,7 @@ public class NFeXMLGenerator
 		}
 				
 		int linhaNF = 1;
+		BigDecimal vBC = Env.ZERO;
 		
 		List<MLBRNotaFiscalLine> nfLines = nf.getLines();
 		for (MLBRNotaFiscalLine nfLine : nfLines) {
@@ -253,7 +245,7 @@ public class NFeXMLGenerator
 
 			dados.add(new DetalheProduto(linhaNF++, produto, impostos, nfLine.getDescription()));
 
-			//
+			//			
 			for (NFeTaxes lt : NFeTaxes.getTaxes(nfLine)) {
 
 				if (lt.getTaxIndicator().equals("ICMS")) {
@@ -310,6 +302,17 @@ public class NFeXMLGenerator
 							icms60.setOrig(taxStatus.substring(0, 1));
 							icms60.setVBCSTRet(TextUtil.bigdecimalToString(lt.getvBCST()));
 							icms60.setVICMSSTRet(TextUtil.bigdecimalToString(lt.getvImpostoST()));
+						}
+						
+						//Diferimento
+						if (taxStatus.endsWith("51")){
+							icmsgrupo.setvBC(nfLine.getQty(),nfLine.getPrice());
+							icmsgrupo.setpICMS("100");
+							icmsgrupo.setvICMSOp(nfLine.getQty(),nfLine.getPrice());
+							icmsgrupo.setpDif("100");
+							icmsgrupo.setvICMSDif(nfLine.getQty(),nfLine.getPrice());
+						
+							vBC = vBC.add(new BigDecimal(icmsgrupo.getvBC()));
 						}
 						
 					}
@@ -402,6 +405,18 @@ public class NFeXMLGenerator
 			}//Impostos das Linhas
 
 		}//	Linhas da NF
+		
+		// Valores Totais
+		ValoresICMS valoresicms = new ValoresICMS(nf.getGrandTotal(),nf.getTotalLines(),
+				nf.getFreightAmt(),nf.getlbr_InsuranceAmt(), nf.getChargeAmt(), nf.getValorTotTrib());
+		
+		for (X_LBR_NFTax nfTax : nf.getTaxes()){
+			valoresicms.setValorImposto(nfTax);
+		}
+		
+		valoresicms.addvBC(vBC);
+		
+		dados.setTotal(new Valores(valoresicms));
 
 		StringWriter sw = new StringWriter ();
 		xstream.marshal (dados,  new CompactWriter (sw));

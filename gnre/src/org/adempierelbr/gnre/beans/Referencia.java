@@ -37,6 +37,7 @@ public class Referencia {
 		setPeriodo(uf);
 		setMes(TextUtil.timeToString(dateDoc, "MM"));
 		setAno(TextUtil.timeToString(dateDoc, "yyyy"));
+		setParcela(uf);
 	}
 	public String getPeriodo() {
 		return periodo;
@@ -66,7 +67,14 @@ public class Referencia {
 	public String getParcela() {
 		return parcela;
 	}
-	public void setParcela(String parcela) {
+	public void setParcela(String uf) {
+		String parcela = null;
+		if (uf != null){
+				if (uf.equals("DF")){
+					parcela = "1"; //mensal
+				}
+		}
+		
 		this.parcela = parcela;
 	}
 	

@@ -59,7 +59,7 @@ public class RE110 extends RegSped {
 	public RE110(BigDecimal VL_TOT_DEBITOS, BigDecimal VL_AJ_DEBITOS, BigDecimal VL_TOT_AJ_DEBITOS,
 			BigDecimal VL_ESTORNOS_CRED, BigDecimal VL_TOT_CREDITOS, BigDecimal VL_AJ_CREDITOS,
 			BigDecimal VL_TOT_AJ_CREDITOS, BigDecimal VL_ESTORNOS_DEB, BigDecimal VL_SLD_CREDOR_ANT,
-			BigDecimal VL_SLD_APURADO, BigDecimal VL_TOT_DED, BigDecimal VL_ICMS_RECOLHER, 
+			BigDecimal VL_SLD_APURADO, BigDecimal VL_TOT_DED,
 			BigDecimal VL_SLD_CREDOR_TRANSPORTAR, BigDecimal DEB_ESP)
 	{
 		super();
@@ -74,7 +74,7 @@ public class RE110 extends RegSped {
 		this.VL_SLD_CREDOR_ANT = VL_SLD_CREDOR_ANT;
 		this.VL_SLD_APURADO = VL_SLD_APURADO;
 		this.VL_TOT_DED = VL_TOT_DED;
-		this.VL_ICMS_RECOLHER = VL_ICMS_RECOLHER;
+		this.VL_ICMS_RECOLHER = VL_SLD_APURADO.subtract(VL_TOT_DED);;
 		this.VL_SLD_CREDOR_TRANSPORTAR = VL_SLD_CREDOR_TRANSPORTAR;
 		this.DEB_ESP = DEB_ESP;
 	}	// RE110
@@ -106,5 +106,9 @@ public class RE110 extends RegSped {
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();
 	} // toString
+
+	public BigDecimal getVL_ICMS_RECOLHER() {
+		return VL_ICMS_RECOLHER;
+	}	
 	
 } 	// RE110

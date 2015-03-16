@@ -1,4 +1,3 @@
-#Fri Feb 24 17:15:37 BRST 2012
 activeContentFilterList=*.makefile,makefile,*.Makefile,Makefile,Makefile.*,*.mk,MANIFEST.MF
 addNewLine=true
 convertActionOnSaave=AnyEdit.CnvrtTabToSpaces

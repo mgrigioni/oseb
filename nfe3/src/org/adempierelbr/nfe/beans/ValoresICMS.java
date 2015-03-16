@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import org.adempierelbr.model.X_LBR_NFTax;
 import org.adempierelbr.model.X_LBR_TaxGroup;
 import org.adempierelbr.util.TextUtil;
+import org.compiere.util.Env;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -74,6 +75,17 @@ public class ValoresICMS {
 		setvTotTrib(vTotTrib);
 		setvOutro(chargeAmt); 
 	} //ValoresICMS
+	
+	public void addvBC(BigDecimal vBC){
+		if (vBC.signum() != 1)
+			return;
+		
+		BigDecimal actualBC = Env.ZERO;
+		if (getvBC() != null)
+			actualBC = new BigDecimal(getvBC());
+			
+		setvBC(actualBC.add(vBC));
+	} //addvBC
 	
 	/**
 	 * Verifica qual o imposto e define o valor

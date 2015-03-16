@@ -54,6 +54,7 @@ import org.adempierelbr.sped.efd.beans.RD510;
 import org.adempierelbr.sped.efd.beans.RD590;
 import org.adempierelbr.sped.efd.beans.RE110;
 import org.adempierelbr.sped.efd.beans.RE111;
+import org.adempierelbr.sped.efd.beans.RE116;
 import org.adempierelbr.sped.efd.beans.RE210;
 import org.adempierelbr.sped.efd.beans.RE250;
 import org.adempierelbr.sped.efd.beans.RE510;
@@ -127,23 +128,13 @@ public class EFDUtil{
 			return null;
 		}
 		
-		if (dateFrom.before(TextUtil.stringToTime("01/01/2011", "dd/MM/yyyy"))){
-			return "003"; //ANTES DE 2011 - VERSAO 003
-		}
-		else if (dateFrom.before(TextUtil.stringToTime("01/01/2012", "dd/MM/yyyy"))){
-			return "004"; //ANTES DE 2012 - VERSAO 004
-		}
-		else if (dateFrom.before(TextUtil.stringToTime("01/07/2012", "dd/MM/yyyy"))){
-			return "005"; //ANTES DE JUL/2012 - VERSAO 005
-		}
-		else if (dateFrom.before(TextUtil.stringToTime("01/01/2013", "dd/MM/yyyy"))){
-			return "006"; //A PARTIR DE JUL/2012 - VERSAO 006
-		}
-		else if (dateFrom.before(TextUtil.stringToTime("01/01/2014", "dd/MM/yyyy"))){
+		if (dateFrom.before(TextUtil.stringToTime("01/01/2014", "dd/MM/yyyy"))){
 			return "007"; //A PARTIR DE JAN/2013 - VERSAO 007
 		}
-		else
+		else if (dateFrom.before(TextUtil.stringToTime("01/01/2015", "dd/MM/yyyy"))){
 			return "008"; //A PARTIR DE JAN/2014 - VERSAO 008
+		}
+			return "009"; //A PARTIR DE JAN/2015 - VERSAO 009
 	}
 	
 	public static String getNFHeaderReg(String nfModel){
@@ -964,7 +955,6 @@ public class EFDUtil{
 		BigDecimal VL_SLD_CREDOR_ANT  = MLBRApuracaoICMS.getCumulatedAmt(getCtx(),period.get_ID());
 		BigDecimal VL_SLD_APURADO     = Env.ZERO;
 		BigDecimal VL_TOT_DED         = Env.ZERO;
-		BigDecimal VL_ICMS_RECOLHER   = Env.ZERO;
 		BigDecimal VL_SLD_CREDOR_TRSP = Env.ZERO;
 		BigDecimal DEB_ESP            = Env.ZERO;
 		
@@ -994,11 +984,10 @@ public class EFDUtil{
 		else{
 			VL_SLD_CREDOR_TRSP = saldo.abs();
 		}
-	
+		
 		return new RE110(VL_TOT_DEBITOS,VL_AJ_DEBITOS,VL_TOT_AJ_DEBITOS,VL_ESTORNOS_CRED,
 				VL_TOT_CREDITOS,VL_AJ_CREDITOS,VL_TOT_AJ_CREDITOS,VL_ESTORNOS_DEB,
-				VL_SLD_CREDOR_ANT,VL_SLD_APURADO,VL_TOT_DED,VL_ICMS_RECOLHER,
-				VL_SLD_CREDOR_TRSP,DEB_ESP);
+				VL_SLD_CREDOR_ANT,VL_SLD_APURADO,VL_TOT_DED, VL_SLD_CREDOR_TRSP,DEB_ESP);
 	} //createRE110
 	
 	public static RE111[] createRE111(Timestamp dateFrom){
@@ -1024,6 +1013,15 @@ public class EFDUtil{
 		list.toArray(retValue);
 		return retValue;
 	} //createRE111
+	
+	public static RE116 createRE116(Timestamp dateFrom, BigDecimal VL_OR){
+		
+		String COD_OR = "000"; //FIXME - ICMS a recolher
+		Timestamp DT_VCTO = AdempiereLBR.addDays(AdempiereLBR.addMonths(dateFrom, 1), 20); //Dia 20 Próx. Mês
+		String COD_REC = "046-2"; //FIXME
+		
+		return new RE116(COD_OR, VL_OR, DT_VCTO, COD_REC);
+	}
 	
 	public static RE210 createRE210(List<RegSped> regs){
 		

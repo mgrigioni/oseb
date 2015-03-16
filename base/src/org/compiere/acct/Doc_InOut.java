@@ -21,14 +21,19 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import org.adempiere.model.POWrapper;
+import org.adempierelbr.model.MLBRCFOP;
 import org.adempierelbr.model.X_LBR_DocType_Acct;
 import org.adempierelbr.util.AdempiereLBR;
+import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MCostDetail;
 import org.compiere.model.MCurrency;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
+import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MProduct;
 import org.compiere.model.MTax;
@@ -203,10 +208,11 @@ public class Doc_InOut extends Doc
 				// MZ Goodwill
 				// if Shipment CostDetail exist then get Cost from Cost Detail
 				BigDecimal costs = line.getProductCosts(as, line.getAD_Org_ID(), true, "M_InOutLine_ID=?");
+				MProduct product = line.getProduct();
 				// end MZ
-				if (costs == null || costs.signum() == 0)	//	zero costs OK
+				if (costs == null || costs.signum() == 0 || !product.isStocked())	//	zero costs OK
 				{
-					MProduct product = line.getProduct();
+					
 					if (product.isStocked())
 					{
 						p_Error = "No Costs for " + line.getProduct().getValue();
@@ -395,8 +401,10 @@ public class Doc_InOut extends Doc
 				MProduct product = line.getProduct();
 				//get costing method for product
 				String costingMethod = product.getCostingMethod(as);
+				
 				if (MAcctSchema.COSTINGMETHOD_AveragePO.equals(costingMethod) ||
-					MAcctSchema.COSTINGMETHOD_LastPOPrice.equals(costingMethod) )
+					MAcctSchema.COSTINGMETHOD_LastPOPrice.equals(costingMethod) ||
+					isAvgCost(line))
 				{
 					int C_OrderLine_ID = line.getC_OrderLine_ID();
 					// Low - check if c_orderline_id is valid
@@ -892,5 +900,35 @@ public class Doc_InOut extends Doc
 
 		return "";
 	}   //  LBR Receipt
+	
+	private boolean isAvgCost(DocLine ioL){
+		
+		int C_InvoiceLine_ID = DB.getSQLValue(null, 
+				"SELECT C_InvoiceLine_ID FROM C_InvoiceLine WHERE M_InOutLine_ID = ?", ioL.get_ID());
+		
+		if (C_InvoiceLine_ID <= 0)
+			return true;
+		
+		MInvoiceLine iLine = new MInvoiceLine(getCtx(),C_InvoiceLine_ID, null);
+		I_W_C_InvoiceLine iLineW = POWrapper.create(iLine, I_W_C_InvoiceLine.class);
+		MLBRCFOP cfop = new MLBRCFOP(getCtx(),iLineW.getLBR_CFOP_ID(),null);
+		
+		MDocType dType = new MDocType(getCtx(),iLine.getC_Invoice().getC_DocType_ID(),null);
+		boolean hasOpenItens = dType.get_ValueAsBoolean("lbr_HasOpenItems");
+		if (hasOpenItens){
+			String cfopValue = cfop.getValue();
+			if (cfopValue.endsWith(".922")){
+				return true;
+			}
+		}
+		else{
+			String cfopValue = cfop.getValue();
+			if (!(cfopValue.endsWith(".116") || cfopValue.endsWith(".117"))){
+				return true;
+			}
+		}
+		
+		return false;
+	} //isAvgCost
 
 }   //  Doc_InOut
