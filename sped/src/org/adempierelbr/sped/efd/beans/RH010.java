@@ -36,6 +36,7 @@ public class RH010 extends RegSped
 	private BigDecimal QTD;
 	private BigDecimal VL_UNIT;
 	private BigDecimal VL_ITEM;
+	private BigDecimal VL_ITEM_IR;
 
 
 	public RH010(String COD_ITEM, String UNID, BigDecimal QTD, BigDecimal VL_UNIT,
@@ -76,6 +77,7 @@ public class RH010 extends RegSped
 	        .append(PIPE).append(COD_PART)
 	        .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(TXT_COMPL), 255))
 	        .append(PIPE).append(COD_CTA)
+	        .append(PIPE).append(TextUtil.toNumeric(VL_ITEM_IR,2))
 	        .append(PIPE).append(EOL);
 	       
 		return format.toString();

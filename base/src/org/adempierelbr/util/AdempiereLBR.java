@@ -228,16 +228,32 @@ public abstract class AdempiereLBR{
 	}//getLocator_IDfromValue
 	
 	public static BigDecimal getQtyOnHand(int M_Product_ID, int M_Locator_ID, String trx){
+		return getQtyOnHand(M_Product_ID, 0, M_Locator_ID,  trx);
+	}
+	
+	public static BigDecimal getQtyOnHand(int M_Product_ID, int M_AttributeSetInstance_ID, int M_Locator_ID, String trx){
 		
 		String sql = "SELECT SUM(s.QtyOnHand) FROM M_Storage s " +
 					 "WHERE s.M_Product_ID = ? AND s.M_Locator_ID = ?";
 		
-		BigDecimal qtyOnHand = DB.getSQLValueBD(trx, sql, new Object[]{M_Product_ID,M_Locator_ID});
+		Object[] params;
+		if (M_AttributeSetInstance_ID > 0){
+			sql += " s.M_AttributeSetInstance_ID = ?";
+			params = new Object[]{M_Product_ID,M_Locator_ID, M_AttributeSetInstance_ID};
+		}
+		else
+			params = new Object[]{M_Product_ID,M_Locator_ID};
+		
+		BigDecimal qtyOnHand = DB.getSQLValueBD(trx, sql, params);
 		
 		return qtyOnHand == null ? Env.ZERO : qtyOnHand;
 	}
 	
 	public static BigDecimal getQtyOnDate(int M_Product_ID, int M_Locator_ID, Timestamp movementDate, String trx){
+		return getQtyOnDate(M_Product_ID, 0, M_Locator_ID, movementDate, trx);
+	}
+	
+	public static BigDecimal getQtyOnDate(int M_Product_ID, int M_AttributeSetInstance_ID, int M_Locator_ID, Timestamp movementDate, String trx){
 		
 		String sql = "SELECT SUM(t.MovementQty)" +
 				     "FROM M_Transaction t " +
@@ -247,7 +263,15 @@ public abstract class AdempiereLBR{
 				     "WHERE p.IsStocked = 'Y' AND TRUNC(t.MovementDate, 'DD') > TRUNC(?, 'DD') " +
 				     "AND p.M_Product_ID=? AND l.M_Locator_ID=?";
 		
-		BigDecimal movementQty = DB.getSQLValueBD(trx, sql, new Object[]{movementDate, M_Product_ID,M_Locator_ID});
+		Object[] params;
+		if (M_AttributeSetInstance_ID > 0){
+			sql += " t.M_AttributeSetInstance_ID = ?";
+			params = new Object[]{movementDate, M_Product_ID,M_Locator_ID,M_AttributeSetInstance_ID};
+		}
+		else
+			params = new Object[]{movementDate, M_Product_ID,M_Locator_ID};
+		
+		BigDecimal movementQty = DB.getSQLValueBD(trx, sql, params);
 		if (movementQty == null || movementQty.signum() == -1) //MAIS SAIDA QUE ENTRADA, ENTAO ZERA PARA NAO ACHAR QUE EXISTE SALDO
 			movementQty = Env.ZERO;
 		
