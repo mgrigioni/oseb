@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.model.MAssetGroupAcct;
+import org.compiere.model.MAttributeSetInstance;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
@@ -233,12 +234,17 @@ public abstract class AdempiereLBR{
 	
 	public static BigDecimal getQtyOnHand(int M_Product_ID, int M_AttributeSetInstance_ID, int M_Locator_ID, String trx){
 		
+		MAttributeSetInstance inst = new MAttributeSetInstance(Env.getCtx(),M_AttributeSetInstance_ID,trx);
+		if (inst.getM_Lot_ID() <= 0 && (inst.getSerNo() == null || inst.getSerNo().trim().isEmpty())){
+			M_AttributeSetInstance_ID = 0;
+		}
+		
 		String sql = "SELECT SUM(s.QtyOnHand) FROM M_Storage s " +
 					 "WHERE s.M_Product_ID = ? AND s.M_Locator_ID = ?";
 		
 		Object[] params;
 		if (M_AttributeSetInstance_ID > 0){
-			sql += " s.M_AttributeSetInstance_ID = ?";
+			sql += " AND s.M_AttributeSetInstance_ID = ?";
 			params = new Object[]{M_Product_ID,M_Locator_ID, M_AttributeSetInstance_ID};
 		}
 		else
@@ -255,6 +261,11 @@ public abstract class AdempiereLBR{
 	
 	public static BigDecimal getQtyOnDate(int M_Product_ID, int M_AttributeSetInstance_ID, int M_Locator_ID, Timestamp movementDate, String trx){
 		
+		MAttributeSetInstance inst = new MAttributeSetInstance(Env.getCtx(),M_AttributeSetInstance_ID,trx);
+		if (inst.getM_Lot_ID() <= 0 && (inst.getSerNo() == null || inst.getSerNo().trim().isEmpty())){
+			M_AttributeSetInstance_ID = 0;
+		}
+		
 		String sql = "SELECT SUM(t.MovementQty)" +
 				     "FROM M_Transaction t " +
 				     "INNER JOIN M_Locator l ON t.M_Locator_ID = l.M_Locator_ID " +
@@ -265,7 +276,7 @@ public abstract class AdempiereLBR{
 		
 		Object[] params;
 		if (M_AttributeSetInstance_ID > 0){
-			sql += " t.M_AttributeSetInstance_ID = ?";
+			sql += " AND t.M_AttributeSetInstance_ID = ?";
 			params = new Object[]{movementDate, M_Product_ID,M_Locator_ID,M_AttributeSetInstance_ID};
 		}
 		else
