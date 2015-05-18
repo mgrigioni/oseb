@@ -332,12 +332,12 @@ class InfInut {
 			return "CNPJ inválido";
 		}
 		
-		if (getMod() == null || getMod().length() != 2 || !NumberUtils.isNumber(getMod())){
+		if (getMod() == null || getMod().length() != 2 || !TextUtil.isNumber(getMod())){
 			return "Modelo da NF inválido";
 		}
 		
 		if (getSerie() == null || getSerie().length() < 1 || 
-				getSerie().length() > 3 || !NumberUtils.isNumber(getSerie())){
+				getSerie().length() > 3 || !TextUtil.isNumber(getSerie())){
 			return "Série da NF inválida";
 		}
 		

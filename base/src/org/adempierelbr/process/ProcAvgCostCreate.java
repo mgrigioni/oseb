@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import org.adempierelbr.model.X_LBR_AverageCost;
 import org.adempierelbr.model.X_LBR_AverageCostLine;
+import org.adempierelbr.util.AdempiereLBR;
 import org.compiere.model.MPeriod;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
@@ -105,7 +106,7 @@ public class ProcAvgCostCreate extends SvrProcess
 					"WHERE i.DocStatus IN ('CL', 'CO') " +
 						 "AND p.ProductType = 'I' " +
 						 "AND i.AD_Client_ID = ? " +
-						 "AND i.IsSotrx = 'N' " +
+						 //"AND i.IsSotrx = 'N' " +
 						 "AND p.IsPurchased = 'Y' " +
 						 "AND PriceEntered > 0 " +
 						 "AND QtyEntered > 0 " +
@@ -139,7 +140,7 @@ public class ProcAvgCostCreate extends SvrProcess
 		{
 			int i=1;
 			pstmt = DB.prepareStatement (sql, trxName);
-			pstmt.setTimestamp(i++, period.getStartDate());
+			pstmt.setTimestamp(i++, AdempiereLBR.addDays(period.getStartDate(),-1));
 			pstmt.setInt(i++, avgCost.getM_CostElement_ID());
 			pstmt.setInt(i++, avgCost.getAD_Client_ID());
 			pstmt.setTimestamp(i++, period.getStartDate());
@@ -166,6 +167,7 @@ public class ProcAvgCostCreate extends SvrProcess
 					BigDecimal compAmt = nfsComp.get(rs.getInt(1));
 					if (compAmt != null && compAmt.signum() == 1){
 						totCumulated = totCumulated.add(compAmt);
+						line.setCumulatedAmt(totCumulated);
 					}
 				}
 				
