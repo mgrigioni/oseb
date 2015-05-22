@@ -34,7 +34,7 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141106L;
+	private static final long serialVersionUID = 20150522L;
 
     /** Standard Constructor */
     public X_LBR_NotaFiscal (Properties ctx, int LBR_NotaFiscal_ID, String trxName)
@@ -2413,6 +2413,18 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public static final String LBR_NFESTATUS_650_RejeiçãoEventoDeCiênciaDaOperaçãoParaNF_ECanceladaOuDenegada = "650";
 	/** 651 - Rejeição: Evento de "Desconhecimento da Operação" para NF-e Cancelada ou Denegada = 651 */
 	public static final String LBR_NFESTATUS_651_RejeiçãoEventoDeDesconhecimentoDaOperaçãoParaNF_ECanceladaOuDenegada = "651";
+	/** 344 - Rejeição: Duplicidade de NF-e informada na Exportação Indireta (Chave de Acesso informada mais de uma vez) = 344 */
+	public static final String LBR_NFESTATUS_344_RejeiçãoDuplicidadeDeNF_EInformadaNaExportaçãoIndiretaChaveDeAcessoInformadaMaisDeUmaVez = "344";
+	/** 334 - Rejeição: Número do processo de drawback não informado na importação = 334 */
+	public static final String LBR_NFESTATUS_334_RejeiçãoNúmeroDoProcessoDeDrawbackNãoInformadoNaImportação = "334";
+	/** 330 - Rejeição: Informar o Valor da AFRMM na importação por via marítima = 330 */
+	public static final String LBR_NFESTATUS_330_RejeiçãoInformarOValorDaAFRMMNaImportaçãoPorViaMarítima = "330";
+	/** 353 - Rejeição: Valor do ICMS no CST=51 não corresponde a diferença do ICMS operação e ICMS diferido = 353 */
+	public static final String LBR_NFESTATUS_353_RejeiçãoValorDoICMSNoCSTEq51NãoCorrespondeADiferençaDoICMSOperaçãoEICMSDiferido = "353";
+	/** 351 - Rejeição: Valor do ICMS da Operação no CST=51 difere do produto BC e Alíquota = 351 */
+	public static final String LBR_NFESTATUS_351_RejeiçãoValorDoICMSDaOperaçãoNoCSTEq51DifereDoProdutoBCEAlíquota = "351";
+	/** 321 - Rejeição: NF-e de devolução de mercadoria não possui documento fiscal referenciado = 321 */
+	public static final String LBR_NFESTATUS_321_RejeiçãoNF_EDeDevoluçãoDeMercadoriaNãoPossuiDocumentoFiscalReferenciado = "321";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe
@@ -2740,31 +2752,6 @@ public class X_LBR_NotaFiscal extends PO implements I_LBR_NotaFiscal, I_Persiste
 	public String getlbr_PackingType () 
 	{
 		return (String)get_Value(COLUMNNAME_lbr_PackingType);
-	}
-
-	public org.adempierelbr.model.I_LBR_NotaFiscal getLBR_RefNotaFiscal() throws RuntimeException
-    {
-		return (org.adempierelbr.model.I_LBR_NotaFiscal)MTable.get(getCtx(), org.adempierelbr.model.I_LBR_NotaFiscal.Table_Name)
-			.getPO(getLBR_RefNotaFiscal_ID(), get_TrxName());	}
-
-	/** Set Nota Fiscal Referenciada.
-		@param LBR_RefNotaFiscal_ID Nota Fiscal Referenciada	  */
-	public void setLBR_RefNotaFiscal_ID (int LBR_RefNotaFiscal_ID)
-	{
-		if (LBR_RefNotaFiscal_ID < 1) 
-			set_Value (COLUMNNAME_LBR_RefNotaFiscal_ID, null);
-		else 
-			set_Value (COLUMNNAME_LBR_RefNotaFiscal_ID, Integer.valueOf(LBR_RefNotaFiscal_ID));
-	}
-
-	/** Get Nota Fiscal Referenciada.
-		@return Nota Fiscal Referenciada	  */
-	public int getLBR_RefNotaFiscal_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_LBR_RefNotaFiscal_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
 	}
 
 	/** Set Service Total Amount.

@@ -32,7 +32,7 @@ public class X_LBR_NCMIVA extends PO implements I_LBR_NCMIVA, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141106L;
+	private static final long serialVersionUID = 20150522L;
 
     /** Standard Constructor */
     public X_LBR_NCMIVA (Properties ctx, int LBR_NCMIVA_ID, String trxName)

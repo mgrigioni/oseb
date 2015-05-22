@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.adempierelbr.model.I_LBR_ICMSBasis;
 import org.adempierelbr.model.MLBRApuracaoICMS;
 import org.adempierelbr.model.MLBRApuracaoIPI;
 import org.adempierelbr.model.MLBRDE;
@@ -1003,7 +1004,7 @@ public class EFDUtil{
 			if (line.getLBR_ICMSBasis().getType().equals("S"))
 				isST = true;
 			
-			String COD_AJ_APUR = getCOD_AJ_APUR(line.getType(),isST);
+			String COD_AJ_APUR = getCOD_AJ_APUR(line.getType(),isST, line.getLBR_ICMSBasis());
 			String DESCR_COMPL_AJ = line.getDescription();
 			BigDecimal VL_AJ_APUR = line.getAmt();
 			list.add(new RE111(COD_AJ_APUR,DESCR_COMPL_AJ,VL_AJ_APUR));
@@ -1406,7 +1407,7 @@ public class EFDUtil{
 		return DB.getSQLValueBD(null, sql, new Object[]{AD_Client_ID,M_Product_ID,AD_Client_ID,invDate});
 	} //getVL_UNIT
 	
-	private static String getCOD_AJ_APUR(String type, boolean isST){
+	private static String getCOD_AJ_APUR(String type, boolean isST, I_LBR_ICMSBasis icmsBasis){
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), AD_Org_ID, get_TrxName());
 		MLocation orgLoc = new MLocation(getCtx(),orgInfo.getC_Location_ID(), get_TrxName());
@@ -1426,7 +1427,7 @@ public class EFDUtil{
 		else
 			return null;
 		
-		return UF + TIPO_OPR + UTILIZACAO + "9999";
+		return UF + TIPO_OPR + UTILIZACAO + (icmsBasis.getValue().replace(".", "")).substring(1);
 	} //getCOD_AJ_APUR
 	
 	private static String getCOD_AJ(String type){

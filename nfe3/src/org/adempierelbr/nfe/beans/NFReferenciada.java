@@ -24,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *  @author Mario Grigioni
  *  @version $Id: NFReferenciada.java,v 2.0 07/08/2012 09:31:00 mgrigioni Exp $
  */
-@XStreamAlias ("NFRef")
+@XStreamAlias ("NFref")
 public class NFReferenciada {
 
 	private String refNFe ;

@@ -30,7 +30,7 @@ public class X_LBR_NFeInut extends PO implements I_LBR_NFeInut, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20141106L;
+	private static final long serialVersionUID = 20150522L;
 
     /** Standard Constructor */
     public X_LBR_NFeInut (Properties ctx, int LBR_NFeInut_ID, String trxName)
@@ -924,6 +924,18 @@ public class X_LBR_NFeInut extends PO implements I_LBR_NFeInut, I_Persistent
 	public static final String LBR_NFESTATUS_650_RejeiçãoEventoDeCiênciaDaOperaçãoParaNF_ECanceladaOuDenegada = "650";
 	/** 651 - Rejeição: Evento de "Desconhecimento da Operação" para NF-e Cancelada ou Denegada = 651 */
 	public static final String LBR_NFESTATUS_651_RejeiçãoEventoDeDesconhecimentoDaOperaçãoParaNF_ECanceladaOuDenegada = "651";
+	/** 344 - Rejeição: Duplicidade de NF-e informada na Exportação Indireta (Chave de Acesso informada mais de uma vez) = 344 */
+	public static final String LBR_NFESTATUS_344_RejeiçãoDuplicidadeDeNF_EInformadaNaExportaçãoIndiretaChaveDeAcessoInformadaMaisDeUmaVez = "344";
+	/** 334 - Rejeição: Número do processo de drawback não informado na importação = 334 */
+	public static final String LBR_NFESTATUS_334_RejeiçãoNúmeroDoProcessoDeDrawbackNãoInformadoNaImportação = "334";
+	/** 330 - Rejeição: Informar o Valor da AFRMM na importação por via marítima = 330 */
+	public static final String LBR_NFESTATUS_330_RejeiçãoInformarOValorDaAFRMMNaImportaçãoPorViaMarítima = "330";
+	/** 353 - Rejeição: Valor do ICMS no CST=51 não corresponde a diferença do ICMS operação e ICMS diferido = 353 */
+	public static final String LBR_NFESTATUS_353_RejeiçãoValorDoICMSNoCSTEq51NãoCorrespondeADiferençaDoICMSOperaçãoEICMSDiferido = "353";
+	/** 351 - Rejeição: Valor do ICMS da Operação no CST=51 difere do produto BC e Alíquota = 351 */
+	public static final String LBR_NFESTATUS_351_RejeiçãoValorDoICMSDaOperaçãoNoCSTEq51DifereDoProdutoBCEAlíquota = "351";
+	/** 321 - Rejeição: NF-e de devolução de mercadoria não possui documento fiscal referenciado = 321 */
+	public static final String LBR_NFESTATUS_321_RejeiçãoNF_EDeDevoluçãoDeMercadoriaNãoPossuiDocumentoFiscalReferenciado = "321";
 	/** Set NFe Status.
 		@param lbr_NFeStatus 
 		Status of NFe

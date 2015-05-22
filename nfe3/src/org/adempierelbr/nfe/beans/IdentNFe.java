@@ -14,11 +14,14 @@
 package org.adempierelbr.nfe.beans;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
 import org.adempierelbr.model.MLBRCFOP;
 import org.adempierelbr.model.MLBRNotaFiscal;
+import org.adempierelbr.model.X_LBR_RefNotaFiscal;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
 import org.adempierelbr.util.NFeUtil;
@@ -29,6 +32,7 @@ import org.compiere.model.MDocType;
 import org.compiere.model.MLocation;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  *  B - Identificação da Nota Fiscal eletrônica
@@ -63,7 +67,9 @@ public class IdentNFe {
 	private final String verProc = AdempiereLBR.VERSION; //Versão do aplicativo
 	private String dhCont;
 	private String xJust;
-	private NFReferenciada NFref;
+	
+	@XStreamImplicit
+	private List<NFReferenciada> NFref;
 	
 	/**
 	 * Default Constructor
@@ -91,14 +97,23 @@ public class IdentNFe {
 		setTpImp(dtW.getlbr_DANFEFormat());
 		setTpAmb(dtW.getlbr_NFeEnv());
 		setTpEmis(dtW.getlbr_NFeTpEmi(),nf.getlbr_DateScan(),nf.getlbr_MotivoScan());
-		if (nf.getLBR_RefNotaFiscal_ID() > 0)
-			setNFref(new NFReferenciada(new MLBRNotaFiscal(nf.getCtx(),nf.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID()));
+		
+		List<X_LBR_RefNotaFiscal> refNFs = nf.getRefNotaFiscal();
+		if (refNFs.size() > 0){
+			List<NFReferenciada> refList = new ArrayList<NFReferenciada>();
+			for(X_LBR_RefNotaFiscal refNF : refNFs){
+				refList.add(new NFReferenciada(new MLBRNotaFiscal(nf.getCtx(),refNF.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID()));
+			}
+			
+			setNFref(refList);
+		}
+		
 	} //IdentNFe
 	
-	public NFReferenciada getNFref() {
+	public List<NFReferenciada> getNFref() {
 		return NFref;
 	}
-	private void setNFref(NFReferenciada fref) {
+	private void setNFref(List<NFReferenciada> fref) {
 		NFref = fref;
 	}
 	

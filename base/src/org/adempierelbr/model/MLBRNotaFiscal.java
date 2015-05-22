@@ -278,6 +278,19 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		return getLines(parameters,whereClause,orderBy,reQuery);
 	} //getLines
 	
+	/**************************************************************************
+	 * get Nota Fiscal Referenciada
+	 * @return List<X_LBR_RefNotaFiscal> lines
+	 */
+	public List<X_LBR_RefNotaFiscal> getRefNotaFiscal(){
+
+		MTable table = MTable.get(getCtx(), X_LBR_RefNotaFiscal.Table_Name);
+		Query query =  new Query(getCtx(), table, "LBR_NotaFiscal_ID=?", get_TrxName());
+	 		  query.setParameters(new Object[]{get_ID()});
+	 		  
+	 	return query.list();
+	} //getRefNotaFiscal
+	
 	/**
 	 * 	Get Primary LBR_NotaFiscalLine_ID
 	 *	@return LBR_NotaFiscalLine_ID
@@ -466,6 +479,14 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		m_processMsg = MLBRCFOP.validateCFOP(this);
 		if (m_processMsg != null)
 			return DocAction.STATUS_Invalid;
+		
+		//Validar Nota Referenciada
+		if (getlbr_FinNFe().indexOf("24") != -1 && islbr_IsOwnDocument()){
+			if (getRefNotaFiscal().size() <= 0){
+				m_processMsg = "Necessário informar Nota Referenciada";
+				return DocAction.STATUS_Invalid;
+			}
+		}
 		
 		//Validação de Valores
 		BigDecimal sumGrandTotal   = Env.ZERO;
