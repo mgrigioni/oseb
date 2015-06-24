@@ -32,7 +32,7 @@ import org.adempierelbr.util.TextUtil;
  */
 public class RI051 extends RegSped {
 	
-	private final String COD_ENT_REF = "10";
+	private final String COD_ENT_REF = "1";
 	//
 	private String COD_CCUS;
 	private String COD_CTA_REF;

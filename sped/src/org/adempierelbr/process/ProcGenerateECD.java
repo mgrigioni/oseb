@@ -37,6 +37,7 @@ import org.adempierelbr.sped.ecd.beans.RJ100;
 import org.adempierelbr.sped.ecd.beans.RJ150;
 import org.adempierelbr.sped.ecd.beans.RJ900;
 import org.adempierelbr.sped.ecd.beans.RJ930;
+import org.adempierelbr.sped.ecd.beans.RJ935;
 import org.adempierelbr.sped.ecd.beans.RJ990;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.BPartnerUtil;
@@ -44,10 +45,12 @@ import org.adempierelbr.util.TextUtil;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
 import org.adempierelbr.wrapper.I_W_C_BPartner;
 import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MElementValue;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MUser;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
@@ -260,10 +263,10 @@ public class ProcGenerateECD extends SvrProcess {
 				result_BI_2A.append(new RI155 (balance, totDebit, totCredit));
 			}
 			else if (COD_NAT <= 3){
-				result_BJ100.append(new RJ100 (COD_NAT, balance));
+				result_BJ100.append(new RJ100 (COD_NAT, balance, totDebit, totCredit));
 			}
 			else if (COD_NAT > 3){
-				result_BJ150.append(new RJ150 (balance));
+				result_BJ150.append(new RJ150 (balance, totDebit, totCredit));
 			}
 			
 		}	//	for
@@ -277,7 +280,8 @@ public class ProcGenerateECD extends SvrProcess {
 
 		RI030 rI030 = new RI030 (p_NUM_ORD, "DIARIO GERAL",
 				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity),
-				NIRE, oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ), dtArq, dtArq, lOrg.getCity());
+				NIRE, oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_CNPJ), dtArq, dtArq, lOrg.getCity(),
+				AdempiereLBR.getLastDayOfMonth(Integer.parseInt(TextUtil.timeToString(p_DateFrom, "yyyy")), 12));
 		result_BI_1.append(rI030);
 
 		
@@ -306,7 +310,7 @@ public class ProcGenerateECD extends SvrProcess {
 		RJ900 rJ900 = new RJ900 (p_NUM_ORD, p_Type,
 				oi.get_ValueAsString(I_W_AD_OrgInfo.COLUMNNAME_lbr_LegalEntity), p_DateFrom, p_DateTo);
 
-		MBPartner bpCont = new MBPartner (ctx, oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_BP_Accountant_ID), null);
+		
 		result.append(new RJ001(true));
 		if (result_BJ100.length() > 0){
 			result.append(new RJ005(p_DateFrom, p_DateTo, "1", null));
@@ -314,11 +318,37 @@ public class ProcGenerateECD extends SvrProcess {
 			result.append(result_BJ150);
 		}
 		result.append(rJ900);
-		RJ930 rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF), "Contador", "900", bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CRC));
+		
+		//CONTADOR
+		MBPartner bpCont = new MBPartner (ctx, oi.get_ValueAsInt(I_W_AD_OrgInfo.COLUMNNAME_LBR_BP_Accountant_ID), null);
+		MBPartnerLocation bpcontLoc = bpCont.getPrimaryC_BPartner_Location();
+		if (bpcontLoc == null){
+			log.severe("ECD RJ930 - CONTADOR SEM ENDERECO CADASTRADO");
+			return null;
+		}
+		String EMAIL = null;
+		int contact_ID = bpCont.getPrimaryAD_User_ID();
+		if (contact_ID > 0){
+			MUser contact = new MUser(getCtx(),contact_ID,get_TrxName());
+			EMAIL = contact.getEMail();
+		}
+		
+		RJ930 rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF), "Contador", "900", 
+				bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CRC), 
+				EMAIL, bpcontLoc.getPhone(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_UFCRC), 
+				bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_NUMSEQCRC), (Timestamp)bpCont.get_Value(I_W_C_BPartner.COLUMNNAME_lbr_DTCRC));
 		result.append(rJ930);
-		bpCont = new MBPartner (ctx, (Integer) oi.get_Value("LBR_BP_Director_ID"), null); //FIXME: Criar campo no LBR
+		
+		//DIRETOR
+		bpCont = new MBPartner (ctx, (Integer) oi.get_Value("LBR_BP_Director_ID"), null);
 		rJ930 = new RJ930 (bpCont.getName(), bpCont.get_ValueAsString(I_W_C_BPartner.COLUMNNAME_lbr_CPF), "Diretor", "203", null);
 		result.append(rJ930);
+		
+		RJ935[] rJ935 = ECDUtil.createRJ935();
+		for (RJ935 rj935 : rJ935){
+			result.append(rj935);
+		}
+		
 		result.append(new RJ990());
 		//
 		result.append(new R9001(true));

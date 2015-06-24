@@ -44,19 +44,25 @@ public class RJ100 extends RegSped {
 	private String DESCR_COD_AGL;
 	private BigDecimal VL_CTA;
 	private String IND_DC_BAL;
+	private BigDecimal VL_CTA_INI;
+	private String IND_DC_BAL_INI;
 
 	/**
 	 * Constructor
 	 */
-	public RJ100(int IND_GPR_BAL, ECDBalance balance) 
+	public RJ100(int IND_GPR_BAL, ECDBalance balance, BigDecimal VL_DEB, BigDecimal VL_CRED) 
 	{
 		super();
 		this.COD_AGL = balance.getAccount().getValue();
 		this.NIVEL_AGL = new BigDecimal (COD_AGL.replaceAll("[^.]","").length() + 1);
 		setIND_GPR_BAL(IND_GPR_BAL);
 		this.DESCR_COD_AGL = balance.getAccount().getName();
-		this.VL_CTA = balance.getBeginBalance().abs();
-		this.IND_DC_BAL = balance.getBeginBalance().signum() == 1 ? "D" : "C";
+		
+		this.VL_CTA = balance.getBeginBalance().add(VL_DEB.abs()).subtract(VL_CRED.abs()).abs();
+		this.IND_DC_BAL = balance.getBeginBalance().add(VL_DEB).subtract(VL_CRED).signum() == 1 ? "D" : "C";
+		
+		this.VL_CTA_INI = balance.getBeginBalance().abs();
+		this.IND_DC_BAL_INI = balance.getBeginBalance().signum() == 1 ? "D" : "C";
 	} // RJ100
 	
 	private void setIND_GPR_BAL(int IND_GPR_BAL){
@@ -83,6 +89,8 @@ public class RJ100 extends RegSped {
             .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(DESCR_COD_AGL), 255))
             .append(PIPE).append(TextUtil.toNumeric(VL_CTA, 0, 255))
             .append(PIPE).append(TextUtil.checkSize(IND_DC_BAL, 1))
+            .append(PIPE).append(TextUtil.toNumeric(VL_CTA_INI, 0, 255))
+            .append(PIPE).append(TextUtil.checkSize(IND_DC_BAL_INI, 1))
             .append(PIPE);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();

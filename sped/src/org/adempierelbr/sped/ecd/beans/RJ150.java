@@ -46,17 +46,17 @@ public class RJ150 extends RegSped {
 	/**
 	 * Constructor
 	 */
-	public RJ150(ECDBalance balance)
+	public RJ150(ECDBalance balance, BigDecimal VL_DEB, BigDecimal VL_CRED)
 	{
 		super();
 		this.COD_AGL       = balance.getAccount().getValue();;
 		this.NIVEL_AGL     = new BigDecimal (COD_AGL.replaceAll("[^.]","").length() + 1);
 		this.DESCR_COD_AGL = balance.getAccount().getName();
-		this.VL_CTA		   = balance.getBeginBalance().abs();
-		setIND_VL(balance);
+		this.VL_CTA		   = balance.getBeginBalance().add(VL_DEB.abs()).subtract(VL_CRED.abs());
+		setIND_VL(balance, VL_CTA);
 	} // RJ150
 	
-	private void setIND_VL(ECDBalance balance){
+	private void setIND_VL(ECDBalance balance, BigDecimal VL_CTA){
 		
 		String acctType = balance.getAccount().getAccountType();
 		if (acctType.equals(MElementValue.ACCOUNTTYPE_Revenue)){
@@ -66,11 +66,11 @@ public class RJ150 extends RegSped {
 			this.IND_VL = "D";
 		}
 		else {
-			if (balance.getBeginBalance().signum() == 1){
-				this.IND_VL = "R";
+			if (VL_CTA.signum() == 1){
+				this.IND_VL = "P";
 			}
 			else{
-				this.IND_VL = "D";
+				this.IND_VL = "N";
 			}
 		}
 	}
@@ -87,7 +87,7 @@ public class RJ150 extends RegSped {
             .append(PIPE).append(TextUtil.checkSize(COD_AGL, 255))
             .append(PIPE).append(TextUtil.toNumeric(NIVEL_AGL, 0))
             .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(DESCR_COD_AGL), 255))
-            .append(PIPE).append(TextUtil.toNumeric(VL_CTA, 0, 255))
+            .append(PIPE).append(TextUtil.toNumeric(VL_CTA.abs(), 0, 255))
             .append(PIPE).append(TextUtil.checkSize(IND_VL, 1))
             .append(PIPE);
 

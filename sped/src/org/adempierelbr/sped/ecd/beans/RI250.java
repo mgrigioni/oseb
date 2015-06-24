@@ -120,7 +120,7 @@ public class RI250 extends RegSped {
             .append(PIPE).append(TextUtil.checkSize(IND_DC, 1))
             .append(PIPE).append(TextUtil.checkSize(NUM_ARQ, 255))
             .append(PIPE).append(TextUtil.checkSize(COD_HIST_PAD, 255))
-            .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(HIST), 65535))
+            .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(HIST.replace('|', ' ')), 65535))
             .append(PIPE).append(TextUtil.checkSize(COD_PART, 255))
             .append(PIPE);
 
