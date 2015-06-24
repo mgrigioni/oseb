@@ -45,6 +45,15 @@ public class R0000 extends RegSped {
 	
 	private Timestamp DT_INI;
 	private Timestamp DT_FIN;
+	
+	private String IND_SIT_INI_PER = "0";
+	private String IND_NIRE = "1";
+	private String IND_FIN_ESC = "0";
+	private String COD_HASH_SUB;
+	private String NIRE_SUBST;
+	private String IND_GRANDE_PORTE = "1";
+	private String TIP_ECD = "0";
+	private String COD_SCP;
 
 	/**
 	 * Constructor
@@ -92,6 +101,14 @@ public class R0000 extends RegSped {
 		    .append(PIPE).append(TextUtil.toNumeric(COD_MUN))
 		    .append(PIPE).append(TextUtil.toNumeric(IM))
 		    .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(IND_SIT_ESP), 1))
+		    .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(IND_SIT_INI_PER), 1))
+		    .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(IND_NIRE), 1))
+		    .append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(IND_FIN_ESC), 1))
+		    .append(PIPE).append(TextUtil.checkSize(COD_HASH_SUB, 40))
+			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(NIRE_SUBST), 11))
+			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(IND_GRANDE_PORTE), 1))
+			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(TIP_ECD), 1))
+			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(COD_SCP), 14))
 		    .append(PIPE);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();

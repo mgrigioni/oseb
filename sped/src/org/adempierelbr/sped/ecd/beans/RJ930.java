@@ -12,6 +12,8 @@
  *****************************************************************************/
 package org.adempierelbr.sped.ecd.beans;
 
+import java.sql.Timestamp;
+
 import org.adempierelbr.sped.RegSped;
 import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
@@ -35,6 +37,32 @@ public class RJ930 extends RegSped {
 	private String IDENT_QUALIF;
 	private String COD_ASSIM;
 	private String IND_CRC;
+	private String EMAIL = "";
+	private String FONE = "";
+	private String UF_CRC = "";
+	private String NUM_SEQ_CRC = "";
+	private Timestamp DT_CRC;
+
+	/**
+	 * Constructor
+	 */
+	public RJ930(String IDENT_NOM, String IDENT_CPF, String IDENT_QUALIF,
+			String COD_ASSIM, String IND_CRC, String EMAIL, String FONE,
+			String UF_CRC, String NUM_SEQ_CRC, Timestamp DT_CRC)
+	{
+		super();
+		this.IDENT_NOM = IDENT_NOM;
+		this.IDENT_CPF = IDENT_CPF;
+		this.IDENT_QUALIF = IDENT_QUALIF;
+		this.COD_ASSIM = COD_ASSIM;
+		this.IND_CRC = IND_CRC;
+		this.EMAIL = EMAIL;
+		this.FONE = FONE;
+		this.UF_CRC = UF_CRC;
+		this.NUM_SEQ_CRC = NUM_SEQ_CRC;
+		this.DT_CRC = DT_CRC;
+	} // RJ930
+	
 
 	/**
 	 * Constructor
@@ -64,6 +92,11 @@ public class RJ930 extends RegSped {
             .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(IDENT_QUALIF), 255))
             .append(PIPE).append(TextUtil.checkSize(COD_ASSIM, 3))
             .append(PIPE).append(TextUtil.checkSize(IND_CRC, 11))
+            .append(PIPE).append(TextUtil.checkSize(EMAIL, 60))
+            .append(PIPE).append(TextUtil.checkSize(FONE, 14))
+            .append(PIPE).append(TextUtil.checkSize(UF_CRC, 2))
+            .append(PIPE).append(NUM_SEQ_CRC)
+            .append(PIPE).append(TextUtil.timeToString(DT_CRC, "ddMMyyyy", false))
             .append(PIPE);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();

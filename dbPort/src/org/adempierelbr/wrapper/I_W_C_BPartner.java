@@ -16,6 +16,7 @@
  *****************************************************************************/
 package org.adempierelbr.wrapper;
 
+import java.sql.Timestamp;
 import org.compiere.model.*;
 
 /** Generated Interface for C_BPartner
@@ -132,6 +133,19 @@ public interface I_W_C_BPartner extends I_C_BPartner
 	  */
 	public int getLBR_CustomerCategory_ID();
 
+    /** Column name lbr_DTCRC */
+    public static final String COLUMNNAME_lbr_DTCRC = "lbr_DTCRC";
+
+	/** Set Validade CRC.
+	  * Data de validade do CRC do contador
+	  */
+	public void setlbr_DTCRC (Timestamp lbr_DTCRC);
+
+	/** Get Validade CRC.
+	  * Data de validade do CRC do contador
+	  */
+	public Timestamp getlbr_DTCRC();
+
     /** Column name LBR_FiscalGroup_Customer_ID */
     public static final String COLUMNNAME_LBR_FiscalGroup_Customer_ID = "LBR_FiscalGroup_Customer_ID";
 
@@ -223,6 +237,19 @@ public interface I_W_C_BPartner extends I_C_BPartner
 	  */
 	public String getlbr_NFModel();
 
+    /** Column name lbr_NUMSEQCRC */
+    public static final String COLUMNNAME_lbr_NUMSEQCRC = "lbr_NUMSEQCRC";
+
+	/** Set Núm Seq. CRC.
+	  * Número sequencial no seguinte formato: UF/ano/número
+	  */
+	public void setlbr_NUMSEQCRC (String lbr_NUMSEQCRC);
+
+	/** Get Núm Seq. CRC.
+	  * Número sequencial no seguinte formato: UF/ano/número
+	  */
+	public String getlbr_NUMSEQCRC();
+
     /** Column name lbr_PaymentRule */
     public static final String COLUMNNAME_lbr_PaymentRule = "lbr_PaymentRule";
 
@@ -274,6 +301,19 @@ public interface I_W_C_BPartner extends I_C_BPartner
 	  * Defines the Transaction Type
 	  */
 	public String getlbr_TransactionType();
+
+    /** Column name lbr_UFCRC */
+    public static final String COLUMNNAME_lbr_UFCRC = "lbr_UFCRC";
+
+	/** Set UF CRC.
+	  * Indicação da unidade da federação que expediu o CRC
+	  */
+	public void setlbr_UFCRC (String lbr_UFCRC);
+
+	/** Get UF CRC.
+	  * Indicação da unidade da federação que expediu o CRC
+	  */
+	public String getlbr_UFCRC();
 
     /** Column name LBR_VendorCategory_ID */
     public static final String COLUMNNAME_LBR_VendorCategory_ID = "LBR_VendorCategory_ID";

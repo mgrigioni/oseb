@@ -38,7 +38,7 @@ public class RI010 extends RegSped
 	 * 
 	 */
 	private String IND_ESC;
-	private final String COD_VER_LC = "1.00";
+	private final String COD_VER_LC = "3.00";
 
 	/**
 	 * Constructor

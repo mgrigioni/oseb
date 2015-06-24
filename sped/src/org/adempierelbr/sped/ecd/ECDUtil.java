@@ -12,14 +12,21 @@
  *****************************************************************************/
 package org.adempierelbr.sped.ecd;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.adempierelbr.sped.CounterSped;
 import org.adempierelbr.sped.ecd.beans.R9900;
 import org.adempierelbr.sped.ecd.beans.RI050;
 import org.adempierelbr.sped.ecd.beans.RI250;
+import org.adempierelbr.sped.ecd.beans.RJ935;
 import org.compiere.model.MElementValue;
+import org.compiere.util.CLogger;
+import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 /**
  *	Utilitarios para o ECD
@@ -30,10 +37,10 @@ import org.compiere.model.MElementValue;
 public class ECDUtil
 {
 	/**	Logger			*/
-	//private static CLogger log = CLogger.getCLogger(ECDUtil.class);
+	private static CLogger log = CLogger.getCLogger(ECDUtil.class);
 	
-	//private static Properties ctx = null; //Context
-	//private static String     trx = null; //Transaction
+	private static Properties ctx = null; //Context
+	private static String     trx = null; //Transaction
 	
 	//Identificação Livros
 	public static final String[] DIARIO_GERAL 	  = {"G","DIARIO GERAL"};
@@ -52,8 +59,8 @@ public class ECDUtil
 	
 	public static void setEnv(Properties ctx, String trx){
 		
-		//ECDUtil.ctx = ctx;
-		//ECDUtil.trx = trx;
+		ECDUtil.ctx = ctx;
+		ECDUtil.trx = trx;
 		
 		CounterSped.clear();
 		ECDBalance.clear();
@@ -84,6 +91,38 @@ public class ECDUtil
 		
 		return OUTRAS;
 	} //getCOD_NAT
+	
+	public static RJ935[] createRJ935(){
+		
+		String sql = "SELECT Name, z_CodCVM " +
+				     " FROM Z_Auditor WHERE IsActive = 'Y' and AD_Client_ID = ?";
+		
+
+		ArrayList<RJ935> list = new ArrayList<RJ935>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement (sql, trx);
+			pstmt.setInt(1, Env.getAD_Client_ID(ctx));
+			rs = pstmt.executeQuery ();
+			while (rs.next ())
+			{
+				list.add (new RJ935(rs.getString("Name"), rs.getString("z_CodCVM")));
+			}
+		}
+		catch (Exception e)
+		{
+			log.log(Level.SEVERE, "", e);
+		}
+		finally{
+		       DB.close(rs, pstmt);
+		}
+
+		RJ935[] retValue = new RJ935[list.size()];
+		list.toArray(retValue);
+		return retValue;
+	}
 	
 	public static R9900[] createR9900(){
 

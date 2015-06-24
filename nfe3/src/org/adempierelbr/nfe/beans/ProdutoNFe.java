@@ -288,6 +288,9 @@ public class ProdutoNFe {
 	}
 	public void setnFCI(MProduct product) {
 		
+		if (product == null)
+			return;
+		
 		I_W_M_Product proW = POWrapper.create(product, I_W_M_Product.class);
 		
 		if ("358".indexOf(proW.getlbr_ProductSource()) != -1){

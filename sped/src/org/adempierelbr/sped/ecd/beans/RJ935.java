@@ -13,41 +13,35 @@
 package org.adempierelbr.sped.ecd.beans;
 
 import org.adempierelbr.sped.RegSped;
+import org.adempierelbr.util.RemoverAcentos;
 import org.adempierelbr.util.TextUtil;
 
 /**
- * Bloco I Registro I051 - PLANO DE CONTAS REFERENCIAL
+ * Identificação do Arquivo
  * 
- * Ocorrência - 1:N Este registro somente deve ser informado para as contas
- * analíticas do Plano de Contas (Campo 04 – IND_CTA – do registro I050 = “A”).
- * Campo 03 – COD_CCUS: preencher somente quando interferir na identificação do
- * código do plano de contas referencial. Caso a vinculação da conta com o
- * código do plano de contas referencial independa do centro de custos, este
- * deve ser informado apenas no registro I100. Chave:
- * [COD_ENT_REF]+[COD_CCUS]+[COD_CTA_REF]
+ * Bloco J Registro J935: Identificação dos Auditores Independentes
  * 
- * @author Priscila Pinheiro (Kenos, www.kenos.com.br)
  * @author Mario Grigioni, mgrigioni
- * @version $Id: RI051.java, 17/11/2010, 10:01:00, mgrigioni
+ * @version $Id: RJ935.java, 23/06/2015, 15:35:00, mgrigioni
  */
-public class RI051 extends RegSped {
+
+public class RJ935 extends RegSped {
 	
-	private final String COD_ENT_REF = "1";
-	//
-	private String COD_CCUS;
-	private String COD_CTA_REF;
+	private String NOME_AUDITOR;
+	private String COD_CVM_AUDITOR;
 
 	/**
 	 * Constructor
 	 */
-	public RI051(String COD_CCUS, String COD_CTA_REF) {
+	public RJ935(String NOME_AUDITOR, String COD_CVM_AUDITOR)
+	{
 		super();
-		this.COD_CCUS = COD_CCUS;
-		this.COD_CTA_REF = COD_CTA_REF;
-	} //RI051
+		this.NOME_AUDITOR = NOME_AUDITOR;
+		this.COD_CVM_AUDITOR = COD_CVM_AUDITOR;
+	} // RJ935
 
 	/**
-	 * Formata
+	 * Formata o Bloco J Registro 935
 	 * 
 	 * @return
 	 */
@@ -55,12 +49,11 @@ public class RI051 extends RegSped {
 		
 		StringBuilder format = new StringBuilder
                    (PIPE).append(REG) 
-            .append(PIPE).append(TextUtil.checkSize(COD_ENT_REF, 2))
-            .append(PIPE).append(TextUtil.checkSize(COD_CCUS, 255))
-            .append(PIPE).append(TextUtil.checkSize(COD_CTA_REF, 255))
+            .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(NOME_AUDITOR), 255))
+            .append(PIPE).append(TextUtil.checkSize(COD_CVM_AUDITOR, 255))
             .append(PIPE);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();
 	}
 	
-} //RI051
+} // RJ935
