@@ -233,8 +233,8 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 		return dateDoc;
 	} //getLastDate
 	
-	public static Set<Integer> loadBOM(MProduct product){	
-		Set<Integer> importados =  new LinkedHashSet<Integer>();
+	public static Set<Object[]> loadBOM(MProduct product, BigDecimal qty){	
+		Set<Object[]> importados =  new LinkedHashSet<Object[]>();
 		
 		if (product.isBOM()){
 			MProductBOM[] boms = MProductBOM.getBOMLines(product);
@@ -244,13 +244,13 @@ public class MLBRProductFCI extends X_LBR_ProductFCI {
 				
 				MProduct pBOM = new MProduct(bom.getCtx(),bom.getM_ProductBOM_ID(),bom.get_TrxName());
 				if (pBOM.getProductType().equals(MProduct.PRODUCTTYPE_Item))
-					importados.addAll(loadBOM(pBOM));
+					importados.addAll(loadBOM(pBOM,bom.getBOMQty().multiply(qty)));
 			}
 		}
 		
 		I_W_M_Product pW = POWrapper.create(product, I_W_M_Product.class);
 		if ("1".equals(pW.getlbr_ProductSource()) && product.isPurchased() && product.isStocked()){ //MATERIAL IMPORTADO
-			importados.add(product.get_ID());
+			importados.add(new Object[]{product.get_ID(),qty});
 		}
 		
 		return importados;

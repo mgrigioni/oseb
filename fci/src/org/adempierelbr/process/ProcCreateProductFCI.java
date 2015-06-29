@@ -80,22 +80,22 @@ public class ProcCreateProductFCI extends SvrProcess
 			MLBRProductFCI actualFCI = MLBRProductFCI.getActual(pai_ID, get_TrxName());
 			boolean hasNewEntry =  false; //VERIFICACAO SE HOUVE QUALQUER ENTRADA NO ULTIMO MES
 			
-			Set<Integer> importados = MLBRProductFCI.loadBOM(produto);
-			for (Integer importado : importados){
+			Set<Object[]> importados = MLBRProductFCI.loadBOM(produto, Env.ONE);
+			for (Object[] importado : importados){
 				
-				BigDecimal valorImportado = MLBRProductFCI.getAmt(dateFrom, dateTo, false, importado);
+				BigDecimal valorImportado = MLBRProductFCI.getAmt(dateFrom, dateTo, false, (Integer)importado[0]);
 				if (valorImportado.signum() != 1){ //NAO HOUVE ENTRADA NO ULTIMO MES
-					Timestamp lastDate = MLBRProductFCI.getLastDate(dateFrom,false,importado,get_TrxName()); //PROCURA ULTIMA ENTRADA COM IMPOSTO
+					Timestamp lastDate = MLBRProductFCI.getLastDate(dateFrom,false,(Integer)importado[0],get_TrxName()); //PROCURA ULTIMA ENTRADA COM IMPOSTO
 					if (lastDate != null){
 						valorImportado = MLBRProductFCI.getAmt(AdempiereLBR.getFirstDayOfMonth(lastDate), 
-								AdempiereLBR.getLastDayOfMonth(lastDate), false, importado);
+								AdempiereLBR.getLastDayOfMonth(lastDate), false, (Integer)importado[0]);
 					}
 				}
 				else{
 					hasNewEntry = true;
 				}
 					
-				parcImp = parcImp.add(valorImportado);
+				parcImp = parcImp.add(valorImportado.multiply((BigDecimal)importado[1]));
 			} // loop entrada importados
 				
 			//VERIFICA SE NAO HOUVE ENTRADA E JA EXISTE FCI

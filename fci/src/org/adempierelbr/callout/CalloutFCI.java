@@ -72,19 +72,19 @@ public class CalloutFCI extends CalloutEngine
 		BigDecimal parcImp = Env.ZERO;
 		BigDecimal parcSai = Env.ZERO;
 			
-		Set<Integer> importados = MLBRProductFCI.loadBOM(product);
-		for (Integer importado : importados){
+		Set<Object[]> importados = MLBRProductFCI.loadBOM(product, Env.ONE);
+		for (Object[] importado : importados){
 			
-			BigDecimal valorImportado = MLBRProductFCI.getAmt(dateFrom, dateTo, false, importado);
+			BigDecimal valorImportado = MLBRProductFCI.getAmt(dateFrom, dateTo, false, (Integer)importado[0]);
 			if (valorImportado.signum() != 1){ //NAO HOUVE ENTRADA NO ULTIMO MES
-				Timestamp lastDate = MLBRProductFCI.getLastDate(AdempiereLBR.addDays(period.getEndDate(),1),false,importado,null); //PROCURA ULTIMA ENTRADA COM IMPOSTO
+				Timestamp lastDate = MLBRProductFCI.getLastDate(AdempiereLBR.addDays(period.getEndDate(),1),false,(Integer)importado[0],null); //PROCURA ULTIMA ENTRADA COM IMPOSTO
 				if (lastDate != null){
 					valorImportado = MLBRProductFCI.getAmt(AdempiereLBR.getFirstDayOfMonth(lastDate), 
-							AdempiereLBR.getLastDayOfMonth(lastDate), false, importado);
+							AdempiereLBR.getLastDayOfMonth(lastDate), false, (Integer)importado[0]);
 				}
 			}
 				
-			parcImp = parcImp.add(valorImportado);
+			parcImp = parcImp.add(valorImportado.multiply((BigDecimal)importado[1]));
 		} // loop entrada importados
 		
 			
