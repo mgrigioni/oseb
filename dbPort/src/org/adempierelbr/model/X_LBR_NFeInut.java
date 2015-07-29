@@ -30,7 +30,7 @@ public class X_LBR_NFeInut extends PO implements I_LBR_NFeInut, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20150522L;
+	private static final long serialVersionUID = 20150703L;
 
     /** Standard Constructor */
     public X_LBR_NFeInut (Properties ctx, int LBR_NFeInut_ID, String trxName)

@@ -32,7 +32,7 @@ public class X_LBR_AverageCostLine extends PO implements I_LBR_AverageCostLine, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20150522L;
+	private static final long serialVersionUID = 20150703L;
 
     /** Standard Constructor */
     public X_LBR_AverageCostLine (Properties ctx, int LBR_AverageCostLine_ID, String trxName)
@@ -173,6 +173,26 @@ public class X_LBR_AverageCostLine extends PO implements I_LBR_AverageCostLine, 
 	public String getDescription () 
 	{
 		return (String)get_Value(COLUMNNAME_Description);
+	}
+
+	/** Set Expense Amount.
+		@param ExpenseAmt 
+		Amount for this expense
+	  */
+	public void setExpenseAmt (BigDecimal ExpenseAmt)
+	{
+		set_Value (COLUMNNAME_ExpenseAmt, ExpenseAmt);
+	}
+
+	/** Get Expense Amount.
+		@return Amount for this expense
+	  */
+	public BigDecimal getExpenseAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_ExpenseAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Future Cost Price.

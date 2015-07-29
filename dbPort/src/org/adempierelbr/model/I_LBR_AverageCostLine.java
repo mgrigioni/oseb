@@ -144,6 +144,19 @@ public interface I_LBR_AverageCostLine
 	  */
 	public String getDescription();
 
+    /** Column name ExpenseAmt */
+    public static final String COLUMNNAME_ExpenseAmt = "ExpenseAmt";
+
+	/** Set Expense Amount.
+	  * Amount for this expense
+	  */
+	public void setExpenseAmt (BigDecimal ExpenseAmt);
+
+	/** Get Expense Amount.
+	  * Amount for this expense
+	  */
+	public BigDecimal getExpenseAmt();
+
     /** Column name FutureCostPrice */
     public static final String COLUMNNAME_FutureCostPrice = "FutureCostPrice";
 

@@ -30,7 +30,7 @@ public class X_LBR_RefNotaFiscal extends PO implements I_LBR_RefNotaFiscal, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20150522L;
+	private static final long serialVersionUID = 20150703L;
 
     /** Standard Constructor */
     public X_LBR_RefNotaFiscal (Properties ctx, int LBR_RefNotaFiscal_ID, String trxName)

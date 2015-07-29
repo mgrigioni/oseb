@@ -32,7 +32,7 @@ public class X_LBR_ProductFCI extends PO implements I_LBR_ProductFCI, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20150522L;
+	private static final long serialVersionUID = 20150703L;
 
     /** Standard Constructor */
     public X_LBR_ProductFCI (Properties ctx, int LBR_ProductFCI_ID, String trxName)

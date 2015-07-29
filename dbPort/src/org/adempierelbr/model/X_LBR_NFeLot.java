@@ -31,7 +31,7 @@ public class X_LBR_NFeLot extends PO implements I_LBR_NFeLot, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20150522L;
+	private static final long serialVersionUID = 20150703L;
 
     /** Standard Constructor */
     public X_LBR_NFeLot (Properties ctx, int LBR_NFeLot_ID, String trxName)

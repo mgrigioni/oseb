@@ -109,7 +109,8 @@ public class ProcAvgCostZoom extends SvrProcess
 							 "AND PriceEntered > 0 " +
 							 "AND QtyEntered > 0 " +
 							 "AND dt.DocBaseType = 'API' " +
-							 "AND dt.lbr_HasOpenItems = 'Y' " +
+							 "AND ((dt.lbr_HasOpenItems = 'Y' AND il.LBR_CFOP_ID NOT IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.922')) " +
+							 " OR (dt.lbr_HasOpenItems = 'N' AND il.LBR_CFOP_ID IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.116' OR Value LIKE '%.117'))) " +
 							 "AND i.DateAcct BETWEEN " + DB.TO_DATE(period.getStartDate()) + " AND " + DB.TO_DATE(period.getEndDate()) + " " +
 							 "AND il.M_Product_ID=" + avgCostLine.getM_Product_ID() + ")";
 		}

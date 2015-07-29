@@ -405,33 +405,40 @@ public class Doc_InOut extends Doc
 				if (MAcctSchema.COSTINGMETHOD_AveragePO.equals(costingMethod) ||
 					MAcctSchema.COSTINGMETHOD_LastPOPrice.equals(costingMethod) ||
 					isAvgCost(line))
-				{
+				{					
 					int C_OrderLine_ID = line.getC_OrderLine_ID();
+					int C_InvoiceLine_ID = getC_InvoiceLine_ID(line.get_ID());
+					
+					//ELTEK - tentar pegar o preço da fatura antes
+					if (C_InvoiceLine_ID > 0){
+						MInvoiceLine invoiceLine = new MInvoiceLine(getCtx(), C_InvoiceLine_ID, getTrxName());
+						costs = invoiceLine.getPriceActual();
+						costs = costs.multiply(line.getQty());
+					}		
 					// Low - check if c_orderline_id is valid
-					if (C_OrderLine_ID > 0)
+					else if (C_OrderLine_ID > 0)
 					{
-					    MOrderLine orderLine = new MOrderLine (getCtx(), C_OrderLine_ID, getTrxName());
-					    // Elaine 2008/06/26
-					    C_Currency_ID = orderLine.getC_Currency_ID();
-					    //
-					    costs = orderLine.getPriceCost();
-					    if (costs == null || costs.signum() == 0)
-					    {
-					    	costs = orderLine.getPriceActual();
+						MOrderLine orderLine = new MOrderLine (getCtx(), C_OrderLine_ID, getTrxName());
+						// Elaine 2008/06/26
+						C_Currency_ID = orderLine.getC_Currency_ID();
+						//
+						costs = orderLine.getPriceCost();
+						if (costs == null || costs.signum() == 0)
+						{
+							costs = orderLine.getPriceActual();
 							//	Goodwill: Correct included Tax
-					    	int C_Tax_ID = orderLine.getC_Tax_ID();
+							int C_Tax_ID = orderLine.getC_Tax_ID();
 							if (orderLine.isTaxIncluded() && C_Tax_ID != 0)
 							{
 								MTax tax = MTax.get(getCtx(), C_Tax_ID);
 								if (!tax.isZeroTax())
 								{
-									int stdPrecision = MCurrency.getStdPrecision(getCtx(), C_Currency_ID);
-									BigDecimal costTax = tax.calculateTax(costs, true, stdPrecision);
+									int stdPrecision = MCurrency.getStdPrecision(getCtx(), C_Currency_ID);										BigDecimal costTax = tax.calculateTax(costs, true, stdPrecision);
 									log.fine("Costs=" + costs + " - Tax=" + costTax);
 									costs = costs.subtract(costTax);
 								}
 							}	//	correct included Tax
-					    }
+						}
 					    costs = costs.multiply(line.getQty());
                     }
                     else
@@ -930,5 +937,17 @@ public class Doc_InOut extends Doc
 		
 		return false;
 	} //isAvgCost
+	
+	private int getC_InvoiceLine_ID(int M_InOutLine_ID){
+		
+		String sql = "SELECT MAX(il.C_InvoiceLine_ID) " +
+				     "FROM C_InvoiceLine il " +
+				     "INNER JOIN C_Invoice i ON (il.C_Invoice_ID = i.C_Invoice_ID)" +
+				     "WHERE il.M_InOutLine_ID = ? and i.DocStatus='CO'";
+		
+		int C_InvoiceLine_ID = DB.getSQLValue(null, sql, M_InOutLine_ID);
+		
+		return C_InvoiceLine_ID;
+	}
 
 }   //  Doc_InOut

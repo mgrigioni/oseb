@@ -140,7 +140,7 @@ public class ProcAvgCostCreate extends SvrProcess
 		{
 			int i=1;
 			pstmt = DB.prepareStatement (sql, trxName);
-			pstmt.setTimestamp(i++, AdempiereLBR.addDays(period.getStartDate(),-1));
+			pstmt.setTimestamp(i++, AdempiereLBR.addDays(period.getStartDate(), -1));
 			pstmt.setInt(i++, avgCost.getM_CostElement_ID());
 			pstmt.setInt(i++, avgCost.getAD_Client_ID());
 			pstmt.setTimestamp(i++, period.getStartDate());
@@ -167,7 +167,7 @@ public class ProcAvgCostCreate extends SvrProcess
 					BigDecimal compAmt = nfsComp.get(rs.getInt(1));
 					if (compAmt != null && compAmt.signum() == 1){
 						totCumulated = totCumulated.add(compAmt);
-						line.setCumulatedAmt(totCumulated);
+						line.setExpenseAmt(compAmt);
 					}
 				}
 				
@@ -239,7 +239,7 @@ public class ProcAvgCostCreate extends SvrProcess
 						line.save();
 					}
 					
-					BigDecimal result = DB.getSQLValueBD(avgCost.get_TrxName(), "SELECT SUM(CumulatedAmt) " +
+					BigDecimal result = DB.getSQLValueBD(avgCost.get_TrxName(), "SELECT SUM(CumulatedAmt+ExpenseAmt) " +
 							"FROM LBR_AverageCostLine WHERE LBR_AverageCost_ID=?", avgCost.getLBR_AverageCost_ID());
 					
 					log.info("Passo: " + j + " / Cost total: " + result);
@@ -284,20 +284,21 @@ public class ProcAvgCostCreate extends SvrProcess
 	private Map<Integer,BigDecimal> getNfComplementar(MPeriod period){
 		
 		String sql =
-				"SELECT M_Product_ID, SUM(ComplAmt) FROM ( " +
-				"SELECT nfComplementar.*, (TotalLines * perct) as ComplAmt FROM ( " +
-				"SELECT M_Product_ID, LineTotalAmt, " +
-				"(SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID) as GrandTotal, " +
-				"ROUND(LineTotalAmt / (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID),4) as perct, " +
-				"compl.LBR_RefNotaFiscal_ID, compl.TotalLines " +
-				"FROM LBR_NotaFiscalLine nfl " +
-				"INNER JOIN " +
-				"(SELECT LBR_RefNotaFiscal_ID, TotalLines " +
-				"FROM LBR_NotaFiscal nf " +
-				"WHERE nf.lbr_FinNFe='2' " +
-				"and TRUNC(NVL(nf.lbr_dateinout,nf.datedoc)) BETWEEN ? and ?) compl " + 
-				"ON (nfl.LBR_NotaFiscal_ID = compl.LBR_RefNotaFiscal_ID)) nfComplementar) " +
-				"GROUP BY M_Product_ID";
+				"SELECT M_Product_ID, SUM(ComplAmt) FROM ( " + 
+						" SELECT nfComplementar.*, (TotalLines * perct) as ComplAmt FROM ( " + 
+						" SELECT M_Product_ID, LineTotalAmt, " + 
+						" (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID) as GrandTotal, " + 
+						" ROUND(LineTotalAmt / (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID),4) as perct, " + 
+						" compl.LBR_RefNotaFiscal_ID, compl.TotalLines " + 
+						" FROM LBR_NotaFiscalLine nfl " + 
+						" INNER JOIN " + 
+						" (SELECT ref.LBR_RefNotaFiscal_ID, complementar.TotalLines " + 
+						" FROM LBR_NotaFiscal complementar " + 
+						" INNER JOIN LBR_RefNotaFiscal ref ON (complementar.LBR_NotaFiscal_ID = ref.LBR_NotaFiscal_ID) " + 
+						" WHERE complementar.lbr_FinNFe='2' " + 
+						" and TRUNC(NVL(complementar.lbr_dateinout,complementar.datedoc)) BETWEEN ? and ?) compl " + 
+						" ON (nfl.LBR_NotaFiscal_ID = compl.LBR_RefNotaFiscal_ID)) nfComplementar) " + 
+						" GROUP BY M_Product_ID";
 		
 		Map<Integer, BigDecimal> nfs = new HashMap<Integer,BigDecimal>();
 		PreparedStatement pstmt = null;

@@ -30,7 +30,7 @@ public class X_LBR_DocPrintField extends PO implements I_LBR_DocPrintField, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20150522L;
+	private static final long serialVersionUID = 20150703L;
 
     /** Standard Constructor */
     public X_LBR_DocPrintField (Properties ctx, int LBR_DocPrintField_ID, String trxName)
