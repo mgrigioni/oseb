@@ -87,6 +87,8 @@ public class ProcCreateFCIFile extends SvrProcess
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), Env.getAD_Org_ID(getCtx()),get_TrxName());
 		oiW = POWrapper.create(orgInfo, I_W_AD_OrgInfo.class);
 		
+		CounterFci.clear();
+		
 		StringBuilder result = montaBLOCO0()
 				       .append(montaBLOCO5())
 				       .append(montaBLOCO9());

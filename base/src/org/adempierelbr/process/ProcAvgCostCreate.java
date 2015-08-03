@@ -95,13 +95,13 @@ public class ProcAvgCostCreate extends SvrProcess
 		
 		if(costType.equals(PUCHASED)){
 			sql = "SELECT DISTINCT p.M_Product_ID, QtyOnDate(p.M_Product_ID, ?), " +
-						 "c.CurrentCostPrice, " +
+						 "COALESCE(c.CurrentCostPrice,0), " +
 						 "SUM(il.PriceEntered*il.QtyEntered), SUM(il.QtyEntered) " +
 					"FROM C_Invoice i " +
 						 "INNER JOIN C_InvoiceLine il ON i.C_Invoice_ID = il.C_Invoice_ID " +
 						 "INNER JOIN C_DocType dt ON dt.C_DocType_ID=i.C_DocTypeTarget_ID " +
 						 "INNER JOIN M_Product p ON p.M_Product_ID = il.M_Product_ID " +
-						 "INNER JOIN M_Cost c ON (c.M_Product_ID = il.M_Product_ID AND " +
+						 "LEFT JOIN M_Cost c ON (c.M_Product_ID = il.M_Product_ID AND " +
 						 "c.M_CostElement_ID = ?) " +
 					"WHERE i.DocStatus IN ('CL', 'CO') " +
 						 "AND p.ProductType = 'I' " +

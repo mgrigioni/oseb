@@ -942,7 +942,7 @@ public class Doc_InOut extends Doc
 		
 		String sql = "SELECT MAX(il.C_InvoiceLine_ID) " +
 				     "FROM C_InvoiceLine il " +
-				     "INNER JOIN C_Invoice i ON (il.C_Invoice_ID = i.C_Invoice_ID)" +
+				     "INNER JOIN C_Invoice i ON (il.C_Invoice_ID = i.C_Invoice_ID) " +
 				     "WHERE il.M_InOutLine_ID = ? and i.DocStatus='CO'";
 		
 		int C_InvoiceLine_ID = DB.getSQLValue(null, sql, M_InOutLine_ID);
