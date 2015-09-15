@@ -333,6 +333,9 @@ public class DadosGNRE {
 			else if (uf.equals("PE")){
 				c39_camposExtras = new CamposExtras("9","T",nfeID);
 			}
+			else if (uf.equals("SE")){
+				c39_camposExtras = new CamposExtras("77","T",nfeID);
+			}
 		}
 		
 		this.c39_camposExtras = c39_camposExtras;

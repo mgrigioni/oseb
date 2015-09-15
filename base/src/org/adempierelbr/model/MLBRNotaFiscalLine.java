@@ -24,10 +24,12 @@ import org.adempiere.model.POWrapper;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TaxBR;
 import org.adempierelbr.util.TextUtil;
+import org.adempierelbr.wrapper.I_W_C_Charge;
 import org.adempierelbr.wrapper.I_W_C_DocType;
 import org.adempierelbr.wrapper.I_W_C_Invoice;
 import org.adempierelbr.wrapper.I_W_C_InvoiceLine;
 import org.adempierelbr.wrapper.I_W_M_Product;
+import org.compiere.model.MCharge;
 import org.compiere.model.MClientInfo;
 import org.compiere.model.MConversionRate;
 import org.compiere.model.MDocType;
@@ -161,9 +163,18 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		//
 		setlbr_IsService(cfop.isService());
 		setDescription(TextUtil.itrim(iLine.getDescription()));
-		setProductName(product.getName());
-		setProductValue(proW.getlbr_ServiceCode() != null ? proW.getlbr_ServiceCode() : product.getValue());
-		setVendorProductNo(AdempiereLBR.getVendorProductNo(product.get_ID(),getParent().getC_BPartner_ID(),get_TrxName()));
+		if (product.get_ID() > 0){
+			setProductName(product.getName());
+			setProductValue(proW.getlbr_ServiceCode() != null ? proW.getlbr_ServiceCode() : product.getValue());
+			setVendorProductNo(AdempiereLBR.getVendorProductNo(product.get_ID(),getParent().getC_BPartner_ID(),get_TrxName()));
+		}
+		else{ //DESPESA
+			MCharge charge = new MCharge(getCtx(),iLine.getC_Charge_ID(),get_TrxName());
+			I_W_C_Charge charW = POWrapper.create(charge, I_W_C_Charge.class);
+			
+			setProductName(charge.getName());
+			setProductValue(charW.getValue());
+		}
 		setlbr_UOMName(AdempiereLBR.getUOM_trl(uom));
 		setQty(iLine.getQtyEntered());
 		//

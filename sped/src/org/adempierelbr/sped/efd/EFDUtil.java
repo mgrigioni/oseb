@@ -1076,15 +1076,11 @@ public class EFDUtil{
 	public static RE250 createRE250(RegSped reg, BigDecimal VL_OR, Timestamp dateTo){
 		
 		if (!reg.get_ValueAsBoolean("isSOTrx"))
-			return null;
+			return  null;
 		
 		String COD_OR = "002"; //Revenda dentro do Estado
-		
 		if (!reg.get_ValueAsBoolean("isSameregion")){
-			COD_OR = "003"; //Dif. de Alíquota
-			if (reg.get_ValueAsBD("VL_BC_ICMS").compareTo(reg.get_ValueAsBD("VL_BC_ICMS_ST")) < 0){
-				COD_OR = "999"; //Revenda fora do Estado
-			}
+			COD_OR = "999"; //Revenda fora do Estado
 		}
 		
 		//BigDecimal VL_OR  = reg.get_ValueAsBD("VL_ICMS_ST");

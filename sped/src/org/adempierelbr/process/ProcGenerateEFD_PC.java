@@ -453,6 +453,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 						if (rc501.equals(oldRC501)){
 							rc501.addValues(oldRC501);
 							rc501.subtractCounter();
+							setRC501.remove(rc501);
 						}
 					}
 				}
@@ -473,6 +474,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 						if (rc505.equals(oldRC505)){
 							rc505.addValues(oldRC505);
 							rc505.subtractCounter();
+							setRC505.remove(rc505);
 						}
 					}
 				}
@@ -501,6 +503,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 						if (rd101.equals(oldRD101)){
 							rd101.addValues(oldRD101);
 							rd101.subtractCounter();
+							setRD101.remove(rd101);
 						}
 					}
 				}
@@ -521,6 +524,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 						if (rd105.equals(oldRD105)){
 							rd105.addValues(oldRD105);
 							rd105.subtractCounter();
+							setRD105.remove(rd105);
 						}
 					}
 				}
@@ -549,6 +553,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 						if (rd501.equals(oldRD501)){
 							rd501.addValues(oldRD501);
 							rd501.subtractCounter();
+							setRD501.remove(rd501);
 						}
 					}
 				}
@@ -569,6 +574,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 						if (rd505.equals(oldRD505)){
 							rd505.addValues(oldRD505);
 							rd505.subtractCounter();
+							setRD505.remove(rd505);
 						}
 					}
 				}

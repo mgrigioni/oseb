@@ -261,11 +261,13 @@ public class ProcGenerateEFD extends SvrProcess
 					else
 						_R0190.add(r0190);
 					
-					r0200 = EFDUtil.createR0200(nfLine);
-					if (_R0200.contains(r0200))
-						r0200.subtractCounter();
-					else
-						_R0200.add(r0200);
+					if (nfReg.equals("C100")){
+						r0200 = EFDUtil.createR0200(nfLine);
+						if (_R0200.contains(r0200))
+							r0200.subtractCounter();
+						else
+							_R0200.add(r0200);
+					}
 				}
 				
 				String COD_ITEM  = r0200 == null ? "SEM CODIGO" : r0200.getCOD_ITEM();
@@ -936,14 +938,17 @@ public class ProcGenerateEFD extends SvrProcess
 					
 					RE210 re210 = EFDUtil.createRE210(regs);
 					BLOCOE.append(re210);
-				
+					
 					BigDecimal VL_TOTAL    = re210.getVL_ICMS_RECOL_ST();
 					BigDecimal VL_TOTAL_OR = Env.ZERO;
-					
+				
 					for (RegSped reg : regs){
 						
 						//DEVOLUCOES
-						BigDecimal VL_OR  = reg.get_ValueAsBD("VL_ICMS_ST");
+						if (reg.get_ValueAsBoolean("isReversal"))
+							continue;
+						
+ 						BigDecimal VL_OR  = reg.get_ValueAsBD("VL_ICMS_ST");
 						VL_TOTAL_OR = VL_TOTAL_OR.add(VL_OR);
 						if (VL_TOTAL_OR.compareTo(VL_TOTAL) == 1){
 							VL_OR = VL_OR.subtract(VL_TOTAL_OR.subtract(VL_TOTAL));
@@ -951,7 +956,7 @@ public class ProcGenerateEFD extends SvrProcess
 								break;
 							}
 						}
-						
+							
 						RE250 re250 = EFDUtil.createRE250(reg,VL_OR,dateTo);
 						if (re250 != null)
 							BLOCOE.append(re250);
