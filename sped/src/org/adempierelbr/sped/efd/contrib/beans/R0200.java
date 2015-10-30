@@ -91,6 +91,10 @@ public class R0200 extends RegSped {
 			}
 		}
 		
+		if (DESCR_ITEM.isEmpty()){ //SERVICO
+			DESCR_ITEM = "ITEM SEM DESCRICAO";
+		}
+		
 		this.COD_ITEM   = COD_ITEM;
 		this.DESCR_ITEM = DESCR_ITEM;
 	}

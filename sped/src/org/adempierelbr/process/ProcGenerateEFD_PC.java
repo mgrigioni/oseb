@@ -181,6 +181,10 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			log.info("Processado: " + String.format("%,.5f",(((double)aux/(double)count)*100)) + "%");
 			aux++;
 			
+			//APENAS NFs com PIS e COFINS
+			if (!nf.isCancelled() && nf.getPISAmt().signum() == 0 && nf.getCOFINSAmt().signum() == 0)
+				continue;
+			
 			String COD_MOD  = nf.getlbr_NFModel().isEmpty() ? "01" : nf.getlbr_NFModel();
 			String IND_EMIT = nf.islbr_IsOwnDocument() ? "0" : "1"; //0 = Própria, 1 = Terceiros
 			String nfReg    = EFDUtil_Contrib.getNFHeaderReg(COD_MOD); //Cabeçalho da NFe
@@ -261,10 +265,7 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			String COD_MOD, String IND_EMIT){
 		
 		List<RegSped> list = new ArrayList<RegSped>();
-		
-		if (nf.isSOTrx() && !nf.isRevenue())
-			return list;
-		
+				
 		//REGISTROS A100 ou C100
 		if (nfReg.equals("C100")){
 			

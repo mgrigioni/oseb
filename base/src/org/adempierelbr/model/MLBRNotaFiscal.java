@@ -78,6 +78,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta3.NfeConsulta3Stub;
 
 /**
  *  LBR_NotaFiscal Model
@@ -904,15 +905,27 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		
 		try{
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaProtocolo(oiW.getlbr_NFeEnv(), getlbr_NFeID())));
+			String respStatus = "";
+			
+			if (BPartnerUtil.getRegionCode(bpLoc.getC_Region_ID()).equals("41")){ //PR o webservice é diferente
+				NfeConsulta3Stub.NfeDadosMsg dadosMsg = NfeConsulta3Stub.NfeDadosMsg.Factory.parse(dadosXML);
+				NfeConsulta3Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta3(bpLoc.getC_Region_ID());
 
-			NfeConsulta2Stub.NfeDadosMsg dadosMsg = NfeConsulta2Stub.NfeDadosMsg.Factory.parse(dadosXML);
-			NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta(bpLoc.getC_Region_ID());
+				NfeConsulta3Stub.setAddress(ws);
+				NfeConsulta3Stub stub = new NfeConsulta3Stub();
+			
+				respStatus = stub.nfeConsultaNF(dadosMsg, cabecMsgE).getExtraElement().toString();
+			}
+			else{
+				NfeConsulta2Stub.NfeDadosMsg dadosMsg = NfeConsulta2Stub.NfeDadosMsg.Factory.parse(dadosXML);
+				NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta(bpLoc.getC_Region_ID());
 
-			NfeConsulta2Stub.setAddress(ws);
-			NfeConsulta2Stub stub = new NfeConsulta2Stub();
-
-			String respStatus = stub.nfeConsultaNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
-
+				NfeConsulta2Stub.setAddress(ws);
+				NfeConsulta2Stub stub = new NfeConsulta2Stub();
+			
+				respStatus = stub.nfeConsultaNF2(dadosMsg, cabecMsgE).getExtraElement().toString();
+			}
+			
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		    Document doc = builder.parse(new InputSource(new StringReader(respStatus)));
 

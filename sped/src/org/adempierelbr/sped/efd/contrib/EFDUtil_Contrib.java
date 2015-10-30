@@ -416,7 +416,7 @@ public class EFDUtil_Contrib
 		String DESCR_COMPL = nfLine.getDescription();
 		BigDecimal VL_ITEM = nfLine.getLineTotalAmt();
 		BigDecimal VL_DESC = nfLine.getDiscountAmt();
-		String NAT_BC_CRED = "13"; //Outros Créditos //FIXME
+		String NAT_BC_CRED = "03"; //Outros Créditos //FIXME
 		String IND_ORIG_CRED = "0";
 		String CST_PIS = nfLine.getCST_PIS();
 		BigDecimal VL_BC_PIS = nfLine.getTaxBaseAmt("PIS");
@@ -686,7 +686,7 @@ public class EFDUtil_Contrib
 		
 		String CST_PIS = nfLine.getCST_PIS();
 		BigDecimal VL_ITEM = nfLine.getLineTotalAmt();
-		String NAT_BC_CRED = "14"; //Atividade de Transporte de Cargas – Subcontratação
+		String NAT_BC_CRED = "07"; //Atividade de Transporte de Cargas – Subcontratação
 		BigDecimal VL_BC_PIS = nfLine.getTaxBaseAmt("PIS");
 		BigDecimal ALIQ_PIS = nfLine.getTaxRate("PIS");
 		BigDecimal VL_PIS = nfLine.getTaxAmt("PIS");
@@ -712,7 +712,7 @@ public class EFDUtil_Contrib
 		
 		String CST_COFINS = nfLine.getCST_COFINS();
 		BigDecimal VL_ITEM = nfLine.getLineTotalAmt();
-		String NAT_BC_CRED = "14"; //Atividade de Transporte de Cargas – Subcontratação
+		String NAT_BC_CRED = "07"; //Atividade de Transporte de Cargas – Subcontratação
 		BigDecimal VL_BC_COFINS = nfLine.getTaxBaseAmt("COFINS");
 		BigDecimal ALIQ_COFINS = nfLine.getTaxRate("COFINS");
 		BigDecimal VL_COFINS = nfLine.getTaxAmt("COFINS");

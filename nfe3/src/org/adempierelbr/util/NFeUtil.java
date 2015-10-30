@@ -64,6 +64,7 @@ import org.w3c.dom.NodeList;
 import br.inf.portalfiscal.www.nfe.wsdl.cadconsultacadastro2.CadConsultaCadastro2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeautorizacao.NfeAutorizacaoStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta2.NfeConsulta2Stub;
+import br.inf.portalfiscal.www.nfe.wsdl.nfeconsulta3.NfeConsulta3Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfedownloadnf.NfeDownloadNFStub;
 import br.inf.portalfiscal.www.nfe.wsdl.nfeinutilizacao2.NfeInutilizacao2Stub;
 import br.inf.portalfiscal.www.nfe.wsdl.nferetautorizacao.NfeRetAutorizacaoStub;
@@ -327,6 +328,23 @@ public abstract class NFeUtil
 		cabecMsg.setVersaoDados(NFeUtil.VERSAO);
 
 		NfeConsulta2Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta2Stub.NfeCabecMsgE();
+		cabecMsgE.setNfeCabecMsg(cabecMsg);
+
+		return cabecMsgE;
+	} //geraCabecConsulta
+	
+	/**
+	 * Método para gerar cabeçalho status da NFe
+	 * @param region
+	 * @return NfeConsulta3Stub.NfeCabecMsgE
+	 */
+	public static NfeConsulta3Stub.NfeCabecMsgE geraCabecConsulta3(int C_Region_ID){
+
+		NfeConsulta3Stub.NfeCabecMsg cabecMsg = new NfeConsulta3Stub.NfeCabecMsg();
+		cabecMsg.setCUF(BPartnerUtil.getRegionCode(C_Region_ID));
+		cabecMsg.setVersaoDados(NFeUtil.VERSAO);
+
+		NfeConsulta3Stub.NfeCabecMsgE cabecMsgE = new NfeConsulta3Stub.NfeCabecMsgE();
 		cabecMsgE.setNfeCabecMsg(cabecMsg);
 
 		return cabecMsgE;

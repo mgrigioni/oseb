@@ -47,7 +47,7 @@ public class ProcTaxaCambio extends SvrProcess
 	private Timestamp dataCambio;
 	private BigDecimal taxaVenda;
 	
-	private final String fonte = "https://www3.bcb.gov.br/ptax_internet/consultarUltimaCotacaoDolar.do";
+	private final String fonte = "http://www4.bcb.gov.br/pec/taxas/batch/taxas.asp?id=txdolar";
 	
 	private final int USD = 100;
 	private final int BRL = 297;
