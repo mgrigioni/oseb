@@ -880,7 +880,7 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 	 */
 	private void getNFeStatus() throws Exception{
 		
-		if (getlbr_NFeID() == null || getlbr_NFeID().isEmpty())
+		if (getlbr_NFeID() == null || getlbr_NFeID().isEmpty() || !getlbr_NFModel().equals("55"))
 			return;
 		
 		MOrgInfo orgInfo = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
@@ -907,7 +907,8 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(NFeUtil.geraMsgConsultaProtocolo(oiW.getlbr_NFeEnv(), getlbr_NFeID())));
 			String respStatus = "";
 			
-			if (BPartnerUtil.getRegionCode(bpLoc.getC_Region_ID()).equals("41")){ //PR o webservice é diferente
+			if (BPartnerUtil.getRegionCode(bpLoc.getC_Region_ID()).equals("41") || 
+					BPartnerUtil.getRegionCode(bpLoc.getC_Region_ID()).equals("29")){ //PR o webservice é diferente
 				NfeConsulta3Stub.NfeDadosMsg dadosMsg = NfeConsulta3Stub.NfeDadosMsg.Factory.parse(dadosXML);
 				NfeConsulta3Stub.NfeCabecMsgE cabecMsgE = NFeUtil.geraCabecConsulta3(bpLoc.getC_Region_ID());
 
@@ -1893,6 +1894,20 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		for(MLBRNotaFiscalLine line : getLines()){
 			MLBRCFOP cfop = new MLBRCFOP(getCtx(),line.getLBR_CFOP_ID(),get_TrxName());
 			return cfop.isRevenue();
+		}
+		return true;
+	} //isRevenue
+	
+	/**
+	 * Verifica se a Nota Fiscal é SOMENTE serviço
+	 * Utilizado para o SPED EFD Pis/Cofins
+	 * @return 
+	 */
+	public boolean isService(){
+		for(MLBRNotaFiscalLine line : getLines()){
+			boolean isItem = line.getM_Product().getProductType().equals(MProduct.PRODUCTTYPE_Item);
+			if (isItem && !line.islbr_IsService())
+				return false;
 		}
 		return true;
 	} //isRevenue

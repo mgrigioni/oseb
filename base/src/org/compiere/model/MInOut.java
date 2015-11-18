@@ -166,6 +166,12 @@ public class MInOut extends X_M_InOut implements DocAction
 
 		return retValue;
 	}	//	createFrom
+	
+	public static MInOut copyFrom (MInOut from, Timestamp dateDoc, Timestamp dateAcct,
+			int C_DocType_ID, boolean isSOTrx, boolean counter, String trxName, boolean setOrder)
+		{
+		return copyFrom(from, dateDoc, dateAcct, C_DocType_ID, isSOTrx, counter, trxName, setOrder, false);
+	}
 
 	/**
 	 * 	Create new Shipment by copying
@@ -179,7 +185,8 @@ public class MInOut extends X_M_InOut implements DocAction
 	 *	@return Shipment
 	 */
 	public static MInOut copyFrom (MInOut from, Timestamp dateDoc, Timestamp dateAcct,
-		int C_DocType_ID, boolean isSOTrx, boolean counter, String trxName, boolean setOrder)
+		int C_DocType_ID, boolean isSOTrx, boolean counter, String trxName, boolean setOrder,
+		boolean isReversal)
 	{
 		MInOut to = new MInOut (from.getCtx(), 0, null);
 		to.set_TrxName(trxName);
@@ -189,6 +196,8 @@ public class MInOut extends X_M_InOut implements DocAction
 		//
 		to.setDocStatus (DOCSTATUS_Drafted);		//	Draft
 		to.setDocAction(DOCACTION_Complete);
+		//
+		to.setReversal(isReversal);
 		//
 		to.setC_DocType_ID (C_DocType_ID);
 		to.setIsSOTrx(isSOTrx);
@@ -2177,13 +2186,12 @@ public class MInOut extends X_M_InOut implements DocAction
 
 		//	Deep Copy
 		MInOut reversal = copyFrom (this, getMovementDate(), getDateAcct(),
-			getC_DocType_ID(), isSOTrx(), false, get_TrxName(), true);
+			getC_DocType_ID(), isSOTrx(), false, get_TrxName(), true, true);
 		if (reversal == null)
 		{
 			m_processMsg = "Could not create Ship Reversal";
 			return false;
 		}
-		reversal.setReversal(true);
 
 		//	Reverse Line Qty
 		MInOutLine[] sLines = getLines(false);

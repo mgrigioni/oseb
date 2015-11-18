@@ -122,7 +122,7 @@ public class ProcAvgCostCreate extends SvrProcess
 						"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 					"FROM " +
 						"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, pp.ProductionQty AS ProductionQty, " +
-							"SUM((ABS(pl.MovementQty)/pp.ProductionQty) * c.CurrentCostPrice) AS Custo FROM M_Production pr " +
+							"SUM((ABS(pl.MovementQty)/ABS(pp.ProductionQty)) * c.CurrentCostPrice) AS Custo FROM M_Production pr " +
 							"INNER JOIN M_ProductionPlan pp ON pr.M_Production_ID=pp.M_Production_ID " +
 							"INNER JOIN M_ProductionLine pl ON (pl.M_ProductionPlan_ID=pp.M_ProductionPlan_ID AND pl.M_Product_ID <> pp.M_Product_ID) " +
 							"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +
@@ -196,8 +196,8 @@ public class ProcAvgCostCreate extends SvrProcess
 					sql = "SELECT PlanCost.M_Product_ID,  PlanCost.LBR_AverageCostLine_ID, " +
 								"SUM(Custo*ProductionQty) AS Custo, SUM(ProductionQty) AS Qtd " +
 							"FROM " +
-								"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, avgl.LBR_AverageCostLine_ID, ABS(pp.ProductionQty) AS ProductionQty, " +
-									"SUM(((pl.MovementQty*-1)/pp.ProductionQty) * (CASE WHEN new_avg_cost.FutureCostPrice IS NOT NULL OR new_avg_cost.FutureCostPrice > 0 THEN new_avg_cost.FutureCostPrice ELSE c.CurrentCostPrice END)) AS Custo FROM M_Production pr " +
+								"(SELECT pp.M_ProductionPlan_ID, pp.M_Product_ID, avgl.LBR_AverageCostLine_ID, pp.ProductionQty AS ProductionQty, " +
+							    "SUM((ABS(pl.MovementQty)/ABS(pp.ProductionQty)) * (CASE WHEN new_avg_cost.FutureCostPrice IS NOT NULL OR new_avg_cost.FutureCostPrice > 0 THEN new_avg_cost.FutureCostPrice ELSE c.CurrentCostPrice END)) AS Custo FROM M_Production pr " +
 									"INNER JOIN M_ProductionPlan pp ON pr.M_Production_ID=pp.M_Production_ID " +
 									"INNER JOIN M_ProductionLine pl ON (pl.M_ProductionPlan_ID=pp.M_ProductionPlan_ID AND pl.M_Product_ID <> pp.M_Product_ID) " +
 									"INNER JOIN M_Cost c ON (c.M_Product_ID=pl.M_Product_ID AND c.M_CostElement_ID=?) " +

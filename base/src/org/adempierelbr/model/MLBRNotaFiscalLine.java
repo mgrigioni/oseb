@@ -96,7 +96,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 		setInvoiceLine(iLine);
 	}
 	
-	private MLBRNotaFiscal getParent(){
+	public MLBRNotaFiscal getParent(){
 		if (m_parent == null)
 			m_parent = new MLBRNotaFiscal(getCtx(),getLBR_NotaFiscal_ID(),get_TrxName());
 		
