@@ -412,7 +412,15 @@ public class Doc_InOut extends Doc
 					//ELTEK - tentar pegar o preço da fatura antes
 					if (C_InvoiceLine_ID > 0){
 						MInvoiceLine invoiceLine = new MInvoiceLine(getCtx(), C_InvoiceLine_ID, getTrxName());
-						costs = invoiceLine.getPriceActual();
+						MLBRCFOP cfop = new MLBRCFOP(getCtx(),invoiceLine.get_ValueAsInt("LBR_CFOP_ID"), getTrxName());
+						BigDecimal taxes = Env.ZERO;
+						
+						if (cfop.getValue().endsWith("116") || cfop.getValue().endsWith("117")){
+							taxes = (BigDecimal)invoiceLine.get_Value("lbr_PriceEnteredBR");
+							taxes = taxes.multiply(new BigDecimal("0.0925")); //RETIRAR PIS E COFINS DO ESTOQUE
+						}
+						
+						costs = invoiceLine.getPriceActual().subtract(taxes);
 						costs = costs.multiply(line.getQty());
 					}		
 					// Low - check if c_orderline_id is valid

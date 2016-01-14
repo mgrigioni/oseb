@@ -782,6 +782,8 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 				CST_PIS = "01";
 				if (getTaxRate("PIS").compareTo(TaxBR.PISRATE) != 0)
 					CST_PIS = "02";
+				if (cfop.isDevolution())
+					CST_PIS = "49";
 			}
 		}
 				
@@ -817,6 +819,8 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 				CST_COFINS = "01";
 				if (getTaxRate("COFINS").compareTo(TaxBR.COFINSRATE) != 0)
 					CST_COFINS = "02";
+				if (cfop.isDevolution())
+					CST_COFINS = "49";
 			}
 		}
 				

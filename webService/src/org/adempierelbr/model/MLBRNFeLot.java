@@ -236,11 +236,11 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 			String nfeConsultaDadosMsg 	= NFeUtil.geraMsgConsultaLote(oiW.getlbr_NFeEnv(),getlbr_NFeRecID());
 
 			//	Validação envio
-			String validation = ValidaXML.validaConsReciNFe(nfeConsultaDadosMsg);
-			if (!validation.isEmpty()){
-				m_processMsg = validation;
-				return false;
-			}
+			//String validation = ValidaXML.validaConsReciNFe(nfeConsultaDadosMsg);
+			//if (!validation.isEmpty()){
+			//	m_processMsg = validation;
+			//	return false;
+			//}
 			
 			nfeConsultaDadosMsg   = "<nfeDadosMsg>" + nfeConsultaDadosMsg + "</nfeDadosMsg>";
 			XMLStreamReader dadosXML = XMLInputFactory.newInstance()
@@ -254,11 +254,11 @@ public class MLBRNFeLot extends X_LBR_NFeLot implements DocAction
 
 			String respConsulta = stub.nfeRetAutorizacaoLote(dadosMsg, cabecMsgE).getExtraElement().toString();
 			//	Validação recebimento
-			validation = ValidaXML.validaRetConsReciNFe(respConsulta);
-			if (!validation.isEmpty()){
-				m_processMsg = validation;
-				return false;
-			}
+			//validation = ValidaXML.validaRetConsReciNFe(respConsulta);
+			//if (!validation.isEmpty()){
+			//	m_processMsg = validation;
+			//	return false;
+			//}
 
 			XStream xstream = new XStream (new DomDriver(TextUtil.UTF8));
 			xstream.processAnnotations(new Class[]{InfProt.class,ProtNFe.class,RetConsReciNFe.class});

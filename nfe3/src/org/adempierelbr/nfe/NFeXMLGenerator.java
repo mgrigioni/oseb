@@ -375,6 +375,9 @@ public class NFeXMLGenerator
 
 				else if(lt.getTaxIndicator().toUpperCase().equals("IPI")) {
 					String CST = nfLine.getlbr_TaxStatusIPI();
+					String cEnqIPI = nfLine.get_ValueAsString("lbr_cEnqIPI");
+					if (cEnqIPI == null || cEnqIPI.trim().isEmpty())
+						cEnqIPI = "999"; 	//	Deixar 999 padrão
 					//
 					if (CST == null || CST.equals(""))
 						;
@@ -384,14 +387,14 @@ public class NFeXMLGenerator
 						ipigrupo.setvIPI(TextUtil.bigdecimalToString(lt.getvImposto()));
 						ipigrupo.setvBC(TextUtil.bigdecimalToString(lt.getvBC()));
 						ipigrupo.setpIPI(TextUtil.bigdecimalToString(lt.getpImposto()));
-						ipinfe.setcEnq("999");	//	Deixar 999 até a RBF criar a regra.
+						ipinfe.setcEnq(cEnqIPI);
 						ipinfe.setIPI(ipigrupo);
 						impostos.setIPI(ipinfe);
 					}
 					else
 					{
 						ipigrupo.setCST(CST);
-						ipinfe.setcEnq("999");
+						ipinfe.setcEnq(cEnqIPI);
 						ipinfe.setIPINT(ipigrupo);
 						impostos.setIPI(ipinfe);
 					}

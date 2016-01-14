@@ -779,7 +779,7 @@ public class EFDUtil{
 		String SER         = nf.getSerieNo();
 		String SUB         = ""; //TODO ???
 		String NUM_DOC     = nf.getDocumentNo(true);
-		String CHV_CTE     = (IND_EMIT.equals("0")) ? nf.getlbr_NFeID() : "";
+		String CHV_CTE     = (IND_OPER.equals("0")) ? nf.getlbr_NFeID() : "";
 		Timestamp DT_DOC   = nf.getDateDoc();
 		Timestamp DT_A_P   = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		String TP_CT_e     = ""; //TODO (só para saída)

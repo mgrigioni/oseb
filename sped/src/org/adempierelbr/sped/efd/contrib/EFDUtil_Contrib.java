@@ -405,7 +405,7 @@ public class EFDUtil_Contrib
 		BigDecimal VL_PIS_RET = nf.getTaxAmt("PISRT").abs();
 		BigDecimal VL_COFINS_RET = nf.getTaxAmt("COFINSRT").abs();
 		BigDecimal VL_ISS = nf.getTaxAmt("ISS").abs();
-	
+		
 		return new RA100(IND_OPER,IND_EMIT,COD_PART,COD_SIT,SER,SUB,NUM_DOC,
 				CHV_NFSE,DT_DOC,DT_EXE_SERV,VL_DOC,IND_PAG,VL_DESC,VL_BC_PIS,
 				VL_PIS,VL_BC_COFINS,VL_COFINS,VL_PIS_RET,VL_COFINS_RET,VL_ISS);
@@ -487,6 +487,11 @@ public class EFDUtil_Contrib
 		BigDecimal VL_COFINS = nf.getTaxAmt("COFINS", false);
 		BigDecimal VL_PIS_ST = Env.ZERO; //TODO ???
 		BigDecimal VL_COFINS_ST = Env.ZERO; //TODO ???
+		
+		if (nf.isSOTrx() && nf.getLBR_CFOP().isDevolution()){
+			VL_PIS = Env.ZERO;
+			VL_COFINS = Env.ZERO;
+		}	
 	
 		return new RC100(IND_OPER,IND_EMIT,COD_PART,COD_MOD,COD_SIT,SER,NUM_DOC,CHV_NFE,
 				DT_DOC,DT_E_S,VL_DOC,IND_PAG,VL_DESC,VL_ABAT_NT,VL_MERC,IND_FRT,VL_FRT,
@@ -556,17 +561,17 @@ public class EFDUtil_Contrib
 		BigDecimal ALIQ_IPI  = nfLine.getIPIRate();
 		BigDecimal VL_IPI    = nfLine.getIPIAmt();
 		String CST_PIS = nfLine.getCST_PIS();
-		BigDecimal VL_BC_PIS = nfLine.getTaxBaseAmt("PIS");
-		BigDecimal ALIQ_PIS = nfLine.getTaxRate("PIS");
+		BigDecimal VL_BC_PIS = CST_PIS.equals("49") ? Env.ZERO : nfLine.getTaxBaseAmt("PIS");
+		BigDecimal ALIQ_PIS = CST_PIS.equals("49") ? Env.ZERO : nfLine.getTaxRate("PIS");
 		BigDecimal QUANT_BC_PIS = null; //TODO ???
 		BigDecimal V_ALIQ_PIS = null; //TODO
-		BigDecimal VL_PIS = nfLine.getTaxAmt("PIS");
+		BigDecimal VL_PIS = CST_PIS.equals("49") ? Env.ZERO : nfLine.getTaxAmt("PIS");
 		String CST_COFINS = nfLine.getCST_COFINS();
-		BigDecimal VL_BC_COFINS = nfLine.getTaxBaseAmt("COFINS");
-		BigDecimal ALIQ_COFINS = nfLine.getTaxRate("COFINS");
+		BigDecimal VL_BC_COFINS = CST_COFINS.equals("49") ? Env.ZERO : nfLine.getTaxBaseAmt("COFINS");
+		BigDecimal ALIQ_COFINS = CST_COFINS.equals("49") ? Env.ZERO : nfLine.getTaxRate("COFINS");
 		BigDecimal QUANT_BC_COFINS = null; //TODO ???
 		BigDecimal V_ALIQ_COFINS = null; //TODO
-		BigDecimal VL_COFINS = nfLine.getTaxAmt("COFINS");
+		BigDecimal VL_COFINS = CST_COFINS.equals("49") ? Env.ZERO : nfLine.getTaxAmt("COFINS");
 		String COD_CTA = ""; //TODO ???
 		
 		BigDecimal VL_OPR = nfLine.getTotalOperationAmt();
@@ -651,7 +656,7 @@ public class EFDUtil_Contrib
 		String SER         = nf.getSerieNo();
 		String SUB         = ""; //TODO ???
 		String NUM_DOC     = nf.getDocumentNo(true);
-		String CHV_CTE     = (IND_EMIT.equals("0")) ? nf.getlbr_NFeID() : "";
+		String CHV_CTE     = (IND_OPER.equals("0")) ? nf.getlbr_NFeID() : "";
 		Timestamp DT_DOC   = nf.getDateDoc();
 		Timestamp DT_A_P   = nf.getlbr_DateInOut() == null ? nf.getDateDoc() : nf.getlbr_DateInOut();
 		String TP_CT_e     = ""; //TODO (só para saída)

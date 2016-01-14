@@ -293,12 +293,21 @@ public class RA100 extends RegSped implements Comparable<Object>{
 			RA100 e1 = (RA100) o1;
 			RA100 e2 = (RA100) o2;
 			//
-			if (e1.DT_EXE_SERV == null)						//	Depois
+			Timestamp dtE1 = e1.DT_EXE_SERV;
+			Timestamp dtE2 = e1.DT_EXE_SERV;
+			
+			//NF Cancelada e Inutilizada fica para o final
+			if (dtE1 == null && dtE2 == null){
+				dtE1 = TextUtil.stringToTime("31/12/9999", "dd/MM/yyyy");
+				dtE2 = TextUtil.stringToTime("31/12/9999", "dd/MM/yyyy");
+			}
+			
+			if (dtE1 == null)						//	Depois
 				return 1;
-			else if (e2.DT_EXE_SERV == null)					// 	Antes
+			else if (dtE2 == null)					// 	Antes
 				return -1;
 			
-			int compare = e1.DT_EXE_SERV.compareTo(e2.DT_EXE_SERV);
+			int compare = dtE1.compareTo(dtE2);
 			
 			if (compare == 0)
 				return e1.NUM_DOC.compareTo(e2.NUM_DOC);	//	Comparar

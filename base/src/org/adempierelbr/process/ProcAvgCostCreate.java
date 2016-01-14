@@ -94,28 +94,36 @@ public class ProcAvgCostCreate extends SvrProcess
 		String sql = "";
 		
 		if(costType.equals(PUCHASED)){
-			sql = "SELECT DISTINCT p.M_Product_ID, QtyOnDate(p.M_Product_ID, ?), " +
-						 "COALESCE(c.CurrentCostPrice,0) as CurrentCostPrice, " +
-						 "SUM(il.PriceEntered*il.QtyEntered), SUM(il.QtyEntered) " +
-					"FROM C_Invoice i " +
-						 "INNER JOIN C_InvoiceLine il ON i.C_Invoice_ID = il.C_Invoice_ID " +
-						 "INNER JOIN C_DocType dt ON dt.C_DocType_ID=i.C_DocTypeTarget_ID " +
-						 "INNER JOIN M_Product p ON p.M_Product_ID = il.M_Product_ID " +
-						 "LEFT JOIN M_Cost c ON (c.M_Product_ID = il.M_Product_ID AND " +
-						 "c.M_CostElement_ID = ?) " +
-					"WHERE i.DocStatus IN ('CL', 'CO') " +
-						 "AND p.ProductType = 'I' " +
-						 "AND i.AD_Client_ID = ? " +
-						 //"AND i.IsSotrx = 'N' " +
-						 "AND p.IsPurchased = 'Y' " +
-						 "AND PriceEntered > 0 " +
-						 "AND QtyEntered > 0 " +
-						 "AND dt.DocBaseType = 'API' " +
-						 "AND ((dt.lbr_HasOpenItems = 'Y' AND il.LBR_CFOP_ID NOT IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.922')) " +
-						    " OR (dt.lbr_HasOpenItems = 'N' AND il.LBR_CFOP_ID IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.116' OR Value LIKE '%.117'))) " +
-						 "AND TRUNC(i.DateAcct) BETWEEN ? AND ? " +
-					" GROUP BY p.M_Product_ID, c.CurrentCostPrice " +
-					"ORDER BY CurrentCostPrice DESC";
+			sql = "SELECT DISTINCT aux.M_Product_ID, QtyOnDate(aux.M_Product_ID, ?), "
+					+ "aux.CurrentCostPrice, SUM(aux.TotalCost), SUM(aux.QtyEntered) "
+					+ "FROM( "
+					+ "SELECT p.M_Product_ID, COALESCE(c.CurrentCostPrice,0) as CurrentCostPrice, "
+					+ "CASE WHEN ( il.LBR_CFOP_ID IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.116' OR Value LIKE '%.117') ) "
+					+ "THEN "
+					+ "(SUM((il.PriceEntered-(il.lbr_PriceEnteredBR*0.0925))*il.QtyEntered)) "
+					+ "ELSE "
+					+ "SUM(il.PriceEntered*il.QtyEntered) "
+					+ "END AS TotalCost, "
+					+ "SUM(il.QtyEntered) as QtyEntered "
+					+ "FROM C_Invoice i "
+					+ "INNER JOIN C_InvoiceLine il ON i.C_Invoice_ID = il.C_Invoice_ID "
+					+ "INNER JOIN C_DocType dt ON dt.C_DocType_ID=i.C_DocTypeTarget_ID "
+					+ "INNER JOIN M_Product p ON p.M_Product_ID = il.M_Product_ID "
+					+ "LEFT JOIN M_Cost c ON (c.M_Product_ID = il.M_Product_ID AND "
+					+ "c.M_CostElement_ID = ?) "
+					+ "WHERE i.DocStatus IN ('CL', 'CO') "
+					+ "AND p.ProductType = 'I' "
+					+ "AND i.AD_Client_ID = ? "
+					+ "AND p.IsPurchased = 'Y' "
+					+ "AND PriceEntered > 0 "
+					+ "AND QtyEntered > 0 "
+					+ "AND dt.DocBaseType = 'API' "
+					+ "AND ((dt.lbr_HasOpenItems = 'Y' AND il.LBR_CFOP_ID NOT IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.922')) "
+					+ "OR (dt.lbr_HasOpenItems = 'N' AND il.LBR_CFOP_ID IN (SELECT LBR_CFOP_ID FROM LBR_CFOP WHERE Value LIKE '%.116' OR Value LIKE '%.117'))) "
+					+ "AND TRUNC(i.DateAcct) BETWEEN ? AND ? "
+					+ "GROUP BY p.M_Product_ID, c.CurrentCostPrice, il.LBR_CFOP_ID "
+					+ "ORDER BY CurrentCostPrice DESC) aux "
+					+ "GROUP BY aux.M_Product_ID, aux.CurrentCostPrice";
 		}
 		else if(costType.equals(MANUFACTURED)){
 			sql = "SELECT PlanCost.M_Product_ID, QtyOnDate(PlanCost.M_Product_ID, ?), c.CurrentCostPrice, " +
@@ -284,22 +292,24 @@ public class ProcAvgCostCreate extends SvrProcess
 	private Map<Integer,BigDecimal> getNfComplementar(MPeriod period){
 		
 		String sql =
-				"SELECT M_Product_ID, SUM(ComplAmt) FROM ( " + 
-						" SELECT nfComplementar.*, (TotalLines * perct) as ComplAmt FROM ( " + 
-						" SELECT M_Product_ID, LineTotalAmt, " + 
-						" (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID) as GrandTotal, " + 
-						" ROUND(LineTotalAmt / (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID),4) as perct, " + 
-						" compl.LBR_RefNotaFiscal_ID, compl.TotalLines " + 
-						" FROM LBR_NotaFiscalLine nfl " + 
-						" INNER JOIN " + 
-						" (SELECT ref.LBR_RefNotaFiscal_ID, complementar.TotalLines " + 
-						" FROM LBR_NotaFiscal complementar " + 
-						" INNER JOIN LBR_RefNotaFiscal ref ON (complementar.LBR_NotaFiscal_ID = ref.LBR_NotaFiscal_ID) " + 
-						" WHERE complementar.lbr_FinNFe='2' " + 
-						" and TRUNC(NVL(complementar.lbr_dateinout,complementar.datedoc)) BETWEEN ? and ?) compl " + 
-						" ON (nfl.LBR_NotaFiscal_ID = compl.LBR_RefNotaFiscal_ID)) nfComplementar) " + 
-						" GROUP BY M_Product_ID";
-		
+				
+				"SELECT M_Product_ID, SUM(ComplAmt) FROM ( " +
+						"SELECT nfComplementar.*, (TotalLines * perct) as ComplAmt FROM ( " +
+						"SELECT M_Product_ID, LineTotalAmt, " +
+						"(SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID) as GrandTotal, " +
+						"ROUND(LineTotalAmt / (SELECT TotalLines FROM LBR_NotaFiscal WHERE nfl.LBR_NotaFiscal_ID = LBR_NotaFiscal.LBR_NotaFiscal_ID),4) as perct, " +
+						"compl.LBR_RefNotaFiscal_ID, compl.TotalLines " +
+						"FROM LBR_NotaFiscalLine nfl " +
+						"INNER JOIN " +
+						"(SELECT ref.LBR_NotaFiscal_ID as LBR_RefNotaFiscal_ID, complementar.LineNetAmt as TotalLines " +
+						"FROM C_InvoiceLine complementar " +
+						"INNER JOIN C_Invoice i ON (complementar.C_Invoice_ID = i.C_Invoice_ID) " +
+						"INNER JOIN LBR_NotaFiscal ref ON (complementar.LBR_NotaFiscal_ID = ref.LBR_NotaFiscal_ID) " + 
+						"WHERE i.DocStatus='CO' AND complementar.C_Charge_ID = 3000114 " +
+						"AND i.dateacct BETWEEN ? and ?) compl " +
+						"ON (nfl.LBR_NotaFiscal_ID = compl.LBR_RefNotaFiscal_ID)) nfComplementar) " +
+						"GROUP BY M_Product_ID";
+				
 		Map<Integer, BigDecimal> nfs = new HashMap<Integer,BigDecimal>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
