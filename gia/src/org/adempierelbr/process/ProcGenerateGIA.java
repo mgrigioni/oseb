@@ -10,6 +10,7 @@ import org.adempierelbr.gia.beans.CR01;
 import org.adempierelbr.gia.beans.CR10;
 import org.adempierelbr.gia.beans.CR14;
 import org.adempierelbr.gia.beans.CR20;
+import org.adempierelbr.gia.beans.CR31;
 import org.adempierelbr.gia.util.GIAUtil;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TextUtil;
@@ -33,6 +34,7 @@ public class ProcGenerateGIA extends SvrProcess
 
 	private CR10[] _CR10; //CFOPS
 	private CR20[] _CR20; //OCORRENCIAS
+	private CR31[] _CR31; //RE
 
 	private Map<String,CR14[]> _CR14 = new HashMap<String,CR14[]>(); //DETALHES POR ESTADO
 
@@ -102,6 +104,7 @@ public class ProcGenerateGIA extends SvrProcess
 
 		_CR10 = GIAUtil.createCR10();
 		_CR20 = GIAUtil.createCR20();
+		_CR31 = GIAUtil.createCR31();
 
 		result.append(new CR01());
 		result.append(GIAUtil.createCR05());
@@ -138,7 +141,13 @@ public class ProcGenerateGIA extends SvrProcess
 				result.append(ocorrencia);
 			}
 		}
-
+		
+		if (_CR31 != null){
+			for(CR31 re : _CR31){
+				result.append(re);
+			}
+		}
+		
 		return result;
 	}	//	runGIA
 

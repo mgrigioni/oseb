@@ -264,7 +264,7 @@ public class RC170 extends RegSped implements Comparable<Object> {
                    (PIPE).append(REG) 
             .append(PIPE).append(TextUtil.lPad(NUM_ITEM, 3))
             .append(PIPE).append(COD_ITEM)
-            .append(PIPE).append(TextUtil.checkSize(RemoverAcentos.remover(DESCR_COMPL).replaceAll("|", ""), 255).trim())
+            .append(PIPE).append(TextUtil.checkSize((RemoverAcentos.remover(DESCR_COMPL)).replace('|', ' '), 255).trim())
             .append(PIPE).append(TextUtil.toNumeric(QTD, 5))
             .append(PIPE).append(UNID)
             .append(PIPE).append(TextUtil.toNumeric(VL_ITEM, 2))

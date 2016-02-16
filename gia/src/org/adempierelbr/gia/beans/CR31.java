@@ -11,17 +11,21 @@ import org.adempierelbr.util.TextUtil;
  */
 public class CR31 extends RegGIA{
 
+	private String RE = "";
+	
 	/**
 	 * Constructor //TODO
 	 */
-	public CR31() {
+	public CR31(String RE) {
 		super();
+		this.RE = RE;
 	} // CR31
 	
 	public String toString(){
 		
 		String format = 
-			CR;
+			CR 
+			+ TextUtil.lPad(TextUtil.toNumeric(RE), 15);
 		
 		return TextUtil.removeEOL(format) + EOL;
 	}

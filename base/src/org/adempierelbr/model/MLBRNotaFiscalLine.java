@@ -768,7 +768,7 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 	 */
 	public String getCST_PIS(){
 
-		String CST_PIS = getlbr_TaxStatusCOFINS();
+		String CST_PIS = getlbr_TaxStatusPIS();
 		
 		MLBRCFOP cfop = new MLBRCFOP(getCtx(),getLBR_CFOP_ID(),get_TrxName());
 		

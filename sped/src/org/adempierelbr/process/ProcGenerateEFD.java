@@ -76,6 +76,8 @@ import org.adempierelbr.sped.efd.beans.RH001;
 import org.adempierelbr.sped.efd.beans.RH005;
 import org.adempierelbr.sped.efd.beans.RH010;
 import org.adempierelbr.sped.efd.beans.RH990;
+import org.adempierelbr.sped.efd.beans.RK001;
+import org.adempierelbr.sped.efd.beans.RK990;
 import org.adempierelbr.util.AdempiereLBR;
 import org.adempierelbr.util.TextUtil;
 import org.compiere.model.MAsset;
@@ -112,6 +114,7 @@ public class ProcGenerateEFD extends SvrProcess
 	private boolean hasD = false;
 	private boolean hasG = false;
 	private boolean hasH = false;
+	private boolean hasK = false;
 	
 	private RH005 rh005 = null; //TOTAIS DO INVENTÁRIO
 	
@@ -303,12 +306,13 @@ public class ProcGenerateEFD extends SvrProcess
 		StringBuilder BLOCOE = montaBLOCOE(dateFrom,dateTo); //Apuração do ICMS e do IPI
 		StringBuilder BLOCOG = montaBLOCOG(dateFrom,dateTo); //Controle do Crédito de ICMS do Ativo Permanente – CIAP
 		StringBuilder BLOCOH = montaBLOCOH(dateFrom); //Inventário Físico
+		StringBuilder BLOCOK = montaBLOCOK(dateFrom); //CONTROLE DA PRODUÇÃO E DO ESTOQUE
 		StringBuilder BLOCO1 = montaBLOCO1(); //Outras Informações
 		StringBuilder BLOCO9 = montaBLOCO9(); //Controle e Encerramento do Arquivo Digital
 		
 		//Monta string final
 		StringBuilder result = BLOCO0.append(BLOCOC).append(BLOCOD).append(BLOCOE)
-		               .append(BLOCOG).append(BLOCOH).append(BLOCO1).append(BLOCO9);
+		               .append(BLOCOG).append(BLOCOH).append(BLOCOK).append(BLOCO1).append(BLOCO9);
 		
 		return result;
 	}	//	runEFD
@@ -1032,6 +1036,21 @@ public class ProcGenerateEFD extends SvrProcess
 		
 		return BLOCOH;
 	} //montaBLOCOH
+	
+	private StringBuilder montaBLOCOK(Timestamp dateFrom){
+		
+		StringBuilder BLOCOK = new StringBuilder("");
+	
+		//MONTA BLOCO K
+		BLOCOK.append(new RK001(hasK));
+		if (hasK){
+			//TODO
+		}
+		BLOCOK.append(new RK990());
+		//FIM BLOCO K
+		
+		return BLOCOK;
+	} //montaBLOCOK
 	
 	private StringBuilder montaBLOCO1(){
 		

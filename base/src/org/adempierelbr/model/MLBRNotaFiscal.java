@@ -1833,10 +1833,17 @@ public class MLBRNotaFiscal extends X_LBR_NotaFiscal implements DocAction, DocOp
 		else
 			serieNo = "";
 		
+		if (getlbr_NFeID() != null && getlbr_NFeID().length() == 44)
+			serieNo = getlbr_NFeID().substring(22, 25);
+		
 		if (serieNo.isEmpty() && islbr_IsOwnDocument()){
 			MDocType dt = new MDocType(getCtx(),getC_DocTypeTarget_ID(),get_TrxName());
 			serieNo = dt.get_ValueAsString(I_W_C_DocType.COLUMNNAME_lbr_NFSerie);
 		}
+		
+		if (!serieNo.isEmpty())
+			return String.valueOf(Integer.parseInt(serieNo));
+		
 		return serieNo;
 	}
 	

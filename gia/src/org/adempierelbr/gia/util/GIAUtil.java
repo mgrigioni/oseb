@@ -12,6 +12,8 @@ import org.adempierelbr.gia.beans.CR05;
 import org.adempierelbr.gia.beans.CR10;
 import org.adempierelbr.gia.beans.CR14;
 import org.adempierelbr.gia.beans.CR20;
+import org.adempierelbr.gia.beans.CR31;
+import org.adempierelbr.model.MLBRDE;
 import org.adempierelbr.model.X_LBR_ApuracaoICMSLine;
 import org.adempierelbr.model.X_LBR_ICMSBasis;
 import org.adempierelbr.wrapper.I_W_AD_OrgInfo;
@@ -95,6 +97,22 @@ public class GIAUtil{
 		
 		return list.toArray(new CR10[list.size()]);
 	} //createCR10
+	
+	public static CR31[] createCR31(){
+		
+		ArrayList<CR31> list = new ArrayList<CR31>();
+		
+		MLBRDE[] des = MLBRDE.get(period.getStartDate(), period.getEndDate(), get_TrxName());
+		for (MLBRDE de : des){
+			if (de.getlbr_RE() == null || de.getlbr_RE().isEmpty())
+				continue;
+			
+			list.add(new CR31(de.getlbr_RE()));
+		}
+		
+		return list.toArray(new CR31[list.size()]);
+	} //createCR31
+	
 	
 	public static CR14[] createCR14(String CFOP){
 		
