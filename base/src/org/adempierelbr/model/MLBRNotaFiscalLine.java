@@ -131,8 +131,12 @@ public class MLBRNotaFiscalLine extends X_LBR_NotaFiscalLine {
 			throw new IllegalArgumentException("Parent not set");
 			
 		//não cria linha para observação da fatura
-		if (iLine.isDescription()) 
+		if (iLine.isDescription()){ 
+			if (iLine.getM_Product_ID() != 0)
+				getParent().setDescription(getParent().getDescription() + "\n" + iLine.getM_Product().getValue());
+			
 			return;
+		}
 		
 		//produto padrão da Empresa não cria linha, atribui ao parent
 		if (setClientProduct(iLine.getM_Product_ID(),iLine.getLineNetAmt()))

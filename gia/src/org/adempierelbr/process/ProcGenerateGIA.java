@@ -143,6 +143,7 @@ public class ProcGenerateGIA extends SvrProcess
 		}
 		
 		if (_CR31 != null){
+			Arrays.sort(_CR31);
 			for(CR31 re : _CR31){
 				result.append(re);
 			}

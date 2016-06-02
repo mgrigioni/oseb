@@ -136,7 +136,7 @@ public class IdentDest {
 		if (iE == null)
 			throw new AdempiereException("IE inválido");
 		else{
-			if ((iE.trim()).isEmpty() || getCPF() != null){
+			if ((iE.trim()).isEmpty() /*|| getCPF() != null*/){
 				setIndIEDest("9"); //9=Não Contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes do ICMS.
 				return;
 			}

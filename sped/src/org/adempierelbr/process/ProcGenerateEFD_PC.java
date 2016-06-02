@@ -182,9 +182,14 @@ public class ProcGenerateEFD_PC extends SvrProcess
 			log.info("Processado: " + String.format("%,.5f",(((double)aux/(double)count)*100)) + "%");
 			aux++;
 			
-			//APENAS NFs com PIS e COFINS
-			if (!nf.isCancelled() && nf.getPISAmt().signum() == 0 && nf.getCOFINSAmt().signum() == 0)
+			if (nf.isCancelled())
 				continue;
+			
+			//APENAS NFs com PIS e COFINS
+			if (nf.getPISAmt().signum() == 0 && nf.getCOFINSAmt().signum() == 0){
+				if (!nf.isRevenue())
+					continue;
+			}
 			
 			String COD_MOD  = nf.getlbr_NFModel().isEmpty() ? "01" : nf.getlbr_NFModel();
 			String IND_EMIT = nf.islbr_IsOwnDocument() ? "0" : "1"; //0 = Própria, 1 = Terceiros

@@ -54,6 +54,7 @@ public class R0000 extends RegSped {
 	private String IND_GRANDE_PORTE = "1";
 	private String TIP_ECD = "0";
 	private String COD_SCP;
+	private String IDENT_MF = "N";
 
 	/**
 	 * Constructor
@@ -109,6 +110,7 @@ public class R0000 extends RegSped {
 			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(IND_GRANDE_PORTE), 1))
 			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(TIP_ECD), 1))
 			.append(PIPE).append(TextUtil.checkSize(TextUtil.toNumeric(COD_SCP), 14))
+			.append(PIPE).append(TextUtil.checkSize(IDENT_MF, 1))
 		    .append(PIPE);
 
 		return (TextUtil.removeEOL(format).append(EOL)).toString();

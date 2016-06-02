@@ -69,7 +69,7 @@ public class IdentNFe {
 	private String xJust;
 	
 	@XStreamImplicit
-	private List<NFReferenciada> NFref;
+	private List<NFeReferenciada> NFref;
 	
 	/**
 	 * Default Constructor
@@ -100,20 +100,30 @@ public class IdentNFe {
 		
 		List<X_LBR_RefNotaFiscal> refNFs = nf.getRefNotaFiscal();
 		if (refNFs.size() > 0){
-			List<NFReferenciada> refList = new ArrayList<NFReferenciada>();
+			List<NFeReferenciada> refListNFe = new ArrayList<NFeReferenciada>();
 			for(X_LBR_RefNotaFiscal refNF : refNFs){
-				refList.add(new NFReferenciada(new MLBRNotaFiscal(nf.getCtx(),refNF.getLBR_RefNotaFiscal_ID(),null).getlbr_NFeID()));
+				MLBRNotaFiscal nfRef = new MLBRNotaFiscal(nf.getCtx(),refNF.getLBR_RefNotaFiscal_ID(),null);
+				if (nfRef.getlbr_NFeID() != null)
+					refListNFe.add(new NFeReferenciada(nfRef.getlbr_NFeID()));
+				else{
+					refListNFe.add(new NFeReferenciada(new NFReferenciada(BPartnerUtil.getRegionCode(nfRef.getC_BPartner_Location().getC_Location().getC_Region_ID()),
+							nfRef.getDateDoc(),nfRef.getlbr_BPCNPJ(),
+							nfRef.getSerieNo(),nfRef.getDocumentNo(true))));
+				}
 			}
 			
-			setNFref(refList);
+			
+			
+			if (refListNFe.size() > 0)
+				setNFref(refListNFe);
 		}
 		
 	} //IdentNFe
 	
-	public List<NFReferenciada> getNFref() {
+	public List<NFeReferenciada> getNFref() {
 		return NFref;
 	}
-	private void setNFref(List<NFReferenciada> fref) {
+	private void setNFref(List<NFeReferenciada> fref) {
 		NFref = fref;
 	}
 	
